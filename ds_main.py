@@ -16,15 +16,14 @@ always applied:
 Other optional vertex selection criteria are:
 
     (3) Multi-depth level criterion I -  vertices that are BELOW a certain
-        threshold across depth levels can be excluded. For example, a mask that
-        contains some inclusion criterion (e.g. z-score conjunction across
-        conditions) that is defined at all depth levels can be used. If the
-        vertex values are below a threshold at all depth levels, the vertex is
-        excluded.
+        threshold at any depth levels can be excluded. For example, a venogram,
+        (or a T2* weighted EPI image with low intensities around veins) that is
+        defined at all depth levels can be used. If the vertex values are below
+        a threshold at any depth level, the vertex is excluded.
     (4) Multi-depth level criterion II - vertices that are ABOVE a certain
-        threshold across depth levels can be excluded. An exclusion mask that
-        is defined at all depth levels can be used. If the vertex value is
-        above a threshold at any depth level, the vertex is excluded.
+        threshold across depth levels can be excluded. For instance, a mask
+        that is defined at all depth levels can be used. If the vertex value
+        is above a threshold at any depth level, the vertex is excluded.
 
     (5) Multi-level data distribution criterion I
         Selection based on combination of z-conjunction-mask mask and
@@ -82,58 +81,6 @@ lstSubIds = ['20150930',
              '20161214',
              '20161219_01']
 
-# Path of csv files with ROI definition (i.e. patch of cortex selected on the
-# surface, e.g. V1) - i.e. the first vertex selection criterion:
-lstCsvRoi = ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/lh/v1.csv',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151118/cbs_distcor/lh/v1.csv',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151127_01/cbs_distcor/lh/v1.csv',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_01/cbs_distcor/lh/v1.csv',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_02/cbs_distcor/lh/v1.csv',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161205/cbs_distcor/lh/v1.csv',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161207/cbs_distcor/lh/v1.csv',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_01/cbs_distcor/lh/v1.csv',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_02/cbs_distcor/lh/v1.csv',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161214/cbs_distcor/lh/v1.csv',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/v1.csv']  #noqa
-
-# Use second selection criterion (e.g. retinotopic information)?
-lgcSlct02 = True
-# Path of vtk files with 2nd vertex selection criterion (e.g. retinotopic
-# information, such as vertices' pRF overlap with visual stimulus). This vtk
-# file is supposed to contain one set of data values (e.g. retinotopic
-# information at mid-grey-matter).
-lstVtkSlct02 = ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/lh/20150930_mp2rage_seg_v24_lh__surf_05_inf_R2.vtk',  #noqa
-                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151118/cbs_distcor/lh/20151118_mp2rage_seg_v14_lh__surf_05_inf_R2.vtk',  #noqa
-                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151127_01/cbs_distcor/lh/20151127_01_mp2rage_seg_v15_lh__surf_05_inf_R2.vtk',  #noqa
-                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_01/cbs_distcor/lh/20151130_01_mp2rage_seg_v16_lh__surf_05_inf_R2.vtk',  #noqa
-                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_02/cbs_distcor/lh/20151130_02_mp2rage_seg_v19_lh__surf_05_inf_R2.vtk',  #noqa
-                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161205/cbs_distcor/lh/20161205_mp2rage_seg_v20_lh__surf_05_inf_R2.vtk',  #noqa
-                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161207/cbs_distcor/lh/20161207_mp2rage_seg_v32_lh__surf_05_inf_R2.vtk',  #noqa
-                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_01/cbs_distcor/lh/20161212_01_mp2rage_seg_v32_lh__surf_05_inf_R2.vtk',  #noqa
-                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_02/cbs_distcor/lh/20161212_02_mp2rage_seg_v28_lh__surf_05_inf_R2.vtk',  #noqa
-                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161214/cbs_distcor/lh/20161214_mp2rage_seg_v31_lh__surf_05_inf_R2.vtk',  #noqa
-                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v18_lh__surf_05_inf_R2.vtk']  #noqa
-# Threshold for vertex selection for 2nd selection criterion (e.g. minimum pRF
-# overlap):
-varThrSlct02 = 0.3
-
-# Use third selection criterion (e.g. z-conjunction-mask)?
-lgcSlct03 = False
-# Path of vtk files with 3rd vertex selection criterion (e.g. z-conjunction
-# mask). This vtk file is supposed to contain one set of data values for each
-# depth level (e.g. value of z-conjunction mask at each depth level).
-lstVtkSlct03 = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']  #noqa
-# Threshold for vertex selection for second selection criterion:
-varThrSlct03 = 0.5
-
-# Use exclusion vtk mask?
-lgcMskExcl = False
-# Path of exclusion mask:
-lstVtkExcl = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']  #noqa
-# Exclusion mask threshold (if ABOVE this threshold at any depth level, vertex
-# is excluded from depth sampling):
-varThrExcl = 0.5
-
 # List of first set of vtk files with depth-sampled data (list of lists), e.g.
 # parameter estimates:
 lstVtkDpth01 = [
@@ -183,6 +130,63 @@ lstVtkDpth01 = [
                  '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v18_lh__surf_05_inf_pe_stim_lvl_04.vtk'],  #noqa
                 ]
 
+# (1)
+# Path of csv files with ROI definition (i.e. patch of cortex selected on the
+# surface, e.g. V1) - i.e. the first vertex selection criterion:
+lstCsvRoi = ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/lh/v1.csv',  #noqa
+             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151118/cbs_distcor/lh/v1.csv',  #noqa
+             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151127_01/cbs_distcor/lh/v1.csv',  #noqa
+             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_01/cbs_distcor/lh/v1.csv',  #noqa
+             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_02/cbs_distcor/lh/v1.csv',  #noqa
+             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161205/cbs_distcor/lh/v1.csv',  #noqa
+             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161207/cbs_distcor/lh/v1.csv',  #noqa
+             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_01/cbs_distcor/lh/v1.csv',  #noqa
+             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_02/cbs_distcor/lh/v1.csv',  #noqa
+             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161214/cbs_distcor/lh/v1.csv',  #noqa
+             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/v1.csv']  #noqa
+
+# (2)
+# Use second selection criterion (e.g. retinotopic information)?
+lgcSlct02 = True
+# Path of vtk files with 2nd vertex selection criterion (e.g. retinotopic
+# information, such as vertices' pRF overlap with visual stimulus). This vtk
+# file is supposed to contain one set of data values (e.g. retinotopic
+# information at mid-grey-matter).
+lstVtkSlct02 = ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/lh/20150930_mp2rage_seg_v24_lh__surf_05_inf_R2.vtk',  #noqa
+                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151118/cbs_distcor/lh/20151118_mp2rage_seg_v14_lh__surf_05_inf_R2.vtk',  #noqa
+                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151127_01/cbs_distcor/lh/20151127_01_mp2rage_seg_v15_lh__surf_05_inf_R2.vtk',  #noqa
+                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_01/cbs_distcor/lh/20151130_01_mp2rage_seg_v16_lh__surf_05_inf_R2.vtk',  #noqa
+                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_02/cbs_distcor/lh/20151130_02_mp2rage_seg_v19_lh__surf_05_inf_R2.vtk',  #noqa
+                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161205/cbs_distcor/lh/20161205_mp2rage_seg_v20_lh__surf_05_inf_R2.vtk',  #noqa
+                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161207/cbs_distcor/lh/20161207_mp2rage_seg_v32_lh__surf_05_inf_R2.vtk',  #noqa
+                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_01/cbs_distcor/lh/20161212_01_mp2rage_seg_v32_lh__surf_05_inf_R2.vtk',  #noqa
+                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_02/cbs_distcor/lh/20161212_02_mp2rage_seg_v28_lh__surf_05_inf_R2.vtk',  #noqa
+                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161214/cbs_distcor/lh/20161214_mp2rage_seg_v31_lh__surf_05_inf_R2.vtk',  #noqa
+                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v18_lh__surf_05_inf_R2.vtk']  #noqa
+# Threshold for vertex selection for 2nd selection criterion (e.g. minimum pRF
+# overlap):
+varThrSlct02 = 0.3
+
+# (3)
+# Use third selection criterion (e.g. z-conjunction-mask)?
+lgcSlct03 = False
+# Path of vtk files with 3rd vertex selection criterion (e.g. z-conjunction
+# mask). This vtk file is supposed to contain one set of data values for each
+# depth level (e.g. value of z-conjunction mask at each depth level).
+lstVtkSlct03 = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']  #noqa
+# Threshold for vertex selection for second selection criterion:
+varThrSlct03 = 0.5
+
+# (4)
+# Use exclusion vtk mask?
+lgcMskExcl = False
+# Path of exclusion mask:
+lstVtkExcl = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']  #noqa
+# Exclusion mask threshold (if ABOVE this threshold at any depth level, vertex
+# is excluded from depth sampling):
+varThrExcl = 0.5
+
+# (5)
 # Load second set of vtk data files (z-values) and use them for vertex
 # selection?
 lgcVtk02 = True
@@ -237,6 +241,7 @@ lstVtkDpth02 = [
                  '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v18_lh__surf_05_inf_zstat_lvl_04.vtk'],  #noqa
                 ]
 
+# (6)
 # Use PE range?
 lgcPeRng = False
 # Lower bound of PE range (vertices with a maximum PE across depths that

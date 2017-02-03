@@ -26,7 +26,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 
 
-def funcPltErt(aryRoiErtMeanDpth,
+def funcPltErt(aryRoiErtMeanDpth,  #noqa
                aryError,
                varNumDpth,
                varNumCon,

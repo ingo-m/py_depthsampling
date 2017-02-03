@@ -22,9 +22,9 @@ Other optional vertex selection criteria are:
         vertex values are below a threshold at all depth levels, the vertex is
         excluded.
     (4) Multi-depth level criterion II - vertices that are ABOVE a certain
-        threshold across depth levels can be excluded. For instance, a vein
-        mask that is defined at all depth levels can be used. If the vertex
-        value is above a threshold at any depth level, the vertex is excluded.
+        threshold across depth levels can be excluded. An exclusion mask that
+        is defined at all depth levels can be used. If the vertex value is
+        above a threshold at any depth level, the vertex is excluded.
 
     (5) Multi-level data distribution criterion I
         Selection based on combination of z-conjunction-mask mask and
@@ -126,13 +126,13 @@ lstVtkSlct03 = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']  #noqa
 # Threshold for vertex selection for second selection criterion:
 varThrSlct03 = 0.5
 
-# Use vein exclusion vtk mask?
-lgcMskVein = False
-# Path of vein mask:
-lstVtkVein = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']  #noqa
-# Vein mask threshold (if ABOVE this threshold at any depth level, vertex
+# Use exclusion vtk mask?
+lgcMskExcl = False
+# Path of exclusion mask:
+lstVtkExcl = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']  #noqa
+# Exclusion mask threshold (if ABOVE this threshold at any depth level, vertex
 # is excluded from depth sampling):
-varThrVein = 0.5
+varThrExcl = 0.5
 
 # List of first set of vtk files with depth-sampled data (list of lists), e.g.
 # parameter estimates:
@@ -372,9 +372,9 @@ for idxPrc in range(0, varNumSubs):
                          lgcSlct03,             # Criterion 3 - Yes or no?
                          lstVtkSlct03[idxPrc],  # Criterion 3 - VTK path
                          varThrSlct03,          # Criterion 3 - Threshold
-                         lgcMskVein,            # Criterion 4 - Yes or no?
-                         lstVtkVein[idxPrc],    # Criterion 4 - VTK path
-                         varThrVein,            # Criterion 4 - Threshold
+                         lgcMskExcl,            # Criterion 4 - Yes or no?
+                         lstVtkExcl[idxPrc],    # Criterion 4 - VTK path
+                         varThrExcl,            # Criterion 4 - Threshold
                          lgcVtk02,              # Criterion 5 - Yes or no?
                          lstVtkDpth02[idxPrc],  # Criterion 5 - VTK path
                          lstNumVrtx[idxPrc],    # Criterion 5 - Num vrtx

@@ -109,9 +109,9 @@ aryTmp03 = np.add(np.add(aryLin, 2.0),
 aryTmp04 = np.add(np.add(aryLin, 3.0),
                   np.multiply(arySin, 4.0))
 aryDemoMix01 = np.vstack((aryTmp01,
-                        aryTmp02,
-                        aryTmp03,
-                        aryTmp04))
+                          aryTmp02,
+                          aryTmp03,
+                          aryTmp04))
 # aryDemoMix01 = aryDemoMix01.T
 
 # Linear is multiplicative, sinusoidal is additive:
@@ -124,9 +124,9 @@ aryTmp03 = np.add(np.multiply(aryLin, 3.0),
 aryTmp04 = np.add(np.multiply(aryLin, 4.0),
                   np.add(arySin, 3.0))
 aryDemoMix02 = np.vstack((aryTmp01,
-                        aryTmp02,
-                        aryTmp03,
-                        aryTmp04))
+                          aryTmp02,
+                          aryTmp03,
+                          aryTmp04))
 # aryDemoMix02 = aryDemoMix01.T
 
 # Scale all profiles, so that they range from 0.5 to 3.5 (just for
@@ -138,12 +138,12 @@ aryDemoAdd = np.divide(aryDemoAdd,
                        np.multiply(np.max(aryDemoAdd),
                                    0.34))
 aryDemoMix01 = np.divide(aryDemoMix01,
-                       np.multiply(np.max(aryDemoMix01),
-                                   0.34))
+                         np.multiply(np.max(aryDemoMix01),
+                                     0.34))
 
 aryDemoMix02 = np.divide(aryDemoMix02,
-                       np.multiply(np.max(aryDemoMix02),
-                                   0.34))
+                         np.multiply(np.max(aryDemoMix02),
+                                     0.34))
 
 aryDemoMul = np.add(aryDemoMul, 0.5)
 aryDemoAdd = np.add(aryDemoAdd, 0.5)

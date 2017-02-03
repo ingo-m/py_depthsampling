@@ -160,7 +160,7 @@ axs01.set_title(('V1 normalised to stimulus level 1, n=' + str(varNumSubs)),
                 fontsize=10)
 
 # Legend for axis 1:
-#axs01.legend(loc=0,
+# axs01.legend(loc=0,
 #             prop={'size': 13})
 
 # # Add vertical grid lines:

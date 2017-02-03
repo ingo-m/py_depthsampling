@@ -45,9 +45,9 @@ def funcAcrSubGetSubsData(idxPrc,        # Process ID  #noqa
                           lgcSlct03,     # Criterion 3 - Yes or no?
                           strVtkSlct03,  # Criterion 3 - VTK path
                           varThrSlct03,  # Criterion 3 - Threshold
-                          lgcMskVein,    # Criterion 4 - Yes or no?
-                          strVtkVein,    # Criterion 4 - VTK path
-                          varThrVein,    # Criterion 4 - Threshold
+                          lgcMskExcl,    # Criterion 4 - Yes or no?
+                          strVtkExcl,    # Criterion 4 - VTK path
+                          varThrExcl,    # Criterion 4 - Threshold
                           lgcVtk02,      # Criterion 5 - Yes or no?
                           lstVtkDpth02,  # Criterion 5 - VTK path
                           varNumVrtx,    # Criterion 5 - Num vrtx to include
@@ -108,17 +108,17 @@ def funcAcrSubGetSubsData(idxPrc,        # Process ID  #noqa
     else:
         arySlct03 = 0
 
-    # Import vein exclusion vtk file (fourth criterion)
-    if lgcMskVein:
+    # Import exclusion mask vtk file (fourth criterion)
+    if lgcMskExcl:
         if idxPrc == 0:
-            print('---------Importing vein exclusion vtk file.')
-        aryVein = funcLoadVtkMulti(strVtkVein,
+            print('---------Importing exclusion mask vtk file.')
+        aryExcl = funcLoadVtkMulti(strVtkExcl,
                                    strPrcdData,
                                    varNumLne,
                                    varNumDpth)
     # Otherwise, create dummy array (for function I/O):
     else:
-        aryVein = 0
+        aryExcl = 0
 
     # Import first set of data vtk files
     if idxPrc == 0:
@@ -174,9 +174,9 @@ def funcAcrSubGetSubsData(idxPrc,        # Process ID  #noqa
                       lgcSlct03,      # Criterion 3 - Yes or no?
                       arySlct03,      # Criterion 3 - Data
                       varThrSlct03,   # Criterion 3 - Threshold
-                      lgcMskVein,     # Criterion 4 - Yes or no? (vein mask)
-                      aryVein,        # Criterion 4 - Data (vein mask)
-                      varThrVein,     # Criterion 4 - Threshold (vein mask)
+                      lgcMskExcl,     # Criterion 4 - Yes or no? (excl. mask)
+                      aryExcl,        # Criterion 4 - Data (excl. mask)
+                      varThrExcl,     # Criterion 4 - Threshold (excl. mask)
                       lgcVtk02,       # Criterion 5 - Yes or no?
                       lstDpthData02,  # Criterion 5 - Depth-sampled data II
                       varNumVrtx,     # Criterion 5 - Num vrtx to include

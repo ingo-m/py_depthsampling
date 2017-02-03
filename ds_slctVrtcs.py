@@ -32,9 +32,9 @@ def funcSlctVrtcs(varNumCon,      # Number of conditions  #noqa
                   lgcSlct03,      # Criterion 3 - Yes or no?
                   arySlct03,      # Criterion 3 - Data
                   varThrSlct03,   # Criterion 3 - Threshold
-                  lgcMskVein,     # Criterion 4 - Yes or no? (vein mask)
-                  aryVein,        # Criterion 4 - Data (vein mask)
-                  varThrVein,     # Criterion 4 - Threshold (vein mask)
+                  lgcMskExcl,     # Criterion 4 - Yes or no? (excl. mask)
+                  aryExcl,        # Criterion 4 - Data (excl. mask)
+                  varThrExcl,     # Criterion 4 - Threshold (excl. mask)
                   lgcVtk02,       # Criterion 5 - Yes or no?
                   lstDpthData02,  # Criterion 5 - VTK path
                   varNumVrtx,     # Criterion 5 - Num vrtx to include
@@ -43,39 +43,7 @@ def funcSlctVrtcs(varNumCon,      # Number of conditions  #noqa
                   varPeRngUp,     # Criterion 6 - Upper bound
                   idxPrc,         # Process ID (to manage status messages)
                   ):
-    """
-    Function for selecting vertices.
-
-    Two vertex selection criteria are always applied:
-
-    (1) The vertex has to be contained within the ROI (as defined by by a csv
-        file).
-    (2) The vertex has to surpass some intensity criterion (e.g. retinotopic
-        overlap above a certain level).
-
-    Other optional vertex selection criteria are:
-
-    (3) Multi-depth level criterion I -  vertices that are BELOW a certain
-        threshold across depth levels can be excluded. For example, a mask that
-        contains some inclusion criterion (e.g. z-score conjunction across
-        conditions) that is defined at all depth levels can be used. If the
-        vertex values are below a threshold at all depth levels, the vertex is
-        excluded.
-    (4) Multi-depth level criterion II - vertices that are ABOVE a certain
-        threshold across depth levels can be excluded. For instance, a vein
-        mask that is defined at all depth levels can be used. If the vertex
-        value is above a threshold at any depth level, the vertex is excluded.
-
-    (5) Multi-level data distribution criterion I
-        Selection based on combination of z-conjunction-mask mask and
-        distribution of z-values.
-    (6) Multi-level data distribution criterion II
-        Calculates maximum data value across depth levels, and excludes
-        vertices whose across-depth-maximum-value is at the lower and/or upper
-        end of the distribution across vertices (as specified by the user).
-        (The distribution across those vertices that have survived all previous
-        exclusion criteria is used here.)
-    """
+    """Function for selecting vertices. See ds_main.py for more information."""
     # **************************************************************************
     # *** (1) Select vertices contained within the ROI
 
@@ -151,20 +119,20 @@ def funcSlctVrtcs(varNumCon,      # Number of conditions  #noqa
 
     # **************************************************************************
     # *** (3) Multi-depth level criterion I
-    #         vertices BELOW threshold at all depth levels are excluded.
-    #         (E.g. z-conjunction-mask.)
+    #         Vertices that are BELOW a certain threshold at any depth level
+    #         are excluded.
 
     if lgcSlct03:
 
         if idxPrc == 0:
             print('---------Select vertices based on multi-depth level ' +
-                  'criterion I (e.g. z-conjunction-mask)')
+                  'criterion I')
 
-        # Get maximum value across cortical depths:
-        vecMaxSlct03 = np.max(arySlct03, axis=1)
+        # Get minimum value across cortical depths:
+        vecMinSlct03 = np.min(arySlct03, axis=1)
 
         # Check whether vertex values are above the exclusion threshold:
-        vecSlct03 = np.greater(vecMaxSlct03, varThrSlct03)
+        vecSlct03 = np.greater(vecMinSlct03, varThrSlct03)
 
         # Extract values for ROI:
         vecSlct03 = vecSlct03[vecRoiIdx]
@@ -180,48 +148,48 @@ def funcSlctVrtcs(varNumCon,      # Number of conditions  #noqa
     # **************************************************************************
     # *** (4) Multi-depth level criterion II
     #         vertices ABOVE threshold at any depth level are excluded.
-    #         (E.g. vein mask.)
+    #         (E.g. exclusion mask.)
 
-    if lgcMskVein:
+    if lgcMskExcl:
 
         if idxPrc == 0:
             print('---------Select vertices based on multi-depth level ' +
-                  'criterion II (e.g. vein mask)')
+                  'criterion II (e.g. exclusion mask)')
 
-        # Get maximum vein mask value across cortical depths:
-        vecMaxVein = np.max(aryVein, axis=1)
+        # Get maximum exclusion mask value across cortical depths:
+        vecMaxExcl = np.max(aryExcl, axis=1)
 
         # Check whether vertex values are above the exclusion threshold:
-        vecVeinExcl = np.greater(vecMaxVein, varThrVein)
+        vecExclMsk = np.greater(vecMaxExcl, varThrExcl)
 
         # Extract values for ROI:
-        vecVeinExcl = vecVeinExcl[vecRoiIdx]
+        vecExclMsk = vecExclMsk[vecRoiIdx]
 
         # Number of currently included vertices:
         varTmp = np.sum(vecInc)
 
-        # Number of vertices to exclude because of veins (among those that
-        # survived the previous selection criterion):
-        varNumVeinExcl = np.sum(vecVeinExcl[vecInc])
+        # Number of vertices to exclude (among those that survived the previous
+        # selection criterion):
+        varNumExclMsk = np.sum(vecExclMsk[vecInc])
 
         # Ratio of vertices to exclude:
-        varRatioVeinExcl = np.multiply(np.divide(float(varNumVeinExcl),
-                                                 float(varTmp)),
-                                       100.0)
-        varRatioVeinExcl = np.round(varRatioVeinExcl, 0)
+        varRatioExclMsk = np.multiply(np.divide(float(varNumExclMsk),
+                                                float(varTmp)),
+                                      100.0)
+        varRatioExclMsk = np.round(varRatioExclMsk, 0)
 
         if idxPrc == 0:
-            print(('------------Will exclude ' + str(varNumVeinExcl)
+            print(('------------Will exclude ' + str(varNumExclMsk)
                    + ' vertices out of ' + str(varTmp) + ', i.e. '
-                   + str(varRatioVeinExcl) + '%, because of veins'))
+                   + str(varRatioExclMsk) + '%, based on exclusion mask'))
 
-        # Take the inverse of the vein exclusion mask (i.e. instead of telling
-        # us whether to exclude a vertex if its value is 'true', it then
-        # informs whether to include a vertex if its value is 'true'):
-        vecVeinExcl = np.logical_not(vecVeinExcl)
+        # Take the inverse of the exclusion mask (i.e. instead of telling us
+        # whether to exclude a vertex if its value is 'true', it then informs
+        # whether to include a vertex if its value is 'true'):
+        vecExclMsk = np.logical_not(vecExclMsk)
 
-        # Apply vein mask to inclusion-vector:
-        vecInc = np.logical_and(vecInc, vecVeinExcl)
+        # Apply mask to inclusion-vector:
+        vecInc = np.logical_and(vecInc, vecExclMsk)
 
         # Update number of included vertices:
         varNumInc = np.sum(vecInc)

@@ -9,7 +9,7 @@ cortical depth levels.
 
 The input to this script are custom-made 'mesh time courses'. Timecourses have
 to be cut into event-related segments and averaged across trials (using the
-'cutSgmntsSmple.py' function of the py_hrf_finding tool). Depth-sampling has to
+'ds_cutSgmnts.py' script of the depth-sampling library). Depth-sampling has to
 be performed with CBS tools, resulting in a 3D mesh for each time point. Here,
 3D meshes (with values for all depth-levels at one point in time, for one
 condition) are combined across time and conditions to be plotted and analysed.

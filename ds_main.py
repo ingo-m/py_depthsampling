@@ -124,10 +124,10 @@ lstVtkDpth01 = [
                  '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161214/cbs_distcor/lh/20161214_mp2rage_seg_v31_lh__surf_05_inf_pe_stim_lvl_02.vtk',  #noqa
                  '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161214/cbs_distcor/lh/20161214_mp2rage_seg_v31_lh__surf_05_inf_pe_stim_lvl_03.vtk',  #noqa
                  '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161214/cbs_distcor/lh/20161214_mp2rage_seg_v31_lh__surf_05_inf_pe_stim_lvl_04.vtk'],  #noqa
-                ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v18_lh__surf_05_inf_pe_stim_lvl_01.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v18_lh__surf_05_inf_pe_stim_lvl_02.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v18_lh__surf_05_inf_pe_stim_lvl_03.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v18_lh__surf_05_inf_pe_stim_lvl_04.vtk'],  #noqa
+                ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v19_lh__surf_05_inf_pe_stim_lvl_01.vtk',  #noqa
+                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v19_lh__surf_05_inf_pe_stim_lvl_02.vtk',  #noqa
+                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v19_lh__surf_05_inf_pe_stim_lvl_03.vtk',  #noqa
+                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v19_lh__surf_05_inf_pe_stim_lvl_04.vtk'],  #noqa
                 ]
 
 # (1)
@@ -162,10 +162,10 @@ lstVtkSlct02 = ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/l
                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_01/cbs_distcor/lh/20161212_01_mp2rage_seg_v32_lh__surf_05_inf_R2.vtk',  #noqa
                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_02/cbs_distcor/lh/20161212_02_mp2rage_seg_v28_lh__surf_05_inf_R2.vtk',  #noqa
                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161214/cbs_distcor/lh/20161214_mp2rage_seg_v31_lh__surf_05_inf_R2.vtk',  #noqa
-                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v18_lh__surf_05_inf_R2.vtk']  #noqa
+                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v19_lh__surf_05_inf_R2.vtk']  #noqa
 # Threshold for vertex selection for 2nd selection criterion (e.g. minimum pRF
 # overlap):
-varThrSlct02 = 0.3
+varThrSlct02 = 0.2
 
 # (3)
 # Use third selection criterion (e.g. z-conjunction-mask)?
@@ -235,10 +235,10 @@ lstVtkDpth02 = [
                  '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161214/cbs_distcor/lh/20161214_mp2rage_seg_v31_lh__surf_05_inf_zstat_lvl_02.vtk',  #noqa
                  '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161214/cbs_distcor/lh/20161214_mp2rage_seg_v31_lh__surf_05_inf_zstat_lvl_03.vtk',  #noqa
                  '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161214/cbs_distcor/lh/20161214_mp2rage_seg_v31_lh__surf_05_inf_zstat_lvl_04.vtk'],  #noqa
-                ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v18_lh__surf_05_inf_zstat_lvl_01.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v18_lh__surf_05_inf_zstat_lvl_02.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v18_lh__surf_05_inf_zstat_lvl_03.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v18_lh__surf_05_inf_zstat_lvl_04.vtk'],  #noqa
+                ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v19_lh__surf_05_inf_zstat_lvl_01.vtk',  #noqa
+                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v19_lh__surf_05_inf_zstat_lvl_02.vtk',  #noqa
+                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v19_lh__surf_05_inf_zstat_lvl_03.vtk',  #noqa
+                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v19_lh__surf_05_inf_zstat_lvl_04.vtk'],  #noqa
                 ]
 
 # (6)

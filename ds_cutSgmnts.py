@@ -56,7 +56,6 @@ def fncLoadNii(strPathIn):
 # be included):
 dicSubId = {'20150930': ['01', '02', '03', '04', '05', '06'],
             '20151118': ['01', '03', '04', '05', '06'],
-            '20151123_01': ['01', '02', '03', '04', '05', '06'],
             '20151127_01': ['01', '02', '03', '04', '05', '06'],
             '20151130_01': ['01', '03', '04', '05', '06'],
             '20151130_02': ['01', '02', '03', '04', '05', '06'],
@@ -70,16 +69,16 @@ dicSubId = {'20150930': ['01', '02', '03', '04', '05', '06'],
             }
 
 # Parent directory:
-strPathParent = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/nii_distcor/feat_level_1/'  #noqa
+strPthPrnt = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/nii_distcor/feat_level_1/'  #noqa
 
 # Path of 4D nii files (location within parent directory):
-strIn01 = 'func_{}.feat/filtered_func_data.nii.gz'
+strInNii = 'func_{}.feat/filtered_func_data.nii.gz'
 
 # Directory containing design matrices (EV files):
-strPathEV = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/FSL_MRI_Metadata/version_01/run_{}_txt_eventmatrix.txt'  #noqa
+strPthEV = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/FSL_MRI_Metadata/version_01/run_{}_txt_eventmatrix.txt'  #noqa
 
 # Output directory:
-strPathOut = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/nii_distcor/func_regAcrssRuns_cube_averages/'  #noqa
+strPthOt = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/nii_distcor/func_regAcrssRuns_cube_averages/'  #noqa
 
 # Volume TR of input nii files:
 varTR = 2.940
@@ -119,22 +118,22 @@ lgcSegs = False
 # %% Loop through subjects:
     
 for strSubId in dicSubId.keys():
- 
+
     # %% Preparations
     
     print('-Processing subject: ' + strSubId)
 
     # Input & output directories, formatted for this subject:
-    strPathParentTmp = strPathParent.format(strSubId)
-    strPathOutTmp = strPathOut.format(strSubId)
+    strPthPrntTmp = strPthPrnt.format(strSubId)
+    strPthOtTmp = strPthOt.format(strSubId)
 
     # Number of input 4D nii files:
     varNumRuns = len(dicSubId[strSubId])
 
     # Load first nii file in order to get image dimensions (headers, and
     # therefore image dimensions, are assummed to be identical across runs):
-    _, hdr01, aryAff01 = fncLoadNii((strPathParent
-                                     + strIn01.format(dicSubId[strSubId][0])))
+    _, hdr01, aryAff01 = fncLoadNii((strPthPrnt.format(strSubId)
+                                     + strInNii.format(dicSubId[strSubId][0])))
     
     # Image dimensions:
     aryDim = np.copy(hdr01['dim'])
@@ -143,7 +142,7 @@ for strSubId in dicSubId.keys():
     # create it:
     if lgcSegs:
         # Target directory for segments:
-        strPathSegs = (strPathOutTmp + 'segs')
+        strPathSegs = (strPthOtTmp + 'segs')
         # Check whether target directory for segments exists:
         lgcDir = os.path.isdir(strPathSegs)
         # If directory does exist, delete it:
@@ -158,9 +157,6 @@ for strSubId in dicSubId.keys():
     
     # %% Load design matrices (EV files)
 
-strIn01Tmp = 'func_{}.feat/filtered_func_data.nii.gz'
-strPathEVTmp = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/FSL_MRI_Metadata/version_01/run_{}_txt_eventmatrix.txt'  #noqa
-    
     print('---Load design matrices (EV files)')
     
     # Empty list that will be filled with EV data:
@@ -169,7 +165,7 @@ strPathEVTmp = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/FSL_MRI_Metadata/versio
     for idxRun in range(0, varNumRuns):
         # print('---Loading: ' + lstIn02[idxRun])
         # Read text file:
-        aryTmp = np.loadtxt((strPathEV + lstIn02[idxRun]),
+        aryTmp = np.loadtxt(strPthEV.format(dicSubId[strSubId][idxRun]),
                             comments='#',
                             delimiter=' ',
                             skiprows=0,
@@ -178,17 +174,17 @@ strPathEVTmp = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/FSL_MRI_Metadata/versio
         # Append current csv object to list:
         lstEV.append(aryTmp)
     
-    
     # %% Create event-related segments
-    
+
     print('---Create event-related segments')
-    
-    # Duration of the first stimulus block (all stimulus blocks are assumed to be
-    # of the same duration) [seconds]:
+
+    # Duration of the first stimulus block (all stimulus blocks are assumed to
+    # be of the same duration) [seconds]:
     varDurStim = lstEV[0][lstEV[0][:, 0] == 3, 1:][0, 1]
-    
-    # Calculate length of segments to be created during the averaging (pre-stimulus
-    # interval + stimulus interval + post-stimulus interval):
+
+    # Calculate length of segments to be created during the averaging (pre-
+    # stimulus  interval + stimulus interval + post-stimulus interval), in
+    # number of volumes:
     varSegDur = int(np.around((float(varVolsPre) +
                                (varDurStim / float(varTR)) +
                                float(varVolsPst)
@@ -210,21 +206,23 @@ strPathEVTmp = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/FSL_MRI_Metadata/versio
     
     # Loop through runs:
     for idxRun in np.arange(varNumRuns):
-    
-        print('------Processing run: ' + strIn01[idxRun])
+
+        strInNiiTmp = strInNii.format(dicSubId[strSubId][idxRun])
+        
+        print('------Processing run: ' + strInNiiTmp)
     
         # Load nii data
     
         # Load input 4D nii files:
-        aryTmpRun, _, _ = fncLoadNii((strPathParentTmp + strIn01[idxRun]))
+        aryTmpRun, _, _ = fncLoadNii((strPthPrntTmp + strInNiiTmp))
     
         # Loop through stimulus levels (conditions):
         for idxCon in np.arange(varNumStimLvls):
     
             print('---------Processing stim level: ' + str((idxCon + 1)))
     
-            # Retrieve start times & duration of the current condition (add 3 here
-            # because relevant stim levels are coded as 3,4,5,6):
+            # Retrieve start times & duration of the current condition (add 3
+            # here because relevant stim levels are coded as 3,4,5,6):
             aryFsl = lstEV[idxRun][lstEV[idxRun][:, 0] == idxCon + 3, 1:]
     
             # Loop through blocks:
@@ -238,8 +236,8 @@ strPathEVTmp = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/FSL_MRI_Metadata/versio
                 # Add post-condition interval to stop time:
                 varTmpEnd = varTmpEnd + varVolsPst
     
-                # We need to remove rounding error from the start and stop indices,
-                # and convert them to integers:
+                # We need to remove rounding error from the start and stop
+                # indices, and convert them to integers:
                 varTmpStr = int(np.around(varTmpStr, 0))
                 varTmpEnd = int(np.around(varTmpEnd, 0))
                 # print('---------------varTmpStr:' + str(varTmpStr))
@@ -292,8 +290,8 @@ strPathEVTmp = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/FSL_MRI_Metadata/versio
         aryBseMne = np.mean(aryBse, axis=6)
         # Get indicies of voxels that have a non-zero prestimulus baseline:
         aryNonZero = np.not_equal(aryBseMne, 0.0)
-        # Divide all voxels that are non-zero in the pre-stimulus baseline by the
-        # prestimulus baseline:
+        # Divide all voxels that are non-zero in the pre-stimulus baseline by
+        # the prestimulus baseline:
         aryTrials[aryNonZero] = np.divide(aryTrials[aryNonZero],
                                           aryBseMne[aryNonZero, None])
     
@@ -311,7 +309,7 @@ strPathEVTmp = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/FSL_MRI_Metadata/versio
                             (tplShpe[4] * tplShpe[5]),
                             tplShpe[6]))
     
-    # Average over runs & dimensions (create event-related average):
+    # Average over run- & block-dimension (create event-related average):
     aryEvntRltAvrg = np.mean(aryTrials, axis=4)
     
     # %% Normalisation on event-related averages:
@@ -330,8 +328,8 @@ strPathEVTmp = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/FSL_MRI_Metadata/versio
         aryBseMne = np.mean(aryBse, axis=4)
         # Get indicies of voxels that have a non-zero prestimulus baseline:
         aryNonZero = np.not_equal(aryBseMne, 0.0)
-        # Divide all voxels that are non-zero in the pre-stimulus baseline by the
-        # prestimulus baseline:
+        # Divide all voxels that are non-zero in the pre-stimulus baseline by
+        # the prestimulus baseline:
         aryEvntRltAvrg[aryNonZero] = np.divide(aryEvntRltAvrg[aryNonZero],
                                                aryBseMne[aryNonZero, None])
     
@@ -341,11 +339,11 @@ strPathEVTmp = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/FSL_MRI_Metadata/versio
     
     # Adjust output filename:
     if varDemean == 1:
-        strTmp = (strPathOutTmp + 'era')
+        strTmp = (strPthOtTmp + 'era')
     elif varDemean == 2:
-        strTmp = (strPathOutTmp + 'era_norm_tbt')
+        strTmp = (strPthOtTmp + 'era_norm_tbt')
     elif varDemean == 3:
-        strTmp = (strPathOutTmp + 'era_norm')
+        strTmp = (strPthOtTmp + 'era_norm')
     
     # Save array as npy file:
     np.save(strTmp, aryTrials)
@@ -361,13 +359,13 @@ strPathEVTmp = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/FSL_MRI_Metadata/versio
     
         # Adjust output filename:
         if varDemean == 1:
-            strTmp = (strPathOutTmp + 'er_avrg_stim_lvl_0' +
+            strTmp = (strPthOtTmp + 'er_avrg_stim_lvl_0' +
                       str((idxCon + 1)) + '.nii')
         elif varDemean == 2:
-            strTmp = (strPathOutTmp + 'er_avrg_demeaned_tbt_stim_lvl_0' +
+            strTmp = (strPthOtTmp + 'er_avrg_demeaned_tbt_stim_lvl_0' +
                       str((idxCon + 1)) + '.nii')
         elif varDemean == 3:
-            strTmp = (strPathOutTmp + 'er_avrg_demeaned_stim_lvl_0' +
+            strTmp = (strPthOtTmp + 'er_avrg_demeaned_stim_lvl_0' +
                       str((idxCon + 1)) + '.nii')
     
         # Create nii object for results:

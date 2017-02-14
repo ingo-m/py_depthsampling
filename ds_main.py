@@ -10,20 +10,18 @@ always applied:
 
     (1) The vertex has to be contained within the ROI (as defined by by a csv
         file).
-    (2) The vertex has to surpass some intensity criterion (e.g. retinotopic
-        overlap above a certain level).
+    (2) The vertex has to surpass some intensity criterion defined at one depth
+        level (legacy option).
 
 Other optional vertex selection criteria are:
 
     (3) Multi-depth level criterion I -  vertices that are BELOW a certain
-        threshold at any depth levels can be excluded. For example, a venogram,
+        threshold at any depth levels are excluded. For example, a venogram,
         (or a T2* weighted EPI image with low intensities around veins) that is
-        defined at all depth levels can be used. If the vertex values are below
-        a threshold at any depth level, the vertex is excluded.
+        defined at all depth level can be used.
     (4) Multi-depth level criterion II - vertices that are ABOVE a certain
-        threshold across depth levels can be excluded. For instance, a mask
-        that is defined at all depth levels can be used. If the vertex value
-        is above a threshold at any depth level, the vertex is excluded.
+        threshold at any depth level are excluded. For instance, a binary mask
+        that is defined at all depth levels can be used.
 
     (5) Multi-level data distribution criterion I
         Selection based on combination of z-conjunction-mask mask and
@@ -69,177 +67,61 @@ print('-Visualisation of depth sampling results')
 # *** Define parameters
 
 # List of subject identifiers:
-lstSubIds = ['20150930',
-             '20151118',
-             '20151127_01',
-             '20151130_01',
-             '20151130_02',
-             '20161205',
-             '20161207',
-             '20161212_01',
-             '20161212_02',
-             '20161214',
-             '20161219_01']
+lstSubIds = ['20150930']
 
-# List of first set of vtk files with depth-sampled data (list of lists), e.g.
-# parameter estimates:
-lstVtkDpth01 = [
-                ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/lh/20150930_mp2rage_seg_v24_lh__surf_05_inf_pe_stim_lvl_01.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/lh/20150930_mp2rage_seg_v24_lh__surf_05_inf_pe_stim_lvl_02.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/lh/20150930_mp2rage_seg_v24_lh__surf_05_inf_pe_stim_lvl_03.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/lh/20150930_mp2rage_seg_v24_lh__surf_05_inf_pe_stim_lvl_04.vtk'],  #noqa
-                ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151118/cbs_distcor/lh/20151118_mp2rage_seg_v14_lh__surf_05_inf_pe_stim_lvl_01.vtk',  #noqa
-                  '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151118/cbs_distcor/lh/20151118_mp2rage_seg_v14_lh__surf_05_inf_pe_stim_lvl_02.vtk',  #noqa
-                  '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151118/cbs_distcor/lh/20151118_mp2rage_seg_v14_lh__surf_05_inf_pe_stim_lvl_03.vtk',  #noqa
-                  '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151118/cbs_distcor/lh/20151118_mp2rage_seg_v14_lh__surf_05_inf_pe_stim_lvl_04.vtk'],  #noqa
-                ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151127_01/cbs_distcor/lh/20151127_01_mp2rage_seg_v15_lh__surf_05_inf_pe_stim_lvl_01.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151127_01/cbs_distcor/lh/20151127_01_mp2rage_seg_v15_lh__surf_05_inf_pe_stim_lvl_02.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151127_01/cbs_distcor/lh/20151127_01_mp2rage_seg_v15_lh__surf_05_inf_pe_stim_lvl_03.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151127_01/cbs_distcor/lh/20151127_01_mp2rage_seg_v15_lh__surf_05_inf_pe_stim_lvl_04.vtk'],  #noqa
-                ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_01/cbs_distcor/lh/20151130_01_mp2rage_seg_v16_lh__surf_05_inf_pe_stim_lvl_01.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_01/cbs_distcor/lh/20151130_01_mp2rage_seg_v16_lh__surf_05_inf_pe_stim_lvl_02.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_01/cbs_distcor/lh/20151130_01_mp2rage_seg_v16_lh__surf_05_inf_pe_stim_lvl_03.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_01/cbs_distcor/lh/20151130_01_mp2rage_seg_v16_lh__surf_05_inf_pe_stim_lvl_04.vtk'],  #noqa
-                ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_02/cbs_distcor/lh/20151130_02_mp2rage_seg_v19_lh__surf_05_inf_pe_stim_lvl_01.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_02/cbs_distcor/lh/20151130_02_mp2rage_seg_v19_lh__surf_05_inf_pe_stim_lvl_02.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_02/cbs_distcor/lh/20151130_02_mp2rage_seg_v19_lh__surf_05_inf_pe_stim_lvl_03.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_02/cbs_distcor/lh/20151130_02_mp2rage_seg_v19_lh__surf_05_inf_pe_stim_lvl_04.vtk'],  #noqa
-                ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161205/cbs_distcor/lh/20161205_mp2rage_seg_v20_lh__surf_05_inf_pe_stim_lvl_01.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161205/cbs_distcor/lh/20161205_mp2rage_seg_v20_lh__surf_05_inf_pe_stim_lvl_02.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161205/cbs_distcor/lh/20161205_mp2rage_seg_v20_lh__surf_05_inf_pe_stim_lvl_03.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161205/cbs_distcor/lh/20161205_mp2rage_seg_v20_lh__surf_05_inf_pe_stim_lvl_04.vtk'],  #noqa
-                ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161207/cbs_distcor/lh/20161207_mp2rage_seg_v32_lh__surf_05_inf_pe_stim_lvl_01.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161207/cbs_distcor/lh/20161207_mp2rage_seg_v32_lh__surf_05_inf_pe_stim_lvl_02.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161207/cbs_distcor/lh/20161207_mp2rage_seg_v32_lh__surf_05_inf_pe_stim_lvl_03.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161207/cbs_distcor/lh/20161207_mp2rage_seg_v32_lh__surf_05_inf_pe_stim_lvl_04.vtk'],  #noqa
-                ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_01/cbs_distcor/lh/20161212_01_mp2rage_seg_v32_lh__surf_05_inf_pe_stim_lvl_01.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_01/cbs_distcor/lh/20161212_01_mp2rage_seg_v32_lh__surf_05_inf_pe_stim_lvl_02.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_01/cbs_distcor/lh/20161212_01_mp2rage_seg_v32_lh__surf_05_inf_pe_stim_lvl_03.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_01/cbs_distcor/lh/20161212_01_mp2rage_seg_v32_lh__surf_05_inf_pe_stim_lvl_04.vtk'],  #noqa
-                ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_02/cbs_distcor/lh/20161212_02_mp2rage_seg_v28_lh__surf_05_inf_pe_stim_lvl_01.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_02/cbs_distcor/lh/20161212_02_mp2rage_seg_v28_lh__surf_05_inf_pe_stim_lvl_02.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_02/cbs_distcor/lh/20161212_02_mp2rage_seg_v28_lh__surf_05_inf_pe_stim_lvl_03.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_02/cbs_distcor/lh/20161212_02_mp2rage_seg_v28_lh__surf_05_inf_pe_stim_lvl_04.vtk'],  #noqa
-                ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161214/cbs_distcor/lh/20161214_mp2rage_seg_v31_lh__surf_05_inf_pe_stim_lvl_01.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161214/cbs_distcor/lh/20161214_mp2rage_seg_v31_lh__surf_05_inf_pe_stim_lvl_02.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161214/cbs_distcor/lh/20161214_mp2rage_seg_v31_lh__surf_05_inf_pe_stim_lvl_03.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161214/cbs_distcor/lh/20161214_mp2rage_seg_v31_lh__surf_05_inf_pe_stim_lvl_04.vtk'],  #noqa
-                ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v19_lh__surf_05_inf_pe_stim_lvl_01.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v19_lh__surf_05_inf_pe_stim_lvl_02.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v19_lh__surf_05_inf_pe_stim_lvl_03.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v19_lh__surf_05_inf_pe_stim_lvl_04.vtk'],  #noqa
-                ]
+# Condition levels (used to complete file names):
+lstCon = ['01', '02', '03', '04']
+# Condition labels:
+lstConLbl = ['2.5%', '6.1%', '16.3%', '72.0%']
+
+# Base path of first set of vtk files with depth-sampled data, e.g. parameter
+# estimates (with subject ID and stimulus level left open):
+strVtkDpth01 = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/{}_mp2rage_P2L_surf_05_inf_pe_stim_lvl_{}.vtk'  # noqa
 
 # (1)
-# Path of csv files with ROI definition (i.e. patch of cortex selected on the
-# surface, e.g. V1) - i.e. the first vertex selection criterion:
-lstCsvRoi = ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/lh/v1.csv',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151118/cbs_distcor/lh/v1.csv',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151127_01/cbs_distcor/lh/v1.csv',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_01/cbs_distcor/lh/v1.csv',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_02/cbs_distcor/lh/v1.csv',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161205/cbs_distcor/lh/v1.csv',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161207/cbs_distcor/lh/v1.csv',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_01/cbs_distcor/lh/v1.csv',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_02/cbs_distcor/lh/v1.csv',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161214/cbs_distcor/lh/v1.csv',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/v1.csv']  #noqa
+# Base path of csv files with ROI definition (i.e. patch of cortex selected on
+# the surface, e.g. V1 or V2) - i.e. the first vertex selection criterion (with
+# subject ID left open):
+strCsvRoi = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/v1.csv'  #noqa
 
 # (2)
-# Use second selection criterion (e.g. retinotopic information)?
-lgcSlct02 = True
-# Path of vtk files with 2nd vertex selection criterion (e.g. retinotopic
-# information, such as vertices' pRF overlap with visual stimulus). This vtk
-# file is supposed to contain one set of data values (e.g. retinotopic
-# information at mid-grey-matter).
-lstVtkSlct02 = ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/lh/20150930_mp2rage_seg_v24_lh__surf_05_inf_R2.vtk',  #noqa
-                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151118/cbs_distcor/lh/20151118_mp2rage_seg_v14_lh__surf_05_inf_R2.vtk',  #noqa
-                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151127_01/cbs_distcor/lh/20151127_01_mp2rage_seg_v15_lh__surf_05_inf_R2.vtk',  #noqa
-                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_01/cbs_distcor/lh/20151130_01_mp2rage_seg_v16_lh__surf_05_inf_R2.vtk',  #noqa
-                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_02/cbs_distcor/lh/20151130_02_mp2rage_seg_v19_lh__surf_05_inf_R2.vtk',  #noqa
-                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161205/cbs_distcor/lh/20161205_mp2rage_seg_v20_lh__surf_05_inf_R2.vtk',  #noqa
-                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161207/cbs_distcor/lh/20161207_mp2rage_seg_v32_lh__surf_05_inf_R2.vtk',  #noqa
-                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_01/cbs_distcor/lh/20161212_01_mp2rage_seg_v32_lh__surf_05_inf_R2.vtk',  #noqa
-                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_02/cbs_distcor/lh/20161212_02_mp2rage_seg_v28_lh__surf_05_inf_R2.vtk',  #noqa
-                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161214/cbs_distcor/lh/20161214_mp2rage_seg_v31_lh__surf_05_inf_R2.vtk',  #noqa
-                '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v19_lh__surf_05_inf_R2.vtk']  #noqa
-# Threshold for vertex selection for 2nd selection criterion (e.g. minimum pRF
-# overlap):
+# Use second selection criterion defined at one depth level (legacy function):
+lgcSlct02 = False
+# Base path of vtk files with 2nd vertex selection criterion. This vtk file is
+# supposed to contain one set of data values (e.g. at mid-grey-matter).
+strVtkSlct02 = ' '
+# Threshold for vertex selection for 2nd selection criterion (vertex excluded
+# if data value is below threshold):
 varThrSlct02 = 0.2
 
 # (3)
-# Use third selection criterion (e.g. z-conjunction-mask)?
-lgcSlct03 = False
-# Path of vtk files with 3rd vertex selection criterion (e.g. z-conjunction
-# mask). This vtk file is supposed to contain one set of data values for each
-# depth level (e.g. value of z-conjunction mask at each depth level).
-lstVtkSlct03 = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']  #noqa
+# Use third selection criterion (vertices that are BELOW threshold at any depth
+# level are excluded):
+lgcSlct03 = True
+# Path of vtk files with 3rd vertex selection criterion. This vtk file is
+# supposed to contain one set of data values for each depth level.
+strVtkSlct03 = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/{}_mp2rage_P2L_surf_05_inf_combined_mean.vtk'  #noqa
 # Threshold for vertex selection for second selection criterion:
-varThrSlct03 = 0.5
+varThrSlct03 = 7000.0
 
 # (4)
-# Use exclusion vtk mask?
-lgcMskExcl = False
+# Use exclusion mask:
+lgcMskExcl = True
 # Path of exclusion mask:
-lstVtkExcl = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']  #noqa
+strVtkExcl = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/{}_mp2rage_P2L_surf_05_inf_SD.vtk'  #noqa
 # Exclusion mask threshold (if ABOVE this threshold at any depth level, vertex
 # is excluded from depth sampling):
-varThrExcl = 0.5
+varThrExcl = 5.0
 
 # (5)
 # Load second set of vtk data files (z-values) and use them for vertex
 # selection?
 lgcVtk02 = True
 # How many vertices to select for each subject?
-lstNumVrtx = [1000] * 11
-# List of second set of vtk files with depth-sampled data (list of lists), e.g.
-# z-values:
-lstVtkDpth02 = [
-                ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/lh/20150930_mp2rage_seg_v24_lh__surf_05_inf_zstat_lvl_01.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/lh/20150930_mp2rage_seg_v24_lh__surf_05_inf_zstat_lvl_02.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/lh/20150930_mp2rage_seg_v24_lh__surf_05_inf_zstat_lvl_03.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/lh/20150930_mp2rage_seg_v24_lh__surf_05_inf_zstat_lvl_04.vtk'],  #noqa
-                ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151118/cbs_distcor/lh/20151118_mp2rage_seg_v14_lh__surf_05_inf_zstat_lvl_01.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151118/cbs_distcor/lh/20151118_mp2rage_seg_v14_lh__surf_05_inf_zstat_lvl_02.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151118/cbs_distcor/lh/20151118_mp2rage_seg_v14_lh__surf_05_inf_zstat_lvl_03.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151118/cbs_distcor/lh/20151118_mp2rage_seg_v14_lh__surf_05_inf_zstat_lvl_04.vtk'],  #noqa
-                ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151127_01/cbs_distcor/lh/20151127_01_mp2rage_seg_v15_lh__surf_05_inf_zstat_lvl_01.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151127_01/cbs_distcor/lh/20151127_01_mp2rage_seg_v15_lh__surf_05_inf_zstat_lvl_02.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151127_01/cbs_distcor/lh/20151127_01_mp2rage_seg_v15_lh__surf_05_inf_zstat_lvl_03.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151127_01/cbs_distcor/lh/20151127_01_mp2rage_seg_v15_lh__surf_05_inf_zstat_lvl_04.vtk'],  #noqa
-                ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_01/cbs_distcor/lh/20151130_01_mp2rage_seg_v16_lh__surf_05_inf_zstat_lvl_01.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_01/cbs_distcor/lh/20151130_01_mp2rage_seg_v16_lh__surf_05_inf_zstat_lvl_02.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_01/cbs_distcor/lh/20151130_01_mp2rage_seg_v16_lh__surf_05_inf_zstat_lvl_03.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_01/cbs_distcor/lh/20151130_01_mp2rage_seg_v16_lh__surf_05_inf_zstat_lvl_04.vtk'],  #noqa
-                ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_02/cbs_distcor/lh/20151130_02_mp2rage_seg_v19_lh__surf_05_inf_zstat_lvl_01.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_02/cbs_distcor/lh/20151130_02_mp2rage_seg_v19_lh__surf_05_inf_zstat_lvl_02.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_02/cbs_distcor/lh/20151130_02_mp2rage_seg_v19_lh__surf_05_inf_zstat_lvl_03.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_02/cbs_distcor/lh/20151130_02_mp2rage_seg_v19_lh__surf_05_inf_zstat_lvl_04.vtk'],  #noqa
-                ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161205/cbs_distcor/lh/20161205_mp2rage_seg_v20_lh__surf_05_inf_zstat_lvl_01.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161205/cbs_distcor/lh/20161205_mp2rage_seg_v20_lh__surf_05_inf_zstat_lvl_02.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161205/cbs_distcor/lh/20161205_mp2rage_seg_v20_lh__surf_05_inf_zstat_lvl_03.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161205/cbs_distcor/lh/20161205_mp2rage_seg_v20_lh__surf_05_inf_zstat_lvl_04.vtk'],  #noqa
-                ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161207/cbs_distcor/lh/20161207_mp2rage_seg_v32_lh__surf_05_inf_zstat_lvl_01.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161207/cbs_distcor/lh/20161207_mp2rage_seg_v32_lh__surf_05_inf_zstat_lvl_02.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161207/cbs_distcor/lh/20161207_mp2rage_seg_v32_lh__surf_05_inf_zstat_lvl_03.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161207/cbs_distcor/lh/20161207_mp2rage_seg_v32_lh__surf_05_inf_zstat_lvl_04.vtk'],  #noqa
-                ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_01/cbs_distcor/lh/20161212_01_mp2rage_seg_v32_lh__surf_05_inf_zstat_lvl_01.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_01/cbs_distcor/lh/20161212_01_mp2rage_seg_v32_lh__surf_05_inf_zstat_lvl_02.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_01/cbs_distcor/lh/20161212_01_mp2rage_seg_v32_lh__surf_05_inf_zstat_lvl_03.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_01/cbs_distcor/lh/20161212_01_mp2rage_seg_v32_lh__surf_05_inf_zstat_lvl_04.vtk'],  #noqa
-                ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_02/cbs_distcor/lh/20161212_02_mp2rage_seg_v28_lh__surf_05_inf_zstat_lvl_01.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_02/cbs_distcor/lh/20161212_02_mp2rage_seg_v28_lh__surf_05_inf_zstat_lvl_02.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_02/cbs_distcor/lh/20161212_02_mp2rage_seg_v28_lh__surf_05_inf_zstat_lvl_03.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161212_02/cbs_distcor/lh/20161212_02_mp2rage_seg_v28_lh__surf_05_inf_zstat_lvl_04.vtk'],  #noqa
-                ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161214/cbs_distcor/lh/20161214_mp2rage_seg_v31_lh__surf_05_inf_zstat_lvl_01.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161214/cbs_distcor/lh/20161214_mp2rage_seg_v31_lh__surf_05_inf_zstat_lvl_02.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161214/cbs_distcor/lh/20161214_mp2rage_seg_v31_lh__surf_05_inf_zstat_lvl_03.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161214/cbs_distcor/lh/20161214_mp2rage_seg_v31_lh__surf_05_inf_zstat_lvl_04.vtk'],  #noqa
-                ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v19_lh__surf_05_inf_zstat_lvl_01.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v19_lh__surf_05_inf_zstat_lvl_02.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v19_lh__surf_05_inf_zstat_lvl_03.vtk',  #noqa
-                 '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20161219_01/cbs_distcor/lh/20161219_01_mp2rage_seg_v19_lh__surf_05_inf_zstat_lvl_04.vtk'],  #noqa
-                ]
+lstNumVrtx = [2000] * len(lstSubIds)
+# Base name of second set of vtk files with depth-sampled data, e.g. z-values
+# (with subject ID and stimulus level left open):
+strVtkDpth02 = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/{}_mp2rage_P2L_surf_05_inf_zstat_lvl_{}.vtk'  #noqa
 
 # (6)
 # Use PE range?
@@ -247,7 +129,7 @@ lgcPeRng = False
 # Lower bound of PE range (vertices with a maximum PE across depths that
 # is below this percentile in the distribution of those values across
 # vertices will be excluded):
-varPeRngLw = 0.0
+varPeRngLw = 10.0
 # Upper bound of PE range (vertices with a maximum PE across depths that
 # is above this percentile in the distribution of those values across
 # vertices will be excluded):
@@ -270,17 +152,7 @@ varNumLne = 2
 strTitle = ('Left hemisphere V1')
 
 # Limits of y-axis for single subject plots (list of tuples, [(Ymin, Ymax)]):
-lstLimY = [(0.0, 2.5),
-           (0.0, 2.5),
-           (0.0, 2.5),
-           (0.0, 2.5),
-           (0.0, 2.5),
-           (0.0, 2.5),
-           (0.0, 2.5),
-           (0.0, 3.0),
-           (0.0, 2.5),
-           (0.0, 2.5),
-           (0.0, 2.5)]
+lstLimY = [(0.0, 2.5)]
 
 # Limits of y-axis for across subject plot:
 varAcrSubsYmin = -0.05
@@ -290,13 +162,10 @@ varAcrSubsYmax = 2.0  # 1.90
 strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'fMRI signal change [arbitrary units]'
 
-# Condition labels:
-lstConLbl = ['2.5%', '6.1%', '16.3%', '72.0%']
-
 # Output path for plots - prfix:
-strPltOtPre = '/home/john/Desktop/tex_acrs_subs_zconj/plots_v1/'
+strPltOtPre = '/home/john/Desktop/tex_pe/plots_v1/'
 # Output path for plots - suffix:
-strPltOtSuf = '_depthplot_R2_0p2_z_con_2000_vertices.png'
+strPltOtSuf = '_depthplot.png'
 
 # Figure scaling factor:
 varDpi = 96.0
@@ -345,6 +214,9 @@ print('---Plotting & retrieving single subject data')
 # Number of subjects:
 varNumSubs = len(lstSubIds)
 
+# Number of conditions (i.e. number of data vtk files per subject):
+varNumCon = len(lstCon)
+
 # List for single subject data (mean PE over depth levels):
 lstSubData01 = [None] * varNumSubs
 
@@ -358,39 +230,56 @@ lstPrcs = [None] * varNumSubs
 queOut = mp.Queue()
 
 # Loop through subjects:
-for idxPrc in range(0, varNumSubs):
+for idxSub in range(0, varNumSubs):
+
+    # Create list with complete file names for the data to be depth-sampled:
+    lstVtkDpth01 = [strVtkDpth01.format(lstSubIds[idxSub],
+                                        lstSubIds[idxSub],
+                                        strTmp) for strTmp in lstCon]
+
+    # Complete file paths:
+    strCsvRoiTmp = strCsvRoi.format(lstSubIds[idxSub])
+    strVtkSlct02Tmp = strVtkSlct02.format(lstSubIds[idxSub], lstSubIds[idxSub])
+    strVtkSlct03Tmp = strVtkSlct03.format(lstSubIds[idxSub], lstSubIds[idxSub])
+    strVtkExclTmp = strVtkExcl.format(lstSubIds[idxSub], lstSubIds[idxSub])
+
+    # Create list with complete file names for multi-level data distribution
+    # criterion II:
+    lstVtkDpth02 = [strVtkDpth02.format(lstSubIds[idxSub],
+                                        lstSubIds[idxSub],
+                                        strTmp) for strTmp in lstCon]
 
     # Prepare processes that plot & return single subject data:
-    lstPrcs[idxPrc] = \
+    lstPrcs[idxSub] = \
         mp.Process(target=funcAcrSubGetSubsData,
-                   args=(idxPrc,                # Process ID
-                         lstSubIds[idxPrc],     # Data struc - Subject ID
-                         lstVtkDpth01[idxPrc],  # Data struc - Pth vtk I
-                         lstCsvRoi[idxPrc],     # Data struc - ROI CSV fle
+                   args=(idxSub,                # Process ID
+                         lstSubIds[idxSub],     # Data struc - Subject ID
+                         lstVtkDpth01,          # Data struc - Pth vtk I
+                         strCsvRoiTmp,          # Data struc - ROI CSV fle
                          varNumDpth,    # Data struc - Num. depth levels
                          varNumHdrRoi,  # Data struc - Header lines CSV
                          strPrcdData,   # Data struc - Str. prcd. VTK data
                          varNumLne,     # Data struc - Lns. prcd. data VTK
                          lgcSlct02,             # Criterion 2 - Yes or no?
-                         lstVtkSlct02[idxPrc],  # Criterion 2 - VTK path
+                         strVtkSlct02Tmp,       # Criterion 2 - VTK path
                          varThrSlct02,          # Criterion 2 - Threshold
                          lgcSlct03,             # Criterion 3 - Yes or no?
-                         lstVtkSlct03[idxPrc],  # Criterion 3 - VTK path
+                         strVtkSlct03Tmp,       # Criterion 3 - VTK path
                          varThrSlct03,          # Criterion 3 - Threshold
                          lgcMskExcl,            # Criterion 4 - Yes or no?
-                         lstVtkExcl[idxPrc],    # Criterion 4 - VTK path
+                         strVtkExclTmp,         # Criterion 4 - VTK path
                          varThrExcl,            # Criterion 4 - Threshold
                          lgcVtk02,              # Criterion 5 - Yes or no?
-                         lstVtkDpth02[idxPrc],  # Criterion 5 - VTK path
-                         lstNumVrtx[idxPrc],    # Criterion 5 - Num vrtx
+                         lstVtkDpth02,          # Criterion 5 - VTK path
+                         lstNumVrtx[idxSub],    # Criterion 5 - Num vrtx
                          lgcPeRng,              # Criterion 6 - Yes or no?
                          varPeRngLw,            # Criterion 6 - Lower lim
                          varPeRngUp,            # Criterion 6 - Upper lim
                          lgcNormDiv,    # Normalisation - Yes or no?
                          varNormIdx,    # Normalisation - Which reference
                          varDpi,              # Plot - dots per inch
-                         lstLimY[idxPrc][0],  # Plot - Minimum of Y axis
-                         lstLimY[idxPrc][1],  # Plot - Maximum of Y axis
+                         lstLimY[idxSub][0],  # Plot - Minimum of Y axis
+                         lstLimY[idxSub][1],  # Plot - Maximum of Y axis
                          lstConLbl,           # Plot - Condition labels
                          strXlabel,           # Plot - X axis label
                          strYlabel,           # Plot - Y axis label
@@ -401,19 +290,19 @@ for idxPrc in range(0, varNumSubs):
                    )
 
     # Daemon (kills processes when exiting):
-    lstPrcs[idxPrc].Daemon = True
+    lstPrcs[idxSub].Daemon = True
 
 # Start processes:
-for idxPrc in range(0, varNumSubs):
-    lstPrcs[idxPrc].start()
+for idxSub in range(0, varNumSubs):
+    lstPrcs[idxSub].start()
 
 # Collect results from queue:
-for idxPrc in range(0, varNumSubs):
-    lstParResult[idxPrc] = queOut.get(True)
+for idxSub in range(0, varNumSubs):
+    lstParResult[idxSub] = queOut.get(True)
 
 # Join processes:
-for idxPrc in range(0, varNumSubs):
-    lstPrcs[idxPrc].join()
+for idxSub in range(0, varNumSubs):
+    lstPrcs[idxSub].join()
 
 # Create list  to put the function output into the correct order:
 lstPrcId = [None] * varNumSubs
@@ -427,9 +316,6 @@ for idxRes in range(0, varNumSubs):
 
     # Put fitting results into list, in correct order:
     lstSubData01[varTmpIdx] = lstParResult[idxRes][1]
-
-# Number of conditions (i.e. number of data vtk files per subject):
-varNumCon = len(lstVtkDpth01[0])
 
 # Array with single-subject depth sampling results, of the form
 # aryDpthMeans[idxSub, idxCondition, idxDpth].

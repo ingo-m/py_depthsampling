@@ -90,7 +90,8 @@ def funcAcrSubGetSubsData(idxPrc,        # Process ID  #noqa
     # Import second criterion vtk file (one depth level)
     if lgcSlct02:
         if idxPrc == 0:
-            print('---------Importing second criterion vtk file.')
+            print('---------Importing second criterion vtk file (one depth '
+                  + 'level).')
         vecSlct02 = funcLoadVtkSingle(strVtkSlct02, strPrcdData, varNumLne)
     # Otherwise, create dummy vector (for function I/O)
     else:
@@ -99,7 +100,8 @@ def funcAcrSubGetSubsData(idxPrc,        # Process ID  #noqa
     # Import third criterion vtk file (all depth levels)
     if lgcSlct03:
         if idxPrc == 0:
-            print('---------Importing second criterion vtk file.')
+            print('---------Importing third criterion vtk file (all depth '
+                  + 'levels).')
         arySlct03 = funcLoadVtkMulti(strVtkSlct03,
                                      strPrcdData,
                                      varNumLne,
@@ -108,10 +110,11 @@ def funcAcrSubGetSubsData(idxPrc,        # Process ID  #noqa
     else:
         arySlct03 = 0
 
-    # Import exclusion mask vtk file (fourth criterion)
+    # Import exclusion mask vtk file (fourth criterion, all depth levels)
     if lgcMskExcl:
         if idxPrc == 0:
-            print('---------Importing exclusion mask vtk file.')
+            print('---------Importing exclusion mask vtk file (all depth '
+                  + 'levels).')
         aryExcl = funcLoadVtkMulti(strVtkExcl,
                                    strPrcdData,
                                    varNumLne,

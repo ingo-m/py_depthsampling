@@ -100,8 +100,8 @@ def funcPltAcrDpth(aryData,     # Data to be plotted: aryData[Condition, Depth]
     axs01.set_ylim([varYmin, varYmax])
 
     # Which x values to label with ticks (WM & CSF boundary):
-    # axs01.set_xticks([-0.5, (varNumDpth - 0.5)])
-    axs01.set_xticks([4.0, (varNumDpth - 4.0)])
+    axs01.set_xticks([-0.5, (varNumDpth - 0.5)])
+    # axs01.set_xticks([4.0, (varNumDpth - 4.0)])
 
     # Set tick labels for x ticks:
     axs01.set_xticklabels(['WM', 'CSF'])

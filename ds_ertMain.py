@@ -45,49 +45,24 @@ from ds_ertPlt import funcPltErt
 
 # Load data from previously prepared npy file? If 'False', data is loaded from
 # vtk meshes and saved as npy.
-lgcNpy = True
+lgcNpy = False
 
 # Name of npy file from which to load time course data or save time course data
 # to:
 strPthNpy = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Higher_Level_Analysis/event_related_timecourses/era_v1.npy'  #noqa
 
 # List of subject IDs:
-lstSubId = ['20150930',
-            '20151118',
-            '20151127_01',
-            '20151130_01',
-            '20151130_02']
+lstSubId = ['20150930']
 
-# Vertex inclusion masks:
-lstVtkMsk = ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/lh/20150930_vertec_inclusion_mask_v1.vtk',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151118/cbs_distcor/lh/20151118_vertec_inclusion_mask_v1.vtk',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151127_01/cbs_distcor/lh/20151127_01_vertec_inclusion_mask_patch_01.vtk',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_01/cbs_distcor/lh/20151130_01_vertec_inclusion_mask_v1.vtk',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_02/cbs_distcor/lh/20151130_02_vertec_inclusion_mask_v1.vtk']  #noqa
+# Condition levels (used to complete file names):
+lstCon = ['01', '02', '03', '04']
 
-# The paths of single-volume vtk meshes that together make up the timecourse
-# are defined in CSV files (one file per condition per subject). Provide the
-# paths of those CSV files here (list of lists):
-lstCsvPath = [['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/lh_era/filelist_stim_lvl_01.csv',  #noqa
-               '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/lh_era/filelist_stim_lvl_02.csv',  #noqa
-               '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/lh_era/filelist_stim_lvl_03.csv',  #noqa
-               '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/lh_era/filelist_stim_lvl_04.csv'],  #noqa
-              ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151118/cbs_distcor/lh_era/filelist_stim_lvl_01.csv',  #noqa
-               '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151118/cbs_distcor/lh_era/filelist_stim_lvl_02.csv',  #noqa
-               '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151118/cbs_distcor/lh_era/filelist_stim_lvl_03.csv',  #noqa
-               '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151118/cbs_distcor/lh_era/filelist_stim_lvl_04.csv'],  #noqa
-              ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151127_01/cbs_distcor/lh_era/filelist_stim_lvl_01.csv',  #noqa
-               '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151127_01/cbs_distcor/lh_era/filelist_stim_lvl_02.csv',  #noqa
-               '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151127_01/cbs_distcor/lh_era/filelist_stim_lvl_03.csv',  #noqa
-               '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151127_01/cbs_distcor/lh_era/filelist_stim_lvl_04.csv'],  #noqa
-              ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_01/cbs_distcor/lh_era/filelist_stim_lvl_01.csv',  #noqa
-               '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_01/cbs_distcor/lh_era/filelist_stim_lvl_02.csv',  #noqa
-               '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_01/cbs_distcor/lh_era/filelist_stim_lvl_03.csv',  #noqa
-               '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_01/cbs_distcor/lh_era/filelist_stim_lvl_04.csv'],  #noqa
-              ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_02/cbs_distcor/lh_era/filelist_stim_lvl_01.csv',  #noqa
-               '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_02/cbs_distcor/lh_era/filelist_stim_lvl_02.csv',  #noqa
-               '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_02/cbs_distcor/lh_era/filelist_stim_lvl_03.csv',  #noqa
-               '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_02/cbs_distcor/lh_era/filelist_stim_lvl_04.csv']]  #noqa
+# Base name of vertex inclusion masks (subject ID left open):
+strVtkMsk = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/{}_vertec_inclusion_mask_v1.vtk'  #noqa
+
+# Base name of single-volume vtk meshes that together make up the timecourse
+# (subject ID, stimulus level, subject ID, and volume index left open):
+strVtkPth = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh_era/stim_lvl_{}/{}_mp2rage_P2L_surf_05_inf_vol_{}.vtk'  #noqa
 
 # Number of cortical depths:
 varNumDpth = 11
@@ -103,11 +78,7 @@ strPrcdData = 'SCALARS'
 varNumLne = 2
 
 # Limits of axis for single subject plots (list of tuples, [(Ymin, Ymax)]):
-lstLimY = [(0.0, 2.5),
-           (0.0, 2.5),
-           (0.0, 2.5),
-           (0.0, 2.5),
-           (0.0, 2.5)]
+lstLimY = [(0.0, 2.5)] * len(lstSubId)
 
 # Limits of axis for across subject plot:
 varAcrSubsYmin = -0.02
@@ -156,7 +127,7 @@ print('-Event-related timecourses depth sampling')
 varNumSub = len(lstSubId)
 
 # Number of conditions:
-varNumCon = len(lstCsvPath[0])
+varNumCon = len(lstCon)
 
 if lgcNpy:
 
@@ -179,16 +150,18 @@ else:
 
         print(('------Subject: ' + lstSubId[idxSub]))
 
+        # Complete file path of vertex inclusion mask for current subject:
+        strVtkMskTmp = strVtkMsk.format(lstSubId[idxSub], lstSubId[idxSub])
+
         # Load data for current subject:
         aryAllSubsRoiErt[idxSub, :, :, :] = funcGetSubData(lstSubId[idxSub],
-                                                           lstVtkMsk[idxSub],
-                                                           lstCsvPath[idxSub],
-                                                           varNumDpth,
+                                                           strVtkMskTmp,
+                                                           strVtkPth,
+                                                           lstCon,
                                                            varNumVol,
+                                                           varNumDpth,
                                                            strPrcdData,
                                                            varNumLne)
-
-        # print(lstCsvPath[idxSub])
 
     # Save event-related timecourses to disk as npy file:
     np.save(strPthNpy, aryAllSubsRoiErt)

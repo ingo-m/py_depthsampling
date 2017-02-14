@@ -42,10 +42,10 @@ from ds_pltAcrDpth import funcPltAcrDpth
 
 # Name of npy file from which to load time course data or save time course data
 # to:
-strPthNpy = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Higher_Level_Analysis/event_related_timecourses/era_v2.npy'  #noqa
+strPthNpy = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Higher_Level_Analysis/event_related_timecourses/era_v1.npy'  #noqa
 
 # Number of subjects:
-varNumSub = 5
+varNumSub = 1
 
 # Number of conditions:
 varNumCon = 4
@@ -69,7 +69,7 @@ tplIdxMin = (10, 11, 12)
 lstConLbl = ['72.0%', '16.3%', '6.1%', '2.5%']
 
 # Title for mean positive responst plot:
-strTtl01 = 'Positive response V2'
+strTtl01 = 'Positive response V1'
 # Limits of y-axis for ratio-across-depth plot:
 varYmin01 = 0.00
 varYmax01 = 0.10
@@ -77,12 +77,12 @@ varYmax01 = 0.10
 strXlabel01 = 'Cortical depth level'
 strYlabel01 = 'Percent signal change'
 # Output path for ratio-across-depth plots:
-strPathOut01 = '/home/john/Desktop/tex_era/plots_v2/main_resp_acr_dpths.svg'
+strPathOut01 = '/home/john/Desktop/tex_era/plots_v1/main_resp_acr_dpths.png'
 # Plot legend?
 lgcLgnd01 = True
 
 # Title for mean undershoot responst plot:
-strTtl02 = 'Undershoot V2'
+strTtl02 = 'Undershoot V1'
 # Limits of y-axis for ratio-across-depth plot:
 varYmin02 = -0.02
 varYmax02 = 0.02
@@ -90,12 +90,12 @@ varYmax02 = 0.02
 strXlabel02 = 'Cortical depth level'
 strYlabel02 = 'Percent signal change'
 # Output path for ratio-across-depth plots:
-strPathOut02 = '/home/john/Desktop/tex_era/plots_v2/undrsht_acr_dpths.svg'
+strPathOut02 = '/home/john/Desktop/tex_era/plots_v1/undrsht_acr_dpths.png'
 # Plot legend?
 lgcLgnd02 = False
 
 # Title for ratio-across-depth plot:
-strTtl03 = 'Ratio positive response / undershoot V2'
+strTtl03 = 'Ratio positive response / undershoot V1'
 # Limits of y-axis for ratio-across-depth plot:
 varYmin03 = 1.0
 varYmax03 = 1.12
@@ -103,7 +103,7 @@ varYmax03 = 1.12
 strXlabel03 = 'Cortical depth level'
 strYlabel03 = 'Ratio'
 # Output path for ratio-across-depth plots:
-strPathOut03 = '/home/john/Desktop/tex_era/plots_v2/ratio_acr_dpths_not_demeaned.svg'  #noqa
+strPathOut03 = '/home/john/Desktop/tex_era/plots_v1/ratio_acr_dpths_not_demeaned.png'  #noqa
 # Plot legend?
 lgcLgnd03 = False
 

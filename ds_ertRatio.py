@@ -45,7 +45,7 @@ from ds_pltAcrDpth import funcPltAcrDpth
 strPthNpy = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Higher_Level_Analysis/event_related_timecourses/era_v1.npy'  #noqa
 
 # Number of subjects:
-varNumSub = 1
+varNumSub = 2
 
 # Number of conditions:
 varNumCon = 4

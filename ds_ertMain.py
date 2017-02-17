@@ -52,7 +52,8 @@ lgcNpy = False
 strPthNpy = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Higher_Level_Analysis/event_related_timecourses/era_v1.npy'  #noqa
 
 # List of subject IDs:
-lstSubId = ['20150930']
+lstSubId = ['20150930',
+            '20151118']
 
 # Condition levels (used to complete file names):
 lstCon = ['01', '02', '03', '04']

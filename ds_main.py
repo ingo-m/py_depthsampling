@@ -67,7 +67,8 @@ print('-Visualisation of depth sampling results')
 # *** Define parameters
 
 # List of subject identifiers:
-lstSubIds = ['20150930']
+lstSubIds = ['20150930',
+             '20151118']
 
 # Condition levels (used to complete file names):
 lstCon = ['01', '02', '03', '04']
@@ -152,7 +153,8 @@ varNumLne = 2
 strTitle = ('Left hemisphere V1')
 
 # Limits of y-axis for single subject plots (list of tuples, [(Ymin, Ymax)]):
-lstLimY = [(0.0, 2.5)]
+lstLimY = [(0.0, 2.5),
+           (0.0, 2.5)]
 
 # Limits of y-axis for across subject plot:
 varAcrSubsYmin = -0.05

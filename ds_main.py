@@ -68,7 +68,16 @@ print('-Visualisation of depth sampling results')
 
 # List of subject identifiers:
 lstSubIds = ['20150930',
-             '20151118']
+             '20151118',
+             '20151127_01',
+             '20151130_01',
+             '20151130_02',
+             '20161205',
+             '20161207',
+             '20161212_01',
+             '20161212_02',
+             '20161214',
+             '20161219_01']
 
 # Condition levels (used to complete file names):
 lstCon = ['01', '02', '03', '04']
@@ -77,20 +86,20 @@ lstConLbl = ['2.5%', '6.1%', '16.3%', '72.0%']
 
 # Base path of first set of vtk files with depth-sampled data, e.g. parameter
 # estimates (with subject ID and stimulus level left open):
-strVtkDpth01 = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/{}_mp2rage_P2L_surf_05_inf_pe_stim_lvl_{}.vtk'  # noqa
+strVtkDpth01 = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/pe_stim_lvl_{}.vtk'  # noqa
 
 # (1)
 # Base path of csv files with ROI definition (i.e. patch of cortex selected on
 # the surface, e.g. V1 or V2) - i.e. the first vertex selection criterion (with
 # subject ID left open):
-strCsvRoi = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/v1.csv'  #noqa
+strCsvRoi = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/v2.csv'  #noqa
 
 # (2)
 # Use second selection criterion defined at one depth level (legacy function):
 lgcSlct02 = False
 # Base path of vtk files with 2nd vertex selection criterion. This vtk file is
 # supposed to contain one set of data values (e.g. at mid-grey-matter).
-strVtkSlct02 = ' '
+strVtkSlct02 = ''  #noqa
 # Threshold for vertex selection for 2nd selection criterion (vertex excluded
 # if data value is below threshold):
 varThrSlct02 = 0.2
@@ -101,28 +110,30 @@ varThrSlct02 = 0.2
 lgcSlct03 = True
 # Path of vtk files with 3rd vertex selection criterion. This vtk file is
 # supposed to contain one set of data values for each depth level.
-strVtkSlct03 = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/{}_mp2rage_P2L_surf_05_inf_combined_mean.vtk'  #noqa
+# strVtkSlct03 = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/combined_mean.vtk'  #noqa
+strVtkSlct03 = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/R2_multi.vtk'  #noqa
 # Threshold for vertex selection for second selection criterion:
-varThrSlct03 = 7000.0
+# varThrSlct03 = 7000.0
+varThrSlct03 = 0.1
 
 # (4)
 # Use exclusion mask:
-lgcMskExcl = True
+lgcMskExcl = False
 # Path of exclusion mask:
-strVtkExcl = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/{}_mp2rage_P2L_surf_05_inf_SD.vtk'  #noqa
+strVtkExcl = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/SD.vtk'  #noqa
 # Exclusion mask threshold (if ABOVE this threshold at any depth level, vertex
 # is excluded from depth sampling):
-varThrExcl = 5.0
+varThrExcl = 2.0
 
 # (5)
 # Load second set of vtk data files (z-values) and use them for vertex
 # selection?
 lgcVtk02 = True
 # How many vertices to select for each subject?
-lstNumVrtx = [2000] * len(lstSubIds)
+lstNumVrtx = [800] * len(lstSubIds)
 # Base name of second set of vtk files with depth-sampled data, e.g. z-values
 # (with subject ID and stimulus level left open):
-strVtkDpth02 = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/{}_mp2rage_P2L_surf_05_inf_zstat_lvl_{}.vtk'  #noqa
+strVtkDpth02 = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/zstat_lvl_{}.vtk'  #noqa
 
 # (6)
 # Use PE range?
@@ -130,11 +141,11 @@ lgcPeRng = False
 # Lower bound of PE range (vertices with a maximum PE across depths that
 # is below this percentile in the distribution of those values across
 # vertices will be excluded):
-varPeRngLw = 10.0
+varPeRngLw = 0.0
 # Upper bound of PE range (vertices with a maximum PE across depths that
 # is above this percentile in the distribution of those values across
 # vertices will be excluded):
-varPeRngUp = 90.0
+varPeRngUp = 80.0
 
 # Number of header lines in ROI CSV file:
 varNumHdrRoi = 1
@@ -150,11 +161,10 @@ strPrcdData = 'SCALARS'
 varNumLne = 2
 
 # Title for mean plot:
-strTitle = ('Left hemisphere V1')
+strTitle = ('Left hemisphere V2')
 
 # Limits of y-axis for single subject plots (list of tuples, [(Ymin, Ymax)]):
-lstLimY = [(0.0, 2.5),
-           (0.0, 2.5)]
+lstLimY = [(0.0, 2.5)] * len(lstSubIds)
 
 # Limits of y-axis for across subject plot:
 varAcrSubsYmin = -0.05
@@ -165,7 +175,7 @@ strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'fMRI signal change [arbitrary units]'
 
 # Output path for plots - prfix:
-strPltOtPre = '/home/john/Desktop/tex_pe/plots_v1/'
+strPltOtPre = '/home/john/Desktop/tex_pe/plots_v2/'
 # Output path for plots - suffix:
 strPltOtSuf = '_depthplot.png'
 
@@ -201,7 +211,7 @@ varLinRegYmax = 0.165  # 0.165  # 0.15  # 0.17
 strLinRegYlabel = 'Regression coefficient'
 
 # Output path for depth samling results (within subject means):
-strDpthMeans = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Higher_Level_Analysis/depthsampling_mean_pe/v1.npy'  #noqa
+strDpthMeans = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Higher_Level_Analysis/depthsampling_mean_pe/v2.npy'  #noqa
 
 # Maximum number of processes to run in parallel: *** NOT IMPLEMENTED
 # varPar = 10
@@ -236,20 +246,20 @@ for idxSub in range(0, varNumSubs):
 
     # Create list with complete file names for the data to be depth-sampled:
     lstVtkDpth01 = [strVtkDpth01.format(lstSubIds[idxSub],
-                                        lstSubIds[idxSub],
                                         strTmp) for strTmp in lstCon]
 
     # Complete file paths:
     strCsvRoiTmp = strCsvRoi.format(lstSubIds[idxSub])
-    strVtkSlct02Tmp = strVtkSlct02.format(lstSubIds[idxSub], lstSubIds[idxSub])
-    strVtkSlct03Tmp = strVtkSlct03.format(lstSubIds[idxSub], lstSubIds[idxSub])
-    strVtkExclTmp = strVtkExcl.format(lstSubIds[idxSub], lstSubIds[idxSub])
+    strVtkSlct02Tmp = strVtkSlct02.format(lstSubIds[idxSub])
+    strVtkSlct03Tmp = strVtkSlct03.format(lstSubIds[idxSub])
+    strVtkExclTmp = strVtkExcl.format(lstSubIds[idxSub])
 
     # Create list with complete file names for multi-level data distribution
     # criterion II:
     lstVtkDpth02 = [strVtkDpth02.format(lstSubIds[idxSub],
-                                        lstSubIds[idxSub],
                                         strTmp) for strTmp in lstCon]
+    # lstVtkDpth02 = [strVtkDpth02.format(lstSubIds[idxSub])] * len(lstCon)
+    print(lstVtkDpth02)
 
     # Prepare processes that plot & return single subject data:
     lstPrcs[idxSub] = \

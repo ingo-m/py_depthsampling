@@ -53,7 +53,16 @@ strPthNpy = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Higher_Level_Analysis/even
 
 # List of subject IDs:
 lstSubId = ['20150930',
-            '20151118']
+            '20151118',
+            '20151127_01',
+            '20151130_01',
+            '20151130_02',
+            '20161205',
+            '20161207',
+            '20161212_01',
+            '20161212_02',
+            '20161214',
+            '20161219_01']
 
 # Condition levels (used to complete file names):
 lstCon = ['01', '02', '03', '04']
@@ -62,8 +71,8 @@ lstCon = ['01', '02', '03', '04']
 strVtkMsk = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/{}_vertec_inclusion_mask_v1.vtk'  #noqa
 
 # Base name of single-volume vtk meshes that together make up the timecourse
-# (subject ID, stimulus level, subject ID, and volume index left open):
-strVtkPth = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh_era/stim_lvl_{}/{}_mp2rage_P2L_surf_05_inf_vol_{}.vtk'  #noqa
+# (subject ID, stimulus level, and volume index left open):
+strVtkPth = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh_era/stim_lvl_{}/vol_{}.vtk'  #noqa
 
 # Number of cortical depths:
 varNumDpth = 11

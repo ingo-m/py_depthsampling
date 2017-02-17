@@ -72,7 +72,6 @@ def funcGetSubData(strSubId,
             # Complete file path of current volume:
             strVtkPthTmp = strVtkPth.format(strSubId,
                                             lstCon[idxCon],
-                                            strSubId,
                                             str(idxVol).zfill(3))
 
             # Load vtk mesh for current timepoint:

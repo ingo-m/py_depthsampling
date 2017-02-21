@@ -273,6 +273,14 @@ def funcSlctVrtcs(varNumCon,      # Number of conditions  #noqa
         # Initial value for z-conjunction threshold:
         varThrZcon = 0.0
 
+        # If we attempt to select more vertices than have survived all
+        # inclusion criteria until now, the following while-loop will be
+        # skipped. We create a dummy-version of the vector that would have
+        # been created in the while-loop (all 'columns' that have survived
+        # until now are also included after this criterion has been applied).
+        if not(np.greater(varNumIncTmp, varNumVrtx)):
+            vecLgcZconAny = np.ones(np.sum(vecInc), dtype=bool)
+
         # We increase the z conjunction threshold until we have reached the
         # number of vertices we would like to inlcude:
         while np.greater(varNumIncTmp, varNumVrtx):

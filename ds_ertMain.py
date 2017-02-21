@@ -34,6 +34,7 @@ condition) are combined across time and conditions to be plotted and analysed.
 
 # *****************************************************************************
 # *** Import modules
+import pickle
 import numpy as np
 from ds_ertGetSubData import funcGetSubData
 from ds_ertPlt import funcPltErt
@@ -43,13 +44,13 @@ from ds_ertPlt import funcPltErt
 # *****************************************************************************
 # *** Define parameters
 
-# Load data from previously prepared npy file? If 'False', data is loaded from
-# vtk meshes and saved as npy.
-lgcNpy = False
+# Load data from previously prepared pickle? If 'False', data is loaded from
+# vtk meshes and saved as pickle.
+lgcPic = False
 
-# Name of npy file from which to load time course data or save time course data
-# to:
-strPthNpy = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Higher_Level_Analysis/event_related_timecourses/era_v1.npy'  #noqa
+# Name of pickle file from which to load time course data or save time course
+# data to:
+strPthPic = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/era_v1.pickle'  #noqa
 
 # List of subject IDs:
 lstSubId = ['20150930',
@@ -68,11 +69,11 @@ lstSubId = ['20150930',
 lstCon = ['01', '02', '03', '04']
 
 # Base name of vertex inclusion masks (subject ID left open):
-strVtkMsk = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/{}_vertec_inclusion_mask_v1.vtk'  #noqa
+strVtkMsk = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/{}_vertec_inclusion_mask_v1.vtk'  #noqa
 
 # Base name of single-volume vtk meshes that together make up the timecourse
 # (subject ID, stimulus level, and volume index left open):
-strVtkPth = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh_era/stim_lvl_{}/vol_{}.vtk'  #noqa
+strVtkPth = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh_era/stim_lvl_{}/vol_{}.vtk'  #noqa
 
 # Number of cortical depths:
 varNumDpth = 11
@@ -121,10 +122,10 @@ lgcLgnd02 = False
 # Output path for plots - prfix:
 strPltOtPre = '/home/john/Desktop/tex_era/plots_v1/'
 # Output path for plots - suffix:
-strPltOtSuf = '_ert.svg'
+strPltOtSuf = '_ert.png'
 
 # Figure scaling factor:
-varDpi = 96.0
+varDpi = 70.0
 # *****************************************************************************
 
 
@@ -139,42 +140,47 @@ varNumSub = len(lstSubId)
 # Number of conditions:
 varNumCon = len(lstCon)
 
-if lgcNpy:
+if lgcPic:
 
-    print('---Loading data npy file')
+    print('---Loading data pickle')
 
-    # Load previously prepared event-related timecourses from npy file:
-    aryAllSubsRoiErt = np.load(strPthNpy)
+    # Load previously prepared event-related timecourses from pickle:
+    dicAllSubsRoiErt = pickle.load(open(strPthPic, "rb" ))
 
 else:
 
     print('---Loading data from vtk meshes')
 
-    # Array for ROI event-related averages. NOTE: Once the Depth-sampling can
-    # be scripted, this array should be extended to contain one timecourse per
-    # trial (per subject & depth level).
-    aryAllSubsRoiErt = np.zeros((varNumSub, varNumCon, varNumDpth, varNumVol))
+    # Dictionary for ROI event-related averages. NOTE: Once the Depth-sampling
+    # can be scripted, this array should be extended to contain one timecourse
+    # per trial (per subject & depth level).
+
+    # The keys for the dictionary will be the subject IDs, and for each
+    # subject there is an array of the form:
+    # aryRoiErt[varNumCon, varNumDpth, varNumVol]
+    dicAllSubsRoiErt = {}
 
     # Loop through subjects and load data:
-    for idxSub in range(0, varNumSub):
+    for strSubID in lstSubId:
 
-        print(('------Subject: ' + lstSubId[idxSub]))
+        print(('------Subject: ' + strSubID))
 
         # Complete file path of vertex inclusion mask for current subject:
-        strVtkMskTmp = strVtkMsk.format(lstSubId[idxSub], lstSubId[idxSub])
+        strVtkMskTmp = strVtkMsk.format(strSubID, strSubID)
 
-        # Load data for current subject:
-        aryAllSubsRoiErt[idxSub, :, :, :] = funcGetSubData(lstSubId[idxSub],
-                                                           strVtkMskTmp,
-                                                           strVtkPth,
-                                                           lstCon,
-                                                           varNumVol,
-                                                           varNumDpth,
-                                                           strPrcdData,
-                                                           varNumLne)
+        # Load data for current subject (returns array of the form:
+        # aryRoiErt[varNumCon, varNumDpth, varNumVol]):
+        dicAllSubsRoiErt[strSubID] = funcGetSubData(strSubID,
+                                                    strVtkMskTmp,
+                                                    strVtkPth,
+                                                    lstCon,
+                                                    varNumVol,
+                                                    varNumDpth,
+                                                    strPrcdData,
+                                                    varNumLne)
 
-    # Save event-related timecourses to disk as npy file:
-    np.save(strPthNpy, aryAllSubsRoiErt)
+    # Save event-related timecourses to disk as pickle:
+    pickle.dump(dicAllSubsRoiErt, open(strPthPic, "wb"))
 # *****************************************************************************
 
 
@@ -186,7 +192,10 @@ else:
 # pre-stimulus baseline, and the pre-stimulus baseline has a mean of one. We
 # subtract one, so that the datapoints are percent signal change relative to
 # baseline.
-aryAllSubsRoiErt = np.subtract(aryAllSubsRoiErt, 1.0)
+for strSubID, aryRoiErt in dicAllSubsRoiErt.items():
+    aryRoiErt = np.subtract(aryRoiErt, 1.0)
+    # Is this line necessary (hard copy)?
+    dicAllSubsRoiErt[strSubID] = aryRoiErt
 # *****************************************************************************
 
 
@@ -195,31 +204,27 @@ aryAllSubsRoiErt = np.subtract(aryAllSubsRoiErt, 1.0)
 
 print('---Ploting single-subjects event-related averages')
 
-# Structure of the data array:
-# aryAllSubsRoiErt[Subject, Condition, Depth, Volume]
-
 # Loop through subjects:
-for idxSub in range(0, varNumSub):
+for strSubID, aryRoiErt in dicAllSubsRoiErt.items():
 
     # Loop through depth levels (we only create plots for three depth levels):
     for idxDpth in [0, 5, 10]:
 
         # Title for plot:
-        # strTmpTtl = ('Event-related average, depth level ' + str(idxDpth))
-        strTmpTtl = ''
+        strTmpTtl = (strSubID + ' ERA, depth level ' + str(idxDpth))
 
         # Output filename:
-        strTmpPth = (strPltOtPre + lstSubId[idxSub] + '_dpth_' +
-                     str(idxDpth) + strPltOtSuf)
+        strTmpPth = (strPltOtPre + strSubID + '_dpth_' + str(idxDpth)
+                     + strPltOtSuf)
 
         # We don't have the variances across trials (within subjects),
         # therefore we create an empty array as a placeholder. NOTE: This
         # should be replaced by between-trial variance once the depth sampling
         # is fully scriptable.
-        aryDummy = np.zeros(aryAllSubsRoiErt[idxSub, :, idxDpth, :].shape)
+        aryDummy = np.zeros(aryRoiErt[:, idxDpth, :].shape)
 
         # We create one plot per depth-level.
-        funcPltErt(aryAllSubsRoiErt[idxSub, :, idxDpth, :],
+        funcPltErt(aryRoiErt[:, idxDpth, :],
                    aryDummy,
                    varNumDpth,
                    varNumCon,
@@ -244,6 +249,14 @@ for idxSub in range(0, varNumSub):
 # *** Plot across-subjects average
 
 print('---Ploting across-subjects average')
+
+# Create across-subjects data array of the form:
+# aryAllSubsRoiErt[varNumSub, varNumCon, varNumDpth, varNumVol]
+aryAllSubsRoiErt = np.zeros((varNumSub, varNumCon, varNumDpth, varNumVol))
+idxSub = 0
+for aryRoiErt in dicAllSubsRoiErt.values():
+    aryAllSubsRoiErt[idxSub, :, :, :] = aryRoiErt
+    idxSub += 1
 
 # Calculate mean event-related time courses (mean across subjects):
 aryRoiErtMean = np.mean(aryAllSubsRoiErt, axis=0)

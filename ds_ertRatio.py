@@ -32,6 +32,7 @@ that have been created with 'ds_ertMain' before (saved in an npy file).
 
 # *****************************************************************************
 # *** Import modules
+import pickle
 import numpy as np
 from ds_pltAcrDpth import funcPltAcrDpth
 # *****************************************************************************
@@ -42,13 +43,16 @@ from ds_pltAcrDpth import funcPltAcrDpth
 
 # Name of npy file from which to load time course data or save time course data
 # to:
-strPthNpy = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Higher_Level_Analysis/event_related_timecourses/era_v1.npy'  #noqa
+strPthPic = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/era_v1.pickle'  #noqa
 
 # Number of subjects:
-varNumSub = 2
+varNumSub = 11
 
 # Number of conditions:
 varNumCon = 4
+
+# Number of time points in the event-related average segments:
+varNumVol = 14
 
 # Number of cortical depths:
 varNumDpth = 11
@@ -58,7 +62,7 @@ varNumDpth = 11
 
 # Time points at which maximum response is expected (for calculation of ratio
 # positive response / undershoot):
-tplIdxMax = (5, 6, 7)
+tplIdxMax = (5, 5)
 
 # Time points at which post-stimulus undershoot is expected (for calculation
 # of ratio positive response / undershoot):
@@ -68,11 +72,24 @@ tplIdxMin = (10, 11, 12)
 # lstConLbl = ['2.5%', '6.1%', '16.3%', '72.0%']
 lstConLbl = ['72.0%', '16.3%', '6.1%', '2.5%']
 
-# Title for mean positive responst plot:
+# Title for single-subject positive response plot:
+strTtl04 = 'Positive response V1'
+# Limits of y-axis for ratio-across-depth plot:
+varYmin04 = 0.0
+varYmax04 = 0.1
+# Label for axes:
+strXlabel04 = 'Cortical depth level'
+strYlabel04 = 'Percent signal change'
+# Output path for ratio-across-depth plots (subject ID left open):
+strPathOut04 = '/home/john/Desktop/tex_era/plots_v1/{}_main_resp_acr_dpths.png'
+# Plot legend?
+lgcLgnd04 = True
+
+# Title for mean positive response plot:
 strTtl01 = 'Positive response V1'
 # Limits of y-axis for ratio-across-depth plot:
-varYmin01 = 0.00
-varYmax01 = 0.10
+varYmin01 = 0.0
+varYmax01 = 2.0
 # Label for axes:
 strXlabel01 = 'Cortical depth level'
 strYlabel01 = 'Percent signal change'
@@ -81,7 +98,7 @@ strPathOut01 = '/home/john/Desktop/tex_era/plots_v1/main_resp_acr_dpths.png'
 # Plot legend?
 lgcLgnd01 = True
 
-# Title for mean undershoot responst plot:
+# Title for mean undershoot response plot:
 strTtl02 = 'Undershoot V1'
 # Limits of y-axis for ratio-across-depth plot:
 varYmin02 = -0.02
@@ -115,18 +132,31 @@ varDpi = 96.0
 # *****************************************************************************
 # *** Load data
 
-print('-Depth-dependent BOLD positive-undershoot ratio')
+print('-Depth-dependent BOLD ERT plots')
 
 # Number of conditions:
 # varNumCon = len(lstCsvPath[0])
 
-print('---Loading data npy file')
+print('---Loading data pickle file')
 
-# Load previously prepared event-related timecourses from npy file:
-aryAllSubsRoiErt = np.load(strPthNpy)
+# Load previously prepared event-related timecourses from pickle:
+dicAllSubsRoiErt = pickle.load(open(strPthPic, "rb" ))
 
-# The array has the form:
-# aryAllSubsRoiErt[Subject, Condition, Depth, Volume]
+# The dictionary contains one array per subject, of the form:
+# aryRoiErt[Condition, Depth, Volume]
+# *****************************************************************************
+
+
+# *****************************************************************************
+# *** Create across-subjects data array
+
+# Create across-subjects data array of the form:
+# aryAllSubsRoiErt[varNumSub, varNumCon, varNumDpth, varNumVol]
+aryAllSubsRoiErt = np.zeros((varNumSub, varNumCon, varNumDpth, varNumVol))
+idxSub = 0
+for aryRoiErt in dicAllSubsRoiErt.values():
+    aryAllSubsRoiErt[idxSub, :, :, :] = aryRoiErt
+    idxSub += 1
 # *****************************************************************************
 
 
@@ -170,7 +200,7 @@ funcPltAcrDpth(aryRatioMean,
                varDpi,
                varYmin03,
                varYmax03,
-               False,
+               True,
                lstConLbl,
                strXlabel03,
                strYlabel03,
@@ -184,21 +214,100 @@ funcPltAcrDpth(aryRatioMean,
 # *** Subtract baseline mean
 
 # The input to this function are timecourses that have been normalised to the
-# pre-stimulus baseline individually for each trial. The datapoints are signal
-# intensity relative to the pre-stimulus baseline, and the pre-stimulus
-# baseline has a mean of one. We subtract one, so that the datapoints are
-# percent signal change relative to baseline.
-aryAllSubsRoiErt = np.subtract(aryAllSubsRoiErt, 1.0)
+# pre-stimulus baseline. The datapoints are signal intensity relative to the
+# pre-stimulus baseline, and the pre-stimulus baseline has a mean of one. We
+# subtract one, so that the datapoints are percent signal change relative to
+# baseline.
+for strSubID, aryRoiErt in dicAllSubsRoiErt.items():
+    aryRoiErt = np.subtract(aryRoiErt, 1.0)
+    # Is this line necessary (hard copy)?
+    dicAllSubsRoiErt[strSubID] = aryRoiErt
+# *****************************************************************************
 
-# Extract the time segments for the positive response and the post-stimulus
-# undershoot again (because they have changed when subtracting the baseline
-# mean):
+
+# *****************************************************************************
+# *** Create across-subjects data array (again)
+
+# This has to be done again because the data has changed when subtracting the
+# baseline mean.
+
+# Create across-subjects data array of the form:
+# aryAllSubsRoiErt[varNumSub, varNumCon, varNumDpth, varNumVol]
+aryAllSubsRoiErt = np.zeros((varNumSub, varNumCon, varNumDpth, varNumVol))
+idxSub = 0
+for aryRoiErt in dicAllSubsRoiErt.values():
+    aryAllSubsRoiErt[idxSub, :, :, :] = aryRoiErt
+    idxSub += 1
+
+# Likewise, extract the time segments for the positive response and the
+# post-stimulus undershoot again :
 aryMax = aryAllSubsRoiErt[:, :, :, (tplIdxMax)]
 aryMin = aryAllSubsRoiErt[:, :, :, (tplIdxMin)]
 
 # Take the mean over time within the two segments:
 aryMax = np.mean(aryMax, axis=3)
 aryMin = np.mean(aryMin, axis=3)
+# *****************************************************************************
+
+
+# *****************************************************************************
+# *** Plot positive response for each subject
+
+for strSubID, aryRoiErt in dicAllSubsRoiErt.items():
+
+    # Extract the two time segment of the expected maximal response:
+    aryPos = aryRoiErt[:, :, (tplIdxMax)]
+
+
+
+    # Calculate 'grand mean', i.e. the mean PE across depth levels and
+    # conditions, for the current subject:
+    # varGrndMean = np.mean(aryPos[:, :])
+
+    # Divide all values by the grand mean:
+    # aryPos[:, :] = np.divide(aryPos[:, :], varGrndMean)
+
+
+    
+    # Take the mean over time within the segment:
+    aryPosMean = np.mean(aryPos, axis=2)
+
+    # We don't have the variances across trials (within subjects),
+    # therefore we create an empty array as a placeholder. NOTE: This
+    # should be replaced by between-trial variance once the depth sampling
+    # is fully scriptable.
+    aryDummy = np.zeros(aryPosMean.shape)
+
+    # Create single-subject depth plots for positive response:
+    funcPltAcrDpth(aryPosMean,   # Data to be plotted: aryData[Condition, Depth]
+                   aryDummy,   # Error shading: aryError[Condition, Depth]
+                   varNumDpth,   # Number of depth levels (on the x-axis)
+                   varNumCon,    # Number of conditions (separate lines)
+                   varDpi,       # Resolution of the output figure
+                   varYmin04,    # Minimum of Y axis
+                   varYmax04,    # Maximum of Y axis
+                   False,        # Boolean: whether to convert y axis to %
+                   lstConLbl,    # Labels for conditions (separate lines)
+                   strXlabel04,  # Label on x axis
+                   strYlabel04,  # Label on y axis
+                   strTtl04,     # Figure title
+                   lgcLgnd04,    # Boolean: whether to plot a legend
+                   strPathOut04.format(strSubID))  # Output path figure
+# *****************************************************************************
+
+
+# *****************************************************************************
+# *** Normalisation by division
+
+for idxSub in range(0, varNumSub):
+
+    # Calculate 'grand mean', i.e. the mean PE across depth levels and
+    # conditions, for the current subject:
+    varGrndMean = np.mean(aryMax[idxSub, :, :])
+
+    # Divide all values by the grand mean:
+    aryMax[idxSub, :, :] = np.divide(aryMax[idxSub, :, :], varGrndMean)
+    # aryDpthConf = np.divide(aryDpthConf, varGrndMean)
 # *****************************************************************************
 
 

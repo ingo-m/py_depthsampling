@@ -113,8 +113,8 @@ lgcSlct03 = True
 # strVtkSlct03 = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/combined_mean.vtk'  #noqa
 strVtkSlct03 = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/R2_multi.vtk'  #noqa
 # Threshold for vertex selection for second selection criterion:
-# varThrSlct03 = 7000.0
-varThrSlct03 = 0.1
+# varThrSlct03 = 8000.0
+varThrSlct03 = 0.15
 
 # (4)
 # Use exclusion mask:
@@ -130,7 +130,8 @@ varThrExcl = 2.0
 # selection?
 lgcVtk02 = True
 # How many vertices to select for each subject?
-lstNumVrtx = [800] * len(lstSubIds)
+lstNumVrtx = [1000] * len(lstSubIds)
+
 # Base name of second set of vtk files with depth-sampled data, e.g. z-values
 # (with subject ID and stimulus level left open):
 strVtkDpth02 = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/zstat_lvl_{}.vtk'  #noqa
@@ -177,7 +178,7 @@ strYlabel = 'fMRI signal change [arbitrary units]'
 # Output path for plots - prfix:
 strPltOtPre = '/home/john/Desktop/tex_pe/plots_v2/'
 # Output path for plots - suffix:
-strPltOtSuf = '_depthplot.png'
+strPltOtSuf = '_depthplot_1000_R2multi_0p15.png'
 
 # Figure scaling factor:
 varDpi = 96.0
@@ -259,7 +260,6 @@ for idxSub in range(0, varNumSubs):
     lstVtkDpth02 = [strVtkDpth02.format(lstSubIds[idxSub],
                                         strTmp) for strTmp in lstCon]
     # lstVtkDpth02 = [strVtkDpth02.format(lstSubIds[idxSub])] * len(lstCon)
-    print(lstVtkDpth02)
 
     # Prepare processes that plot & return single subject data:
     lstPrcs[idxSub] = \

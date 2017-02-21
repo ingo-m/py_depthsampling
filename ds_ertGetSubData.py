@@ -90,6 +90,10 @@ def funcGetSubData(strSubId,
     # is supposed to contain ones for vertices that are included, and zeros
     # elsewhere).
     vecInc = np.greater_equal(vecVtkMsk, 0.5)
+    
+    print('---------Subject: ' + strSubId + ' --- Number of vertices in ROI: '
+          + str(np.sum(vecInc)))
+    print('------------Based on vtk mask: ' + strVtkMsk)
 
     # Apply selection to timecourses:
     aryErt = aryErt[:, :, :, vecInc]

@@ -335,9 +335,13 @@ def funcAcrSubGetSubsData(idxPrc,        # Process ID  #noqa
                      fontsize=13)
 
     # Adjust title:
+    # strTitle = (strSubId + ' ' + strTitle + ' - Number of vertices: ' +
+    #             str(varNumInc) + ', z-conjunction-threshold = ' +
+    #             str(np.around((varThrZcon), decimals=2)))
+
     strTitle = (strSubId + ' ' + strTitle + ' - Number of vertices: ' +
-                str(varNumInc) + ', z-conjunction-threshold = ' +
-                str(np.around((varThrZcon), decimals=2)))
+                str(varNumInc))
+
     axs01.set_title(strTitle, fontsize=10)
 
     # Legend for axis 1:

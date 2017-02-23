@@ -70,11 +70,9 @@ print('-Visualisation of depth sampling results')
 lstSubIds = ['20150930',
              '20151118',
              '20151127_01',
-             '20151130_01',
              '20151130_02',
              '20161205',
              '20161207',
-             '20161212_01',
              '20161212_02',
              '20161214',
              '20161219_01']
@@ -86,13 +84,13 @@ lstConLbl = ['2.5%', '6.1%', '16.3%', '72.0%']
 
 # Base path of first set of vtk files with depth-sampled data, e.g. parameter
 # estimates (with subject ID and stimulus level left open):
-strVtkDpth01 = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/pe_stim_lvl_{}.vtk'  # noqa
+strVtkDpth01 = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/pe_stim_lvl_{}.vtk'  # noqa
 
 # (1)
 # Base path of csv files with ROI definition (i.e. patch of cortex selected on
 # the surface, e.g. V1 or V2) - i.e. the first vertex selection criterion (with
 # subject ID left open):
-strCsvRoi = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/v2.csv'  #noqa
+strCsvRoi = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/v1.csv'  #noqa
 
 # (2)
 # Use second selection criterion defined at one depth level (legacy function):
@@ -110,17 +108,17 @@ varThrSlct02 = 0.2
 lgcSlct03 = True
 # Path of vtk files with 3rd vertex selection criterion. This vtk file is
 # supposed to contain one set of data values for each depth level.
-# strVtkSlct03 = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/combined_mean.vtk'  #noqa
-strVtkSlct03 = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/R2_multi.vtk'  #noqa
+# strVtkSlct03 = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/combined_mean.vtk'  #noqa
+strVtkSlct03 = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/R2_multi.vtk'  #noqa
 # Threshold for vertex selection for second selection criterion:
-# varThrSlct03 = 8000.0
+# varThrSlct03 = 7000.0
 varThrSlct03 = 0.15
 
 # (4)
 # Use exclusion mask:
 lgcMskExcl = False
 # Path of exclusion mask:
-strVtkExcl = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/SD.vtk'  #noqa
+strVtkExcl = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/SD.vtk'  #noqa
 # Exclusion mask threshold (if ABOVE this threshold at any depth level, vertex
 # is excluded from depth sampling):
 varThrExcl = 2.0
@@ -134,7 +132,7 @@ lstNumVrtx = [1000] * len(lstSubIds)
 
 # Base name of second set of vtk files with depth-sampled data, e.g. z-values
 # (with subject ID and stimulus level left open):
-strVtkDpth02 = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/zstat_lvl_{}.vtk'  #noqa
+strVtkDpth02 = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/zstat_lvl_{}.vtk'  #noqa
 
 # (6)
 # Use PE range?
@@ -162,7 +160,7 @@ strPrcdData = 'SCALARS'
 varNumLne = 2
 
 # Title for mean plot:
-strTitle = ('Left hemisphere V2')
+strTitle = ('Left hemisphere V1')
 
 # Limits of y-axis for single subject plots (list of tuples, [(Ymin, Ymax)]):
 lstLimY = [(0.0, 2.5)] * len(lstSubIds)
@@ -176,9 +174,10 @@ strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'fMRI signal change [arbitrary units]'
 
 # Output path for plots - prfix:
-strPltOtPre = '/home/john/Desktop/tex_pe/plots_v2/'
+strPltOtPre = '/home/john/Desktop/tex_pe/plots_v1/'
 # Output path for plots - suffix:
 strPltOtSuf = '_depthplot_1000_R2multi_0p15.png'
+# strPltOtSuf = '_depthplot_1000_combmean_7000.png'
 
 # Figure scaling factor:
 varDpi = 96.0
@@ -212,7 +211,7 @@ varLinRegYmax = 0.165  # 0.165  # 0.15  # 0.17
 strLinRegYlabel = 'Regression coefficient'
 
 # Output path for depth samling results (within subject means):
-strDpthMeans = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Higher_Level_Analysis/depthsampling_mean_pe/v2.npy'  #noqa
+strDpthMeans = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy'  #noqa
 
 # Maximum number of processes to run in parallel: *** NOT IMPLEMENTED
 # varPar = 10

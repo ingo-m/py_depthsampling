@@ -56,11 +56,9 @@ strPthPic = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/era_v1.pickl
 lstSubId = ['20150930',
             '20151118',
             '20151127_01',
-            '20151130_01',
             '20151130_02',
             '20161205',
             '20161207',
-            '20161212_01',
             '20161212_02',
             '20161214',
             '20161219_01']
@@ -145,7 +143,7 @@ if lgcPic:
     print('---Loading data pickle')
 
     # Load previously prepared event-related timecourses from pickle:
-    dicAllSubsRoiErt = pickle.load(open(strPthPic, "rb" ))
+    dicAllSubsRoiErt = pickle.load(open(strPthPic, "rb"))
 
 else:
 

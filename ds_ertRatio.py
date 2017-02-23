@@ -62,7 +62,7 @@ varNumDpth = 11
 
 # Time points at which maximum response is expected (for calculation of ratio
 # positive response / undershoot):
-tplIdxMax = (5, 5)
+tplIdxMax = (5, 6)
 
 # Time points at which post-stimulus undershoot is expected (for calculation
 # of ratio positive response / undershoot):
@@ -140,7 +140,7 @@ print('-Depth-dependent BOLD ERT plots')
 print('---Loading data pickle file')
 
 # Load previously prepared event-related timecourses from pickle:
-dicAllSubsRoiErt = pickle.load(open(strPthPic, "rb" ))
+dicAllSubsRoiErt = pickle.load(open(strPthPic, "rb"))
 
 # The dictionary contains one array per subject, of the form:
 # aryRoiErt[Condition, Depth, Volume]
@@ -268,7 +268,7 @@ for strSubID, aryRoiErt in dicAllSubsRoiErt.items():
     # aryPos[:, :] = np.divide(aryPos[:, :], varGrndMean)
 
 
-    
+
     # Take the mean over time within the segment:
     aryPosMean = np.mean(aryPos, axis=2)
 
@@ -279,7 +279,7 @@ for strSubID, aryRoiErt in dicAllSubsRoiErt.items():
     aryDummy = np.zeros(aryPosMean.shape)
 
     # Create single-subject depth plots for positive response:
-    funcPltAcrDpth(aryPosMean,   # Data to be plotted: aryData[Condition, Depth]
+    funcPltAcrDpth(aryPosMean,   # Data for plot: aryData[Condition, Depth]
                    aryDummy,   # Error shading: aryError[Condition, Depth]
                    varNumDpth,   # Number of depth levels (on the x-axis)
                    varNumCon,    # Number of conditions (separate lines)
@@ -330,7 +330,7 @@ funcPltAcrDpth(aryPosMean,
                varDpi,
                varYmin01,
                varYmax01,
-               True,
+               False,
                lstConLbl,
                strXlabel01,
                strYlabel01,

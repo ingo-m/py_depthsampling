@@ -50,20 +50,19 @@ def fncLoadNii(strPathIn):
     # Output nii data as numpy array and header:
     return aryTmp, hdrTmp, aryAff
 
+
 # %% Define parameters
 
 # Subject IDs & run IDs for each subject (for some subjects, not all runs can
 # be included):
 dicSubId = {'20150930': ['01', '02', '03', '04', '05', '06'],
             '20151118': ['01', '03', '04', '05', '06'],
-            '20151127_01': ['01', '02', '03', '04', '05', '06'],
-            '20151130_01': ['01', '03', '04', '05', '06'],
-            '20151130_02': ['01', '02', '03', '04', '05', '06'],
-            '20161205': ['01', '02', '03', '04', '05', '06'],
+            '20151127_01': ['01', '02', '03', '04', '05'],
+            '20151130_02': ['02', '03', '04', '05', '06'],
+            '20161205': ['02', '03', '04', '05', '06'],
             '20161207': ['01', '02', '03', '04', '05', '06'],
-            '20161212_01': ['01', '02', '03', '04', '05', '06'],
-            '20161212_02': ['01', '02', '03', '04', '05', '06'],
-            '20161214': ['01', '02', '03', '04', '05', '06'],
+            '20161212_02': ['02', '03', '04', '05', '06'],
+            '20161214': ['02', '03', '04'],
             '20161219_01': ['01', '02', '03', '04', '05', '06'],
             '20161219_02': ['01', '02', '03', '04', '05', '06']
             }
@@ -102,7 +101,7 @@ varVolsPst = 7
 #   1 = No normalisation.
 #   2 = Segments are normalised trial-by-trial (before averaging).
 #   3 = The event-related average is normalised (after averaging).
-varDemean = 3
+varDemean = 2
 
 # Which time points to use for the de-meaning, relative to the stimulus
 # condition onset. (I.e., if you specify -3 and 0, the three volumes
@@ -116,11 +115,11 @@ lgcSegs = False
 
 
 # %% Loop through subjects:
-    
-for strSubId in dicSubId.keys():
+
+for strSubId in dicSubId.keys():  #noqa
 
     # %% Preparations
-    
+
     print('-Processing subject: ' + strSubId)
 
     # Input & output directories, formatted for this subject:
@@ -134,10 +133,10 @@ for strSubId in dicSubId.keys():
     # therefore image dimensions, are assummed to be identical across runs):
     _, hdr01, aryAff01 = fncLoadNii((strPthPrnt.format(strSubId)
                                      + strInNii.format(dicSubId[strSubId][0])))
-    
+
     # Image dimensions:
     aryDim = np.copy(hdr01['dim'])
-    
+
     # Check whether directory for segments of each trial already exists, if not
     # create it:
     if lgcSegs:
@@ -150,18 +149,18 @@ for strSubId in dicSubId.keys():
             # Create direcotry for segments:
             os.mkdir(strPathSegs)
         # print('---Trial segments will be saved at: ' + strPathSegs)
-    
+
     # Convert number of pre-stimulus volumes to integer, just in case the user
     # entered a float:
     varVolsPre = int(np.around(varVolsPre, 0))
-    
+
     # %% Load design matrices (EV files)
 
     print('---Load design matrices (EV files)')
-    
+
     # Empty list that will be filled with EV data:
     lstEV = []
-    
+
     for idxRun in range(0, varNumRuns):
         # print('---Loading: ' + lstIn02[idxRun])
         # Read text file:
@@ -173,7 +172,7 @@ for strSubId in dicSubId.keys():
                             )
         # Append current csv object to list:
         lstEV.append(aryTmp)
-    
+
     # %% Create event-related segments
 
     print('---Create event-related segments')
@@ -189,11 +188,11 @@ for strSubId in dicSubId.keys():
                                (varDurStim / float(varTR)) +
                                float(varVolsPst)
                                )))
-    
+
     # Number of stimulus-condition blocks per run (assumed to be equal across
     # runs):
     varNumBlck = len(lstEV[0][lstEV[0][:, 0] == 3, 1:][:, 0])
-    
+
     # Array that will be filled with event-related segments:
     aryTrials = np.empty((aryDim[1],
                           aryDim[2],
@@ -203,52 +202,52 @@ for strSubId in dicSubId.keys():
                           varNumBlck,
                           varSegDur,
                           ), dtype='float32')
-    
+
     # Loop through runs:
     for idxRun in np.arange(varNumRuns):
 
         strInNiiTmp = strInNii.format(dicSubId[strSubId][idxRun])
-        
+
         print('------Processing run: ' + strInNiiTmp)
-    
+
         # Load nii data
-    
+
         # Load input 4D nii files:
         aryTmpRun, _, _ = fncLoadNii((strPthPrntTmp + strInNiiTmp))
-    
+
         # Loop through stimulus levels (conditions):
         for idxCon in np.arange(varNumStimLvls):
-    
+
             print('---------Processing stim level: ' + str((idxCon + 1)))
-    
+
             # Retrieve start times & duration of the current condition (add 3
             # here because relevant stim levels are coded as 3,4,5,6):
             aryFsl = lstEV[idxRun][lstEV[idxRun][:, 0] == idxCon + 3, 1:]
-    
+
             # Loop through blocks:
             for idxBlck in np.arange(varNumBlck):
-    
+
                 # Start time of current block (in seconds, as in EV file):
                 varTmpStr = (aryFsl[idxBlck, 0] / varTR)
-    
+
                 # Stop time of current condition:
                 varTmpEnd = varTmpStr + (aryFsl[idxBlck, 1] / varTR)
                 # Add post-condition interval to stop time:
                 varTmpEnd = varTmpEnd + varVolsPst
-    
+
                 # We need to remove rounding error from the start and stop
                 # indices, and convert them to integers:
                 varTmpStr = int(np.around(varTmpStr, 0))
                 varTmpEnd = int(np.around(varTmpEnd, 0))
                 # print('---------------varTmpStr:' + str(varTmpStr))
                 # print('---------------varTmpEnd:' + str(varTmpEnd))
-    
+
                 # Cut segment pertaining to current run and block:
                 aryTmpBlck = np.copy(aryTmpRun[:,
                                                :,
                                                :,
                                                (varTmpStr - varVolsPre):varTmpEnd])
-    
+
     #            # Trial-by-trial normalisation:
     #            if varDemean == 2:
     #                # Get prestimulus baseline:
@@ -268,14 +267,14 @@ for strSubId in dicSubId.keys():
     #                aryTmpBlck[aryTmpNonZero] = \
     #                    np.divide(aryTmpBlck[aryTmpNonZero],
     #                              aryTmpBseMne[aryTmpNonZero, None])
-    
+
                 # Assign current stimulus segment to array:
                 aryTrials[:, :, :, idxCon, idxRun, idxBlck, :] = aryTmpBlck
-    
+
     # %% Trial-by-trial normalisation:
-    
+
     if varDemean == 2:
-    
+
         # Get prestimulus baseline:
         aryBse = np.copy(aryTrials[:,
                                    :,
@@ -285,7 +284,7 @@ for strSubId in dicSubId.keys():
                                    :,
                                    (varVolsPre + tplBase[0]):
                                    (varVolsPre + tplBase[1])])
-    
+
         # Mean for each voxel over time (i.e. over the pre-stimulus baseline):
         aryBseMne = np.mean(aryBse, axis=6)
         # Get indicies of voxels that have a non-zero prestimulus baseline:
@@ -294,12 +293,12 @@ for strSubId in dicSubId.keys():
         # the prestimulus baseline:
         aryTrials[aryNonZero] = np.divide(aryTrials[aryNonZero],
                                           aryBseMne[aryNonZero, None])
-    
+
     # %% Average over trials
-    
+
     # Get dimensions:
     tplShpe = aryTrials.shape
-    
+
     # Combine the dimensions corresponding to runs and blocks:
     aryTrials = np.reshape(aryTrials,
                            (tplShpe[0],
@@ -308,14 +307,14 @@ for strSubId in dicSubId.keys():
                             tplShpe[3],
                             (tplShpe[4] * tplShpe[5]),
                             tplShpe[6]))
-    
+
     # Average over run- & block-dimension (create event-related average):
     aryEvntRltAvrg = np.mean(aryTrials, axis=4)
-    
+
     # %% Normalisation on event-related averages:
-    
+
     if varDemean == 3:
-    
+
         # Get prestimulus baseline:
         aryBse = np.copy(aryEvntRltAvrg[:,
                                         :,
@@ -323,7 +322,7 @@ for strSubId in dicSubId.keys():
                                         :,
                                         (varVolsPre + tplBase[0]):
                                         (varVolsPre + tplBase[1])])
-    
+
         # Mean for each voxel over time (i.e. over the pre-stimulus baseline):
         aryBseMne = np.mean(aryBse, axis=4)
         # Get indicies of voxels that have a non-zero prestimulus baseline:
@@ -332,42 +331,44 @@ for strSubId in dicSubId.keys():
         # the prestimulus baseline:
         aryEvntRltAvrg[aryNonZero] = np.divide(aryEvntRltAvrg[aryNonZero],
                                                aryBseMne[aryNonZero, None])
-    
+
     # %% Save segments npy
-    
-    print('---Saving segments as npy file')
-    
-    # Adjust output filename:
-    if varDemean == 1:
-        strTmp = (strPthOtTmp + 'era')
-    elif varDemean == 2:
-        strTmp = (strPthOtTmp + 'era_norm_tbt')
-    elif varDemean == 3:
-        strTmp = (strPthOtTmp + 'era_norm')
-    
-    # Save array as npy file:
-    np.save(strTmp, aryTrials)
-    
+
+    if False:
+
+        print('---Saving segments as npy file')
+
+        # Adjust output filename:
+        if varDemean == 1:
+            strTmp = (strPthOtTmp + 'era')
+        elif varDemean == 2:
+            strTmp = (strPthOtTmp + 'era_norm')
+        elif varDemean == 3:
+            strTmp = (strPthOtTmp + 'era_norm')
+
+        # Save array as npy file:
+        np.save(strTmp, aryTrials)
+
     # %% Save event-related averages as nii
-    
+
     print('---Save event-related averages as nii')
-    
+
     # Loop through stimulus levels (conditions):
     for idxCon in np.arange(varNumStimLvls):
-    
+
         print('---------Processing stim level: ' + str((idxCon + 1)))
-    
+
         # Adjust output filename:
         if varDemean == 1:
             strTmp = (strPthOtTmp + 'er_avrg_stim_lvl_0' +
                       str((idxCon + 1)) + '.nii')
         elif varDemean == 2:
-            strTmp = (strPthOtTmp + 'er_avrg_demeaned_tbt_stim_lvl_0' +
+            strTmp = (strPthOtTmp + 'er_avrg_demeaned_stim_lvl_0' +
                       str((idxCon + 1)) + '.nii')
         elif varDemean == 3:
             strTmp = (strPthOtTmp + 'er_avrg_demeaned_stim_lvl_0' +
                       str((idxCon + 1)) + '.nii')
-    
+
         # Create nii object for results:
         niiOut = nb.Nifti1Image(aryEvntRltAvrg[:, :, :, idxCon, :],
                                 aryAff01,

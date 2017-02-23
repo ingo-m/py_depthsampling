@@ -43,21 +43,19 @@ from os import rename
 dicSubId = {'20150930': 6,
             '20151118': 6,
             '20151127_01': 7,
-            '20151130_01': 7,
             '20151130_02': 7,
             '20161205': 6,
             '20161207': 6,
-            '20161212_01': 7,
             '20161212_02': 7,
             '20161214': 6,
             '20161219_01': 7}
 
 # Paths with files to be renamed (subject ID left open):
-lstPths = ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh/',
-           '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh_era/stim_lvl_01/',  #noqa
-           '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh_era/stim_lvl_02/',  #noqa
-           '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh_era/stim_lvl_03/',  #noqa
-           '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/{}/cbs_distcor/lh_era/stim_lvl_04/']  #noqa
+lstPths = ['/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/',
+           '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh_era/stim_lvl_01/',  #noqa
+           '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh_era/stim_lvl_02/',  #noqa
+           '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh_era/stim_lvl_03/',  #noqa
+           '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh_era/stim_lvl_04/']  #noqa
 
 # File type (suffix):
 strFleTpe = '.vtk'

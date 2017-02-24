@@ -44,15 +44,17 @@ from ds_paramEccDpthHist import funcParamEccDpthHist
 
 # List of subject IDs:
 lstSubId = ['20150930',
-            # '20151118',
-            '20151130_01',
-            '20151130_02']
+            '20151118',
+            '20151127_01',
+            '20151130_02',
+            '20161205',
+            '20161207',
+            '20161212_02',
+            '20161214',
+            '20161219_01']
 
-# Path of vtk files with eccentricity information:
-lstVtkEcc = ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/lh/20150930_mp2rage_seg_v24_lh__surf_05_inf_eccentricity.vtk',  #noqa
-             #'/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151118/cbs_distcor/lh/20151118_mp2rage_seg_v14_lh__surf_05_inf_eccentricity.vtk',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_01/cbs_distcor/lh/20151130_01_mp2rage_seg_v16_lh__surf_05_inf_eccentricity.vtk',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_02/cbs_distcor/lh/20151130_02_mp2rage_seg_v19_lh__surf_05_inf_eccentricity.vtk']  #noqa
+# Path of vtk files with eccentricity information (subject ID left open):
+strVtkEcc = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/eccentricity.vtk'  #noqa
 
 # Minimum & maximum eccentricity:
 # varEccMin = 0.5
@@ -72,11 +74,9 @@ vecEccBin = np.array([0.2,
                       4.5,
                       7.0])
 
-# Path of vtk file with statistical parameters (at several depth levels):
-lstVtkParam = ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/lh/20150930_mp2rage_seg_v24_lh__surf_05_inf_pe_stim_lvl_04.vtk',  #noqa
-               #'/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151118/cbs_distcor/lh/20151118_mp2rage_seg_v14_lh__surf_05_inf_pe_stim_lvl_04.vtk',  #noqa
-               '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_01/cbs_distcor/lh/20151130_01_mp2rage_seg_v16_lh__surf_05_inf_pe_stim_lvl_04.vtk',  #noqa
-               '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_02/cbs_distcor/lh/20151130_02_mp2rage_seg_v19_lh__surf_05_inf_pe_stim_lvl_04.vtk']  #noqa
+# Path of vtk file with statistical parameters (at several depth levels;
+# subject ID left open):
+strVtkParam = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/pe_stim_lvl_04.vtk'  #noqa
 # Number of depth levels in the parameter vtk files:
 varNumDpth = 11
 
@@ -88,32 +88,21 @@ strPrcdData = 'SCALARS'
 varNumLne = 2
 
 # Paths of csv files with ROI information (created with paraview on a vtk mesh
-# in the same space as the above vtk files):
-# lstCsvRoi = ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/lh/v1_liberal.csv',  #noqa
-#             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151118/cbs_distcor/lh/v1_liberal.csv',  #noqa
-#             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_01/cbs_distcor/lh/v1_liberal.csv',  #noqa
-#             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_02/cbs_distcor/lh/v1_liberal.csv']  #noqa
-lstCsvRoi = ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/lh/v2.csv',  #noqa
-             #'/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151118/cbs_distcor/lh/v2.csv',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_01/cbs_distcor/lh/v2.csv',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_02/cbs_distcor/lh/v2.csv']  #noqa
+# in the same space as the above vtk files; subject ID left open):
+strCsvRoi = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/v1.csv'  #noqa
 
 # Number of header lines in ROI CSV file:
 varNumHdrRoi = 1
 
-# Paths of vtk files with intensity information for thresholding (one value per
-# vertex, e.g. R2 from pRF analysis):
-lstVtkThr = ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/lh/20150930_mp2rage_seg_v24_lh__surf_05_inf_R2.vtk',  #noqa
-             #'/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151118/cbs_distcor/lh/20151118_mp2rage_seg_v14_lh__surf_05_inf_R2.vtk',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_01/cbs_distcor/lh/20151130_01_mp2rage_seg_v16_lh__surf_05_inf_R2.vtk',  #noqa
-             '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20151130_02/cbs_distcor/lh/20151130_02_mp2rage_seg_v19_lh__surf_05_inf_R2.vtk']  #noqa
-
-# Threshold (e.g. minimum R2 value):
-# varThr = 0.15
-varThr = 0.125
+# Paths of vtk files with intensity information for thresholding (at all depth
+# levels, e.g. R2 from pRF analysis; subject ID left open):
+strVtkThr = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/R2_multi.vtk'  #noqa
+# Threshold (e.g. minimum R2 value - if vertex is below this value at any
+# depth level, vertex is excluded):
+varThr = 0.16
 
 # Output basename:
-strPathOut = '/home/john/Desktop/paramEccV2/plot'
+strPathOut = '/home/john/Desktop/paramEccV1/plot_stim_lvl_04'
 # *****************************************************************************
 
 
@@ -140,15 +129,15 @@ for idxSub in range(0, varNumSub):
     print(('------Dataset: ' + lstSubId[idxSub]))
 
     lstSubMean[idxSub], lstSubEcc[idxSub] = \
-        funcParamEccDpthGet(lstVtkEcc[idxSub],
+        funcParamEccDpthGet(strVtkEcc.format(lstSubId[idxSub]),
                             strPrcdData,
                             varNumLne,
-                            lstVtkParam[idxSub],
+                            strVtkParam.format(lstSubId[idxSub]),
                             varNumDpth,
-                            lstCsvRoi[idxSub],
+                            strCsvRoi.format(lstSubId[idxSub]),
                             varNumHdrRoi,
                             vecEccBin,
-                            lstVtkThr[idxSub],
+                            strVtkThr.format(lstSubId[idxSub]),
                             varThr)
 # *****************************************************************************
 
@@ -189,21 +178,43 @@ funcParamEccDpthHist(vecEccAcrSubs,
 # *****************************************************************************
 
 
+## *****************************************************************************
+## *** Plot single subject results
+#
+#print('---Ploting single subject results')
+#
+## Loop through subjects and plot single subject results:
+#for idxSub in range(0, varNumSub):
+#
+#    print(('------Dataset: ' + lstSubId[idxSub]))
+#
+#    strTmp = (strPathOut + '_sngl_sub_' + lstSubId[idxSub] + '.png')
+#
+#    funcParamEccDpthPlt(lstSubMean[idxSub],
+#                        vecEccBin,
+#                        strTmp)
+## *****************************************************************************
+
+
 # *****************************************************************************
-# *** Plot single subject results
+# *** Grand mean scaling
 
-print('---Ploting single subject results')
-
-# Loop through subjects and plot single subject results:
+# Before averaging across subjects, we apply grand mean scaling; i.e. we
+# divide all PE values for a subject (i.e. all depth levels, all
+# eccentricities) by the grand mean (i.e. the mean across depth levels &
+# eccentricities).
 for idxSub in range(0, varNumSub):
 
-    print(('------Dataset: ' + lstSubId[idxSub]))
+    # Calculate 'grand mean', i.e. the mean PE across depth levels and
+    # conditions:
+    #varGrndMean = np.mean(lstSubMean[idxSub])
+    varGrndMean = np.median(lstSubMean[idxSub])
 
-    strTmp = (strPathOut + '_sngl_sub_' + lstSubId[idxSub] + '.png')
+    # Divide all values by the grand mean:
+    lstSubMean[idxSub] = np.divide(lstSubMean[idxSub], varGrndMean)
 
-    funcParamEccDpthPlt(lstSubMean[idxSub],
-                        vecEccBin,
-                        strTmp)
+    # Rescale data (multiplication by 100):
+    lstSubMean[idxSub] = np.multiply(lstSubMean[idxSub], 100.0)
 # *****************************************************************************
 
 

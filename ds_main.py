@@ -100,7 +100,7 @@ lgcSlct02 = False
 strVtkSlct02 = ''  #noqa
 # Threshold for vertex selection for 2nd selection criterion (vertex excluded
 # if data value is below threshold):
-varThrSlct02 = 0.2
+varThrSlct02 = 100.0
 
 # (3)
 # Use third selection criterion (vertices that are BELOW threshold at any depth
@@ -112,7 +112,7 @@ lgcSlct03 = True
 strVtkSlct03 = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/R2_multi.vtk'  #noqa
 # Threshold for vertex selection for second selection criterion:
 # varThrSlct03 = 7000.0
-varThrSlct03 = 0.15
+varThrSlct03 = 0.16
 
 # (4)
 # Use exclusion mask:
@@ -176,7 +176,7 @@ strYlabel = 'fMRI signal change [arbitrary units]'
 # Output path for plots - prfix:
 strPltOtPre = '/home/john/Desktop/tex_pe/plots_v1/'
 # Output path for plots - suffix:
-strPltOtSuf = '_depthplot_1000_R2multi_0p15.png'
+strPltOtSuf = '_depthplot_1000_R2multi_0p16.png'
 # strPltOtSuf = '_depthplot_1000_combmean_7000.png'
 
 # Figure scaling factor:

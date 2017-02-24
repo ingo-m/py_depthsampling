@@ -70,9 +70,10 @@ def funcParamEccDpthGet(strVtkEcc,
                                 varNumHdrRoi)
 
     # Import intensity data for vertex selection (e.g. R2 values):
-    vecVtkThr = funcLoadVtkSingle(strVtkThr,
-                                  strPrcdData,
-                                  varNumLne)
+    aryVtkThr = funcLoadVtkMulti(strVtkThr,
+                                 strPrcdData,
+                                 varNumLne,
+                                 varNumDpth)
     # *************************************************************************
 
     # *************************************************************************
@@ -90,10 +91,15 @@ def funcParamEccDpthGet(strVtkEcc,
     # *************************************************************************
     # *** Select vertices based on intensity criterion
 
+    # We would like to exclude vertices if the intensity (e.g. R2 value) is
+    # below the threshold at any depth level. Get minimum value across
+    # cortical depths:
+    vecVtkThr = np.min(aryVtkThr, axis=1)
+
     # Previously, we selected those vertices in the data array that are
     # contained within the ROI. In order to apply the intensity-criterion, we
     # have to extract the data corresponding to the ROI from the intensity
-    # array (e.g. extract R2 data for the ROI).
+    # array (extract e.g. R2 data for the ROI).
 
     # Selcet vertices from patch-selection arrays:
     vecVtkThr = vecVtkThr[vecRoiIdx]

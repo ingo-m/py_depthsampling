@@ -264,6 +264,7 @@ def funcAcrSubGetSubsData(idxPrc,        # Process ID  #noqa
         # Calculate 'grand mean', i.e. the mean PE across depth levels and
         # conditions:
         varGrndMean = np.mean(aryDpthMean)
+        # varGrndMean = np.median(aryDpthMean)
 
         # Divide all values by the grand mean:
         aryDpthMean = np.divide(aryDpthMean, varGrndMean)

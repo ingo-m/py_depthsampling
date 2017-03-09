@@ -75,7 +75,8 @@ lstSubIds = ['20150930',
              '20161207',
              '20161212_02',
              '20161214',
-             '20161219_01']
+             '20161219_01',
+             '20161219_02']
 
 # Condition levels (used to complete file names):
 lstCon = ['01', '02', '03', '04']
@@ -160,7 +161,7 @@ strPrcdData = 'SCALARS'
 varNumLne = 2
 
 # Title for mean plot:
-strTitle = ('Left hemisphere V1')
+strTitle = ('V1')
 
 # Limits of y-axis for single subject plots (list of tuples, [(Ymin, Ymax)]):
 lstLimY = [(0.0, 2.5)] * len(lstSubIds)
@@ -180,7 +181,7 @@ strPltOtSuf = '_depthplot_1000_R2multi_0p16.png'
 # strPltOtSuf = '_depthplot_1000_combmean_7000.png'
 
 # Figure scaling factor:
-varDpi = 96.0
+varDpi = 80.0
 
 # If normalisation - data from which input file to divide by?
 # (Indexing starts at zero.) Note: This functionality is not used at the

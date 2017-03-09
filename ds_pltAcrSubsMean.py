@@ -112,25 +112,35 @@ def funcPltAcrSubsMean(arySubDpthMns,
     # Labels for x ticks:
     axs01.set_xticklabels(['WM', 'CSF'])
 
+    # Which y values to label with ticks:
+    # vecYlbl = np.linspace(varAcrSubsYmin,
+    #                       varAcrSubsYmax,
+    #                       num=5,
+    #                       endpoint=True)
+    vecYlbl = np.linspace(0, varAcrSubsYmax, num=5, endpoint=True)
+    # Round:
+    # vecYlbl = np.around(vecYlbl, decimals=2)
+    # Set ticks:
+    axs01.set_yticks(vecYlbl)
+
     # Set x & y tick font size:
-    axs01.tick_params(labelsize=24,
+    axs01.tick_params(labelsize=36,
                       top='off',
                       right='off')
 
     # Adjust labels:
     axs01.set_xlabel(strXlabel,
-                     fontsize=24)
+                     fontsize=36)
     axs01.set_ylabel(strYlabel,
-                     fontsize=24)
+                     fontsize=36)
 
     # Adjust title:
-    # axs01.set_title((strTitle + ', n=' + str(varNumSubs)),
-    #                 fontsize=13)
+    axs01.set_title(strTitle, fontsize=36, fontweight="bold")
 
     # Legend for axis 1:
-    # axs01.legend(loc=0,
-    #              frameon=False,
-    #              prop={'size': 22})
+    #axs01.legend(loc=0,
+    #             frameon=False,
+    #             prop={'size': 22})
 
     # # Add vertical grid lines:
     #    axs01.xaxis.grid(which=u'major',

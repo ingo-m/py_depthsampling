@@ -46,11 +46,11 @@ from ds_ertPlt import funcPltErt
 
 # Load data from previously prepared pickle? If 'False', data is loaded from
 # vtk meshes and saved as pickle.
-lgcPic = False
+lgcPic = True # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 # Name of pickle file from which to load time course data or save time course
 # data to:
-strPthPic = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/era_v2.pickle'  #noqa
+strPthPic = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/era_v1.pickle'  #noqa
 
 # List of subject IDs:
 lstSubId = ['20150930',
@@ -61,13 +61,14 @@ lstSubId = ['20150930',
             '20161207',
             '20161212_02',
             '20161214',
-            '20161219_01']
+            '20161219_01',
+            '20161219_02']
 
 # Condition levels (used to complete file names):
 lstCon = ['01', '02', '03', '04']
 
 # Base name of vertex inclusion masks (subject ID left open):
-strVtkMsk = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/{}_vertec_inclusion_mask_v2.vtk'  #noqa
+strVtkMsk = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/{}_vertec_inclusion_mask_v1.vtk'  #noqa
 
 # Base name of single-volume vtk meshes that together make up the timecourse
 # (subject ID, stimulus level, and volume index left open):
@@ -91,7 +92,7 @@ lstLimY = [(0.0, 2.5)] * len(lstSubId)
 
 # Limits of axis for across subject plot:
 varAcrSubsYmin = -0.02
-varAcrSubsYmax = 0.10
+varAcrSubsYmax = 0.08
 
 # Convert y-axis values to percent (i.e. divide label values by 100)?
 lgcCnvPrct = True
@@ -118,9 +119,9 @@ lgcLgnd01 = False
 lgcLgnd02 = False
 
 # Output path for plots - prfix:
-strPltOtPre = '/home/john/Desktop/tex_era/plots_v2/'
+strPltOtPre = '/home/john/Desktop/tex_era/plots_v1/'
 # Output path for plots - suffix:
-strPltOtSuf = '_ert.png'
+strPltOtSuf = '_ert.svg'
 
 # Figure scaling factor:
 varDpi = 70.0

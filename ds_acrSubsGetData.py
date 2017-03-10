@@ -45,9 +45,9 @@ def funcAcrSubGetSubsData(idxPrc,        # Process ID  #noqa
                           lgcSlct03,     # Criterion 3 - Yes or no?
                           strVtkSlct03,  # Criterion 3 - VTK path
                           varThrSlct03,  # Criterion 3 - Threshold
-                          lgcMskExcl,    # Criterion 4 - Yes or no?
-                          strVtkExcl,    # Criterion 4 - VTK path
-                          varThrExcl,    # Criterion 4 - Threshold
+                          lgcSlct04,     # Criterion 4 - Yes or no?
+                          strVtkSlct04,  # Criterion 4 - VTK path
+                          varThrSlct04,  # Criterion 4 - Threshold
                           lgcVtk02,      # Criterion 5 - Yes or no?
                           lstVtkDpth02,  # Criterion 5 - VTK path
                           varNumVrtx,    # Criterion 5 - Num vrtx to include
@@ -110,18 +110,18 @@ def funcAcrSubGetSubsData(idxPrc,        # Process ID  #noqa
     else:
         arySlct03 = 0
 
-    # Import exclusion mask vtk file (fourth criterion, all depth levels)
-    if lgcMskExcl:
+    # Import fourth criterion vtk file (all depth levels)
+    if lgcSlct04:
         if idxPrc == 0:
-            print('---------Importing exclusion mask vtk file (all depth '
+            print('---------Importing fourth criterion vtk file (all depth '
                   + 'levels).')
-        aryExcl = funcLoadVtkMulti(strVtkExcl,
-                                   strPrcdData,
-                                   varNumLne,
-                                   varNumDpth)
+        arySlct04 = funcLoadVtkMulti(strVtkSlct04,
+                                     strPrcdData,
+                                     varNumLne,
+                                     varNumDpth)
     # Otherwise, create dummy array (for function I/O):
     else:
-        aryExcl = 0
+        arySlct04 = 0
 
     # Import first set of data vtk files
     if idxPrc == 0:
@@ -177,9 +177,9 @@ def funcAcrSubGetSubsData(idxPrc,        # Process ID  #noqa
                       lgcSlct03,      # Criterion 3 - Yes or no?
                       arySlct03,      # Criterion 3 - Data
                       varThrSlct03,   # Criterion 3 - Threshold
-                      lgcMskExcl,     # Criterion 4 - Yes or no? (excl. mask)
-                      aryExcl,        # Criterion 4 - Data (excl. mask)
-                      varThrExcl,     # Criterion 4 - Threshold (excl. mask)
+                      lgcSlct04,      # Criterion 4 - Yes or no?
+                      arySlct04,      # Criterion 4 - Data
+                      varThrSlct04,   # Criterion 4 - Threshold
                       lgcVtk02,       # Criterion 5 - Yes or no?
                       lstDpthData02,  # Criterion 5 - Depth-sampled data II
                       varNumVrtx,     # Criterion 5 - Num vrtx to include

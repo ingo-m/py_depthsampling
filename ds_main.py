@@ -19,9 +19,8 @@ Other optional vertex selection criteria are:
         threshold at any depth levels are excluded. For example, a venogram,
         (or a T2* weighted EPI image with low intensities around veins) that is
         defined at all depth level can be used.
-    (4) Multi-depth level criterion II - vertices that are ABOVE a certain
-        threshold at any depth level are excluded. For instance, a binary mask
-        that is defined at all depth levels can be used.
+    (4) Multi-depth level criterion II - same as (3). Vertices that are BELOW a
+        certain threshold at any depth level are excluded.
 
     (5) Multi-level data distribution criterion I
         Selection based on combination of z-conjunction-mask mask and
@@ -109,20 +108,19 @@ varThrSlct02 = 100.0
 lgcSlct03 = True
 # Path of vtk files with 3rd vertex selection criterion. This vtk file is
 # supposed to contain one set of data values for each depth level.
-# strVtkSlct03 = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/combined_mean.vtk'  #noqa
 strVtkSlct03 = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/R2_multi.vtk'  #noqa
 # Threshold for vertex selection for second selection criterion:
-# varThrSlct03 = 7000.0
 varThrSlct03 = 0.16
 
 # (4)
-# Use exclusion mask:
-lgcMskExcl = False
+# Use fourth selection criterion (vertices that are BELOW threshold at any
+# depth level are excluded):
+lgcSlct04 = True
 # Path of exclusion mask:
-strVtkExcl = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/SD.vtk'  #noqa
+strVtkSlct04 = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/zstat_linear.vtk'  #noqa
 # Exclusion mask threshold (if ABOVE this threshold at any depth level, vertex
 # is excluded from depth sampling):
-varThrExcl = 2.0
+varThrSlct04 = 2.0
 
 # (5)
 # Load second set of vtk data files (z-values) and use them for vertex
@@ -253,7 +251,7 @@ for idxSub in range(0, varNumSubs):
     strCsvRoiTmp = strCsvRoi.format(lstSubIds[idxSub])
     strVtkSlct02Tmp = strVtkSlct02.format(lstSubIds[idxSub])
     strVtkSlct03Tmp = strVtkSlct03.format(lstSubIds[idxSub])
-    strVtkExclTmp = strVtkExcl.format(lstSubIds[idxSub])
+    strVtkSlct04Tmp = strVtkSlct04.format(lstSubIds[idxSub])
 
     # Create list with complete file names for multi-level data distribution
     # criterion II:
@@ -278,9 +276,9 @@ for idxSub in range(0, varNumSubs):
                          lgcSlct03,             # Criterion 3 - Yes or no?
                          strVtkSlct03Tmp,       # Criterion 3 - VTK path
                          varThrSlct03,          # Criterion 3 - Threshold
-                         lgcMskExcl,            # Criterion 4 - Yes or no?
-                         strVtkExclTmp,         # Criterion 4 - VTK path
-                         varThrExcl,            # Criterion 4 - Threshold
+                         lgcSlct04,             # Criterion 4 - Yes or no?
+                         strVtkSlct04Tmp,       # Criterion 4 - VTK path
+                         varThrSlct04,          # Criterion 4 - Threshold
                          lgcVtk02,              # Criterion 5 - Yes or no?
                          lstVtkDpth02,          # Criterion 5 - VTK path
                          lstNumVrtx[idxSub],    # Criterion 5 - Num vrtx

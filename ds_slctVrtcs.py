@@ -32,9 +32,9 @@ def funcSlctVrtcs(varNumCon,      # Number of conditions  #noqa
                   lgcSlct03,      # Criterion 3 - Yes or no?
                   arySlct03,      # Criterion 3 - Data
                   varThrSlct03,   # Criterion 3 - Threshold
-                  lgcMskExcl,     # Criterion 4 - Yes or no? (excl. mask)
-                  aryExcl,        # Criterion 4 - Data (excl. mask)
-                  varThrExcl,     # Criterion 4 - Threshold (excl. mask)
+                  lgcSlct04,      # Criterion 4 - Yes or no?
+                  arySlct04,      # Criterion 4 - Data
+                  varThrSlct04,     # Criterion 4 - Threshold
                   lgcVtk02,       # Criterion 5 - Yes or no?
                   lstDpthData02,  # Criterion 5 - VTK path
                   varNumVrtx,     # Criterion 5 - Num vrtx to include
@@ -91,6 +91,11 @@ def funcSlctVrtcs(varNumCon,      # Number of conditions  #noqa
 
     # Initialise number of included vertices:
     varNumInc = np.sum(vecInc)
+
+    # Only print status messages if this is the first of several parallel
+    # processes:
+    if idxPrc == 0:
+        print('------------Remaining vertices: ' + str(varNumInc))
     # **************************************************************************
 
     # **************************************************************************
@@ -115,6 +120,11 @@ def funcSlctVrtcs(varNumCon,      # Number of conditions  #noqa
 
         # Update number of included vertices:
         varNumInc = np.sum(vecInc)
+
+        # Only print status messages if this is the first of several parallel
+        # processes:
+        if idxPrc == 0:
+            print('------------Remaining vertices: ' + str(varNumInc))
     # **************************************************************************
 
     # **************************************************************************
@@ -143,56 +153,43 @@ def funcSlctVrtcs(varNumCon,      # Number of conditions  #noqa
 
         # Update number of included vertices:
         varNumInc = np.sum(vecInc)
+
+        # Only print status messages if this is the first of several parallel
+        # processes:
+        if idxPrc == 0:
+            print('------------Remaining vertices: ' + str(varNumInc))
     # **************************************************************************
 
     # **************************************************************************
     # *** (4) Multi-depth level criterion II
-    #         vertices ABOVE threshold at any depth level are excluded.
-    #         (E.g. exclusion mask.)
+    #         vertices BELOW threshold at any depth level are excluded.
 
-    if lgcMskExcl:
+    if lgcSlct04:
 
         if idxPrc == 0:
             print('---------Select vertices based on multi-depth level ' +
-                  'criterion II (e.g. exclusion mask)')
+                  'criterion II')
 
-        # Get maximum exclusion mask value across cortical depths:
-        vecMaxExcl = np.max(aryExcl, axis=1)
+        # Get minimum value across cortical depths:
+        vecMinSlct04 = np.min(arySlct04, axis=1)
 
         # Check whether vertex values are above the exclusion threshold:
-        vecExclMsk = np.greater(vecMaxExcl, varThrExcl)
+        vecSlct04 = np.greater(vecMinSlct04, varThrSlct04)
 
         # Extract values for ROI:
-        vecExclMsk = vecExclMsk[vecRoiIdx]
+        vecSlct04 = vecSlct04[vecRoiIdx]
 
-        # Number of currently included vertices:
-        varTmp = np.sum(vecInc)
-
-        # Number of vertices to exclude (among those that survived the previous
-        # selection criterion):
-        varNumExclMsk = np.sum(vecExclMsk[vecInc])
-
-        # Ratio of vertices to exclude:
-        varRatioExclMsk = np.multiply(np.divide(float(varNumExclMsk),
-                                                float(varTmp)),
-                                      100.0)
-        varRatioExclMsk = np.round(varRatioExclMsk, 0)
-
-        if idxPrc == 0:
-            print(('------------Will exclude ' + str(varNumExclMsk)
-                   + ' vertices out of ' + str(varTmp) + ', i.e. '
-                   + str(varRatioExclMsk) + '%, based on exclusion mask'))
-
-        # Take the inverse of the exclusion mask (i.e. instead of telling us
-        # whether to exclude a vertex if its value is 'true', it then informs
-        # whether to include a vertex if its value is 'true'):
-        vecExclMsk = np.logical_not(vecExclMsk)
-
-        # Apply mask to inclusion-vector:
-        vecInc = np.logical_and(vecInc, vecExclMsk)
+        # Apply second vertex selection criterion to inclusion-vector:
+        vecInc = np.logical_and(vecInc,
+                                vecSlct04)
 
         # Update number of included vertices:
         varNumInc = np.sum(vecInc)
+
+        # Only print status messages if this is the first of several parallel
+        # processes:
+        if idxPrc == 0:
+            print('------------Remaining vertices: ' + str(varNumInc))
     # **************************************************************************
 
     # **************************************************************************

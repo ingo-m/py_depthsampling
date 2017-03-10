@@ -109,7 +109,7 @@ lgcSlct03 = True
 # Path of vtk files with 3rd vertex selection criterion. This vtk file is
 # supposed to contain one set of data values for each depth level.
 strVtkSlct03 = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/R2_multi.vtk'  #noqa
-# Threshold for vertex selection for second selection criterion:
+# Threshold for vertex selection:
 varThrSlct03 = 0.16
 
 # (4)
@@ -117,10 +117,9 @@ varThrSlct03 = 0.16
 # depth level are excluded):
 lgcSlct04 = True
 # Path of exclusion mask:
-strVtkSlct04 = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/zstat_linear.vtk'  #noqa
-# Exclusion mask threshold (if ABOVE this threshold at any depth level, vertex
-# is excluded from depth sampling):
-varThrSlct04 = 2.0
+strVtkSlct04 = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/combined_mean.vtk'  #noqa
+# Threshold for vertex selection:
+varThrSlct04 = 7000.0
 
 # (5)
 # Load second set of vtk data files (z-values) and use them for vertex

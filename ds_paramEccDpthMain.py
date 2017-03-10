@@ -51,7 +51,8 @@ lstSubId = ['20150930',
             '20161207',
             '20161212_02',
             '20161214',
-            '20161219_01']
+            '20161219_01',
+            '20161219_02']
 
 # Path of vtk files with eccentricity information (subject ID left open):
 strVtkEcc = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/eccentricity.vtk'  #noqa
@@ -64,7 +65,6 @@ strVtkEcc = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/eccentricity.vtk
 # Create eccentricity bins:
 # vecEccBin = np.linspace(varEccMin, varEccMax, num=varEccNum, endpoint=True)
 vecEccBin = np.array([0.2,
-                      1.0,
                       1.5,
                       2.0,
                       2.5,

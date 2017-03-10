@@ -47,7 +47,6 @@ lstSubId = ['20150930',
             '20151118',
             '20151127_01',
             '20151130_02',
-            '20161205',
             '20161207',
             '20161212_02',
             '20161214',
@@ -65,13 +64,11 @@ strVtkEcc = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/eccentricity.vtk
 # Create eccentricity bins:
 # vecEccBin = np.linspace(varEccMin, varEccMax, num=varEccNum, endpoint=True)
 vecEccBin = np.array([0.2,
-                      1.5,
+                      1.2,
                       2.0,
-                      2.5,
                       3.0,
-                      3.5,
                       4.0,
-                      4.5,
+                      5.0,
                       7.0])
 
 # Path of vtk file with statistical parameters (at several depth levels;
@@ -96,10 +93,11 @@ varNumHdrRoi = 1
 
 # Paths of vtk files with intensity information for thresholding (at all depth
 # levels, e.g. R2 from pRF analysis; subject ID left open):
-strVtkThr = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/R2_multi.vtk'  #noqa
+# strVtkThr = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/R2_multi.vtk'  #noqa
+strVtkThr = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/combined_mean.vtk'  #noqa
 # Threshold (e.g. minimum R2 value - if vertex is below this value at any
 # depth level, vertex is excluded):
-varThr = 0.16
+varThr = 8000.0
 
 # Output basename:
 strPathOut = '/home/john/Desktop/paramEccV1/plot_stim_lvl_04'
@@ -123,12 +121,15 @@ lstSubMean = [None] * varNumSub
 # List for single subject data - eccentricity values for ROI:
 lstSubEcc = [None] * varNumSub
 
+# List for single subject data - number of vertices in each eccentricity bin:
+lstSubCnt = [None] * varNumSub
+
 # Loop through subjects and load eccentricity-by-depth data within ROI:
 for idxSub in range(0, varNumSub):
 
     print(('------Dataset: ' + lstSubId[idxSub]))
 
-    lstSubMean[idxSub], lstSubEcc[idxSub] = \
+    lstSubMean[idxSub], lstSubEcc[idxSub], lstSubCnt[idxSub] = \
         funcParamEccDpthGet(strVtkEcc.format(lstSubId[idxSub]),
                             strPrcdData,
                             varNumLne,
@@ -178,9 +179,31 @@ funcParamEccDpthHist(vecEccAcrSubs,
 # *****************************************************************************
 
 
+# *****************************************************************************
+# *** Grand mean scaling
+
+# Before averaging across subjects, we apply grand mean scaling; i.e. we
+# divide all PE values for a subject (i.e. all depth levels, all
+# eccentricities) by the grand mean (i.e. the mean across depth levels &
+# eccentricities).
+for idxSub in range(0, varNumSub):
+
+    # Calculate 'grand mean', i.e. the mean PE across depth levels and
+    # conditions:
+    varGrndMean = np.mean(lstSubMean[idxSub])
+    # varGrndMean = np.median(lstSubMean[idxSub])
+
+    # Divide all values by the grand mean:
+    lstSubMean[idxSub] = np.divide(lstSubMean[idxSub], varGrndMean)
+
+    # Rescale data (multiplication by 100):
+    lstSubMean[idxSub] = np.multiply(lstSubMean[idxSub], 100.0)
+# *****************************************************************************
+
+
 ## *****************************************************************************
 ## *** Plot single subject results
-#
+##
 #print('---Ploting single subject results')
 #
 ## Loop through subjects and plot single subject results:
@@ -197,28 +220,6 @@ funcParamEccDpthHist(vecEccAcrSubs,
 
 
 # *****************************************************************************
-# *** Grand mean scaling
-
-# Before averaging across subjects, we apply grand mean scaling; i.e. we
-# divide all PE values for a subject (i.e. all depth levels, all
-# eccentricities) by the grand mean (i.e. the mean across depth levels &
-# eccentricities).
-for idxSub in range(0, varNumSub):
-
-    # Calculate 'grand mean', i.e. the mean PE across depth levels and
-    # conditions:
-    #varGrndMean = np.mean(lstSubMean[idxSub])
-    varGrndMean = np.median(lstSubMean[idxSub])
-
-    # Divide all values by the grand mean:
-    lstSubMean[idxSub] = np.divide(lstSubMean[idxSub], varGrndMean)
-
-    # Rescale data (multiplication by 100):
-    lstSubMean[idxSub] = np.multiply(lstSubMean[idxSub], 100.0)
-# *****************************************************************************
-
-
-# *****************************************************************************
 # *** Plot across subject results
 
 print('---Ploting across subjects results')
@@ -229,12 +230,34 @@ varEccNum = vecEccBin.shape[0]
 # Array data from all subjects:
 arySubData = np.zeros(((varEccNum - 1), varNumDpth, varNumSub))
 
+# Array for total vertex count (total number of vertices in each bin, across
+# subject):
+vecCntTtl = np.zeros(lstSubCnt[0].shape)
+
 # Fill array:
 for idxSub in range(0, varNumSub):
-    arySubData[:, :, idxSub] = lstSubMean[idxSub]
+
+    # In order to calculate the weighted average, we multiply the PE values
+    # in each eccentricity bin with the number of vertices in that bin:
+    arySubData[:, :, idxSub] = np.multiply(lstSubMean[idxSub],
+                                           lstSubCnt[idxSub][:, None])
+    
+    # Add current subject's vertex count to total count:
+    vecCntTtl = vecCntTtl + lstSubCnt[idxSub]
+
+# Take weighted mean across subjects:
+
+arySubData = np.sum(arySubData, axis=2)
+
+arySubData = np.divide(arySubData, vecCntTtl[:, None])
+
+#idxSub = 0
+#aaa = lstSubMean[idxSub]
+#bbb = lstSubCnt[idxSub]
+
 
 # Take mean across subjects:
-arySubData = np.mean(arySubData, axis=2)
+# arySubData = np.mean(arySubData, axis=2)
 
 # Plot across subjects mean:
 strTmp = (strPathOut + '_acrsSubsMean.png')

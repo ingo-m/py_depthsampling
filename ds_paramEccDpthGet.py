@@ -170,6 +170,9 @@ def funcParamEccDpthGet(strVtkEcc,
 
     print(('---------' + str(vecEccIdx)))
 
+    # Array for number of vertices in each bin:
+    vecBinNumVrtc = np.zeros((varEccNum - 1))
+
     # Loop through eccentricity bins:
     for idxEcc in range(0, (varEccNum - 1)):
 
@@ -178,9 +181,12 @@ def funcParamEccDpthGet(strVtkEcc,
         varTmpFrst = vecEccIdx[idxEcc]
         varTmpLast = vecEccIdx[(idxEcc + 1)]
 
+        # Number of vertices in current eccentricity bin:
+        vecBinNumVrtc[idxEcc] =  varTmpLast - varTmpFrst
+
         # Report vertices in current eccentricity bin:
         strTmp = ('---------Eccentricity bin ' + str(idxEcc) + ' - Number ' +
-                  'of vertices: ' + str((varTmpLast - varTmpFrst)))
+                  'of vertices: ' + str(vecBinNumVrtc[idxEcc]))
         print(strTmp)
 
         # Calculate the mean across eccentricities:
@@ -197,5 +203,5 @@ def funcParamEccDpthGet(strVtkEcc,
     # Return the average statistical parameter for each eccentricity bin &
     # depth level, and the eccentricity information within the ROI (for
     # histrogram plot):
-    return aryMean, vecEcc
+    return aryMean, vecEcc, vecBinNumVrtc
     # *************************************************************************

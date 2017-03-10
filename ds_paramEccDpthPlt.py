@@ -56,8 +56,12 @@ def funcParamEccDpthPlt(aryMean,
     # Round:
     # varMin = (np.floor(varMin * 10.0) / 10.0)
     # varMax = (np.ceil(varMax * 10.0) / 10.0)
-    varMin = (np.floor(varMin * 0.1) / 0.1)
-    varMax = (np.ceil(varMax * 0.1) / 0.1)
+    varMin = np.floor(varMin)
+    varMax = np.ceil(varMax)
+    print('+++ varMin = ' + str(varMin))
+    print('+++ varMax = ' + str(varMax))
+    # varMin = (np.floor(varMin * 0.1) / 0.1)
+    # varMax = (np.ceil(varMax * 0.1) / 0.1)
 
     # Create main figure:
     fig01 = plt.figure(figsize=(4.0, 3.0),
@@ -226,7 +230,7 @@ def funcParamEccDpthPlt(aryMean,
 
     # Save figure:
     fig01.savefig(strPathOut,
-                  dpi=180.0,
+                  dpi=160.0,
                   facecolor='w',
                   edgecolor='w',
                   orientation='landscape',

@@ -69,7 +69,7 @@ vecEccBin = np.array([0.1,
 
 # Path of vtk file with statistical parameters (at several depth levels;
 # subject ID left open):
-strVtkParam = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/zstat_linear.vtk'  #noqa
+strVtkParam = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/pe_stim_lvl_04.vtk'  #noqa
 # Number of depth levels in the parameter vtk files:
 varNumDpth = 11
 
@@ -99,7 +99,7 @@ varThr = 0.25
 lgcNegLkp = True
 
 # Output basename:
-strPathOut = '/home/john/Desktop/paramEccV1/zstat_linear_R2_0p25'
+strPathOut = '/home/john/Desktop/paramEccV1/pe_stim_lvl_04_R2_0p25_GMS'
 # *****************************************************************************
 
 
@@ -183,7 +183,7 @@ funcParamEccDpthHist(vecEccAcrSubs,
 # *****************************************************************************
 # *** Grand mean scaling
 
-if False:
+if True:
 
     # Before averaging across subjects, we apply grand mean scaling; i.e. we
     # divide all PE values for a subject (i.e. all depth levels, all

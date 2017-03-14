@@ -57,7 +57,7 @@ import numpy as np
 import multiprocessing as mp
 from ds_acrSubsGetData import funcAcrSubGetSubsData
 from ds_pltAcrSubsMean import funcPltAcrSubsMean
-from ds_pltAcrSubsLinReg import funcPltAcrSubsLinReg
+from ds_linRegAcrSubs import funcLinRegAcrSubs
 # *****************************************************************************
 
 print('-Visualisation of depth sampling results')
@@ -191,7 +191,7 @@ varNormIdx = 0
 lgcNormDiv = True
 
 # Linear regression?
-lgcLinReg = False
+lgcLinReg = True
 
 # Constrast vector for simple linear regression model (array with one value per
 # condition, e.g. per stimulus contrast level):
@@ -202,8 +202,10 @@ vecLinRegMdl = np.array([-3.0, -1.0, 1.0, 3.0])
 varLinRegP = 0.001
 
 # Range of y-axis for regression plots:
-varLinRegYmin = 0.025  # 0.085  # 0.025  # 0.09
-varLinRegYmax = 0.165  # 0.165  # 0.15  # 0.17
+# varLinRegYmin = 0.09
+# varLinRegYmax = 0.18
+varLinRegYmin = 0.0
+varLinRegYmax = 0.18
 
 # Linear regression plot - label for axes:
 strLinRegYlabel = 'Regression coefficient'
@@ -374,17 +376,17 @@ if lgcLinReg:
 
     print('---Plot results - simple linear regression (across-subjects).')
 
-    funcPltAcrSubsLinReg(arySubDpthMns,
-                         vecLinRegMdl,
-                         varNumSubs,
-                         varNumDpth,
-                         strTitle,
-                         strXlabel,
-                         strLinRegYlabel,
-                         varLinRegYmin,
-                         varLinRegYmax,
-                         varLinRegP,
-                         varDpi,
-                         strPltOtPre,
-                         strPltOtSuf)
+    funcLinRegAcrSubs(arySubDpthMns,
+                      vecLinRegMdl,
+                      varNumSubs,
+                      varNumDpth,
+                      strTitle,
+                      strXlabel,
+                      strLinRegYlabel,
+                      varLinRegYmin,
+                      varLinRegYmax,
+                      varLinRegP,
+                      varDpi,
+                      strPltOtPre,
+                      strPltOtSuf)
 # *****************************************************************************

@@ -182,16 +182,27 @@ def funcParamEccDpthGet(strVtkEcc,
         varTmpLast = vecEccIdx[(idxEcc + 1)]
 
         # Number of vertices in current eccentricity bin:
-        vecBinNumVrtc[idxEcc] =  varTmpLast - varTmpFrst
+        varTmp = varTmpLast - varTmpFrst
+        # If there is no vertex in the current bin, the difference varTmpLast
+        # minus varTmpFrst would be negative, we have to set the variable to
+        # zero in that case.
+        if np.greater(varTmp, 0.0):
+            vecBinNumVrtc[idxEcc] = varTmp
+        else:
+            vecBinNumVrtc[idxEcc] = 0.0
 
         # Report vertices in current eccentricity bin:
         strTmp = ('---------Eccentricity bin ' + str(idxEcc) + ' - Number ' +
                   'of vertices: ' + str(vecBinNumVrtc[idxEcc]))
         print(strTmp)
 
-        # Calculate the mean across eccentricities:
-        aryMean[idxEcc, :] = np.mean(aryData[varTmpFrst:varTmpLast, :],
-                                     axis=0)
+        # Calculate the mean across eccentricities (only if the current
+        # eccentricity bin is not empty, otherwise set the mean to zero):
+        if np.greater(varTmp, 0.0):
+            aryMean[idxEcc, :] = np.mean(aryData[varTmpFrst:varTmpLast, :],
+                                         axis=0)
+        else:
+            aryMean[idxEcc, :] = 0.0
 
     # Remove first column from array (the eccentricity column):
     aryMean = aryMean[:, 1:]

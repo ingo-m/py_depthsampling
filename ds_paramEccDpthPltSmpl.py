@@ -23,21 +23,20 @@ Function of the depth sampling pipeline.
 
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.colors as colors
+# import matplotlib.colors as colors
 # from matplotlib.colors import BoundaryNorm
 
 
-def funcParamEccDpthPlt(aryMean,
-                        vecEccBin,
-                        strPathOut):
+def funcParamEccDpthPltSmpl(aryMean,
+                            vecEccBin,
+                            strPathOut):
     """
     Plot results for eccentricity & cortical depth analysis.
 
     This function plots statistical parameters (e.g. parameter estimates) by
     cortical depth (x-axis) and pRF eccentricity (y-axis).
 
-    This version plots the values using two separate colourmaps for negative
-    and positive values.
+    This version plots the values using only a single linear colourmap.
 
     This function is part of a tool for analysis of cortical-depth-dependent
     fMRI responses at different retinotopic eccentricities. (Which is a part
@@ -53,8 +52,10 @@ def funcParamEccDpthPlt(aryMean,
     vecFontClr = np.array([17.0/255.0, 85.0/255.0, 124.0/255.0])
 
     # Find minimum and maximum correlation values:
-    varMin = np.percentile(aryMean, 0.0)
-    varMax = np.percentile(aryMean, 100.0)
+    # varMin = np.percentile(aryMean, 0.0)
+    # varMax = np.percentile(aryMean, 100.0)
+    varMin = np.min(aryMean)
+    varMax = np.max(aryMean)
 
     # Round:
     # varMin = (np.floor(varMin * 10.0) / 10.0)
@@ -110,48 +111,13 @@ def funcParamEccDpthPlt(aryMean,
     # Create colour-bar axis:
     axsTmp = fig01.add_subplot(111)
 
-    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-    # Number of colour increments:
-    varNumClr = 20
-
-    # Colour values for the first colormap (used for negative values):
-    aryClr01 = plt.cm.PuBu(np.linspace(0.1, 1.0, varNumClr))
-
-    # Invert the first colour map:
-    aryClr01 = np.flipud(np.array(aryClr01, ndmin=2))
-
-    # Colour values for the second colormap (used for positive values):
-    aryClr02 = plt.cm.OrRd(np.linspace(0.1, 1.0, varNumClr))
-
-    # Combine negative and positive colour arrays:
-    aryClr03 = np.vstack((aryClr01, aryClr02))
-
-    # Create new custom colormap, combining two default colormaps:
-    objCustClrMp = colors.LinearSegmentedColormap.from_list('custClrMp',
-                                                            aryClr03)
-
-    # Lookup vector for negative colour range:
-    vecClrRngNeg = np.linspace(varMin, 0.0, num=varNumClr)
-
-    # Lookup vector for positive colour range:
-    vecClrRngPos = np.linspace(0.0, varMax, num=varNumClr)
-
-    # Stack lookup vectors:
-    vecClrRng = np.hstack((vecClrRngNeg, vecClrRngPos))
-
-    # 'Normalize' object, needed to use custom colour maps and lookup table
-    # with matplotlib:
-    objClrNorm = colors.BoundaryNorm(vecClrRng, objCustClrMp.N)
-
-    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
     # Plot correlation coefficients of current depth level:
     pltTmpCorr = plt.imshow(aryMean,
                             interpolation='none',  # 'bicubic',
                             origin='lower',
-                            norm=objClrNorm,
-                            cmap=objCustClrMp)
+                            vmin=varMin,
+                            vmax=varMax,
+                            cmap='viridis')
 
     # Position of labels for the x-axis:
     vecXlblsPos = np.array([0, (aryMean.shape[1] - 1)])
@@ -211,11 +177,7 @@ def funcParamEccDpthPlt(aryMean,
                               shrink=1.0)
 
     # The values to be labeled on the colour bar:
-    # vecClrLblsPos01 = np.arange(varMin, 0.0, 10)
-    # vecClrLblsPos02 = np.arange(0.0, varMax, 100)
-    vecClrLblsPos01 = np.linspace(varMin, 0.0, num=3)
-    vecClrLblsPos02 = np.linspace(0.0, varMax, num=3)
-    vecClrLblsPos = np.hstack((vecClrLblsPos01, vecClrLblsPos02))
+    vecClrLblsPos = np.linspace(varMin, varMax, num=3)
 
     # The labels (strings):
     vecClrLblsStr = map(str, vecClrLblsPos)

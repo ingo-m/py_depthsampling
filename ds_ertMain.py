@@ -46,11 +46,11 @@ from ds_ertPlt import funcPltErt
 
 # Load data from previously prepared pickle? If 'False', data is loaded from
 # vtk meshes and saved as pickle.
-lgcPic = True # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+lgcPic = False
 
 # Name of pickle file from which to load time course data or save time course
 # data to:
-strPthPic = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/era_v1.pickle'  #noqa
+strPthPic = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/era_v2.pickle'  #noqa
 
 # List of subject IDs:
 lstSubId = ['20150930',
@@ -68,7 +68,7 @@ lstSubId = ['20150930',
 lstCon = ['01', '02', '03', '04']
 
 # Base name of vertex inclusion masks (subject ID left open):
-strVtkMsk = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/{}_vertec_inclusion_mask_v1.vtk'  #noqa
+strVtkMsk = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/{}_vertec_inclusion_mask_v2.vtk'  #noqa
 
 # Base name of single-volume vtk meshes that together make up the timecourse
 # (subject ID, stimulus level, and volume index left open):
@@ -119,7 +119,7 @@ lgcLgnd01 = False
 lgcLgnd02 = False
 
 # Output path for plots - prfix:
-strPltOtPre = '/home/john/Desktop/tex_era/plots_v1/'
+strPltOtPre = '/home/john/Desktop/tex_era/plots_v2/'
 # Output path for plots - suffix:
 strPltOtSuf = '_ert.svg'
 

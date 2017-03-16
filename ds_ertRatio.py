@@ -43,10 +43,10 @@ from ds_pltAcrDpth import funcPltAcrDpth
 
 # Name of npy file from which to load time course data or save time course data
 # to:
-strPthPic = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/era_v2.pickle'  #noqa
+strPthPic = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/era_v1.pickle'  #noqa
 
 # Number of subjects:
-varNumSub = 9
+varNumSub = 10
 
 # Number of conditions:
 varNumCon = 4
@@ -73,7 +73,7 @@ tplIdxMin = (10, 11)
 lstConLbl = ['72.0%', '16.3%', '6.1%', '2.5%']
 
 # Title for single-subject positive response plot:
-strTtl04 = 'Positive response V2'
+strTtl04 = 'Positive response V1'
 # Limits of y-axis for ratio-across-depth plot:
 varYmin04 = 0.0
 varYmax04 = 0.1
@@ -81,12 +81,12 @@ varYmax04 = 0.1
 strXlabel04 = 'Cortical depth level'
 strYlabel04 = 'Percent signal change'
 # Output path for ratio-across-depth plots (subject ID left open):
-strPathOut04 = '/home/john/Desktop/tex_era/plots_v2/{}_main_resp_acr_dpths.png'
+strPathOut04 = '/home/john/Desktop/tex_era/plots_v1/{}_main_resp_acr_dpths.png'
 # Plot legend?
 lgcLgnd04 = True
 
 # Title for mean positive response plot:
-strTtl01 = 'Positive response V2'
+strTtl01 = 'Positive response V1'
 # Limits of y-axis for ratio-across-depth plot:
 varYmin01 = 0.0
 varYmax01 = 2.0
@@ -94,12 +94,12 @@ varYmax01 = 2.0
 strXlabel01 = 'Cortical depth level'
 strYlabel01 = 'Percent signal change'
 # Output path for ratio-across-depth plots:
-strPathOut01 = '/home/john/Desktop/tex_era/plots_v2/main_resp_acr_dpths.png'
+strPathOut01 = '/home/john/Desktop/tex_era/plots_v1/main_resp_acr_dpths.png'
 # Plot legend?
 lgcLgnd01 = True
 
 # Title for mean undershoot response plot:
-strTtl02 = 'Undershoot V2'
+strTtl02 = 'Undershoot V1'
 # Limits of y-axis for ratio-across-depth plot:
 varYmin02 = -0.02
 varYmax02 = 0.02
@@ -107,12 +107,12 @@ varYmax02 = 0.02
 strXlabel02 = 'Cortical depth level'
 strYlabel02 = 'Percent signal change'
 # Output path for ratio-across-depth plots:
-strPathOut02 = '/home/john/Desktop/tex_era/plots_v2/undrsht_acr_dpths.png'
+strPathOut02 = '/home/john/Desktop/tex_era/plots_v1/undrsht_acr_dpths.png'
 # Plot legend?
 lgcLgnd02 = False
 
 # Title for ratio-across-depth plot:
-strTtl03 = 'Ratio positive response / undershoot V2'
+strTtl03 = 'Ratio positive response / undershoot V1'
 # Limits of y-axis for ratio-across-depth plot:
 varYmin03 = 1.0
 varYmax03 = 1.12
@@ -120,7 +120,7 @@ varYmax03 = 1.12
 strXlabel03 = 'Cortical depth level'
 strYlabel03 = 'Ratio'
 # Output path for ratio-across-depth plots:
-strPathOut03 = '/home/john/Desktop/tex_era/plots_v2/ratio_acr_dpths_not_demeaned.png'  #noqa
+strPathOut03 = '/home/john/Desktop/tex_era/plots_v1/ratio_acr_dpths_not_demeaned.png'  #noqa
 # Plot legend?
 lgcLgnd03 = False
 

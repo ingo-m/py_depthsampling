@@ -90,7 +90,7 @@ strVtkDpth01 = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/pe_stim_lvl_{
 # Base path of csv files with ROI definition (i.e. patch of cortex selected on
 # the surface, e.g. V1 or V2) - i.e. the first vertex selection criterion (with
 # subject ID left open):
-strCsvRoi = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/v1.csv'  #noqa
+strCsvRoi = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/v2.csv'  #noqa
 
 # (2)
 # Use second selection criterion defined at one depth level (legacy function):
@@ -110,7 +110,8 @@ lgcSlct03 = True
 # supposed to contain one set of data values for each depth level.
 strVtkSlct03 = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/R2_multi.vtk'  #noqa
 # Threshold for vertex selection:
-varThrSlct03 = 0.16
+# varThrSlct03 = 0.16
+varThrSlct03 = 0.12
 
 # (4)
 # Use fourth selection criterion (vertices that are BELOW threshold at any
@@ -142,7 +143,7 @@ varPeRngLw = 0.0
 # Upper bound of PE range (vertices with a maximum PE across depths that
 # is above this percentile in the distribution of those values across
 # vertices will be excluded):
-varPeRngUp = 80.0
+varPeRngUp = 70.0
 
 # Number of header lines in ROI CSV file:
 varNumHdrRoi = 1
@@ -158,7 +159,7 @@ strPrcdData = 'SCALARS'
 varNumLne = 2
 
 # Title for mean plot:
-strTitle = ('V1')
+strTitle = ('V2')
 
 # Limits of y-axis for single subject plots (list of tuples, [(Ymin, Ymax)]):
 lstLimY = [(0.0, 2.5)] * len(lstSubIds)
@@ -172,7 +173,7 @@ strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'fMRI signal change [arbitrary units]'
 
 # Output path for plots - prfix:
-strPltOtPre = '/home/john/Desktop/tex_pe/plots_v1/'
+strPltOtPre = '/home/john/Desktop/tex_pe/plots_v2/'
 # Output path for plots - suffix:
 strPltOtSuf = '_depthplot_1000_R2multi_0p16.png'
 # strPltOtSuf = '_depthplot_1000_combmean_7000.png'
@@ -211,7 +212,7 @@ varLinRegYmax = 0.18
 strLinRegYlabel = 'Regression coefficient'
 
 # Output path for depth samling results (within subject means):
-strDpthMeans = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy'  #noqa
+strDpthMeans = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2.npy'  #noqa
 
 # Maximum number of processes to run in parallel: *** NOT IMPLEMENTED
 # varPar = 10

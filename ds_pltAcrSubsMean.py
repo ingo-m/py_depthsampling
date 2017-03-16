@@ -138,9 +138,9 @@ def funcPltAcrSubsMean(arySubDpthMns,
     axs01.set_title(strTitle, fontsize=36, fontweight="bold")
 
     # Legend for axis 1:
-    #axs01.legend(loc=0,
-    #             frameon=False,
-    #             prop={'size': 22})
+    axs01.legend(loc=0,
+                 frameon=False,
+                 prop={'size': 22})
 
     # # Add vertical grid lines:
     #    axs01.xaxis.grid(which=u'major',

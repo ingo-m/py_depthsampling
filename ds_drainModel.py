@@ -42,34 +42,29 @@ as depicted in Figure 3F (p. 495):
         + ((3.9 - 3.6) * var5)
         + ((4.4 - 3.9) * var6)
 
-These values are translated into the corrected relative contribution of local
-signal (originating from the given depth level) and signal from lower layers:
+These values are translated into the a transfer function of the effect of
+neuronal activity at each depth layer on the haemodynamic response at all
+layers. There is one vector for each depth level, each entry gives the effect
+of one unit of neural activity at that depth level on the haemodynamic signal
+at all depth levels.
 
     Layer VI:
-    varCrct6 = varEmp6 / 1.9
-    
+    vecTrsf6 = np.array([1.9, 0.6, 0.6, 0.5, 0.5])
+
     Layer V:
-    varCrct5 = (varEmp5
-                - (0.6 * varCrct6)) / 1.5
-    
+    vecTrsf5 = np.array([0.0, 1.5, 0.3, 0.3, 0.3])
+
     Layer IV:
-    varCrct4 = (varEmp4
-                - (0.3 * varCrct5)
-                - (0.6 * varCrct6)) / 2.2
+    vecTrsf4 = np.array([0.0, 0.0, 2.2, 1.3, 1.3])
     
     Layer II/III:
-    varCrct23 = (varEmp23
-                 - (1.3 * varCrct4)
-                 - (0.3 * varCrct5)
-                 - (0.5 * varCrct6)) / 1.7
+    vecTrsf23 = np.array([0.0, 0.0, 0.0, 1.7, 0.7])
     
     Layer I:
-    varCrct1 = (varEmp1
-                - (0.7 * varCrct23)
-                - (1.3 * varCrct4)
-                - (0.3 * varCrct5)
-                - (0.5 * varCrct6)) / 1.6
+    vecTrsf23 = np.array([0.0, 0.0, 0.0, 0.0, 1.6])
 
+Multiplying these vectors with the local neuronal activity in each layer, and
+adding up the result gives the predicted haemodynamic signal.
 
 Reference:
 Markuerkiaga, I., Barth, M., & Norris, D. G. (2016). A cortical vascular model
@@ -103,18 +98,24 @@ import numpy as np
 #varEmp23 = 3.8
 #varEmp1 = 4.4
 
-#varConstant = 1.0
-#varEmp6 = 1.9 * varConstant
-#varEmp5 = 2.1 * varConstant
-#varEmp4 = 3.1 * varConstant + 2.0
-#varEmp23 = 3.8 * varConstant + 1.5
-#varEmp1 = 4.4 * varConstant + 1.0
+# Layer VI:
+vecTrsf6 = np.array([1.9, 0.6, 0.6, 0.5, 0.5])
 
-varEmp6 = 1.0
-varEmp5 = 1.5
-varEmp4 = 2.0
-varEmp23 = 2.2
-varEmp1 = 2.4
+# Layer V:
+vecTrsf5 = np.array([0.0, 1.5, 0.3, 0.3, 0.3])
+
+# Layer IV:
+vecTrsf4 = np.array([0.0, 0.0, 2.2, 1.3, 1.3])
+
+# Layer II/III:
+vecTrsf23 = np.array([0.0, 0.0, 0.0, 1.7, 0.7])
+
+# Layer I:
+vecTrsf1 = np.array([0.0, 0.0, 0.0, 0.0, 1.6])
+
+
+vecHdm = vecTrsf6 + vecTrsf5 + vecTrsf4 + vecTrsf23 + vecTrsf1
+
 
 #Layer VI:
 varCrct6 = varEmp6 / 1.9

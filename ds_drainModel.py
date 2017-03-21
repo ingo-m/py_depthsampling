@@ -116,16 +116,34 @@ Markuerkiaga, I., Barth, M., & Norris, D. G. (2016). A cortical vascular model
 
 import numpy as np
 from scipy.interpolate import griddata
+from ds_pltAcrSubsMean import funcPltAcrSubsMean
 
 
 # ----------------------------------------------------------------------------
 # *** Define parameters
 
-# Number of equi-volume depth levels in the input data:
-varNumDpth = 11
-
 # Path of depth-profile to correct:
 strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy'
+
+# Output path & prefix:
+strPthOt = '/home/john/Desktop/deconvolution_'
+
+# File type suffix for plot:
+strFlTp = '.png'
+
+# Figure scaling factor:
+varDpi = 80.0
+
+# Limits of y-axis for across subject plot:
+varAcrSubsYmin = -0.05
+varAcrSubsYmax = 2.0  # 1.90
+
+# Label for axes:
+strXlabel = 'Cortical depth level (equivolume)'
+strYlabel = 'fMRI signal change [arbitrary units]'
+
+# Condition labels:
+lstConLbl = ['2.5%', '6.1%', '16.3%', '72.0%']
 
 
 # ----------------------------------------------------------------------------
@@ -135,80 +153,136 @@ strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy'
 # aryEmpSnSb[idxSub, idxCondition, idxDpth].
 aryEmpSnSb = np.load(strPthPrf)
 
-# Across-subjects mean:
-aryEmp = np.mean(aryEmpSnSb, axis=0)
-
-# aryEmp = np.array([1.9, 2.1, 3.1, 3.8, 4.4], ndmin=2)
+# Number of subjects:
+varNumSub = aryEmpSnSb.shape[0]
 
 # Number of conditions:
-varNumCon = aryEmp.shape[0]
+varNumCon = aryEmpSnSb.shape[1]
+
+# Number of equi-volume depth levels in the input data:
+varNumDpth = aryEmpSnSb.shape[2]
 
 
 # ----------------------------------------------------------------------------
-# *** Interpolation (downsampling)
+# *** Loop through subjects
 
-# The empirical depth profiles are defined at more depth levels than the
-# draining model. We downsample the empirical depth profiles to the number of
-# depth levels of the model.
+# Array for single-subject interpolation result (before deconvolution):
+aryEmp5SnSb = np.zeros((varNumSub, varNumCon, 5))
 
-# Relative thickness of the layers (layer VI, 20%; layer V, 10%; layer IV,
-# 40%; layer II/III, 20%; layer I, 10%; Markuerkiaga et al. 2016).
-# lstThck = [0.2, 0.1, 0.4, 0.2, 0.1]
-# From the relative thickness, we derive the relative position of the layers
-# (we set the position of each layer to the sum of all lower layers plus half
-# its own thickness):
-vecPosMdl = np.array([0.1, 0.25, 0.5, 0.8, 0.95])
+# Array for single-subject deconvolution result:
+aryNrnSnSb = np.zeros((varNumSub, varNumCon, 5))
 
-# Position of empirical datapoints:
-vecPosEmp = np.linspace(0.0, 1.0, num=varNumDpth, endpoint=True)
+for idxSub in range(0, varNumSub):
 
-# Vector for downsampled empirical depth profiles:
-aryEmp5 = np.zeros((varNumCon, 5))
 
-# Loop through conditions and downsample the depth profiles:
-for idxCon in range(0, varNumCon):
-    # Interpolation:
-    aryEmp5[idxCon] = griddata(vecPosEmp,
-                               aryEmp[idxCon, :],
-                               vecPosMdl,
-                               method='linear')
+    # ----------------------------------------------------------------------------
+    # *** Interpolation (downsampling)
+    
+    # The empirical depth profiles are defined at more depth levels than the
+    # draining model. We downsample the empirical depth profiles to the number of
+    # depth levels of the model.
+    
+    # Relative thickness of the layers (layer VI, 20%; layer V, 10%; layer IV,
+    # 40%; layer II/III, 20%; layer I, 10%; Markuerkiaga et al. 2016).
+    # lstThck = [0.2, 0.1, 0.4, 0.2, 0.1]
+    # From the relative thickness, we derive the relative position of the layers
+    # (we set the position of each layer to the sum of all lower layers plus half
+    # its own thickness):
+    vecPosMdl = np.array([0.1, 0.25, 0.5, 0.8, 0.95])
+    
+    # Position of empirical datapoints:
+    vecPosEmp = np.linspace(0.0, 1.0, num=varNumDpth, endpoint=True)
+    
+    # Vector for downsampled empirical depth profiles:
+    aryEmp5 = np.zeros((varNumCon, 5))
+    
+    # Loop through conditions and downsample the depth profiles:
+    for idxCon in range(0, varNumCon):
+        # Interpolation:
+        aryEmp5[idxCon] = griddata(vecPosEmp,
+                                   aryEmpSnSb[idxSub, idxCon, :],
+                                   vecPosMdl,
+                                   method='linear')
+
+    # Put interpolation result for this subject into the array:
+    aryEmp5SnSb[idxSub, :, :] = np.copy(aryEmp5)
+
+
+    # ----------------------------------------------------------------------------
+    # *** Subtraction of draining effect
+    
+    for idxCon in range(0, varNumCon):
+
+        # Array for corrected depth profiles:
+        aryNrn = np.zeros(aryEmp5.shape)
+
+        # Layer VI:
+        aryNrn[idxCon, 0] = aryEmp5[idxCon, 0] / 1.9
+
+        #Layer V:
+        aryNrn[idxCon, 1] = (aryEmp5[idxCon, 1]
+                             - 0.6 * aryNrn[idxCon, 0]) / 1.5
+
+        # Layer IV:
+        aryNrn[idxCon, 2] = (aryEmp5[idxCon, 2]
+                             - 0.3 * aryNrn[idxCon, 1]
+                             - 0.6 * aryNrn[idxCon, 0]) / 2.2
+
+        # Layer II/III:
+        aryNrn[idxCon, 3] = (aryEmp5[idxCon, 3]
+                             - 1.3 * aryNrn[idxCon, 2]
+                             - 0.3 * aryNrn[idxCon, 1]
+                             - 0.5 * aryNrn[idxCon, 0]) / 1.7
+
+        # Layer I:
+        aryNrn[idxCon, 4] = (aryEmp5[idxCon, 4]
+                             - 0.7 * aryNrn[idxCon, 3]
+                             - 1.3 * aryNrn[idxCon, 2]
+                             - 0.3 * aryNrn[idxCon, 1]
+                             - 0.5 * aryNrn[idxCon, 0]) / 1.6
+
+        # Put deconvolution result for this subject into the array:
+        aryNrnSnSb[idxSub, idxCon, :] = np.copy(aryNrn[idxCon, :])
 
 
 # ----------------------------------------------------------------------------
-# *** Subtraction of draining effect
+# *** Plot results
 
-# Array for corrected depth profiles:
-aryNrn = np.copy(aryEmp5)
+# Plot across-subjects mean before deconvolution:
+strTmpTtl = 'Before deconvolution'
+strTmpPth = (strPthOt + 'before')
+funcPltAcrSubsMean(aryEmp5SnSb,
+                   varNumSub,
+                   5,
+                   varNumCon,
+                   varDpi,
+                   varAcrSubsYmin,
+                   varAcrSubsYmax,
+                   lstConLbl,
+                   strXlabel,
+                   strYlabel,
+                   strTmpTtl,
+                   strTmpPth,
+                   strFlTp)
 
-# Layer VI:
-aryNrn[0, 0] = aryEmp5[0, 0] / 1.9
 
-#Layer V:
-aryNrn[0, 1] = (aryEmp5[0, 1]
-                - 0.6 * aryNrn[0, 0]) / 1.5
+# Across-subjects mean after deconvolution:
+strTmpTtl = 'After deconvolution'
+strTmpPth = (strPthOt + 'after')
+funcPltAcrSubsMean(aryNrnSnSb,
+                   varNumSub,
+                   5,
+                   varNumCon,
+                   varDpi,
+                   varAcrSubsYmin,
+                   varAcrSubsYmax,
+                   lstConLbl,
+                   strXlabel,
+                   strYlabel,
+                   strTmpTtl,
+                   strTmpPth,
+                   strFlTp)
 
-# Layer IV:
-aryNrn[0, 2] = (aryEmp5[0, 2]
-                - 0.3 * aryNrn[0, 1]
-                - 0.6 * aryNrn[0, 0]) / 2.2
-
-# Layer II/III:
-aryNrn[0, 3] = (aryEmp5[0, 3]
-                - 1.3 * aryNrn[0, 2]
-                - 0.3 * aryNrn[0, 1]
-                - 0.5 * aryNrn[0, 0]) / 1.7
-
-# Layer I:
-aryNrn[0, 4] = (aryEmp5[0, 4]
-                - 0.7 * aryNrn[0, 3]
-                - 1.3 * aryNrn[0, 2]
-                - 0.3 * aryNrn[0, 1]
-                - 0.5 * aryNrn[0, 0]) / 1.6
-
-aryEmp = aryEmp.T
-aryEmp5 = aryEmp5.T
-aryNrn = aryNrn.T
-
-print('lala')
-# ----------------------------------------------------------------------------
+aryEmp5 = np.mean(aryEmp5SnSb, axis=0).T
+aryNrn = np.mean(aryNrnSnSb, axis=0).T
 

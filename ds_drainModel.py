@@ -123,10 +123,10 @@ from ds_pltAcrSubsMean import funcPltAcrSubsMean
 # *** Define parameters
 
 # Path of depth-profile to correct:
-strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy'
+strPthPrf = '/Users/john/Desktop/Higher_Level_Analysis/v1.npy'
 
 # Output path & prefix:
-strPthOt = '/home/john/Desktop/deconvolution_'
+strPthOt = '/Users/john/Desktop/deconvolution_'
 
 # File type suffix for plot:
 strFlTp = '.png'
@@ -135,8 +135,10 @@ strFlTp = '.png'
 varDpi = 80.0
 
 # Limits of y-axis for across subject plot:
-varAcrSubsYmin = -0.05
-varAcrSubsYmax = 2.0  # 1.90
+varAcrSubsYmin01 = -0.05
+varAcrSubsYmax01 = 2.0
+varAcrSubsYmin02 = -0.05
+varAcrSubsYmax02 = 1.0
 
 # Label for axes:
 strXlabel = 'Cortical depth level (equivolume)'
@@ -152,6 +154,7 @@ lstConLbl = ['2.5%', '6.1%', '16.3%', '72.0%']
 # Array with single-subject depth sampling results, of the form
 # aryEmpSnSb[idxSub, idxCondition, idxDpth].
 aryEmpSnSb = np.load(strPthPrf)
+# aryEmpSnSb = np.array([1.9, 2.1, 3.1, 3.8, 4.4], ndmin=3)
 
 # Number of subjects:
 varNumSub = aryEmpSnSb.shape[0]
@@ -192,6 +195,9 @@ for idxSub in range(0, varNumSub):
     
     # Position of empirical datapoints:
     vecPosEmp = np.linspace(0.0, 1.0, num=varNumDpth, endpoint=True)
+    # vecPosEmp = np.array([0.1, 0.25, 0.5, 0.8, 0.95])
+
+
     
     # Vector for downsampled empirical depth profiles:
     aryEmp5 = np.zeros((varNumCon, 5))
@@ -256,8 +262,8 @@ funcPltAcrSubsMean(aryEmp5SnSb,
                    5,
                    varNumCon,
                    varDpi,
-                   varAcrSubsYmin,
-                   varAcrSubsYmax,
+                   varAcrSubsYmin01,
+                   varAcrSubsYmax01,
                    lstConLbl,
                    strXlabel,
                    strYlabel,
@@ -274,8 +280,8 @@ funcPltAcrSubsMean(aryNrnSnSb,
                    5,
                    varNumCon,
                    varDpi,
-                   varAcrSubsYmin,
-                   varAcrSubsYmax,
+                   varAcrSubsYmin02,
+                   varAcrSubsYmax02,
                    lstConLbl,
                    strXlabel,
                    strYlabel,

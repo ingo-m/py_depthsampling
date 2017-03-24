@@ -2,6 +2,21 @@
 """
 Function of the depth sampling pipeline.
 
+This version of the script removes the draining effect AND divides the local
+fMRI signal at each layer by a (layer specific) constant to account for
+different neuronal-to-fMRI-signal coupling.
+
+In other words, if the neuronal signal at each layer is the same, this would
+result in different fMRI signal strength at each layer even without the
+draining effect, according to the model proposed by Markuerkiaga et al.
+(2016). This version of the script account both for this effect and the
+draining effect.
+
+The purpose of this script is to remove the contribution of lower cortical
+depth levels to the signal at each consecutive depth level. In other words,
+at a given depth level, the contribution from lower depth levels is removed
+based on the model proposed by Markuerkiaga et al. (2016).
+
 The purpose of this script is to remove the contribution of lower cortical
 depth levels to the signal at each consecutive depth level. In other words,
 at a given depth level, the contribution from lower depth levels is removed
@@ -123,10 +138,10 @@ from ds_pltAcrSubsMean import funcPltAcrSubsMean
 # *** Define parameters
 
 # Path of depth-profile to correct:
-strPthPrf = '/Users/john/Desktop/Higher_Level_Analysis/v1.npy'
+strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy'
 
 # Output path & prefix:
-strPthOt = '/Users/john/Desktop/deconvolution_'
+strPthOt = '/home/john/Desktop/deconvolution_'
 
 # File type suffix for plot:
 strFlTp = '.png'
@@ -154,7 +169,6 @@ lstConLbl = ['2.5%', '6.1%', '16.3%', '72.0%']
 # Array with single-subject depth sampling results, of the form
 # aryEmpSnSb[idxSub, idxCondition, idxDpth].
 aryEmpSnSb = np.load(strPthPrf)
-# aryEmpSnSb = np.array([1.9, 2.1, 3.1, 3.8, 4.4], ndmin=3)
 
 # Number of subjects:
 varNumSub = aryEmpSnSb.shape[0]
@@ -196,8 +210,6 @@ for idxSub in range(0, varNumSub):
     # Position of empirical datapoints:
     vecPosEmp = np.linspace(0.0, 1.0, num=varNumDpth, endpoint=True)
     # vecPosEmp = np.array([0.1, 0.25, 0.5, 0.8, 0.95])
-
-
     
     # Vector for downsampled empirical depth profiles:
     aryEmp5 = np.zeros((varNumCon, 5))
@@ -220,28 +232,28 @@ for idxSub in range(0, varNumSub):
     for idxCon in range(0, varNumCon):
 
         # Array for corrected depth profiles:
-        aryNrn = np.zeros(aryEmp5.shape)
+        aryNrn = np.zeros(aryEmp5SnSb[idxSub, :, :].shape)
 
         # Layer VI:
-        aryNrn[idxCon, 0] = aryEmp5[idxCon, 0] / 1.9
+        aryNrn[idxCon, 0] = aryEmp5SnSb[idxSub, idxCon, 0] / 1.9
 
         #Layer V:
-        aryNrn[idxCon, 1] = (aryEmp5[idxCon, 1]
+        aryNrn[idxCon, 1] = (aryEmp5SnSb[idxSub, idxCon, 1]
                              - 0.6 * aryNrn[idxCon, 0]) / 1.5
 
         # Layer IV:
-        aryNrn[idxCon, 2] = (aryEmp5[idxCon, 2]
+        aryNrn[idxCon, 2] = (aryEmp5SnSb[idxSub, idxCon, 2]
                              - 0.3 * aryNrn[idxCon, 1]
                              - 0.6 * aryNrn[idxCon, 0]) / 2.2
 
         # Layer II/III:
-        aryNrn[idxCon, 3] = (aryEmp5[idxCon, 3]
+        aryNrn[idxCon, 3] = (aryEmp5SnSb[idxSub, idxCon, 3]
                              - 1.3 * aryNrn[idxCon, 2]
                              - 0.3 * aryNrn[idxCon, 1]
                              - 0.5 * aryNrn[idxCon, 0]) / 1.7
 
         # Layer I:
-        aryNrn[idxCon, 4] = (aryEmp5[idxCon, 4]
+        aryNrn[idxCon, 4] = (aryEmp5SnSb[idxSub, idxCon, 4]
                              - 0.7 * aryNrn[idxCon, 3]
                              - 1.3 * aryNrn[idxCon, 2]
                              - 0.3 * aryNrn[idxCon, 1]
@@ -249,6 +261,18 @@ for idxSub in range(0, varNumSub):
 
         # Put deconvolution result for this subject into the array:
         aryNrnSnSb[idxSub, idxCon, :] = np.copy(aryNrn[idxCon, :])
+
+
+    # ----------------------------------------------------------------------------
+    # *** Normalisation
+
+    # Calculate 'grand mean', i.e. the mean PE across depth levels and
+    # conditions:
+    # varGrndMean = np.mean(aryNrnSnSb[idxSub, :, :])
+
+    # Divide all values by the grand mean:
+    # aryNrnSnSb[idxSub, :, :] = np.divide(aryNrnSnSb[idxSub, :, :],
+    #                                      varGrndMean)
 
 
 # ----------------------------------------------------------------------------
@@ -289,6 +313,6 @@ funcPltAcrSubsMean(aryNrnSnSb,
                    strTmpPth,
                    strFlTp)
 
-aryEmp5 = np.mean(aryEmp5SnSb, axis=0).T
-aryNrn = np.mean(aryNrnSnSb, axis=0).T
+#aryEmp5 = np.mean(aryEmp5SnSb, axis=0).T
+#aryNrn = np.mean(aryNrnSnSb, axis=0).T
 

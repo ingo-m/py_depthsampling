@@ -119,7 +119,7 @@ lgcLgnd01 = False
 lgcLgnd02 = False
 
 # Output path for plots - prfix:
-strPltOtPre = '/home/john/Desktop/tex_era/plots_v2/'
+strPltOtPre = '/home/john/PhD/Tex/tex_era/plots_v2/'
 # Output path for plots - suffix:
 strPltOtSuf = '_ert.svg'
 

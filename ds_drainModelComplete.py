@@ -17,11 +17,6 @@ depth levels to the signal at each consecutive depth level. In other words,
 at a given depth level, the contribution from lower depth levels is removed
 based on the model proposed by Markuerkiaga et al. (2016).
 
-The purpose of this script is to remove the contribution of lower cortical
-depth levels to the signal at each consecutive depth level. In other words,
-at a given depth level, the contribution from lower depth levels is removed
-based on the model proposed by Markuerkiaga et al. (2016).
-
 The following data from Markuerkiaga et al. (2016) is used in this script:
 
     "The cortical layer boundaries of human V1 in the model were fixed
@@ -140,8 +135,11 @@ from ds_pltAcrSubsMean import funcPltAcrSubsMean
 # Path of depth-profile to correct:
 strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy'
 
-# Output path & prefix:
-strPthOt = '/home/john/Desktop/deconvolution_'
+# Output path for corrected depth-profiles:
+strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected.npy'
+
+# Output path & prefix for plots:
+strPthPltOt = '/home/john/Desktop/deconvolution_'
 
 # File type suffix for plot:
 strFlTp = '.png'
@@ -276,11 +274,20 @@ for idxSub in range(0, varNumSub):
 
 
 # ----------------------------------------------------------------------------
+# *** Save corrected depth profiles
+
+# Save array with single-subject corrected depth profiles, of the form
+# aryNrnSnSb[idxSub, idxCondition, idxDpth].
+np.save(strPthPrfOt,
+        aryNrnSnSb)
+
+
+# ----------------------------------------------------------------------------
 # *** Plot results
 
 # Plot across-subjects mean before deconvolution:
 strTmpTtl = 'Before deconvolution'
-strTmpPth = (strPthOt + 'before')
+strTmpPth = (strPthPltOt + 'before')
 funcPltAcrSubsMean(aryEmp5SnSb,
                    varNumSub,
                    5,
@@ -298,7 +305,7 @@ funcPltAcrSubsMean(aryEmp5SnSb,
 
 # Across-subjects mean after deconvolution:
 strTmpTtl = 'After deconvolution'
-strTmpPth = (strPthOt + 'after')
+strTmpPth = (strPthPltOt + 'after')
 funcPltAcrSubsMean(aryNrnSnSb,
                    varNumSub,
                    5,

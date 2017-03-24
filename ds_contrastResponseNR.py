@@ -38,24 +38,30 @@ from scipy.optimize import curve_fit
 # Path of draining-corrected depth-profiles:
 strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected.npy'
 
+# Stimulus luminance contrast levels:
+vecCont = np.array([0.025, 0.061, 0.163, 0.72])
+
 
 # ----------------------------------------------------------------------------
 # *** Load depth profiles
 
 # Load array with single-subject corrected depth profiles, of the form
-# aryNrnSnSb[idxSub, idxCondition, idxDpth].
-aryNrnSnSb = np.load(strPthPrfOt)
+# aryDpthSnSb[idxSub, idxCondition, idxDpth].
+aryDpthSnSb = np.load(strPthPrfOt)
 
 
 # ----------------------------------------------------------------------------
 # *** Average over subjects
 
 # Across-subjects mean:
-aryNrn = np.mean(aryNrnSnSb, axis=0)
+aryDpth = np.mean(aryDpthSnSb, axis=0)
+
+# Mean across depth-levels:
+aryMne = np.mean(aryDpth, axis=1)
 
 
 # ----------------------------------------------------------------------------
-# *** Fit contrast reponse function
+# *** Define contrast reponse function
 
 # Neuronal contrast response function, following the 'Naka-Rushton equation'
 # (see Niemeyer & Paradiso, 2016).
@@ -73,17 +79,30 @@ def funcCrf(varC, varRmax, varC50, varM, varN):
     return varR
 
 
+# ----------------------------------------------------------------------------
+# *** Fit contrast reponse function
 
+# Number of conditions:
+varNumCon = aryDpth.shape[0]
 
+# Number of depth levels:
+varNumDpth = aryDpth.shape[1]
 
+# for idxDpth in range(0, varNumDpth):
+
+vecTmp = aryMne
+
+varRmax = np.max(vecTmp)
+varC50 = 
+varM = 0.0
 
 vecModelPar, vecModelCov = curve_fit(lambda varC, varN: funcCrf(varC,
                                                                 varRmax,
                                                                 varC50,
                                                                 varM,
                                                                 varN),
-                                     x1,
-                                     x2)
+                                     vecCont,
+                                     aryMne)
 
 
 

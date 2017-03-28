@@ -55,7 +55,7 @@ varYmax = 2.0
 
 # Axis labels
 strLblX = 'Luminance contrast'
-strLblY = 'fMRI response'
+strLblY = 'fMRI signal change [arbitrary units]'
 
 # Title for contrast response plots
 strTtle = 'fMRI contrast response function'
@@ -66,6 +66,7 @@ varDpi = 80.0
 # Limits of y-axis for response-at-half-maximum plot
 # varYmin = 0.0
 # varYmax = 2.0
+
 
 # ----------------------------------------------------------------------------
 # *** Define contrast reponse function
@@ -89,128 +90,150 @@ def funcCrf(varC, varS, varA):
 varP = 0.25
 varQ = 2.0
 
+
 # ----------------------------------------------------------------------------
 # *** Load depth profiles
 
 # Load array with single-subject corrected depth profiles, of the form
-# aryDpthSnSb[idxSub, idxCondition, idxDpth].
-aryDpthSnSb = np.load(strPthPrfOt)
+# aryDpth[idxSub, idxCondition, idxDpth].
+aryDpth = np.load(strPthPrfOt)
 
 
 # ----------------------------------------------------------------------------
-# *** Average over subjects
+# *** Fit CRF
 
-# Across-subjects mean:
-aryDpthMne = np.mean(aryDpthSnSb, axis=0)
+# We fit the contrast response function separately for all subjects & depth
+# levels.
 
 # Number of subjects:
-varNumSubs = aryDpthSnSb.shape[0]
+varNumSubs = aryDpth.shape[0]
 
-# Standard error of the mean (across subjects):
-aryDpthSem = np.divide(np.std(aryDpthSnSb, axis=0),
-                              np.sqrt(varNumSubs))
+# Number of conditions:
+varNumCon = aryDpth.shape[1]
 
-# Mean across depth-levels:
-# aryMne = np.mean(aryDpth, axis=1)
-# arySd = np.std(aryDpth, axis=1)
+# Number of depth levels:
+varNumDpth = aryDpth.shape[2]
+
+# Number of x-values for which to solve the function:
+varNumX = 1000
+
+# Vector for which the function will be fitted:
+vecX = np.linspace(varXmin, varXmax, num=varNumX, endpoint=True)
+
+# Vector for y-values of fitted function (for each subject & depth level):
+aryFit = np.zeros((varNumSubs, varNumDpth, varNumX))
+
+# Vector for response at half maximum contrast:
+aryHlfMaxResp = np.zeros((varNumSubs, varNumDpth))
+
+# Vector for contrast at half maximum response:
+aryHlfMaxCont = np.zeros((varNumSubs, varNumDpth))
+
+# Loop through subjects:
+for idxSub in range(0, varNumSubs):
+
+    # Loop through depth levels:
+    for idxDpth in range(0, varNumDpth):
+
+        # --------------------------------------------------------------------
+        # *** Fit contrast reponse function
+        
+        vecModelPar, vecModelCov = curve_fit(funcCrf,
+                                             vecCont,
+                                             aryDpth[idxSub, :, idxDpth])
+        
+        
+        # --------------------------------------------------------------------
+        # *** Apply reponse function
+
+        # Calculate fitted y-values:
+        aryFit[idxSub, idxDpth, :] = funcCrf(vecX,
+                                             vecModelPar[0],
+                                             vecModelPar[1])
+
+
+        # --------------------------------------------------------------------
+        # *** Calculate response at half maximum contrast
+    
+        # The response at half maximum contrast (i.e. at a luminance contrast
+        # of 50%):
+        aryHlfMaxResp[idxSub, idxDpth] = funcCrf(0.5,
+                                                vecModelPar[0],
+                                                vecModelPar[1])
+    
+    
+        # --------------------------------------------------------------------
+        # *** Calculate contrast at half maximum response
+    
+        # The maximum response (defined as the response at 100% luminance
+        # contrast):
+        varRes50 = funcCrf(1.0,
+                           vecModelPar[0],
+                           vecModelPar[1])
+    
+        # Half maximum response:
+        varRes50 = np.multiply(varRes50, 0.5)
+    
+        # Search for the luminance contrast level at half maximum response. A
+        # while loop is more practical than an analytic solution - it is easy
+        # to implement and reliable because of the contraint nature of the
+        # problem. The problem is contraint because the luminance contrast has
+        # to be between zero and one.
+    
+        # Initial value for the contrast level (will be incremented until the
+        # half maximum response is reached).
+        varHlfMaxCont = 0.0
+    
+        # Initial value for the resposne.
+        varResTmp = 0.0
+    
+        # Increment the contrast level until the half maximum response is
+        # reached:
+        while np.less(varResTmp, varRes50):
+            varHlfMaxCont += 0.01
+            varResTmp = funcCrf(varHlfMaxCont, vecModelPar[0], vecModelPar[1])
+        aryHlfMaxCont[idxSub, idxDpth] = varResTmp
 
 
 # ----------------------------------------------------------------------------
-# *** Fit CRF separately for all depth levels
+# *** Average across subjects
 
-# Number of conditions:
-varNumCon = aryDpthMne.shape[0]
+# Across-subjects mean for measured response:
+aryDpthMne = np.mean(aryDpth, axis=0)
+# Standard error of the mean (across subjects):
+aryDpthSem = np.divide(np.std(aryDpth, axis=0),
+                       np.sqrt(varNumSubs))
 
-# Number of depth levels:
-varNumDpth = aryDpthMne.shape[1]
+# Across-subjects mean for fitted CRF:
+aryFitMne = np.mean(aryFit, axis=0)
+# Standard error of the mean (across subjects):
+aryFitSme = np.divide(np.std(aryFit, axis=0),
+                      np.sqrt(varNumSubs))
+
+# Average response at half maximum contrast:
+aryHlfMaxRespMne = np.mean(aryHlfMaxResp, axis=0, keepdims=True)
+# Standard error of the mean (across subjects):
+aryHlfMaxRespSme = np.divide(np.std(aryHlfMaxResp, axis=0),
+                             np.sqrt(varNumSubs))
+# Restore original number of dimensions:
+aryHlfMaxRespSme = np.array(aryHlfMaxRespSme, ndmin=2)
+
+# Average response at half maximum contrast:
+aryHlfMaxContMne = np.mean(aryHlfMaxCont, axis=0, keepdims=True)
+# Standard error of the mean (across subjects):
+aryHlfMaxContSme = np.divide(np.std(aryHlfMaxCont, axis=0),
+                             np.sqrt(varNumSubs))
+# Restore original number of dimensions:
+aryHlfMaxContSme = np.array(aryHlfMaxContSme, ndmin=2)
+
+# ----------------------------------------------------------------------------
+# *** Plot CRF
 
 # Counter for plot file names:
 varCntPlt = 0
 
-# Vector for response at half maximum contrast at all depth levels:
-vecHlfMaxResp = np.zeros((1, varNumDpth))
-
-# Vector for contrast at half maximum response at all depth levels:
-vecHlfMaxCont = np.zeros((1, varNumDpth))
-
-# Loop through depth levels
+# We plot the average CRF (averaged across subjects) for all depth levels.
 for idxDpth in range(0, varNumDpth):
-# for idxDpth in range(5, 6):
-
-    # ------------------------------------------------------------------------
-    # *** Fit contrast reponse function
-    
-    vecModelPar, vecModelCov = curve_fit(funcCrf,
-                                         vecCont,
-                                         aryDpthMne[:, idxDpth])
-    
-    
-    # ------------------------------------------------------------------------
-    # *** Apply reponse function
-    
-    # In order to plot the fitted function, we have to apply it to a range of
-    # values:
-    vecX = np.linspace(varXmin, varXmax, num=1000, endpoint=True)
-    
-    # Calculate fitted values:
-    vecFit = funcCrf(vecX,
-                     vecModelPar[0],
-                     vecModelPar[1])
-
-    # print(vecModelPar[0])
-
-    # Create string for model parameters of exponential function:
-    varParamA = np.around(vecModelPar[0], decimals=4)
-    varParamS = np.around(vecModelPar[1], decimals=2)
-
-    strModel = ('R(C) = '
-                + str(varParamA)
-                + ' * C^(' + str(varP) + '+' + str(varQ) + ') '
-                + '/ '
-                + '(C^' + str(varQ) + ' + ' + str(varParamS) + '^' + str(varQ)
-                + ')'
-                )
-
-
-    # ------------------------------------------------------------------------
-    # *** Calculate response at half maximum contrast
-
-    # The response at half maximum contrast (i.e. luminance contrast of 50%)
-    vecHlfMaxResp[0, idxDpth] = funcCrf(0.5,
-                                        vecModelPar[0],
-                                        vecModelPar[1])
-
-
-    # ------------------------------------------------------------------------
-    # *** Calculate contrast at half maximum response
-
-    # The maximum response defined as the response at 100% luminance contrast
-    varRes50 = funcCrf(1.0,
-                       vecModelPar[0],
-                       vecModelPar[1])
-
-    # Half maximum response:
-    varRes50 = np.multiply(varRes50, 0.5)
-
-    # Search for the luminance contrast level at half maximum response. A
-    # while loop is more practical than an analytic solution - it is easy to
-    # implement and reliable because of the contraint nature of the problem.
-    # The problem is contraint because the luminance contrast has to be
-    # between zero and one.
-
-    # Initial value for the contrast level (will be incremented until the
-    # half maximum response is reached).
-    varHlfMaxCont = 0.0
-
-    # Initial value for the resposne.
-    varResTmp = 0.0
-
-    # Increment the contrast level until the half maximum response is reached:
-    while np.less(varResTmp, varRes50):
-        varHlfMaxCont += 0.001
-        varResTmp = funcCrf(varHlfMaxCont, vecModelPar[0], vecModelPar[1])
-
-    vecHlfMaxCont[0, idxDpth] = varResTmp
 
 
     # ------------------------------------------------------------------------
@@ -220,22 +243,39 @@ for idxDpth in range(0, varNumDpth):
 
     axs01 = fig01.add_subplot(111)
 
+    # Plot  model prediction
+    plt01 = axs01.plot(vecX,  #noqa
+                       aryFitMne[idxDpth, :],
+                       color='red',
+                       alpha=0.9,
+                       label='Modelled mean (SEM)',
+                       linewidth=2.0,
+                       antialiased=True,
+                       zorder=2)
+
+    # Plot error shading
+    plot02 = axs01.fill_between(vecX,  #noqa
+                                np.subtract(aryFitMne[idxDpth, :],
+                                            aryFitSme[idxDpth, :]),
+                                np.add(aryFitMne[idxDpth, :],
+                                       aryFitSme[idxDpth, :]),
+                                alpha=0.4,
+                                edgecolor='red',
+                                facecolor='red',
+                                linewidth=0.0,
+                                # linestyle='dashdot',
+                                antialiased=True,
+                                zorder=1)
+
     # Plot the average dependent data with error bars:
-    plt01 = axs01.errorbar(vecCont,
+    plt03 = axs01.errorbar(vecCont,
                            aryDpthMne[:, idxDpth],
                            yerr=aryDpthSem[:, idxDpth],
                            color='blue',
-                           label='Mean (SD)',
-                           linewidth=0.9,
-                           antialiased=True)
-
-    # Plot model prediction:
-    plt02 = axs01.plot(vecX,
-                       vecFit,
-                       color='red',
-                       label=strModel,
-                       linewidth=1.0,
-                       antialiased=True)
+                           label='Empirical mean (SEM)',
+                           linewidth=2.0,
+                           antialiased=True,
+                           zorder=3)
 
     # Limits of the x-axis:
     # axs01.set_xlim([np.min(vecInd), np.max(vecInd)])
@@ -244,17 +284,24 @@ for idxDpth in range(0, varNumDpth):
     # Limits of the y-axis:
     axs01.set_ylim([varYmin, varYmax])
 
+    # Which y values to label with ticks:
+    vecYlbl = np.linspace(varYmin, varYmax, num=5, endpoint=True)
+    # Round:
+    # vecYlbl = np.around(vecYlbl, decimals=2)
+    # Set ticks:
+    axs01.set_yticks(vecYlbl)
+
     # Adjust labels for axis 1:
-    axs01.tick_params(labelsize=10)
-    axs01.set_xlabel(strLblX, fontsize=9)
-    axs01.set_ylabel(strLblY, fontsize=9)
+    axs01.tick_params(labelsize=14)
+    axs01.set_xlabel(strLblX, fontsize=16)
+    axs01.set_ylabel(strLblY, fontsize=16)
 
     # Title:
     strTtleTmp = (strTtle + ', depth level: ' + str(idxDpth))
-    axs01.set_title(strTtleTmp, fontsize=9)
+    axs01.set_title(strTtleTmp, fontsize=14)
 
     # Add legend:
-    axs01.legend(loc=0, prop={'size': 9})
+    axs01.legend(loc=0, prop={'size': 10})
 
     # Add vertical grid lines:
     axs01.xaxis.grid(which=u'major',
@@ -270,16 +317,28 @@ for idxDpth in range(0, varNumDpth):
 
     # Save figure:
     fig01.savefig((strPthOt + '_plot_' + str(varCntPlt) + '.png'),
-                  dpi=200,
+                  dpi=(varDpi * 2.0),
                   facecolor='w',
                   edgecolor='w',
                   orientation='landscape',
-                  papertype='a6',
                   transparent=False,
                   frameon=None)
 
     # Increment file name counter:
     varCntPlt += 1
+
+
+## Create string for model parameters of exponential function:
+#varParamA = np.around(vecModelPar[0], decimals=4)
+#varParamS = np.around(vecModelPar[1], decimals=2)
+#
+#strModel = ('R(C) = '
+#            + str(varParamA)
+#            + ' * C^(' + str(varP) + '+' + str(varQ) + ') '
+#            + '/ '
+#            + '(C^' + str(varQ) + ' + ' + str(varParamS) + '^' + str(varQ)
+#            + ')'
+#            )
 
 
 # ----------------------------------------------------------------------------
@@ -289,8 +348,8 @@ for idxDpth in range(0, varNumDpth):
 strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'fMRI signal change [arbitrary units]'
 
-funcPltAcrDpth(vecHlfMaxResp,   # Data to be plotted: aryData[Condition, Depth]
-               np.zeros((1, varNumDpth)),  # aryError[Condition, Depth]
+funcPltAcrDpth(aryHlfMaxRespMne,  # aryData[Condition, Depth]
+               aryHlfMaxRespSme,  # aryError[Condition, Depth]
                varNumDpth,  # Number of depth levels (on the x-axis)
                1,           # Number of conditions (separate lines)
                varDpi,      # Resolution of the output figure
@@ -302,7 +361,7 @@ funcPltAcrDpth(vecHlfMaxResp,   # Data to be plotted: aryData[Condition, Depth]
                strYlabel,   # Label on y axis
                'Response at half maximum contrast',  # Figure title
                False,       # Boolean: whether to plot a legend
-               (strPthOt + 'half_max_response.png'))
+               (strPthOt + '_half_max_response.png'))
 
 
 # ----------------------------------------------------------------------------
@@ -312,8 +371,8 @@ funcPltAcrDpth(vecHlfMaxResp,   # Data to be plotted: aryData[Condition, Depth]
 strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'Luminance contrast'
 
-funcPltAcrDpth(vecHlfMaxCont,   # Data to be plotted: aryData[Condition, Depth]
-               np.zeros((1, varNumDpth)),  # aryError[Condition, Depth]
+funcPltAcrDpth(aryHlfMaxContMne,  # aryData[Condition, Depth]
+               aryHlfMaxContSme,  # aryError[Condition, Depth]
                varNumDpth,  # Number of depth levels (on the x-axis)
                1,           # Number of conditions (separate lines)
                varDpi,      # Resolution of the output figure
@@ -325,6 +384,34 @@ funcPltAcrDpth(vecHlfMaxCont,   # Data to be plotted: aryData[Condition, Depth]
                strYlabel,   # Label on y axis
                'Contrast at half maximum response',  # Figure title
                False,       # Boolean: whether to plot a legend
-               (strPthOt + 'half_max_contrast.png'))
+               (strPthOt + '_half_max_contrast.png'))
+# ----------------------------------------------------------------------------
+
+
+# ----------------------------------------------------------------------------
+# *** Plot SEM of the CRF across depth
+
+# Mean of the SEM of the CRF across contrast levels:
+vecFitSmeMne = np.mean(aryFitSme, axis=1)
+vecFitSmeMne = np.array(vecFitSmeMne, ndmin=2)
+
+# Label for axes:
+strXlabel = 'Cortical depth level (equivolume)'
+strYlabel = 'SEM of the CRF'
+
+funcPltAcrDpth(vecFitSmeMne,  # aryData[Condition, Depth]
+               np.zeros((1, vecFitSmeMne.shape[0])),  # aryError[Condition, Depth]
+               varNumDpth,  # Number of depth levels (on the x-axis)
+               1,           # Number of conditions (separate lines)
+               varDpi,      # Resolution of the output figure
+               0.0,     # Minimum of Y axis
+               0.15,     # Maximum of Y axis
+               False,       # Boolean: whether to convert y axis to %
+               [' '],       # Labels for conditions (separate lines)
+               strXlabel,   # Label on x axis
+               strYlabel,   # Label on y axis
+               'Model fit across cortical depth',  # Figure title
+               False,       # Boolean: whether to plot a legend
+               (strPthOt + '_modelfit.png'))
 # ----------------------------------------------------------------------------
 

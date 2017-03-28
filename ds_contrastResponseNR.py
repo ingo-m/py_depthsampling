@@ -1,4 +1,6 @@
 """
+NOTE: WORK IN PROGRESS
+
 Function of the depth sampling pipeline.
 
 The purpose of this function is to apply fit a contrast response function to

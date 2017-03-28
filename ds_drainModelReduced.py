@@ -94,13 +94,14 @@ from ds_pltAcrSubsMean import funcPltAcrSubsMean
 # *** Define parameters
 
 # Path of depth-profile to correct:
-strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy'
+strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2.npy'
 
 # Output path for corrected depth-profiles:
-strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected.npy'
+strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2_corrected.npy'
 
 # Output path & prefix for plots:
-strPthPltOt = '/home/john/PhD/Tex/deconv/tex_deconv_v1_reduced/deconvolution_'
+# strPthPltOt = '/home/john/PhD/Tex/deconv/tex_deconv_v1_reduced/deconvolution_'
+strPthPltOt = '/home/john/Desktop/deconvolution_'
 
 # File type suffix for plot:
 strFlTp = '.png'

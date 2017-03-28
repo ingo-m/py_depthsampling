@@ -28,25 +28,28 @@ The contrast response function used here is that proposed by Boynton et al.
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
+from ds_pltAcrDpth import funcPltAcrDpth
 
 
 # ----------------------------------------------------------------------------
 # *** Define parameters
 
 # Path of draining-corrected depth-profiles:
-strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy'
+strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2.npy'
 
 # Stimulus luminance contrast levels:
 vecCont = np.array([0.025, 0.061, 0.163, 0.72])
+# Luminance contrast in percent:
+# vecCont = np.multiply(vecCont, 100.0)
 
 # Output path for plot:
-strPthOt = '/home/john/Desktop/tmp/contrast_response'
+strPthOt = '/home/john/PhD/Tex/contrast_response/v2/contrast_response'
 
-# Limits of x-axis:
+# Limits of x-axis for contrast response plots
 varXmin = 0.0
 varXmax = 1.0
 
-# Limits of x-axis:
+# Limits of y-axis for contrast response plots
 varYmin = 0.0
 varYmax = 2.0
 
@@ -54,8 +57,37 @@ varYmax = 2.0
 strLblX = 'Luminance contrast'
 strLblY = 'fMRI response'
 
-# Title for plots
-lstTtle = ['fMRI contrast response function']
+# Title for contrast response plots
+strTtle = 'fMRI contrast response function'
+
+# Figure scaling factor:
+varDpi = 80.0
+
+# Limits of y-axis for response-at-half-maximum plot
+# varYmin = 0.0
+# varYmax = 2.0
+
+# ----------------------------------------------------------------------------
+# *** Define contrast reponse function
+
+# Contrast-fMRI-response function as defined in Boynton et al. (1999).
+#   - varR is response
+#   - varC is stimulus contrast
+#   - varP - determines shape of contrast-response function, typical value: 0.3
+#   - varQ - determines shape of contrast-response function, typical value: 2.0
+#   - varS - ?
+#   - varA - Scaling factor
+def funcCrf(varC, varS, varA):
+    varP = 0.25
+    varQ = 2.0
+    varR = varA * np.divide(
+                            np.power(varC, (varP + varQ)),
+                            (np.power(varC, varQ) + np.power(varS, varQ))
+                            )
+    return varR
+
+varP = 0.25
+varQ = 2.0
 
 # ----------------------------------------------------------------------------
 # *** Load depth profiles
@@ -82,25 +114,6 @@ aryDpthSem = np.divide(np.std(aryDpthSnSb, axis=0),
 # aryMne = np.mean(aryDpth, axis=1)
 # arySd = np.std(aryDpth, axis=1)
 
-# ----------------------------------------------------------------------------
-# *** Define contrast reponse function
-
-# Contrast-fMRI-response function as defined in Boynton et al. (1999).
-#   - varR is response
-#   - varC is stimulus contrast
-#   - varP - determines shape of contrast-response function, typical value: 0.3
-#   - varQ - determines shape of contrast-response function, typical value: 2.0
-#   - varS - ?
-#   - varA - Scaling factor
-def funcCrf(varC, varS, varA):
-    varP = 0.3
-    varQ = 2.0
-    varR = varA * np.divide(
-                            np.power(varC, (varP + varQ)),
-                            (np.power(varC, varQ) + np.power(varS, varQ))
-                            )
-    return varR
-
 
 # ----------------------------------------------------------------------------
 # *** Fit CRF separately for all depth levels
@@ -114,11 +127,14 @@ varNumDpth = aryDpthMne.shape[1]
 # Counter for plot file names:
 varCntPlt = 0
 
+# Vector for response at half maximum contrast at all depth levels:
+vecHlfMax = np.zeros((1, varNumDpth))
+
 # Loop through depth levels
 for idxDpth in range(0, varNumDpth):
+# for idxDpth in range(5, 6):
 
-
-    # ----------------------------------------------------------------------------
+    # ------------------------------------------------------------------------
     # *** Fit contrast reponse function
     
     vecModelPar, vecModelCov = curve_fit(funcCrf,
@@ -126,7 +142,7 @@ for idxDpth in range(0, varNumDpth):
                                          aryDpthMne[:, idxDpth])
     
     
-    # ----------------------------------------------------------------------------
+    # ------------------------------------------------------------------------
     # *** Apply reponse function
     
     # In order to plot the fitted function, we have to apply it to a range of
@@ -137,96 +153,119 @@ for idxDpth in range(0, varNumDpth):
     vecFit = funcCrf(vecX,
                      vecModelPar[0],
                      vecModelPar[1])
-    
-    varP = 0.3
-    varQ = 2.0
-    
+
     # Create string for model parameters of exponential function:
-    varParamA = np.around(vecModelPar[0], 2)
-    varParamS = np.around(vecModelPar[1], 2)
+    print(vecModelPar[0])
+    
+    varParamA = np.around(vecModelPar[0], decimals=4)
+    varParamS = np.around(vecModelPar[1], decimals=2)
+
     strModel = ('R(C) = '
                 + str(varParamA)
                 + ' * C^(' + str(varP) + '+' + str(varQ) + ') '
                 + '/ '
-                + '(C^' + str(varQ) + ' + ' + str(varParamA) + '^' + str(varQ)
+                + '(C^' + str(varQ) + ' + ' + str(varParamS) + '^' + str(varQ)
                 + ')'
                 )
-    
-    
+
+
+    # ------------------------------------------------------------------------
+    # *** Calculate response at half maximum
+
+    vecHlfMax[0, idxDpth] = funcCrf(0.5,
+                                 vecModelPar[0],
+                                 vecModelPar[1])
+
+
     # ------------------------------------------------------------------------
     # *** Create plots
-    
-    # List with model predictions:
-    lstModPre = [vecFit]
-    
-    # List with model parameters:
-    lstModPar = [strModel]
-    
-    # We create one plot per function:
-    for idxPlt in range(0, len(lstModPre)):
-    
-        fig01 = plt.figure()
-    
-        axs01 = fig01.add_subplot(111)
-    
-        # Plot the average dependent data with error bars:
-        plt01 = axs01.errorbar(vecCont,
-                               aryDpthMne[:, idxDpth],
-                               yerr=aryDpthSem[:, idxDpth],
-                               color='blue',
-                               label='Mean (SD)',
-                               linewidth=0.9,
-                               antialiased=True)
-    
-        # Plot model prediction:
-        plt02 = axs01.plot(vecX,
-                           lstModPre[idxPlt],
-                           color='red',
-                           label=lstModPar[idxPlt],
-                           linewidth=1.0,
-                           antialiased=True)
-    
-        # Limits of the x-axis:
-        # axs01.set_xlim([np.min(vecInd), np.max(vecInd)])
-        axs01.set_xlim([varXmin, varXmax])
-    
-        # Limits of the y-axis:
-        axs01.set_ylim([varYmin, varYmax])
-    
-        # Adjust labels for axis 1:
-        axs01.tick_params(labelsize=10)
-        axs01.set_xlabel(strLblX, fontsize=9)
-        axs01.set_ylabel(strLblY, fontsize=9)
 
-        # Title:
-        strTtleTmp = (lstTtle[idxPlt] + ', depth level: ' + str(idxDpth))
-        axs01.set_title(strTtleTmp, fontsize=9)
-    
-        # Add legend:
-        axs01.legend(loc=0, prop={'size': 9})
-    
-        # Add vertical grid lines:
-        axs01.xaxis.grid(which=u'major',
-                         color=([0.5, 0.5, 0.5]),
-                         linestyle='-',
-                         linewidth=0.3)
-    
-        # Add horizontal grid lines:
-        axs01.yaxis.grid(which=u'major',
-                         color=([0.5, 0.5, 0.5]),
-                         linestyle='-',
-                         linewidth=0.3)
-    
-        # Save figure:
-        fig01.savefig((strPthOt + '_plot_' + str(varCntPlt) + '.png'),
-                      dpi=200,
-                      facecolor='w',
-                      edgecolor='w',
-                      orientation='landscape',
-                      papertype='a6',
-                      transparent=False,
-                      frameon=None)
+    fig01 = plt.figure()
+
+    axs01 = fig01.add_subplot(111)
+
+    # Plot the average dependent data with error bars:
+    plt01 = axs01.errorbar(vecCont,
+                           aryDpthMne[:, idxDpth],
+                           yerr=aryDpthSem[:, idxDpth],
+                           color='blue',
+                           label='Mean (SD)',
+                           linewidth=0.9,
+                           antialiased=True)
+
+    # Plot model prediction:
+    plt02 = axs01.plot(vecX,
+                       vecFit,
+                       color='red',
+                       label=strModel,
+                       linewidth=1.0,
+                       antialiased=True)
+
+    # Limits of the x-axis:
+    # axs01.set_xlim([np.min(vecInd), np.max(vecInd)])
+    axs01.set_xlim([varXmin, varXmax])
+
+    # Limits of the y-axis:
+    axs01.set_ylim([varYmin, varYmax])
+
+    # Adjust labels for axis 1:
+    axs01.tick_params(labelsize=10)
+    axs01.set_xlabel(strLblX, fontsize=9)
+    axs01.set_ylabel(strLblY, fontsize=9)
+
+    # Title:
+    strTtleTmp = (strTtle + ', depth level: ' + str(idxDpth))
+    axs01.set_title(strTtleTmp, fontsize=9)
+
+    # Add legend:
+    axs01.legend(loc=0, prop={'size': 9})
+
+    # Add vertical grid lines:
+    axs01.xaxis.grid(which=u'major',
+                     color=([0.5, 0.5, 0.5]),
+                     linestyle='-',
+                     linewidth=0.3)
+
+    # Add horizontal grid lines:
+    axs01.yaxis.grid(which=u'major',
+                     color=([0.5, 0.5, 0.5]),
+                     linestyle='-',
+                     linewidth=0.3)
+
+    # Save figure:
+    fig01.savefig((strPthOt + '_plot_' + str(varCntPlt) + '.png'),
+                  dpi=200,
+                  facecolor='w',
+                  edgecolor='w',
+                  orientation='landscape',
+                  papertype='a6',
+                  transparent=False,
+                  frameon=None)
 
     # Increment file name counter:
     varCntPlt += 1
-    # ------------------------------------------------------------------------
+
+
+# ----------------------------------------------------------------------------
+# *** Plot response at half maximum
+
+# Label for axes:
+strXlabel = 'Cortical depth level (equivolume)'
+strYlabel = 'fMRI signal change [arbitrary units]'
+
+funcPltAcrDpth(vecHlfMax,   # Data to be plotted: aryData[Condition, Depth]
+               np.zeros((1, varNumDpth)),  # aryError[Condition, Depth]
+               varNumDpth,  # Number of depth levels (on the x-axis)
+               1,           # Number of conditions (separate lines)
+               varDpi,      # Resolution of the output figure
+               varYmin,     # Minimum of Y axis
+               varYmax,     # Maximum of Y axis
+               False,       # Boolean: whether to convert y axis to %
+               [' '],       # Labels for conditions (separate lines)
+               strXlabel,   # Label on x axis
+               strYlabel,   # Label on y axis
+               'Response at half maximum contrast',  # Figure title
+               False,       # Boolean: whether to plot a legend
+               (strPthOt + 'half_max_response.png'))
+# ----------------------------------------------------------------------------
+

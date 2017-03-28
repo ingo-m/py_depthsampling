@@ -37,10 +37,10 @@ from ds_pltAcrDpth import funcPltAcrDpth
 # Path of draining-corrected depth-profiles:
 strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2.npy'
 
-# Stimulus luminance contrast levels:
+# Stimulus luminance contrast levels. NOTE: Should be between zero and one.
+# When using precent (i.e. from zero to 100), the search for the luminance at
+# half maximum response below would need to be adjusted.
 vecCont = np.array([0.025, 0.061, 0.163, 0.72])
-# Luminance contrast in percent:
-# vecCont = np.multiply(vecCont, 100.0)
 
 # Output path for plot:
 strPthOt = '/home/john/PhD/Tex/contrast_response/v2/contrast_response'
@@ -128,7 +128,10 @@ varNumDpth = aryDpthMne.shape[1]
 varCntPlt = 0
 
 # Vector for response at half maximum contrast at all depth levels:
-vecHlfMax = np.zeros((1, varNumDpth))
+vecHlfMaxResp = np.zeros((1, varNumDpth))
+
+# Vector for contrast at half maximum response at all depth levels:
+vecHlfMaxCont = np.zeros((1, varNumDpth))
 
 # Loop through depth levels
 for idxDpth in range(0, varNumDpth):
@@ -154,9 +157,9 @@ for idxDpth in range(0, varNumDpth):
                      vecModelPar[0],
                      vecModelPar[1])
 
+    # print(vecModelPar[0])
+
     # Create string for model parameters of exponential function:
-    print(vecModelPar[0])
-    
     varParamA = np.around(vecModelPar[0], decimals=4)
     varParamS = np.around(vecModelPar[1], decimals=2)
 
@@ -170,11 +173,44 @@ for idxDpth in range(0, varNumDpth):
 
 
     # ------------------------------------------------------------------------
-    # *** Calculate response at half maximum
+    # *** Calculate response at half maximum contrast
 
-    vecHlfMax[0, idxDpth] = funcCrf(0.5,
-                                 vecModelPar[0],
-                                 vecModelPar[1])
+    # The response at half maximum contrast (i.e. luminance contrast of 50%)
+    vecHlfMaxResp[0, idxDpth] = funcCrf(0.5,
+                                        vecModelPar[0],
+                                        vecModelPar[1])
+
+
+    # ------------------------------------------------------------------------
+    # *** Calculate contrast at half maximum response
+
+    # The maximum response defined as the response at 100% luminance contrast
+    varRes50 = funcCrf(1.0,
+                       vecModelPar[0],
+                       vecModelPar[1])
+
+    # Half maximum response:
+    varRes50 = np.multiply(varRes50, 0.5)
+
+    # Search for the luminance contrast level at half maximum response. A
+    # while loop is more practical than an analytic solution - it is easy to
+    # implement and reliable because of the contraint nature of the problem.
+    # The problem is contraint because the luminance contrast has to be
+    # between zero and one.
+
+    # Initial value for the contrast level (will be incremented until the
+    # half maximum response is reached).
+    varHlfMaxCont = 0.0
+
+    # Initial value for the resposne.
+    varResTmp = 0.0
+
+    # Increment the contrast level until the half maximum response is reached:
+    while np.less(varResTmp, varRes50):
+        varHlfMaxCont += 0.001
+        varResTmp = funcCrf(varHlfMaxCont, vecModelPar[0], vecModelPar[1])
+
+    vecHlfMaxCont[0, idxDpth] = varResTmp
 
 
     # ------------------------------------------------------------------------
@@ -247,13 +283,13 @@ for idxDpth in range(0, varNumDpth):
 
 
 # ----------------------------------------------------------------------------
-# *** Plot response at half maximum
+# *** Plot response at half maximum contrast
 
 # Label for axes:
 strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'fMRI signal change [arbitrary units]'
 
-funcPltAcrDpth(vecHlfMax,   # Data to be plotted: aryData[Condition, Depth]
+funcPltAcrDpth(vecHlfMaxResp,   # Data to be plotted: aryData[Condition, Depth]
                np.zeros((1, varNumDpth)),  # aryError[Condition, Depth]
                varNumDpth,  # Number of depth levels (on the x-axis)
                1,           # Number of conditions (separate lines)
@@ -267,5 +303,28 @@ funcPltAcrDpth(vecHlfMax,   # Data to be plotted: aryData[Condition, Depth]
                'Response at half maximum contrast',  # Figure title
                False,       # Boolean: whether to plot a legend
                (strPthOt + 'half_max_response.png'))
+
+
+# ----------------------------------------------------------------------------
+# *** Plot contrast at half maximum response
+
+# Label for axes:
+strXlabel = 'Cortical depth level (equivolume)'
+strYlabel = 'Luminance contrast'
+
+funcPltAcrDpth(vecHlfMaxCont,   # Data to be plotted: aryData[Condition, Depth]
+               np.zeros((1, varNumDpth)),  # aryError[Condition, Depth]
+               varNumDpth,  # Number of depth levels (on the x-axis)
+               1,           # Number of conditions (separate lines)
+               varDpi,      # Resolution of the output figure
+               0.0,     # Minimum of Y axis
+               1.0,     # Maximum of Y axis
+               False,       # Boolean: whether to convert y axis to %
+               [' '],       # Labels for conditions (separate lines)
+               strXlabel,   # Label on x axis
+               strYlabel,   # Label on y axis
+               'Contrast at half maximum response',  # Figure title
+               False,       # Boolean: whether to plot a legend
+               (strPthOt + 'half_max_contrast.png'))
 # ----------------------------------------------------------------------------
 

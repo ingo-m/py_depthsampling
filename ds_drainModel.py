@@ -1,23 +1,36 @@
 # -*- coding: utf-8 -*-
 """
+**Model-based correction of draining effect.**
+
 Function of the depth sampling pipeline.
 
-This version of the script removes the draining effect AND divides the local
-fMRI signal at each layer by a (layer specific) constant to account for
-different neuronal-to-fMRI-signal coupling.
-
-In other words, if the neuronal signal at each layer is the same, this would
-result in different fMRI signal strength at each layer even without the
-draining effect, according to the model proposed by Markuerkiaga et al.
-(2016). This version of the script account both for this effect and the
-draining effect.
+Notes
+-----
 
 The purpose of this script is to remove the contribution of lower cortical
 depth levels to the signal at each consecutive depth level. In other words,
 at a given depth level, the contribution from lower depth levels is removed
 based on the model proposed by Markuerkiaga et al. (2016).
 
-The following data from Markuerkiaga et al. (2016) is used in this script:
+The correction for the draining effect is done in a function called by this
+script. There are three different option for correction (see respective
+functions for details):
+
+(1) Only correct draining effect (based on model by Markuerkiaga et al., 2016).
+
+(2) Correct draining effect (based on model by Markuerkiaga et al., 2016) &
+    perform scaling to account for different vascular density and/or
+    haemodynamic coupling between depth levels based on model by Markuerkiaga
+    et al. (2016).
+
+(3) Correct draining effect (based on model by Markuerkiaga et al., 2016) &
+    perform scaling to account for different vascular density and/or
+    haemodynamic coupling between depth levels based on data by Weber et al.
+    (2008). This option allows for different correction for V1 & extrastriate
+    cortex.
+
+The following data from Markuerkiaga et al. (2016) is used in this script,
+irrespective of which draining effect model is choosen:
 
     "The cortical layer boundaries of human V1 in the model were fixed
     following de Sousa et al. (2010) and Burkhalter and Bernardo (1989):
@@ -28,83 +41,15 @@ The following data from Markuerkiaga et al. (2016) is used in this script:
     layer I, 10%
     (values rounded to the closest multiple of 10)." (p. 492)
 
-Let varEmpVI, varEmpV, varEmpIV, varEmpII_III, and varEmpI be the observed
-(empirical) signal at the different depth levels, and varNrnVI, varNrnV,
-varNrnIV, varNrnII_III, and varNrnI the underlying neuronal activity.
-Following to the model by Markuerkiaga et al. (2016), the absolute fMRI signal
-for each layer for a GE sequence can be predicted as follows (forward model,
-as depicted in Figure 3F, p. 495):
-
-    Layer VI:
-
-        varEmpVI = 1.9 * varNrnVI
-
-    Layer V:
-
-        varEmpV = 1.5 * varNrnV
-                  + 0.6 * varNrnVI
-
-    Layer IV:
-
-        varEmpIV = 2.2 * varNrnIV
-                   + 0.3 * varNrnV
-                   + 0.6 * varNrnVI
-
-    Layer II/III:
-
-        varEmpII_III = 1.7 * varNrnII_III
-                       + 1.3 * varNrnIV
-                       + 0.3 * varNrnV
-                       + 0.5 * varNrnVI
-
-    Layer I:
-
-        varEmpI = 1.6 * varNrnI
-                  + 0.7 * varNrnII_III
-                  + 1.3 * varNrnIV
-                  + 0.3 * varNrnV
-                  + 0.5 * varNrnVI
-
-These values are translated into the a transfer function to estimate the local
-neural activity at each layer given an empirically observed fMRI signal depth
-profile:
-
-    Layer VI:
-
-        varNrnVI = varEmpVI / 1.9
-
-    Layer V:
-
-        varNrnV = (varEmpV
-                   - 0.6 * varNrnVI) / 1.5
-
-    Layer IV:
-
-        varNrnIV = (varEmpIV
-                    - 0.3 * varNrnV
-                    - 0.6 * varNrnVI) / 2.2
-
-    Layer II/III:
-
-        varNrnII_III = (varEmpII_III
-                        - 1.3 * varNrnIV
-                        - 0.3 * varNrnV
-                        - 0.5 * varNrnVI) / 1.7
-
-    Layer I:
-
-        varNrnI = (varEmpI
-                   - 0.7 * varNrnII_III
-                   - 1.3 * varNrnIV
-                   - 0.3 * varNrnV
-                   - 0.5 * varNrnVI) / 1.6
-
-Reference:
+References
+----------
 Markuerkiaga, I., Barth, M., & Norris, D. G. (2016). A cortical vascular model
-    for examining the specificity of the laminar BOLD signal. Neuroimage, 132,
-    491-498.
+for examining the specificity of the laminar BOLD signal. Neuroimage, 132,
+491-498.
 
-@author: Ingo Marquardt, 21.03.2017
+Weber, B., Keller, A. L., Reichold, J., & Logothetis, N. K. (2008). The
+microvascular system of the striate and extrastriate visual cortex of the
+macaque. Cerebral Cortex, 18(10), 2318-2330.
 """
 
 # Part of py_depthsampling library
@@ -127,10 +72,15 @@ Markuerkiaga, I., Barth, M., & Norris, D. G. (2016). A cortical vascular model
 import numpy as np
 from scipy.interpolate import griddata
 from ds_pltAcrSubsMean import funcPltAcrSubsMean
-
+from ds_drainModelDecon01 import depth_deconv_01
+from ds_drainModelDecon02 import depth_deconv_02
+from ds_drainModelDecon03 import depth_deconv_03
 
 # ----------------------------------------------------------------------------
 # *** Define parameters
+
+# Which draining model to use (1, 2, or 3 - see above for details):
+varMdl = 1
 
 # Path of depth-profile to correct:
 strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy'
@@ -226,39 +176,23 @@ for idxSub in range(0, varNumSub):
 
     # ----------------------------------------------------------------------------
     # *** Subtraction of draining effect
-    
-    for idxCon in range(0, varNumCon):
 
-        # Array for corrected depth profiles:
-        aryNrn = np.zeros(aryEmp5SnSb[idxSub, :, :].shape)
+    # (1) Deconvolution based on Markuerkiaga et al. (2016).
+    if varMdl == 1:
+        aryNrnSnSb[idxSub, :, :] = depth_deconv_01(varNumCon,
+                                                   aryEmp5SnSb[idxSub, :, :])
 
-        # Layer VI:
-        aryNrn[idxCon, 0] = aryEmp5SnSb[idxSub, idxCon, 0] / 1.9
+    # (2) Deconvolution based on Markuerkiaga et al. (2016) & scaling based on
+    #     Markuerkiaga et al. (2016).
+    elif varMdl == 2:
+        aryNrnSnSb[idxSub, :, :] = depth_deconv_02(varNumCon,
+                                                   aryEmp5SnSb[idxSub, :, :])
 
-        #Layer V:
-        aryNrn[idxCon, 1] = (aryEmp5SnSb[idxSub, idxCon, 1]
-                             - 0.6 * aryNrn[idxCon, 0]) / 1.5
-
-        # Layer IV:
-        aryNrn[idxCon, 2] = (aryEmp5SnSb[idxSub, idxCon, 2]
-                             - 0.3 * aryNrn[idxCon, 1]
-                             - 0.6 * aryNrn[idxCon, 0]) / 2.2
-
-        # Layer II/III:
-        aryNrn[idxCon, 3] = (aryEmp5SnSb[idxSub, idxCon, 3]
-                             - 1.3 * aryNrn[idxCon, 2]
-                             - 0.3 * aryNrn[idxCon, 1]
-                             - 0.5 * aryNrn[idxCon, 0]) / 1.7
-
-        # Layer I:
-        aryNrn[idxCon, 4] = (aryEmp5SnSb[idxSub, idxCon, 4]
-                             - 0.7 * aryNrn[idxCon, 3]
-                             - 1.3 * aryNrn[idxCon, 2]
-                             - 0.3 * aryNrn[idxCon, 1]
-                             - 0.5 * aryNrn[idxCon, 0]) / 1.6
-
-        # Put deconvolution result for this subject into the array:
-        aryNrnSnSb[idxSub, idxCon, :] = np.copy(aryNrn[idxCon, :])
+    # (2) Deconvolution based on Markuerkiaga et al. (2016) & scaling based on
+    #     Weber et al. (2008).
+    elif varMdl == 3:
+        aryNrnSnSb[idxSub, :, :] = depth_deconv_03(varNumCon,
+                                                   aryEmp5SnSb[idxSub, :, :])
 
 
     # ----------------------------------------------------------------------------

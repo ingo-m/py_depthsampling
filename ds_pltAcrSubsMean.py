@@ -39,7 +39,39 @@ def funcPltAcrSubsMean(arySubDpthMns,
                        strTitle,
                        strPltOtPre,
                        strPltOtSuf):
-    """Calculate & plot across-subjects mean."""
+    """
+    # Calculate & plot across-subjects mean.
+
+    Parameters
+    ----------
+    arySubDpthMns : np.array
+        Array with depth data to be plotted, of the form:
+        aryDpthMeans[Subject, Condition, Depth]
+    varNumSubs : int
+        Number of subect
+    varNumDpth : int
+        Number of cortical depth levels
+    varNumCon : int
+        Number of conditions
+    varDpi : int
+        DPI value for the plot
+    varAcrSubsYmin : int
+        Minimum of the y-axis
+    varAcrSubsYmax : int
+        Maximum of the y-axis
+    lstConLbl : list
+        List of labels for the conditions
+    strXlabel : str
+        Label for the x-axis
+    strYlabel : str
+        Label for the y-axis
+    strTitle : str
+        Title for the plot
+    strPltOtPre : str
+        Path for saving plots (prefix)
+    strPltOtSuf : str
+        File type for saing plots (suffix)
+    """
     # Across-subjects mean:
     aryAcrSubDpthMean = np.mean(arySubDpthMns, axis=0)
 

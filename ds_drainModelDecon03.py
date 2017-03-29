@@ -22,7 +22,7 @@
 import numpy as np
 
 
-def depth_deconv_03(varNumCon, aryEmp5):
+def depth_deconv_03(varNumCon, aryEmp5, strRoi='v1'):
     """
     **Deconvolution of GE fMRI depth profiles (draining effect correction)**.
 
@@ -38,6 +38,12 @@ def depth_deconv_03(varNumCon, aryEmp5):
     aryEmp5 : np.array
         Two-dimensional array with depth profiles defined at 5 depth levels,
         separately for each condition: aryEmp5[condition, depthlevel].
+    strRoi : str
+        Region of interest. If ``strRoi='v1'``, vascular density and/or
+        haemodynamic coupling bias as estimated for V1 is corrected. If
+        ``strRoi='v2'``, biased corrected as estimated for extrastriate cortex
+        is applied (both based on Weber et al., 2008). Default value is
+        ``'v1'``.
 
     Returns
     -------
@@ -52,91 +58,100 @@ def depth_deconv_03(varNumCon, aryEmp5):
     words, at a given depth level, the contribution from lower depth levels is
     removed based on the model proposed by Markuerkiaga et al. (2016).
 
-    This function removes the draining effect AND divides the local fMRI
-    signal at each layer by a (layer specific) constant to account for
-    different neuronal-to-fMRI-signal coupling, based on the model by
-    Markuerkiaga et al. (2016).
+    **This function divides the local fMRI signal at each layer by a (layer
+    specific) constant to account for different vascular density and/or
+    neuronal-to-fMRI-signal coupling (based on Weber et al., 2008) AND removes
+    the draining effect (based on the model by Markuerkiaga et al., 2016).**
 
     In other words, if the neuronal signal at each layer is the same, this
     would result in different fMRI signal strength at each layer even without
-    the draining effect, according to the model proposed by Markuerkiaga et
-    al. (2016). This version of the script account both for this effect and
-    the draining effect.
+    the draining effect. This version of the script account both for this
+    effect and the draining effect.
 
-    Let varEmpVI, varEmpV, varEmpIV, varEmpII_III, and varEmpI be the observed
-    (empirical) signal at the different depth levels, and varNrnVI, varNrnV,
-    varNrnIV, varNrnII_III, and varNrnI the underlying neuronal activity.
-    Following to the model by Markuerkiaga et al. (2016), the absolute fMRI
-    signal for each layer for a GE sequence can be predicted as follows
-    (forward model, as depicted in Figure 3F, p. 495):
+    The correction is based on the cortical blood volume as published in
+    Weber et al. (2008), Figure 4C (V1) and Figure 5C (extrastriate cortex).
+    Cortical blood volume fraction across cortical layers:
 
-        Layer VI:
+    V1:
+    Layer I:    2.05
+    Layer II:   1.9
+    Layer III:  2.0
+    Layer IVa:  2.15
+    Layer IVb:  2.2
+    Layer IVca: 2.6
+    Layer IVcb: 2.7
+    Layer V:    2.1
+    Layer VI:   2.3
 
-        >>> varEmpVI = 1.9 * varNrnVI
+    Extrastriate:
+    Layer I:      2.0
+    Layer II/III: 2.1
+    Layer IV:     2.2
+    Layer V:      2.1
+    Layer VI:     2.0
 
-        Layer V:
+    The draining model by Markuerkiaga et al. (2016) is only defined at five
+    layers (I, II/III, IV, V, VI). Thus, we need to average the above CBV
+    fractions within these five layers. We refer to the relative thickness of
+    the layers as mentioned in Xing et al. (2012, p. 13875) (refering to
+    Hawken et al., 1988): 
 
-        >>> varEmpV = 1.5 * varNrnV
-                      + 0.6 * varNrnVI
+        "The mean relative thickness of each layer is
+        0.442 for layers 2 and 3,
+        0.058 for layer 4A,
+        0.108 for layer 4B,
+        0.083 for layer 4Calpha,
+        0.083 for layer 4Cbeta,
+        0.11 for layer 5, and
+        0.116 for layer 6".
 
-        Layer IV:
+    This leads to the following CBV fractions for the five layers at which the
+    draining model is defined:
 
-        >>> varEmpIV = 2.2 * varNrnIV
-                       + 0.3 * varNrnV
-                       + 0.6 * varNrnVI
+    V1:
 
-        Layer II/III:
+        >>> # Layer VI:
+        >>> vecCbv[0] = 2.3
+        >>> # Layer V:
+        >>> vecCbv[1] = 2.1
+        >>>  # Layer IV:
+        >>> vecCbv[2] = ((2.15 * 0.058 / 0.332)
+        >>>              + (2.2 * 0.108 / 0.332)
+        >>>              + (2.6 * 0.083 / 0.332)
+        >>>              + (2.7 * 0.083 / 0.332))
+        >>> # Layer II/III:
+        >>> # (Just the arithmetic mean, because no relative thickness
+        >>> # information is given.)
+        >>> vecCbv[3] = (1.9 + 2.0) * 0.5
+        >>> # Layer I:
+        >>> vecCbv[4] = 2.05
 
-        >>> varEmpII_III = 1.7 * varNrnII_III
-                           + 1.3 * varNrnIV
-                           + 0.3 * varNrnV
-                           + 0.5 * varNrnVI
+    Extrastriate cortex:
 
-        Layer I:
+        >>> # Layer VI:
+        >>> vecCbv[0] = 2.0
+        >>> # Layer V:
+        >>> vecCbv[1] = 2.1
+        >>> # Layer IV:
+        >>> vecCbv[2] = 2.2
+        >>> # Layer II/III:
+        >>> vecCbv[3] = 2.1
+        >>> #Layer I:
+        >>> vecCbv[4] = 2.0
 
-        >>> varEmpI = 1.6 * varNrnI
-                      + 0.7 * varNrnII_III
-                      + 1.3 * varNrnIV
-                      + 0.3 * varNrnV
-                      + 0.5 * varNrnVI
+    Let ``varEmp*`` be the empirically measured fMRI signal at different
+    cortical depth levels, and ``varCrct*`` be the corrected signal. The
+    correction, based on a combination of Markuerkiaga et al. (2016) and Weber
+    et al. (2008), is performed as follows:
 
-    These values are translated into the a transfer function to estimate the
-    local neural activity at each layer given an empirically observed fMRI
-    signal depth profile:
+    ...
 
-        Layer VI:
+    References
+    ----------
+    Hawken, M. J., Parker, A. J., & Lund, J. S. (1988). Laminar organization
+    and contrast sensitivity of direction-selective cells in the striate
+    cortex of the Old World monkey. J. Neurosci., 8(10), 3541-3548.
 
-        >>> varNrnVI = varEmpVI / 1.9
-
-        Layer V:
-
-        >>> varNrnV = (varEmpV
-                       - 0.6 * varNrnVI) / 1.5
-
-        Layer IV:
-
-        >>> varNrnIV = (varEmpIV
-                        - 0.3 * varNrnV
-                        - 0.6 * varNrnVI) / 2.2
-
-        Layer II/III:
-
-        >>> varNrnII_III = (varEmpII_III
-                            - 1.3 * varNrnIV
-                            - 0.3 * varNrnV
-                            - 0.5 * varNrnVI) / 1.7
-
-        Layer I:
-
-        >>> varNrnI = (varEmpI
-                       - 0.7 * varNrnII_III
-                       - 1.3 * varNrnIV
-                       - 0.3 * varNrnV
-                       - 0.5 * varNrnVI) / 1.6
-
-
-    Reference
-    ---------
     Markuerkiaga, I., Barth, M., & Norris, D. G. (2016). A cortical vascular
     model for examining the specificity of the laminar BOLD signal.
     Neuroimage, 132, 491-498.
@@ -144,37 +159,113 @@ def depth_deconv_03(varNumCon, aryEmp5):
     Weber, B., Keller, A. L., Reichold, J., & Logothetis, N. K. (2008). The
     microvascular system of the striate and extrastriate visual cortex of the
     macaque. Cerebral Cortex, 18(10), 2318-2330.
+
+    Xing, D., Yeh, C. I., Burns, S., & Shapley, R. M. (2012). Laminar analysis
+    of visually evoked activity in the primary visual cortex. Proceedings of
+    the National Academy of Sciences, 109(34), 13871-13876.
     """
-    # *** Subtraction of draining effect
+    # ------------------------------------------------------------------------
+    # *** Define CBV fractions
+
+    # Vector for layer-specific CBV fractions:
+    vecCbv = np.zeros(5)
+
+    # The layer-specific CBV fractions are different for V1 & extrastriate
+    # cortex:
+    if strRoi == 'v1':
+
+        # Layer VI:
+        vecCbv[0] = 2.3
+        # Layer V:
+        vecCbv[1] = 2.1
+         # Layer IV:
+        vecCbv[2] = ((2.15 * 0.058 / 0.332)
+                     + (2.2 * 0.108 / 0.332)
+                     + (2.6 * 0.083 / 0.332)
+                     + (2.7 * 0.083 / 0.332))
+        # Layer II/III:
+        vecCbv[3] = (1.9 + 2.0) * 0.5
+        # Layer I:
+        vecCbv[4] = 2.05
+
+    elif strRoi == 'v2':
+        # Layer VI:
+        vecCbv[0] = 2.0
+        # Layer V:
+        vecCbv[1] = 2.1
+        # Layer IV:
+        vecCbv[2] = 2.2
+        # Layer II/III:
+        vecCbv[3] = 2.1
+        #Layer I:
+        vecCbv[4] = 2.0
+
+    # Normalise the CBV fraction vector by its maximum value:
+    vecCbv = np.divide(vecCbv, np.max(vecCbv))
+
+
+    # ------------------------------------------------------------------------
+    # *** Deconvolution (removal of draining effect)
 
     # Array for corrected depth profiles:
     aryNrn = np.zeros(aryEmp5.shape)
 
     for idxCon in range(0, varNumCon):
 
+#        # Layer VI:
+#        aryNrn[idxCon, 0] = aryEmp5[idxCon, 0] / vecCbv[0]
+#
+#        # Layer V:
+#        aryNrn[idxCon, 1] = (aryEmp5[idxCon, 1] / vecCbv[1]
+#                             - (0.6 / 1.9) * aryNrn[idxCon, 0])
+#
+#        # Layer IV:
+#        aryNrn[idxCon, 2] = (aryEmp5[idxCon, 2] / vecCbv[2]
+#                             - (0.3 / 1.5) * aryNrn[idxCon, 1]
+#                             - (0.6 / 1.9) * aryNrn[idxCon, 0])
+#
+#        # Layer II/III:
+#        aryNrn[idxCon, 3] = (aryEmp5[idxCon, 3] / vecCbv[3]
+#                             - (1.3 / 2.2) * aryNrn[idxCon, 2]
+#                             - (0.3 / 1.5) * aryNrn[idxCon, 1]
+#                             - (0.5 / 1.9) * aryNrn[idxCon, 0])
+#
+#        # Layer I:
+#        aryNrn[idxCon, 4] = (aryEmp5[idxCon, 4] / vecCbv[4]
+#                             - (0.7 / 1.7) * aryNrn[idxCon, 3]
+#                             - (1.3 / 2.2) * aryNrn[idxCon, 2]
+#                             - (0.3 / 1.5) * aryNrn[idxCon, 1]
+#                             - (0.5 / 1.9) * aryNrn[idxCon, 0])
+
         # Layer VI:
-        aryNrn[idxCon, 0] = aryEmp5[idxCon, 0] / 1.9
+        aryNrn[idxCon, 0] = aryEmp5[idxCon, 0]
 
         # Layer V:
         aryNrn[idxCon, 1] = (aryEmp5[idxCon, 1]
-                             - 0.6 * aryNrn[idxCon, 0]) / 1.5
+                             - (0.6 / 1.9) * aryNrn[idxCon, 0])
 
         # Layer IV:
         aryNrn[idxCon, 2] = (aryEmp5[idxCon, 2]
-                             - 0.3 * aryNrn[idxCon, 1]
-                             - 0.6 * aryNrn[idxCon, 0]) / 2.2
+                             - (0.3 / 1.5) * aryNrn[idxCon, 1]
+                             - (0.6 / 1.9) * aryNrn[idxCon, 0])
 
         # Layer II/III:
         aryNrn[idxCon, 3] = (aryEmp5[idxCon, 3]
-                             - 1.3 * aryNrn[idxCon, 2]
-                             - 0.3 * aryNrn[idxCon, 1]
-                             - 0.5 * aryNrn[idxCon, 0]) / 1.7
+                             - (1.3 / 2.2) * aryNrn[idxCon, 2]
+                             - (0.3 / 1.5) * aryNrn[idxCon, 1]
+                             - (0.5 / 1.9) * aryNrn[idxCon, 0])
 
         # Layer I:
         aryNrn[idxCon, 4] = (aryEmp5[idxCon, 4]
-                             - 0.7 * aryNrn[idxCon, 3]
-                             - 1.3 * aryNrn[idxCon, 2]
-                             - 0.3 * aryNrn[idxCon, 1]
-                             - 0.5 * aryNrn[idxCon, 0]) / 1.6
+                             - (0.7 / 1.7) * aryNrn[idxCon, 3]
+                             - (1.3 / 2.2) * aryNrn[idxCon, 2]
+                             - (0.3 / 1.5) * aryNrn[idxCon, 1]
+                             - (0.5 / 1.9) * aryNrn[idxCon, 0])
+
+        aryNrn[idxCon, 0] = aryNrn[idxCon, 0] / vecCbv[0]
+        aryNrn[idxCon, 1] = aryNrn[idxCon, 1] / vecCbv[1]
+        aryNrn[idxCon, 2] = aryNrn[idxCon, 2] / vecCbv[2]
+        aryNrn[idxCon, 3] = aryNrn[idxCon, 3] / vecCbv[3]
+        aryNrn[idxCon, 4] = aryNrn[idxCon, 4] / vecCbv[4]
 
     return aryNrn

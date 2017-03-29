@@ -54,8 +54,8 @@ def depth_deconv_02(varNumCon, aryEmp5):
 
     **This function removes the draining effect AND divides the local fMRI
     signal at each layer by a (layer specific) constant to account for
-    different neuronal-to-fMRI-signal coupling, based on the model by
-    Markuerkiaga et al. (2016).**
+    different vascular density and/or neuronal-to-fMRI-signal coupling, based
+    on the model by Markuerkiaga et al. (2016).**
 
     In other words, if the neuronal signal at each layer is the same, this
     would result in different fMRI signal strength at each layer even without
@@ -141,7 +141,7 @@ def depth_deconv_02(varNumCon, aryEmp5):
     model for examining the specificity of the laminar BOLD signal.
     Neuroimage, 132, 491-498.
     """
-    # *** Subtraction of draining effect
+    # *** Deconvolution (removal of draining effect)
 
     # Array for corrected depth profiles:
     aryNrn = np.zeros(aryEmp5.shape)

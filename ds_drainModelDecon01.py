@@ -103,8 +103,7 @@ def depth_deconv_01(varNumCon, aryEmp5):
     model for examining the specificity of the laminar BOLD signal.
     Neuroimage, 132, 491-498.
     """
-    # ----------------------------------------------------------------------------
-    # *** Subtraction of draining effect
+    # *** Deconvolution (removal of draining effect)
 
     # Array for corrected depth profiles:
     aryNrn = np.zeros(aryEmp5.shape)

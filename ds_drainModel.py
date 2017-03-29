@@ -80,7 +80,7 @@ from ds_drainModelDecon03 import depth_deconv_03
 # *** Define parameters
 
 # Which draining model to use (1, 2, or 3 - see above for details):
-varMdl = 1
+varMdl = 3
 
 # Path of depth-profile to correct:
 strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy'
@@ -89,7 +89,7 @@ strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy'
 strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected.npy'
 
 # Output path & prefix for plots:
-strPthPltOt = '/home/john/Desktop/deconvolution_'
+strPthPltOt = '/home/john/Desktop/deconvolution_m03_'
 
 # File type suffix for plot:
 strFlTp = '.png'
@@ -101,7 +101,7 @@ varDpi = 80.0
 varAcrSubsYmin01 = -0.05
 varAcrSubsYmax01 = 2.0
 varAcrSubsYmin02 = -0.05
-varAcrSubsYmax02 = 1.0
+varAcrSubsYmax02 = 2.0
 
 # Label for axes:
 strXlabel = 'Cortical depth level (equivolume)'
@@ -192,7 +192,8 @@ for idxSub in range(0, varNumSub):
     #     Weber et al. (2008).
     elif varMdl == 3:
         aryNrnSnSb[idxSub, :, :] = depth_deconv_03(varNumCon,
-                                                   aryEmp5SnSb[idxSub, :, :])
+                                                   aryEmp5SnSb[idxSub, :, :],
+                                                   strRoi='v1')
 
 
     # ----------------------------------------------------------------------------

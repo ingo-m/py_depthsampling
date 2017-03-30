@@ -105,9 +105,12 @@ def depth_deconv_01(varNumCon, aryEmp5):
     """
     # *** Deconvolution (removal of draining effect)
 
+    print('------Deconvolution - Model 1 (only draining effects)')
+
     # Array for corrected depth profiles:
     aryNrn = np.zeros(aryEmp5.shape)
 
+    # Subtraction of draining effect:
     for idxCon in range(0, varNumCon):
 
         # Layer VI:

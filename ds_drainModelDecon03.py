@@ -139,12 +139,9 @@ def depth_deconv_03(varNumCon, aryEmp5, strRoi='v1'):
         >>> #Layer I:
         >>> vecCbv[4] = 2.0
 
-    Let ``varEmp*`` be the empirically measured fMRI signal at different
-    cortical depth levels, and ``varCrct*`` be the corrected signal. The
-    correction, based on a combination of Markuerkiaga et al. (2016) and Weber
-    et al. (2008), is performed as follows:
-
-    ...
+    These values are translated into the a transfer function to estimate the
+    local neural activity at each layer given an empirically observed fMRI
+    signal depth profile.
 
     References
     ----------
@@ -174,6 +171,8 @@ def depth_deconv_03(varNumCon, aryEmp5, strRoi='v1'):
     # cortex:
     if strRoi == 'v1':
 
+        print('------Calculating layer specific CBV fractions for V1')
+
         # Layer VI:
         vecCbv[0] = 2.3
         # Layer V:
@@ -189,6 +188,9 @@ def depth_deconv_03(varNumCon, aryEmp5, strRoi='v1'):
         vecCbv[4] = 2.05
 
     elif strRoi == 'v2':
+
+        print('------Calculating layer specific CBV fractions for V2')
+
         # Layer VI:
         vecCbv[0] = 2.0
         # Layer V:
@@ -203,39 +205,23 @@ def depth_deconv_03(varNumCon, aryEmp5, strRoi='v1'):
     # Normalise the CBV fraction vector by its maximum value:
     vecCbv = np.divide(vecCbv, np.max(vecCbv))
 
+    # Uncomment the following code and plot aryComparison to compare the
+    # correction based on Weber et al. (2008) vs. that of Markuerkiaga et al.
+    # (2016).
+    #    vecCbvM = np.array([1.9, 1.5, 2.2, 1.7, 1.6])
+    #    vecCbvM = np.divide(vecCbvM, np.max(vecCbvM))
+    #    aryComparison = np.vstack((vecCbvM, vecCbv)).T
 
     # ------------------------------------------------------------------------
     # *** Deconvolution (removal of draining effect)
 
+    print('------Deconvolution - Model 3')
+
     # Array for corrected depth profiles:
     aryNrn = np.zeros(aryEmp5.shape)
 
+    # Subtraction of draining effect:
     for idxCon in range(0, varNumCon):
-
-#        # Layer VI:
-#        aryNrn[idxCon, 0] = aryEmp5[idxCon, 0] / vecCbv[0]
-#
-#        # Layer V:
-#        aryNrn[idxCon, 1] = (aryEmp5[idxCon, 1] / vecCbv[1]
-#                             - (0.6 / 1.9) * aryNrn[idxCon, 0])
-#
-#        # Layer IV:
-#        aryNrn[idxCon, 2] = (aryEmp5[idxCon, 2] / vecCbv[2]
-#                             - (0.3 / 1.5) * aryNrn[idxCon, 1]
-#                             - (0.6 / 1.9) * aryNrn[idxCon, 0])
-#
-#        # Layer II/III:
-#        aryNrn[idxCon, 3] = (aryEmp5[idxCon, 3] / vecCbv[3]
-#                             - (1.3 / 2.2) * aryNrn[idxCon, 2]
-#                             - (0.3 / 1.5) * aryNrn[idxCon, 1]
-#                             - (0.5 / 1.9) * aryNrn[idxCon, 0])
-#
-#        # Layer I:
-#        aryNrn[idxCon, 4] = (aryEmp5[idxCon, 4] / vecCbv[4]
-#                             - (0.7 / 1.7) * aryNrn[idxCon, 3]
-#                             - (1.3 / 2.2) * aryNrn[idxCon, 2]
-#                             - (0.3 / 1.5) * aryNrn[idxCon, 1]
-#                             - (0.5 / 1.9) * aryNrn[idxCon, 0])
 
         # Layer VI:
         aryNrn[idxCon, 0] = aryEmp5[idxCon, 0]
@@ -262,10 +248,8 @@ def depth_deconv_03(varNumCon, aryEmp5, strRoi='v1'):
                              - (0.3 / 1.5) * aryNrn[idxCon, 1]
                              - (0.5 / 1.9) * aryNrn[idxCon, 0])
 
-        aryNrn[idxCon, 0] = aryNrn[idxCon, 0] / vecCbv[0]
-        aryNrn[idxCon, 1] = aryNrn[idxCon, 1] / vecCbv[1]
-        aryNrn[idxCon, 2] = aryNrn[idxCon, 2] / vecCbv[2]
-        aryNrn[idxCon, 3] = aryNrn[idxCon, 3] / vecCbv[3]
-        aryNrn[idxCon, 4] = aryNrn[idxCon, 4] / vecCbv[4]
+    # Division (correction for different vascular density and/or haemodynamic
+    # coupling):
+    aryNrn = np.divide(aryNrn, vecCbv[None, :])
 
     return aryNrn

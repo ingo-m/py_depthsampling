@@ -82,14 +82,17 @@ from ds_drainModelDecon03 import depth_deconv_03
 # Which draining model to use (1, 2, or 3 - see above for details):
 varMdl = 3
 
+# ROI (V1 or V2):
+strRoi = 'v2'
+
 # Path of depth-profile to correct:
-strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy'
+strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}.npy'.format(strRoi)
 
 # Output path for corrected depth-profiles:
-strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected.npy'
+strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}_corrected.npy'.format(strRoi)
 
 # Output path & prefix for plots:
-strPthPltOt = '/home/john/Desktop/deconvolution_m03_'
+strPthPltOt = '/home/john/PhD/Tex/deconv/tex_deconv_{}_model_{}/deconv_{}_m{}_'.format(strRoi, str(varMdl), strRoi, str(varMdl))
 
 # File type suffix for plot:
 strFlTp = '.png'
@@ -114,6 +117,10 @@ lstConLbl = ['2.5%', '6.1%', '16.3%', '72.0%']
 # ----------------------------------------------------------------------------
 # *** Load depth profile from disk
 
+print('-Model-based correction of draining effect')
+
+print('---Loading data')
+
 # Array with single-subject depth sampling results, of the form
 # aryEmpSnSb[idxSub, idxCondition, idxDpth].
 aryEmpSnSb = np.load(strPthPrf)
@@ -131,6 +138,8 @@ varNumDpth = aryEmpSnSb.shape[2]
 # ----------------------------------------------------------------------------
 # *** Loop through subjects
 
+print('---Subject-by-subject deconvolution')
+
 # Array for single-subject interpolation result (before deconvolution):
 aryEmp5SnSb = np.zeros((varNumSub, varNumCon, 5))
 
@@ -144,20 +153,31 @@ for idxSub in range(0, varNumSub):
     # *** Interpolation (downsampling)
     
     # The empirical depth profiles are defined at more depth levels than the
-    # draining model. We downsample the empirical depth profiles to the number of
-    # depth levels of the model.
-    
-    # Relative thickness of the layers (layer VI, 20%; layer V, 10%; layer IV,
-    # 40%; layer II/III, 20%; layer I, 10%; Markuerkiaga et al. 2016).
-    # lstThck = [0.2, 0.1, 0.4, 0.2, 0.1]
-    # From the relative thickness, we derive the relative position of the layers
-    # (we set the position of each layer to the sum of all lower layers plus half
-    # its own thickness):
-    vecPosMdl = np.array([0.1, 0.25, 0.5, 0.8, 0.95])
-    
+    # draining model. We downsample the empirical depth profiles to the number
+    # of depth levels of the model.
+
+    # The relative thickness of the layers differs between V1 & V2.
+    if strRoi == 'v1':
+        print('------Interpolation - V1')
+        # Relative thickness of the layers (layer VI, 20%; layer V, 10%; layer IV,
+        # 40%; layer II/III, 20%; layer I, 10%; Markuerkiaga et al. 2016).
+        # lstThck = [0.2, 0.1, 0.4, 0.2, 0.1]
+        # From the relative thickness, we derive the relative position of the layers
+        # (we set the position of each layer to the sum of all lower layers plus half
+        # its own thickness):
+        vecPosMdl = np.array([0.1, 0.25, 0.5, 0.8, 0.95])
+
+    elif strRoi == 'v2':
+        print('------Interpolation - V2')
+        # Relative position of the layers (accordign to Weber et al., 2008,
+        # Figure 5C, p. 2322). We start with the absolute depth:
+        vecPosMdl = np.array([160.0, 590.0, 1110.0, 1400.0, 1620.0])
+        # Divide by overall thickness (1.7 mm):
+        vecPosMdl = np.divide(vecPosMdl, 1700.0)
+
     # Position of empirical datapoints:
     vecPosEmp = np.linspace(0.0, 1.0, num=varNumDpth, endpoint=True)
-    # vecPosEmp = np.array([0.1, 0.25, 0.5, 0.8, 0.95])
+
     
     # Vector for downsampled empirical depth profiles:
     aryEmp5 = np.zeros((varNumCon, 5))
@@ -193,7 +213,7 @@ for idxSub in range(0, varNumSub):
     elif varMdl == 3:
         aryNrnSnSb[idxSub, :, :] = depth_deconv_03(varNumCon,
                                                    aryEmp5SnSb[idxSub, :, :],
-                                                   strRoi='v1')
+                                                   strRoi=strRoi)
 
 
     # ----------------------------------------------------------------------------
@@ -219,6 +239,8 @@ np.save(strPthPrfOt,
 
 # ----------------------------------------------------------------------------
 # *** Plot results
+
+print('---Plot results')
 
 # Plot across-subjects mean before deconvolution:
 strTmpTtl = 'Before deconvolution'
@@ -258,3 +280,4 @@ funcPltAcrSubsMean(aryNrnSnSb,
 #aryEmp5 = np.mean(aryEmp5SnSb, axis=0).T
 #aryNrn = np.mean(aryNrnSnSb, axis=0).T
 
+print('-Done.')

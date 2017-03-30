@@ -102,38 +102,7 @@ def depth_deconv_02(varNumCon, aryEmp5):
 
     These values are translated into the a transfer function to estimate the
     local neural activity at each layer given an empirically observed fMRI
-    signal depth profile:
-
-        Layer VI:
-
-        >>> varNrnVI = varEmpVI / 1.9
-
-        Layer V:
-
-        >>> varNrnV = (varEmpV
-                       - 0.6 * varNrnVI) / 1.5
-
-        Layer IV:
-
-        >>> varNrnIV = (varEmpIV
-                        - 0.3 * varNrnV
-                        - 0.6 * varNrnVI) / 2.2
-
-        Layer II/III:
-
-        >>> varNrnII_III = (varEmpII_III
-                            - 1.3 * varNrnIV
-                            - 0.3 * varNrnV
-                            - 0.5 * varNrnVI) / 1.7
-
-        Layer I:
-
-        >>> varNrnI = (varEmpI
-                       - 0.7 * varNrnII_III
-                       - 1.3 * varNrnIV
-                       - 0.3 * varNrnV
-                       - 0.5 * varNrnVI) / 1.6
-
+    signal depth profile.
 
     Reference
     ---------
@@ -143,34 +112,46 @@ def depth_deconv_02(varNumCon, aryEmp5):
     """
     # *** Deconvolution (removal of draining effect)
 
+    print('------Deconvolution - Model 2')
+
     # Array for corrected depth profiles:
     aryNrn = np.zeros(aryEmp5.shape)
 
+    # Subtraction of draining effect:
     for idxCon in range(0, varNumCon):
 
         # Layer VI:
-        aryNrn[idxCon, 0] = aryEmp5[idxCon, 0] / 1.9
+        aryNrn[idxCon, 0] = aryEmp5[idxCon, 0]
 
         # Layer V:
         aryNrn[idxCon, 1] = (aryEmp5[idxCon, 1]
-                             - 0.6 * aryNrn[idxCon, 0]) / 1.5
+                             - (0.6 / 1.9) * aryNrn[idxCon, 0])
 
         # Layer IV:
         aryNrn[idxCon, 2] = (aryEmp5[idxCon, 2]
-                             - 0.3 * aryNrn[idxCon, 1]
-                             - 0.6 * aryNrn[idxCon, 0]) / 2.2
+                             - (0.3 / 1.5) * aryNrn[idxCon, 1]
+                             - (0.6 / 1.9) * aryNrn[idxCon, 0])
 
         # Layer II/III:
         aryNrn[idxCon, 3] = (aryEmp5[idxCon, 3]
-                             - 1.3 * aryNrn[idxCon, 2]
-                             - 0.3 * aryNrn[idxCon, 1]
-                             - 0.5 * aryNrn[idxCon, 0]) / 1.7
+                             - (1.3 / 2.2) * aryNrn[idxCon, 2]
+                             - (0.3 / 1.5) * aryNrn[idxCon, 1]
+                             - (0.5 / 1.9) * aryNrn[idxCon, 0])
 
         # Layer I:
         aryNrn[idxCon, 4] = (aryEmp5[idxCon, 4]
-                             - 0.7 * aryNrn[idxCon, 3]
-                             - 1.3 * aryNrn[idxCon, 2]
-                             - 0.3 * aryNrn[idxCon, 1]
-                             - 0.5 * aryNrn[idxCon, 0]) / 1.6
+                             - (0.7 / 1.7) * aryNrn[idxCon, 3]
+                             - (1.3 / 2.2) * aryNrn[idxCon, 2]
+                             - (0.3 / 1.5) * aryNrn[idxCon, 1]
+                             - (0.5 / 1.9) * aryNrn[idxCon, 0])
+
+    # Vector for layer-specific intensity correction (CBV fractions):
+    vecCbv = np.array([1.9, 1.5, 2.2, 1.7, 1.6])
+    # Normalise the vector to its maximum:
+    # vecCbv = np.divide(vecCbv, np.max(vecCbv))
+
+    # Division (correction for different vascular density and/or haemodynamic
+    # coupling):
+    aryNrn = np.divide(aryNrn, vecCbv[None, :])
 
     return aryNrn

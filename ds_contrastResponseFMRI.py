@@ -46,7 +46,7 @@ vecCont = np.array([0.025, 0.061, 0.163, 0.72])
 strPthOt = '/home/john/PhD/Tex/contrast_response/v2/contrast_response'
 
 # Limits of x-axis for contrast response plots
-varXmin = 0.0
+varXmin = 0.001
 varXmax = 1.0
 
 # Limits of y-axis for contrast response plots
@@ -79,7 +79,8 @@ varDpi = 80.0
 #   - varS - ?
 #   - varA - Scaling factor
 def funcCrf(varC, varS, varA):
-    varP = 0.25
+    # varR = varS * np.log(varC) + varA
+    varP = 0.3
     varQ = 2.0
     varR = varA * np.divide(
                             np.power(varC, (varP + varQ)),
@@ -87,8 +88,8 @@ def funcCrf(varC, varS, varA):
                             )
     return varR
 
-varP = 0.25
-varQ = 2.0
+#varP = 0.25
+#varQ = 2.0
 
 
 # ----------------------------------------------------------------------------
@@ -129,6 +130,9 @@ aryHlfMaxResp = np.zeros((varNumSubs, varNumDpth))
 # Vector for contrast at half maximum response:
 aryHlfMaxCont = np.zeros((varNumSubs, varNumDpth))
 
+# Array for residual variance:
+aryRes = np.zeros((varNumSubs, varNumDpth))
+
 # Loop through subjects:
 for idxSub in range(0, varNumSubs):
 
@@ -140,7 +144,8 @@ for idxSub in range(0, varNumSubs):
         
         vecModelPar, vecModelCov = curve_fit(funcCrf,
                                              vecCont,
-                                             aryDpth[idxSub, :, idxDpth])
+                                             aryDpth[idxSub, :, idxDpth],
+                                             maxfev=100000)
         
         
         # --------------------------------------------------------------------
@@ -193,6 +198,30 @@ for idxSub in range(0, varNumSubs):
             varHlfMaxCont += 0.01
             varResTmp = funcCrf(varHlfMaxCont, vecModelPar[0], vecModelPar[1])
         aryHlfMaxCont[idxSub, idxDpth] = varResTmp
+
+
+        # --------------------------------------------------------------------
+        # *** Calculate residual variance
+
+        # In order to assess the fit of the model, we calculate the deviation
+        # of the measured response from the fitted model (average across
+        # conditions). First we have to calculate the deviation for each
+        # condition.
+        vecRes = np.zeros(varNumCon)
+        for idxCon in range(0, varNumCon):
+
+            # Model prediction for current contrast level:
+            varTmp = funcCrf(vecCont[idxCon], vecModelPar[0], vecModelPar[1])
+
+            # Residual = absolute of difference between prediction and
+            # measurement
+            vecRes[idxCon] = np.absolute(np.subtract(aryDpth[idxSub,
+                                                             idxCon,
+                                                             idxDpth],
+                                                     varTmp))
+
+        # Mean residual across conditions:
+        aryRes[idxSub, idxDpth] = np.mean(vecRes)
 
 
 # ----------------------------------------------------------------------------
@@ -385,22 +414,25 @@ funcPltAcrDpth(aryHlfMaxContMne,  # aryData[Condition, Depth]
                'Contrast at half maximum response',  # Figure title
                False,       # Boolean: whether to plot a legend
                (strPthOt + '_half_max_contrast.png'))
-# ----------------------------------------------------------------------------
 
 
 # ----------------------------------------------------------------------------
-# *** Plot SEM of the CRF across depth
+# *** Plot residual variance
 
-# Mean of the SEM of the CRF across contrast levels:
-vecFitSmeMne = np.mean(aryFitSme, axis=1)
-vecFitSmeMne = np.array(vecFitSmeMne, ndmin=2)
+# Mean residual variance across subjects:
+vecResMne = np.mean(aryRes, axis=0, keepdims=True)
+
+# Standard error of the mean:
+vecResSem = np.divide(np.std(aryRes, axis=0),
+                      np.sqrt(varNumSubs))
+vecResSem = np.array(vecResSem, ndmin=2)
 
 # Label for axes:
 strXlabel = 'Cortical depth level (equivolume)'
-strYlabel = 'SEM of the CRF'
+strYlabel = 'Residual variance'
 
-funcPltAcrDpth(vecFitSmeMne,  # aryData[Condition, Depth]
-               np.zeros((1, vecFitSmeMne.shape[0])),  # aryError[Condition, Depth]
+funcPltAcrDpth(vecResMne,   # aryData[Condition, Depth]
+               vecResSem,   # aryError[Condition, Depth]
                varNumDpth,  # Number of depth levels (on the x-axis)
                1,           # Number of conditions (separate lines)
                varDpi,      # Resolution of the output figure
@@ -413,5 +445,4 @@ funcPltAcrDpth(vecFitSmeMne,  # aryData[Condition, Depth]
                'Model fit across cortical depth',  # Figure title
                False,       # Boolean: whether to plot a legend
                (strPthOt + '_modelfit.png'))
-# ----------------------------------------------------------------------------
 

@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
 """
-**Model-based correction of draining effect.**
+**Model-based correction of draining effect**.
 
 Function of the depth sampling pipeline.
 
@@ -86,13 +85,13 @@ varMdl = 3
 strRoi = 'v2'
 
 # Path of depth-profile to correct:
-strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}.npy'.format(strRoi)
+strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}.npy'.format(strRoi)  #noqa
 
 # Output path for corrected depth-profiles:
-strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}_corrected.npy'.format(strRoi)
+strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}_corrected.npy'.format(strRoi)  #noqa
 
 # Output path & prefix for plots:
-strPthPltOt = '/home/john/PhD/Tex/deconv/tex_deconv_{}_model_{}/deconv_{}_m{}_'.format(strRoi, str(varMdl), strRoi, str(varMdl))
+strPthPltOt = '/home/john/PhD/Tex/deconv/tex_deconv_{}_model_{}/deconv_{}_m{}_'.format(strRoi, str(varMdl), strRoi, str(varMdl))  #noqa
 
 # File type suffix for plot:
 strFlTp = '.png'
@@ -148,10 +147,9 @@ aryNrnSnSb = np.zeros((varNumSub, varNumCon, 5))
 
 for idxSub in range(0, varNumSub):
 
-
-    # ----------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # *** Interpolation (downsampling)
-    
+
     # The empirical depth profiles are defined at more depth levels than the
     # draining model. We downsample the empirical depth profiles to the number
     # of depth levels of the model.
@@ -159,12 +157,12 @@ for idxSub in range(0, varNumSub):
     # The relative thickness of the layers differs between V1 & V2.
     if strRoi == 'v1':
         print('------Interpolation - V1')
-        # Relative thickness of the layers (layer VI, 20%; layer V, 10%; layer IV,
-        # 40%; layer II/III, 20%; layer I, 10%; Markuerkiaga et al. 2016).
+        # Relative thickness of the layers (layer VI, 20%; layer V, 10%; layer
+        # IV, 40%; layer II/III, 20%; layer I, 10%; Markuerkiaga et al. 2016).
         # lstThck = [0.2, 0.1, 0.4, 0.2, 0.1]
-        # From the relative thickness, we derive the relative position of the layers
-        # (we set the position of each layer to the sum of all lower layers plus half
-        # its own thickness):
+        # From the relative thickness, we derive the relative position of the
+        # layers (we set the position of each layer to the sum of all lower
+        # layers plus half  its own thickness):
         vecPosMdl = np.array([0.1, 0.25, 0.5, 0.8, 0.95])
 
     elif strRoi == 'v2':
@@ -178,10 +176,9 @@ for idxSub in range(0, varNumSub):
     # Position of empirical datapoints:
     vecPosEmp = np.linspace(0.0, 1.0, num=varNumDpth, endpoint=True)
 
-    
     # Vector for downsampled empirical depth profiles:
     aryEmp5 = np.zeros((varNumCon, 5))
-    
+
     # Loop through conditions and downsample the depth profiles:
     for idxCon in range(0, varNumCon):
         # Interpolation:
@@ -193,8 +190,7 @@ for idxSub in range(0, varNumSub):
     # Put interpolation result for this subject into the array:
     aryEmp5SnSb[idxSub, :, :] = np.copy(aryEmp5)
 
-
-    # ----------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # *** Subtraction of draining effect
 
     # (1) Deconvolution based on Markuerkiaga et al. (2016).
@@ -215,8 +211,7 @@ for idxSub in range(0, varNumSub):
                                                    aryEmp5SnSb[idxSub, :, :],
                                                    strRoi=strRoi)
 
-
-    # ----------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # *** Normalisation
 
     # Calculate 'grand mean', i.e. the mean PE across depth levels and
@@ -277,7 +272,7 @@ funcPltAcrSubsMean(aryNrnSnSb,
                    strTmpPth,
                    strFlTp)
 
-#aryEmp5 = np.mean(aryEmp5SnSb, axis=0).T
-#aryNrn = np.mean(aryNrnSnSb, axis=0).T
+# aryEmp5 = np.mean(aryEmp5SnSb, axis=0).T
+# aryNrn = np.mean(aryNrnSnSb, axis=0).T
 
 print('-Done.')

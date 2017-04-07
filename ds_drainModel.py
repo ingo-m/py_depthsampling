@@ -79,7 +79,7 @@ from ds_drainModelDecon03 import depth_deconv_03
 # *** Define parameters
 
 # Which draining model to use (1, 2, or 3 - see above for details):
-varMdl = 3
+varMdl = 1
 
 # ROI (V1 or V2):
 strRoi = 'v2'
@@ -94,7 +94,7 @@ strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}_correct
 strPthPltOt = '/home/john/PhD/Tex/deconv/{}_model_{}/deconv_{}_m{}_'.format(strRoi, str(varMdl), strRoi, str(varMdl))  #noqa
 
 # File type suffix for plot:
-strFlTp = '.png'
+strFlTp = '.svg'
 
 # Figure scaling factor:
 varDpi = 80.0
@@ -238,7 +238,7 @@ np.save(strPthPrfOt,
 print('---Plot results')
 
 # Plot across-subjects mean before deconvolution:
-strTmpTtl = 'Before deconvolution'
+strTmpTtl = '{} Before deconvolution'.format(strRoi.upper())
 strTmpPth = (strPthPltOt + 'before')
 funcPltAcrSubsMean(aryEmp5SnSb,
                    varNumSub,
@@ -256,7 +256,7 @@ funcPltAcrSubsMean(aryEmp5SnSb,
 
 
 # Across-subjects mean after deconvolution:
-strTmpTtl = 'After deconvolution'
+strTmpTtl = '{} After deconvolution'.format(strRoi.upper())
 strTmpPth = (strPthPltOt + 'after')
 funcPltAcrSubsMean(aryNrnSnSb,
                    varNumSub,

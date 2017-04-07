@@ -140,7 +140,8 @@ def funcPltAcrSubsMean(arySubDpthMns,
     axs01.set_ylim([varAcrSubsYmin, varAcrSubsYmax])
 
     # Which x values to label with ticks (WM & CSF boundary):
-    axs01.set_xticks([-0.5, (varNumDpth - 0.5)])
+    # axs01.set_xticks([-0.5, (varNumDpth - 0.5)])
+    axs01.set_xticks([-0.05, (varNumDpth - 0.95)])
     # Labels for x ticks:
     axs01.set_xticklabels(['WM', 'CSF'])
 

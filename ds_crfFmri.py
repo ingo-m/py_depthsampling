@@ -1,4 +1,6 @@
 """
+Fit contrast response function for fMRI data.
+
 Function of the depth sampling pipeline.
 
 The purpose of this function is to apply fit a contrast response function to
@@ -26,16 +28,16 @@ The contrast response function used here is that proposed by Boynton et al.
 
 
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from ds_pltAcrDpth import funcPltAcrDpth
+from ds_crfPlot import funcCrfPlt
 
 
 # ----------------------------------------------------------------------------
 # *** Define parameters
 
 # Path of draining-corrected depth-profiles:
-strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2.npy'
+strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected.npy'
 
 # Stimulus luminance contrast levels. NOTE: Should be between zero and one.
 # When using precent (i.e. from zero to 100), the search for the luminance at
@@ -43,7 +45,7 @@ strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2.npy'
 vecCont = np.array([0.025, 0.061, 0.163, 0.72])
 
 # Output path for plot:
-strPthOt = '/home/john/PhD/Tex/contrast_response/v2/contrast_response'
+strPthOt = '/home/john/PhD/Tex/contrast_response/v1_corrected/crf'
 
 # Limits of x-axis for contrast response plots
 varXmin = 0.001
@@ -255,119 +257,27 @@ aryHlfMaxContSme = np.divide(np.std(aryHlfMaxCont, axis=0),
 # Restore original number of dimensions:
 aryHlfMaxContSme = np.array(aryHlfMaxContSme, ndmin=2)
 
+
 # ----------------------------------------------------------------------------
-# *** Plot CRF
+# *** Plot contrast response functions
 
-# Counter for plot file names:
-varCntPlt = 0
-
-# We plot the average CRF (averaged across subjects) for all depth levels.
-for idxDpth in range(0, varNumDpth):
-
-
-    # ------------------------------------------------------------------------
-    # *** Create plots
-
-    fig01 = plt.figure()
-
-    axs01 = fig01.add_subplot(111)
-
-    # Plot  model prediction
-    plt01 = axs01.plot(vecX,  #noqa
-                       aryFitMne[idxDpth, :],
-                       color='red',
-                       alpha=0.9,
-                       label='Modelled mean (SEM)',
-                       linewidth=2.0,
-                       antialiased=True,
-                       zorder=2)
-
-    # Plot error shading
-    plot02 = axs01.fill_between(vecX,  #noqa
-                                np.subtract(aryFitMne[idxDpth, :],
-                                            aryFitSme[idxDpth, :]),
-                                np.add(aryFitMne[idxDpth, :],
-                                       aryFitSme[idxDpth, :]),
-                                alpha=0.4,
-                                edgecolor='red',
-                                facecolor='red',
-                                linewidth=0.0,
-                                # linestyle='dashdot',
-                                antialiased=True,
-                                zorder=1)
-
-    # Plot the average dependent data with error bars:
-    plt03 = axs01.errorbar(vecCont,
-                           aryDpthMne[:, idxDpth],
-                           yerr=aryDpthSem[:, idxDpth],
-                           color='blue',
-                           label='Empirical mean (SEM)',
-                           linewidth=2.0,
-                           antialiased=True,
-                           zorder=3)
-
-    # Limits of the x-axis:
-    # axs01.set_xlim([np.min(vecInd), np.max(vecInd)])
-    axs01.set_xlim([varXmin, varXmax])
-
-    # Limits of the y-axis:
-    axs01.set_ylim([varYmin, varYmax])
-
-    # Which y values to label with ticks:
-    vecYlbl = np.linspace(varYmin, varYmax, num=5, endpoint=True)
-    # Round:
-    # vecYlbl = np.around(vecYlbl, decimals=2)
-    # Set ticks:
-    axs01.set_yticks(vecYlbl)
-
-    # Adjust labels for axis 1:
-    axs01.tick_params(labelsize=14)
-    axs01.set_xlabel(strLblX, fontsize=16)
-    axs01.set_ylabel(strLblY, fontsize=16)
-
-    # Title:
-    strTtleTmp = (strTtle + ', depth level: ' + str(idxDpth))
-    axs01.set_title(strTtleTmp, fontsize=14)
-
-    # Add legend:
-    axs01.legend(loc=0, prop={'size': 10})
-
-    # Add vertical grid lines:
-    axs01.xaxis.grid(which=u'major',
-                     color=([0.5, 0.5, 0.5]),
-                     linestyle='-',
-                     linewidth=0.3)
-
-    # Add horizontal grid lines:
-    axs01.yaxis.grid(which=u'major',
-                     color=([0.5, 0.5, 0.5]),
-                     linestyle='-',
-                     linewidth=0.3)
-
-    # Save figure:
-    fig01.savefig((strPthOt + '_plot_' + str(varCntPlt) + '.png'),
-                  dpi=(varDpi * 2.0),
-                  facecolor='w',
-                  edgecolor='w',
-                  orientation='landscape',
-                  transparent=False,
-                  frameon=None)
-
-    # Increment file name counter:
-    varCntPlt += 1
-
-
-## Create string for model parameters of exponential function:
-#varParamA = np.around(vecModelPar[0], decimals=4)
-#varParamS = np.around(vecModelPar[1], decimals=2)
-#
-#strModel = ('R(C) = '
-#            + str(varParamA)
-#            + ' * C^(' + str(varP) + '+' + str(varQ) + ') '
-#            + '/ '
-#            + '(C^' + str(varQ) + ' + ' + str(varParamS) + '^' + str(varQ)
-#            + ')'
-#            )
+# CRF per depth level:
+strPthOtTmp = (strPthOt + '_dpth')
+funcCrfPlt(vecX,         # X-values for fitted data
+           aryFitMne,    # Fitted y-values aryFitMne[idxDpth, idxContr]
+           aryFitSme,    # Error of fitted y; aryFitSme[idxDpth, idxContr]
+           vecCont,      # Empirical stimulus luminance contrast levels
+           aryDpthMne,   # Empirical y-data; aryDpthMne[idxCon, idxDpth]
+           aryDpthSem,   # Error of emp. y; aryDpthSem[idxCon, idxDpth]
+           strPthOtTmp,  # Output path
+           varXmin,      # Lower limit of x axis
+           varXmax,      # Upper limit of x axis
+           varYmin,      # Lower limit of y axis
+           varYmax,      # Upper limit of y axis
+           strLblX,      # Label for x axis
+           strLblY,      # Label for y axis
+           strTtle,      # Plot title
+           varDpi)       # Figure scaling factor
 
 
 # ----------------------------------------------------------------------------

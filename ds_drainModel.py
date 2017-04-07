@@ -91,7 +91,7 @@ strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}.npy'.form
 strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}_corrected.npy'.format(strRoi)  #noqa
 
 # Output path & prefix for plots:
-strPthPltOt = '/home/john/PhD/Tex/deconv/tex_deconv_{}_model_{}/deconv_{}_m{}_'.format(strRoi, str(varMdl), strRoi, str(varMdl))  #noqa
+strPthPltOt = '/home/john/PhD/Tex/deconv/{}_model_{}/deconv_{}_m{}_'.format(strRoi, str(varMdl), strRoi, str(varMdl))  #noqa
 
 # File type suffix for plot:
 strFlTp = '.png'

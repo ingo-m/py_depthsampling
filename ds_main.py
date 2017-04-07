@@ -65,6 +65,9 @@ print('-Visualisation of depth sampling results')
 # *****************************************************************************
 # *** Define parameters
 
+# Region of interest ('v1' or 'v2'):
+strRoi = 'v2'
+
 # List of subject identifiers:
 lstSubIds = ['20150930',
              '20151118',
@@ -89,8 +92,8 @@ strVtkDpth01 = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/pe_stim_lvl_{
 # (1)
 # Base path of csv files with ROI definition (i.e. patch of cortex selected on
 # the surface, e.g. V1 or V2) - i.e. the first vertex selection criterion (with
-# subject ID left open):
-strCsvRoi = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/v1.csv'  #noqa
+# subject ID & ROI left open):
+strCsvRoi = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/{}.csv'  #noqa
 
 # (2)
 # Use second selection criterion defined at one depth level (legacy function):
@@ -159,7 +162,7 @@ strPrcdData = 'SCALARS'
 varNumLne = 2
 
 # Title for mean plot:
-strTitle = ('V1')
+strTitle = strRoi.upper()
 
 # Limits of y-axis for single subject plots (list of tuples, [(Ymin, Ymax)]):
 lstLimY = [(0.0, 2.5)] * len(lstSubIds)
@@ -173,7 +176,7 @@ strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'fMRI signal change [arbitrary units]'
 
 # Output path for plots - prfix:
-strPltOtPre = '/home/john/PhD/Tex/tex_pe/plots_v1/'
+strPltOtPre = '/home/john/PhD/Tex/tex_pe/plots_{}/'.format(strRoi)
 # Output path for plots - suffix:
 strPltOtSuf = '_depthplot_1000_R2multi_0p16.png'
 # strPltOtSuf = '_depthplot_1000_combmean_7000.png'
@@ -212,7 +215,7 @@ varLinRegYmax = 0.18
 strLinRegYlabel = 'Regression coefficient'
 
 # Output path for depth samling results (within subject means):
-strDpthMeans = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy'  #noqa
+strDpthMeans = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}.npy'.format(strRoi)  #noqa
 
 # Maximum number of processes to run in parallel: *** NOT IMPLEMENTED
 # varPar = 10
@@ -250,7 +253,7 @@ for idxSub in range(0, varNumSubs):
                                         strTmp) for strTmp in lstCon]
 
     # Complete file paths:
-    strCsvRoiTmp = strCsvRoi.format(lstSubIds[idxSub])
+    strCsvRoiTmp = strCsvRoi.format(lstSubIds[idxSub], strRoi)
     strVtkSlct02Tmp = strVtkSlct02.format(lstSubIds[idxSub])
     strVtkSlct03Tmp = strVtkSlct03.format(lstSubIds[idxSub])
     strVtkSlct04Tmp = strVtkSlct04.format(lstSubIds[idxSub])

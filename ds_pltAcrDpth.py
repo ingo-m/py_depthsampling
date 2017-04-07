@@ -64,7 +64,7 @@ def funcPltAcrDpth(aryData,     # Data to be plotted: aryData[Condition, Depth]
     for idxCon in range(0, varNumCon):
 
         # Adjust the colour of current line:
-        vecClrTmp = objCmap(objClrNorm(idxCon))
+        vecClrTmp = objCmap(objClrNorm(varNumCon - 1 - idxCon))
 
         # Plot depth profile for current input file:
         plt01 = axs01.plot(vecX,  #noqa
@@ -149,7 +149,7 @@ def funcPltAcrDpth(aryData,     # Data to be plotted: aryData[Condition, Depth]
     if lgcLgnd:
         axs01.legend(loc=0,
                      frameon=False,
-                     prop={'size': 36})
+                     prop={'size': 26})
 
     # Save figure:
     fgr01.savefig(strPath,

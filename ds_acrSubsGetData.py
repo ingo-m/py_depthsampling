@@ -22,13 +22,14 @@ Function of the depth sampling pipeline.
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np  # noqa
-import matplotlib.pyplot as plt
-import matplotlib.colors as colors
+# import matplotlib.pyplot as plt
+# import matplotlib.colors as colors
 from ds_loadCsvRoi import funcLoadCsvRoi
 from ds_loadVtkSingle import funcLoadVtkSingle
 from ds_loadVtkMulti import funcLoadVtkMulti
 from ds_slctVrtcs import funcSlctVrtcs
 from ds_crtVtkMsk import funcCrtVtkMsk
+from ds_pltAcrDpth import funcPltAcrDpth
 
 
 def funcAcrSubGetSubsData(idxPrc,        # Process ID  #noqa
@@ -208,7 +209,7 @@ def funcAcrSubGetSubsData(idxPrc,        # Process ID  #noqa
     # **************************************************************************
 
     # **************************************************************************
-    # *** Plot results - mean over vertices
+    # *** Calculate mean & conficende interval
 
     if idxPrc == 0:
         print('---------Plot results - mean over vertices.')
@@ -269,105 +270,31 @@ def funcAcrSubGetSubsData(idxPrc,        # Process ID  #noqa
         # Divide all values by the grand mean:
         aryDpthMean = np.divide(aryDpthMean, varGrndMean)
         aryDpthConf = np.divide(aryDpthConf, varGrndMean)
+    # **************************************************************************
 
-    # Create figure:
-    fgr01 = plt.figure(figsize=(800.0/varDpi, 600.0/varDpi),
-                       dpi=varDpi)
-    # Create axis:
-    axs01 = fgr01.add_subplot(111)
-
-    # Vector for x-data:
-    vecX = range(0, varNumDpth)
-
-    # Prepare colour map:
-    objClrNorm = colors.Normalize(vmin=0, vmax=(varNumCon - 1))
-    objCmap = plt.cm.winter
-
-    # Loop through input files:
-    for idxIn in range(0, varNumCon):
-
-        # Adjust the colour of current line:
-        # vecClrTmp = np.array([(float(idxIn) / float(varNumCon)),
-        #                       (1.0 - (float(idxIn) / float(varNumCon))),
-        #                       (float(idxIn) / float(varNumCon))
-        #                       ])
-        vecClrTmp = objCmap(objClrNorm(varNumCon - 1 - idxIn))
-
-        # Plot depth profile for current input file:
-        plt01 = axs01.plot(vecX,  #noqa
-                           aryDpthMean[idxIn, :],
-                           color=vecClrTmp,
-                           alpha=0.9,
-                           label=('Luminance contrast '
-                                  + lstConLbl[idxIn]),
-                           linewidth=8.0,
-                           antialiased=True)
-
-        # Plot error shading:
-        plot02 = axs01.fill_between(vecX,  #noqa
-                                    np.subtract(aryDpthMean[idxIn, :],
-                                                aryDpthConf[idxIn, :]),
-                                    np.add(aryDpthMean[idxIn, :],
-                                           aryDpthConf[idxIn, :]),
-                                    alpha=0.4,
-                                    edgecolor=vecClrTmp,
-                                    facecolor=vecClrTmp,
-                                    linewidth=0,
-                                    # linestyle='dashdot',
-                                    antialiased=True)
-
-    # Set x-axis range:
-    axs01.set_xlim([-1, varNumDpth])
-    # Set y-axis range:
-    axs01.set_ylim([varYmin, varYmax])
-
-    # Which x values to label with ticks (WM & CSF boundary):
-    axs01.set_xticks([-0.5, (varNumDpth - 0.5)])
-    # Labels for x ticks:
-    axs01.set_xticklabels(['WM', 'CSF'])
-
-    # Set x & y tick font size:
-    axs01.tick_params(labelsize=13)
-
-    # Adjust labels:
-    axs01.set_xlabel(strXlabel,
-                     fontsize=13)
-    axs01.set_ylabel(strYlabel,
-                     fontsize=13)
-
-    # Adjust title:
-    # strTitle = (strSubId + ' ' + strTitle + ' - Number of vertices: ' +
-    #             str(varNumInc) + ', z-conjunction-threshold = ' +
-    #             str(np.around((varThrZcon), decimals=2)))
-
-    strTitle = (strSubId + ' ' + strTitle + ' - Number of vertices: ' +
-                str(varNumInc))
-
-    axs01.set_title(strTitle, fontsize=10)
-
-    # Legend for axis 1:
-    axs01.legend(loc=0,
-                 prop={'size': 13})
-
-    # # Add vertical grid lines:
-    #    axs01.xaxis.grid(which=u'major',
-    #                     color=([0.5,0.5,0.5]),
-    #                     linestyle='-',
-    #                     linewidth=0.2)
+    # **************************************************************************
+    # *** Create plot
 
     # File name for figure:
     strPltOt = strPltOtPre + strSubId + strPltOtSuf
 
-    # Save figure:
-    fgr01.savefig(strPltOt,
-                  facecolor='w',
-                  edgecolor='w',
-                  orientation='landscape',
-                  transparent=False,
-                  frameon=None)
+    # Title, including information about number of vertices:
+    strTitleTmp = (strTitle + ', ' + str(varNumInc) + ' vertices')
 
-    # Close figure:
-    plt.close(fgr01)
+    funcPltAcrDpth(aryDpthMean,  # Data: aryData[Condition, Depth]
+                   aryDpthConf,  # Error shading: aryError[Condition, Depth]
+                   varNumDpth,   # Number of depth levels (on the x-axis)
+                   varNumCon,    # Number of conditions (separate lines)
+                   varDpi,       # Resolution of the output figure
+                   varYmin,      # Minimum of Y axis
+                   varYmax,      # Maximum of Y axis
+                   False,        # Boolean: whether to convert y axis to %
+                   lstConLbl,    # Labels for conditions (separate lines)
+                   strXlabel,    # Label on x axis
+                   strYlabel,    # Label on y axis
+                   strTitleTmp,  # Figure title
+                   True,         # Boolean: whether to plot a legend
+                   strPltOt)
     # **************************************************************************
 
     # **************************************************************************

@@ -94,7 +94,7 @@ def depth_deconv_03(varNumCon, aryEmp5, strRoi='v1'):
     layers (I, II/III, IV, V, VI). Thus, we need to average the above CBV
     fractions within these five layers. We refer to the relative thickness of
     the layers as mentioned in Xing et al. (2012, p. 13875) (refering to
-    Hawken et al., 1988): 
+    Hawken et al., 1988):
 
         "The mean relative thickness of each layer is
         0.442 for layers 2 and 3,
@@ -177,7 +177,7 @@ def depth_deconv_03(varNumCon, aryEmp5, strRoi='v1'):
         vecCbv[0] = 2.3
         # Layer V:
         vecCbv[1] = 2.1
-         # Layer IV:
+        # Layer IV:
         vecCbv[2] = ((2.15 * 0.058 / 0.332)
                      + (2.2 * 0.108 / 0.332)
                      + (2.6 * 0.083 / 0.332)
@@ -199,7 +199,7 @@ def depth_deconv_03(varNumCon, aryEmp5, strRoi='v1'):
         vecCbv[2] = 2.2
         # Layer II/III:
         vecCbv[3] = 2.1
-        #Layer I:
+        # Layer I:
         vecCbv[4] = 2.0
 
     # Normalise the CBV fraction vector by its maximum value:

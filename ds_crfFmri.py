@@ -37,6 +37,7 @@ from ds_crfPlot import funcCrfPlt
 # *** Define parameters
 
 # Path of draining-corrected depth-profiles:
+# strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2_not_norm_corrected.npy'  #noqa
 strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2_corrected.npy'  #noqa
 
 # Stimulus luminance contrast levels. NOTE: Should be between zero and one.
@@ -45,6 +46,7 @@ strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2_correct
 vecCon = np.array([0.025, 0.061, 0.163, 0.72])
 
 # Output path for plot:
+# strPthOt = '/home/john/PhD/Tex/contrast_response_not_norm/v2_corrected/crf'
 strPthOt = '/home/john/PhD/Tex/contrast_response/v2_corrected/crf'
 
 # Limits of x-axis for contrast response plots
@@ -53,6 +55,7 @@ varXmax = 1.0
 
 # Limits of y-axis for contrast response plots
 varYmin = 0.0
+# varYmax = 5.0
 varYmax = 1.5
 
 # Axis labels
@@ -65,10 +68,10 @@ strTtle = 'fMRI contrast response function'
 # Figure scaling factor:
 varDpi = 80.0
 
-# Lower limits for parameters (intercept, exponent):
-vecLimA = np.array([-10.0, 0.0])
+# Lower limits for parameters (factor, exponent):
+vecLimA = np.array([0.0, 0.0])
 
-# Upper limits for parameters (intercept, exponent):
+# Upper limits for parameters (factor, exponent):
 vecLimB = np.array([10.0, 1.0])
 
 
@@ -96,7 +99,7 @@ vecLimB = np.array([10.0, 1.0])
 # Power function:
 def funcCrf(varC, varA, varB):
     """Contrast-fMRI-response function."""
-    varR = varA + np.power(varC, varB)
+    varR = varA * np.power(varC, varB)
     return varR
 
 
@@ -120,6 +123,9 @@ varNumCon = aryDpth.shape[1]
 # Number of depth levels:
 varNumDpth = aryDpth.shape[2]
 
+# Scaling:
+# aryDpth = np.multiply(aryDpth, 0.01)
+
 # Across-subjects mean for measured response:
 aryDpthMne = np.mean(aryDpth, axis=0)
 
@@ -134,7 +140,7 @@ aryDpthSem = np.divide(np.std(aryDpth, axis=0),
 # We fit the contrast response function separately for all depth levels.
 
 # Number of x-values for which to solve the function:
-varNumX = 1000
+varNumX = 1001
 
 # Vector for which the function will be fitted:
 vecX = np.linspace(varXmin, varXmax, num=varNumX, endpoint=True)
@@ -154,15 +160,14 @@ aryRes = np.zeros((varNumCon, varNumDpth))
 # Loop through depth levels:
 for idxDpth in range(0, varNumDpth):
 
-
     # ------------------------------------------------------------------------
     # *** Fit contrast reponse function
     vecModelPar, vecModelCov = curve_fit(funcCrf,
                                          vecCon,
                                          aryDpthMne[:, idxDpth],
                                          maxfev=100000,
-                                         bounds=(vecLimA, vecLimB))
-
+                                         bounds=(vecLimA, vecLimB),
+                                         p0=(0.5, 0.5))
 
     # ------------------------------------------------------------------------
     # *** Apply reponse function
@@ -172,7 +177,6 @@ for idxDpth in range(0, varNumDpth):
                                  vecModelPar[0],
                                  vecModelPar[1])
 
-
     # ------------------------------------------------------------------------
     # *** Calculate response at half maximum contrast
 
@@ -181,7 +185,6 @@ for idxDpth in range(0, varNumDpth):
     vecHlfMaxResp[0, idxDpth] = funcCrf(0.5,
                                         vecModelPar[0],
                                         vecModelPar[1])
-
 
     # ------------------------------------------------------------------------
     # *** Calculate contrast at half maximum response
@@ -210,10 +213,9 @@ for idxDpth in range(0, varNumDpth):
 
     # Increment the contrast level until the half maximum response is reached:
     while np.less(varRespTmp, varResp50):
-        varHlfMaxCont += 0.01
+        varHlfMaxCont += 0.000001
         varRespTmp = funcCrf(varHlfMaxCont, vecModelPar[0], vecModelPar[1])
-    vecHlfMaxCont[0, idxDpth] = varRespTmp
-
+    vecHlfMaxCont[0, idxDpth] = varHlfMaxCont
 
     # ------------------------------------------------------------------------
     # *** Calculate residual variance
@@ -231,16 +233,15 @@ for idxDpth in range(0, varNumDpth):
                                                                      idxDpth],
                                                           varTmp))
 
-
     # ----------------------------------------------------------------------------
     # *** Plot contrast response functions
-    
+
     # Create string for model parameters of exponential function:
     varParamA = np.around(vecModelPar[0], decimals=2)
     varParamB = np.around(vecModelPar[1], decimals=2)
     strMdlTmp = ('Model: R(C) = '
                  + str(varParamA)
-                 + ' + C ^ '
+                 + ' * C ^ '
                  + str(varParamB)
                  )
     # strModel = ('R(C) = '
@@ -256,22 +257,22 @@ for idxDpth in range(0, varNumDpth):
 
     # Plot CRF for current depth level:
     funcCrfPlt(vecX,
-                   aryFit[idxDpth, :],
-                   vecCon,
-                   aryDpthMne[:, idxDpth],
-                   aryDpthSem[:, idxDpth],
-                   strPthOt,
-                   varXmin=varXmin,
-                   varXmax=varXmax,
-                   varYmin=varYmin,
-                   varYmax=varYmax,
-                   strLblX=strLblX,
-                   strLblY=strLblY,
-                   strTtle=strTtleTmp,
-                   varDpi=80.0,
-                   strMdl=strMdlTmp,
-                   idxDpth=idxDpth
-                   )
+               aryFit[idxDpth, :],
+               vecCon,
+               aryDpthMne[:, idxDpth],
+               aryDpthSem[:, idxDpth],
+               strPthOt,
+               varXmin=varXmin,
+               varXmax=varXmax,
+               varYmin=varYmin,
+               varYmax=varYmax,
+               strLblX=strLblX,
+               strLblY=strLblY,
+               strTtle=strTtleTmp,
+               varDpi=80.0,
+               strMdl=strMdlTmp,
+               idxDpth=idxDpth
+               )
 
 
 # ----------------------------------------------------------------------------
@@ -302,7 +303,11 @@ funcPltAcrDpth(vecHlfMaxResp,     # aryData[Condition, Depth]
 
 # Label for axes:
 strXlabel = 'Cortical depth level (equivolume)'
-strYlabel = 'Luminance contrast'
+strYlabel = 'Percent luminance contrast'
+
+# Convert contrast values to percent (otherwise rounding will be a problem for
+# y-axis values):
+vecHlfMaxCont = np.multiply(vecHlfMaxCont, 100.0)
 
 funcPltAcrDpth(vecHlfMaxCont,  # aryData[Condition, Depth]
                np.zeros(np.shape(vecHlfMaxCont)),  # aryError[Con., Depth]
@@ -310,7 +315,7 @@ funcPltAcrDpth(vecHlfMaxCont,  # aryData[Condition, Depth]
                1,           # Number of conditions (separate lines)
                varDpi,      # Resolution of the output figure
                0.0,     # Minimum of Y axis
-               1.0,     # Maximum of Y axis
+               9.0,     # Maximum of Y axis
                False,       # Boolean: whether to convert y axis to %
                [' '],       # Labels for conditions (separate lines)
                strXlabel,   # Label on x axis
@@ -341,7 +346,7 @@ funcPltAcrDpth(aryResMne,   # aryData[Condition, Depth]
                1,           # Number of conditions (separate lines)
                varDpi,      # Resolution of the output figure
                0.0,         # Minimum of Y axis
-               0.05,        # Maximum of Y axis
+               0.2,        # Maximum of Y axis
                False,       # Boolean: whether to convert y axis to %
                [' '],       # Labels for conditions (separate lines)
                strXlabel,   # Label on x axis

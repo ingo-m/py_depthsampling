@@ -85,25 +85,32 @@ varMdl = 1
 strRoi = 'v2'
 
 # Path of depth-profile to correct:
-strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}.npy'.format(strRoi)  #noqa
+# strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}.npy'.format(strRoi)  #noqa
+strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}_not_norm.npy'.format(strRoi)  #noqa
 
 # Output path for corrected depth-profiles:
-strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}_corrected.npy'.format(strRoi)  #noqa
+# strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}_corrected.npy'.format(strRoi)  #noqa
+strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}_not_norm_corrected.npy'.format(strRoi)  #noqa
 
 # Output path & prefix for plots:
-strPthPltOt = '/home/john/PhD/Tex/deconv/{}_model_{}/deconv_{}_m{}_'.format(strRoi, str(varMdl), strRoi, str(varMdl))  #noqa
+# strPthPltOt = '/home/john/PhD/Tex/deconv/{}_model_{}/deconv_{}_m{}_'.format(strRoi, str(varMdl), strRoi, str(varMdl))  #noqa
+strPthPltOt = '/home/john/PhD/Tex/deconv_not_norm/{}_model_{}/deconv_{}_m{}_'.format(strRoi, str(varMdl), strRoi, str(varMdl))  #noqa
 
 # File type suffix for plot:
-strFlTp = '.svg'
+strFlTp = '.png'
 
 # Figure scaling factor:
 varDpi = 80.0
 
 # Limits of y-axis for across subject plot:
+# varAcrSubsYmin01 = -0.05
+# varAcrSubsYmax01 = 2.0
+# varAcrSubsYmin02 = -0.05
+# varAcrSubsYmax02 = 2.0
 varAcrSubsYmin01 = -0.05
-varAcrSubsYmax01 = 2.0
+varAcrSubsYmax01 = 800.0
 varAcrSubsYmin02 = -0.05
-varAcrSubsYmax02 = 2.0
+varAcrSubsYmax02 = 800.0
 
 # Label for axes:
 strXlabel = 'Cortical depth level (equivolume)'

@@ -66,7 +66,7 @@ print('-Visualisation of depth sampling results')
 # *** Define parameters
 
 # Region of interest ('v1' or 'v2'):
-strRoi = 'v2'
+strRoi = 'v1'
 
 # List of subject identifiers:
 lstSubIds = ['20150930',
@@ -165,18 +165,22 @@ varNumLne = 2
 strTitle = strRoi.upper()
 
 # Limits of y-axis for single subject plots (list of tuples, [(Ymin, Ymax)]):
-lstLimY = [(0.0, 2.5)] * len(lstSubIds)
+# lstLimY = [(0.0, 2.5)] * len(lstSubIds)
+lstLimY = [(0.0, 1200.0)] * len(lstSubIds)
 
 # Limits of y-axis for across subject plot:
 varAcrSubsYmin = -0.05
-varAcrSubsYmax = 2.0  # 1.90
+# varAcrSubsYmax = 2.0
+varAcrSubsYmax = 1200.0
 
 # Label for axes:
 strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'fMRI signal change [arbitrary units]'
 
 # Output path for plots - prfix:
-strPltOtPre = '/home/john/PhD/Tex/tex_pe/plots_{}/'.format(strRoi)
+# strPltOtPre = '/home/john/PhD/Tex/tex_pe/plots_{}/'.format(strRoi)
+strPltOtPre = '/home/john/PhD/Tex/tex_pe_not_norm/plots_{}/'.format(strRoi)
+
 # Output path for plots - suffix:
 strPltOtSuf = '_depthplot_1000_R2multi_0p16.png'
 # strPltOtSuf = '_depthplot_1000_combmean_7000.png'
@@ -192,10 +196,10 @@ varDpi = 80.0
 varNormIdx = 0
 
 # Normalise by division?
-lgcNormDiv = True
+lgcNormDiv = False
 
 # Linear regression?
-lgcLinReg = True
+lgcLinReg = False
 
 # Constrast vector for simple linear regression model (array with one value per
 # condition, e.g. per stimulus contrast level):
@@ -215,7 +219,7 @@ varLinRegYmax = 0.18
 strLinRegYlabel = 'Regression coefficient'
 
 # Output path for depth samling results (within subject means):
-strDpthMeans = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}.npy'.format(strRoi)  #noqa
+strDpthMeans = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}_not_norm.npy'.format(strRoi)  #noqa
 
 # Maximum number of processes to run in parallel: *** NOT IMPLEMENTED
 # varPar = 10

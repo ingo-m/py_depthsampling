@@ -79,7 +79,7 @@ def funcCrfPlt(vecX,         # x-values for fitted data
     axs01.set_ylim([varYmin, varYmax])
 
     # Which y values to label with ticks:
-    vecYlbl = np.linspace(varYmin, varYmax, num=5, endpoint=True)
+    vecYlbl = np.linspace(varYmin, varYmax, num=4, endpoint=True)
     # Round:
     # vecYlbl = np.around(vecYlbl, decimals=2)
     # Set ticks:
@@ -109,7 +109,7 @@ def funcCrfPlt(vecX,         # x-values for fitted data
                      linewidth=0.3)
 
     # Save figure:
-    fig01.savefig((strPthOt + '_dpth_' + str(idxDpth) + '.png'),
+    fig01.savefig(strPthOt,
                   dpi=(varDpi * 2.0),
                   facecolor='w',
                   edgecolor='w',

@@ -132,16 +132,16 @@ for idxIn in range(0, varNumIn):
 
     # Number of subjects:
     varNumSubs = lstDpth[idxIn].shape[0]
-    
+
     # Number of conditions:
     varNumCon = lstDpth[idxIn].shape[1]
-    
+
     # Number of depth levels:
     varNumDpth = lstDpth[idxIn].shape[2]
-    
+
     # Across-subjects mean for measured response:
     lstDpthMne[idxIn] = np.mean(lstDpth[idxIn], axis=0)
-    
+
     # Standard error of the mean (across subjects):
     lstDpthSem[idxIn] = np.divide(np.std(lstDpth[idxIn], axis=0),
                                   np.sqrt(varNumSubs))
@@ -175,7 +175,7 @@ for idxIn in range(0, varNumIn):
 
     # Loop through depth levels:
     for idxDpth in range(0, varNumDpth):
-    
+
         # --------------------------------------------------------------------
         # *** Fit contrast reponse function
         vecModelPar, vecModelCov = curve_fit(funcCrf,
@@ -184,49 +184,49 @@ for idxIn in range(0, varNumIn):
                                              maxfev=100000,
                                              bounds=(vecLimA, vecLimB),
                                              p0=(0.5, 0.5))
-    
+
         # --------------------------------------------------------------------
         # *** Apply reponse function
-    
+
         # Calculate fitted y-values:
         lstFit[idxIn][idxDpth, :] = funcCrf(vecX,
                                             vecModelPar[0],
                                             vecModelPar[1])
-    
+
         # --------------------------------------------------------------------
         # *** Calculate response at half maximum contrast
-    
+
         # The response at half maximum contrast (i.e. at a luminance contrast
         # of 50%):
         lstHlfMaxResp[idxIn][0, idxDpth] = funcCrf(0.5,
                                                    vecModelPar[0],
                                                    vecModelPar[1])
-    
+
         # --------------------------------------------------------------------
         # *** Calculate contrast at half maximum response
-    
+
         # The maximum response (defined as the response at 100% luminance
         # contrast):
         varResp50 = funcCrf(1.0,
                             vecModelPar[0],
                             vecModelPar[1])
-    
+
         # Half maximum response:
         varResp50 = np.multiply(varResp50, 0.5)
-    
+
         # Search for the luminance contrast level at half maximum response. A
         # while loop is more practical than an analytic solution - it is easy
         # to implement and reliable because of the contraint nature of the
         # problem. The problem is contraint because the luminance contrast has
         # to be between zero and one.
-    
+
         # Initial value for the contrast level (will be incremented until the
         # half maximum response is reached).
         varHlfMaxCont = 0.0
-    
+
         # Initial value for the resposne.
         varRespTmp = 0.0
-    
+
         # Increment the contrast level until the half maximum response is
         # reached:
         while np.less(varRespTmp, varResp50):
@@ -235,19 +235,19 @@ for idxIn in range(0, varNumIn):
                                  vecModelPar[0],
                                  vecModelPar[1])
         lstHlfMaxCont[idxIn][0, idxDpth] = varHlfMaxCont
-    
+
         # --------------------------------------------------------------------
         # *** Calculate residual variance
-    
+
         # In order to assess the fit of the model, we calculate the deviation
         # of the measured response from the fitted model (average across
         # conditions). First we have to calculate the deviation for each
         # condition.
         for idxCon in range(0, varNumCon):
-    
+
             # Model prediction for current contrast level:
             varTmp = funcCrf(vecCon[idxCon], vecModelPar[0], vecModelPar[1])
-    
+
             # Residual = absolute of difference between prediction and
             #            measurement
             lstRes[idxIn][idxCon, idxDpth] = \
@@ -256,7 +256,7 @@ for idxIn in range(0, varNumIn):
 
         # ------------------------------------------------------------------------
         # *** Plot contrast response functions
-        
+
         # Create string for model parameters of exponential function:
         varParamA = np.around(vecModelPar[0], decimals=2)
         varParamB = np.around(vecModelPar[1], decimals=2)
@@ -266,13 +266,21 @@ for idxIn in range(0, varNumIn):
                      + str(varParamB)
                      )
         # strModel = ('R(C) = '
-        #            + str(varParamA)
-        #            + ' * C^(' + str(varP) + '+' + str(varQ) + ') '
-        #            + '/ '
-        #            + '(C^' + str(varQ) + ' + ' + str(varParamB) + '^' + str(varQ)
-        #            + ')'
-        #            )
-        
+        #             + str(varParamA)
+        #             + ' * C^(' + str(varP)
+        #             + '+'
+        #             + str(varQ)
+        #             + ') '
+        #             + '/ '
+        #             + '(C^'
+        #             + str(varQ)
+        #             + ' + '
+        #             + str(varParamB)
+        #             + '^'
+        #             + str(varQ)
+        #             + ')'
+        #             )
+
         # Title for current CRF plot:
         strTtleTmp = (strTtle
                       + dicPthDpth.keys()[idxIn]
@@ -347,20 +355,25 @@ aryHlfMaxCont = np.vstack(lstHlfMaxCont[:])
 # y-axis values):
 aryHlfMaxCont = np.multiply(aryHlfMaxCont, 100.0)
 
+# Line colours:
+aryClr = np.array([[0.2, 0.2, 0.9],
+                   [0.9, 0.2, 0.2]])
+
 funcPltAcrDpth(aryHlfMaxCont,      # aryData[Condition, Depth]
                np.zeros(np.shape(aryHlfMaxCont)),  # aryError[Con., Depth]
                varNumDpth,         # Number of depth levels (on the x-axis)
                varNumIn,           # Number of conditions (separate lines)
                varDpi,             # Resolution of the output figure
                0.0,                # Minimum of Y axis
-               9.0,                # Maximum of Y axis
+               10.0,                # Maximum of Y axis
                False,              # Boolean: whether to convert y axis to %
                dicPthDpth.keys(),  # Labels for conditions (separate lines)
                strXlabel,          # Label on x axis
                strYlabel,          # Label on y axis
                'Contrast at half maximum response',  # Figure title
                True,               # Boolean: whether to plot a legend
-               (strPthOt + '_half_max_contrast.png'))
+               (strPthOt + '_half_max_contrast.png'),
+               aryClr=aryClr)
 
 
 # ----------------------------------------------------------------------------
@@ -371,7 +384,7 @@ lstResMne = [None] * varNumIn
 lstResSem = [None] * varNumIn
 
 # Mean residual variance across conditions:
-for idxIn in range(0, varNumIn): 
+for idxIn in range(0, varNumIn):
     # Mean residuals (across conditions):
     lstResMne[idxIn] = np.mean(lstRes[idxIn], axis=0, keepdims=True)
     # Standard error of the mean:
@@ -456,4 +469,3 @@ fig01.savefig((strPthOt + '_modelfit_bars.png'),
 
 
 # ----------------------------------------------------------------------------
-

@@ -39,7 +39,8 @@ def funcPltAcrDpth(aryData,     # Data to be plotted: aryData[Condition, Depth]
                    strYlabel,   # Label on y axis
                    strTitle,    # Figure title
                    lgcLgnd,     # Boolean: whether to plot a legend
-                   strPath):    # Output path for the figure
+                   strPath,     # Output path for the figure
+                   aryClr=None):   # Array for line colours aryClr[idxCon, RGB]
     """
     Plot values across depth level, separately for conditions.
 
@@ -56,15 +57,19 @@ def funcPltAcrDpth(aryData,     # Data to be plotted: aryData[Condition, Depth]
     # Vector for x-data:
     vecX = range(0, varNumDpth)
 
-    # Prepare colour map:
-    objClrNorm = colors.Normalize(vmin=0, vmax=(varNumCon - 1))
-    objCmap = plt.cm.winter
+    if aryClr is None:
+        # Prepare colour map:
+        objClrNorm = colors.Normalize(vmin=0, vmax=(varNumCon - 1))
+        objCmap = plt.cm.winter
 
     # Loop through conditions:
     for idxCon in range(0, varNumCon):
 
-        # Adjust the colour of current line:
-        vecClrTmp = objCmap(objClrNorm(varNumCon - 1 - idxCon))
+        if aryClr is None:
+            # Adjust the colour of current line:
+            vecClrTmp = objCmap(objClrNorm(varNumCon - 1 - idxCon))
+        else:
+            vecClrTmp = aryClr[idxCon, :]
 
         # Plot depth profile for current input file:
         plt01 = axs01.plot(vecX,  #noqa
@@ -72,7 +77,7 @@ def funcPltAcrDpth(aryData,     # Data to be plotted: aryData[Condition, Depth]
                            color=vecClrTmp,
                            alpha=0.9,
                            label=(lstConLbl[idxCon]),
-                           linewidth=8.0,
+                           linewidth=9.0,
                            antialiased=True)
 
         # Plot error shading:
@@ -95,12 +100,13 @@ def funcPltAcrDpth(aryData,     # Data to be plotted: aryData[Condition, Depth]
     axs01.spines['left'].set_visible(True)
 
     # Set x-axis range:
-    axs01.set_xlim([-1, varNumDpth])
+    axs01.set_xlim([-0.5, (varNumDpth - 0.5)])
     # Set y-axis range:
     axs01.set_ylim([varYmin, varYmax])
 
     # Which x values to label with ticks (WM & CSF boundary):
-    axs01.set_xticks([-0.5, (varNumDpth - 0.5)])
+    axs01.set_xticks([-0.1, (varNumDpth - 0.9)])
+    # axs01.set_xticks([-0.5, (varNumDpth - 0.5)])
     # axs01.set_xticks([4.0, (varNumDpth - 4.0)])
 
     # Set tick labels for x ticks:

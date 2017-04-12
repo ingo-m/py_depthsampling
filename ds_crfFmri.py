@@ -39,7 +39,7 @@ import matplotlib.pyplot as plt
 
 # Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
 # function).
-strFunc = 'hyper'
+strFunc = 'power'
 
 # Path of draining-corrected depth-profiles:
 dicPthDpth = {'V1': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected.npy',  #noqa

@@ -157,6 +157,9 @@ def funcPltAcrDpth(aryData,     # Data to be plotted: aryData[Condition, Depth]
                      frameon=False,
                      prop={'size': 26})
 
+    # Make plot & axis labels fit into figure:
+    plt.tight_layout(pad=0.5)
+
     # Save figure:
     fgr01.savefig(strPath,
                   facecolor='w',

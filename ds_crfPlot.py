@@ -90,7 +90,7 @@ def plt_crf(vecMdlX,
     -------
     None : None
         This function has no return value.
-    
+
     Notes
     -----
     Plot fitted contrast response function, and - optionally - measured
@@ -161,14 +161,13 @@ def plt_crf(vecMdlX,
                  frameon=False,
                  prop={'size': 8})  # 14})
 
-
     if lgcGrid:
         # Add vertical grid lines:
         axs01.xaxis.grid(which=u'major',
                          color=([0.5, 0.5, 0.5]),
                          linestyle='-',
                          linewidth=0.3)
-    
+
         # Add horizontal grid lines:
         axs01.yaxis.grid(which=u'major',
                          color=([0.5, 0.5, 0.5]),

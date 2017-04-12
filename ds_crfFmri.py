@@ -575,9 +575,18 @@ aryResMneMne = np.mean(aryResMne, axis=1)
 aryResMneSem = np.divide(np.std(aryResMne, axis=1),
                          np.sqrt(varNumDpth))
 
+# fig01 = plt.figure()
+# axs01 = fig01.add_subplot(111, aspect='100.0')
+
+# Figure dimensions:
+varSizeX = 400.0
+varSizeY = 700.0
+
 # Create plot:
-fig01 = plt.figure()
-axs01 = fig01.add_subplot(111, aspect='100.0')
+fig01 = plt.figure(figsize=((varSizeX * 0.5) / varDpi,
+                            (varSizeY * 0.5) / varDpi),
+                   dpi=varDpi)
+axs01 = fig01.add_subplot(111)
 plt01 = axs01.bar(vecBarX,
                   aryResMneMne,
                   width=0.8,
@@ -602,6 +611,9 @@ axs01.set_ylabel('Mean residual variance (SEM)', fontsize=16)
 
 # Title:
 axs01.set_title('Model fit', fontsize=14)
+
+# Make plot & axis labels fit into figure:
+plt.tight_layout(pad=0.5)
 
 # Save figure:
 fig01.savefig((strPthOt + '_modelfit_bars.png'),

@@ -1,15 +1,19 @@
+# -*- coding: utf-8 -*-
 """
-NOTE: WORK IN PROGRESS
+Contrast response function - hyperbolic ratio.
 
-Function of the depth sampling pipeline.
+Notes
+-----
+The purpose of this script is to plot the hyperbolic ratio function, a
+function used to model the contrast response of visual neurons, also known as
+Naka-Rushton equation.
 
-The purpose of this function is to apply fit a contrast response function to
-fMRI depth profiles, separately for each depth level.
-
-The contrast response function used here is the Naka-Rushton equation
-(Albrecht & Hamilton, 1982; cited in Niemeyer & Paradiso, 2016). This
-neuronal contrast response function is applied to the depth profiles after
-the application of the draining model.
+Reference
+---------
+- Albrecht, D. G., & Hamilton, D. B. (1982). Striate cortex of monkey and cat:
+  contrast response function. Journal of neurophysiology, 48(1), 217-237.
+- Niemeyer, J. E., & Paradiso, M. A. (2017). Contrast sensitivity, V1 neural
+  activity, and natural vision. Journal of neurophysiology, 117(2), 492-508.
 """
 
 # Part of py_depthsampling library
@@ -28,42 +32,8 @@ the application of the draining model.
 # You should have received a copy of the GNU General Public License along with
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
 import numpy as np
-# import matplotlib.pyplot as plt
-from scipy.optimize import curve_fit
-
-
-# ----------------------------------------------------------------------------
-# *** Define parameters
-
-# Path of draining-corrected depth-profiles:
-strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected.npy'
-
-# Stimulus luminance contrast levels:
-vecCont = np.array([0.025, 0.061, 0.163, 0.72])
-
-
-# ----------------------------------------------------------------------------
-# *** Load depth profiles
-
-# Load array with single-subject corrected depth profiles, of the form
-# aryDpthSnSb[idxSub, idxCondition, idxDpth].
-aryDpthSnSb = np.load(strPthPrfOt)
-
-
-# ----------------------------------------------------------------------------
-# *** Average over subjects
-
-# Across-subjects mean:
-aryDpth = np.mean(aryDpthSnSb, axis=0)
-
-# Mean across depth-levels:
-aryMne = np.mean(aryDpth, axis=1)
-
-
-# ----------------------------------------------------------------------------
-# *** Define contrast reponse function
+from ds_crfPlot import plt_crf
 
 # Neuronal contrast response function, following the 'Naka-Rushton equation'
 # (see Niemeyer & Paradiso, 2016).
@@ -71,41 +41,60 @@ aryMne = np.mean(aryDpth, axis=1)
 #    - varC is contrast
 #    - varRmax is the maximum neural response
 #    - varC50 is the contrast that gives a half-maximal response
-#    - varM is the average baseline firing rate
 #    - varN in the exponent, i.e. the parameter to be fitted
-def funcCrf(varC, varRmax, varC50, varM, varN):
+def funcCrf(varC, varRmax, varC50, varN):
     varR = (varRmax
             * np.power(varC, varN)
-            / (np.power(varC, varN) + np.power(varC50, varN))
-            + varM)
+            / (np.power(varC, varN) + np.power(varC50, varN)))
     return varR
 
 
-# ----------------------------------------------------------------------------
-# *** Fit contrast reponse function
+# *** Define parameters
 
-# Number of conditions:
-varNumCon = aryDpth.shape[0]
+strPthOt = '/home/john/Desktop/tmp/hyperbolic_ratio.png'
 
-# Number of depth levels:
-varNumDpth = aryDpth.shape[1]
+# *** Response parameters
 
-# for idxDpth in range(0, varNumDpth):
+# Maximum response:
+varRmax = 5.0
+# Contrast that gives a half-maximal response:
+varC50 = 0.8
+# Average baseline firing rate:
+# varM = 0.1
+# Exponent:
+varN = 0.6
 
-vecTmp = aryMne
+strMdl = ('R(C) = '
+          + str(varRmax)
+          + ' * (C^'
+          + str(varN)
+          + ' / (C^'
+          + str(varN)
+          + ' + '
+          + str(varC50)
+          + '^'
+          + str(varN)
+          + '))'
+          )
 
-varRmax = np.max(vecTmp)
-varC50 = 
-varM = 0.0
+# *** Apply function
 
-vecModelPar, vecModelCov = curve_fit(lambda varC, varN: funcCrf(varC,
-                                                                varRmax,
-                                                                varC50,
-                                                                varM,
-                                                                varN),
-                                     vecCont,
-                                     aryMne)
+# x-values for which the model will be fitted:
+vecMdlX = np.linspace(0.0, 1.0, num=1000.0, endpoint=True)
 
+# Modelled response (y-values as a function of contrast):
+vecMdlY = funcCrf(vecMdlX, varRmax, varC50, varN)
 
+# *** Plot data
 
-
+plt_crf(vecMdlX,
+        vecMdlY,
+        strPthOt,
+        varYmin=0.0,
+        varYmax=3.0,
+        strLblX='Luminance contrast',
+        strLblY='Response',
+        strTtle='Hyperbolic ratio CRF',
+        varDpi=80.0,
+        lgcLgnd=False,
+        strMdl=strMdl)

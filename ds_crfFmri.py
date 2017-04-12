@@ -30,7 +30,7 @@ The contrast response function used here is that proposed by Boynton et al.
 import numpy as np
 from scipy.optimize import curve_fit
 from ds_pltAcrDpth import funcPltAcrDpth
-from ds_crfPlot import funcCrfPlt
+from ds_crfPlot import plt_crf
 import matplotlib.pyplot as plt
 
 
@@ -59,7 +59,7 @@ varYmax = 1.5
 
 # Axis labels
 strLblX = 'Luminance contrast'
-strLblY = 'fMRI signal change [arbitrary units]'
+strLblY = 'fMRI signal change [a.u.]'
 
 # Title for contrast response plots
 strTtle = ''
@@ -293,27 +293,25 @@ for idxIn in range(0, varNumIn):
                        + dicPthDpth.keys()[idxIn]
                        + '_dpth_'
                        + str(idxDpth)
-                       + '.png')
+                       + '.svg')
 
         # Plot CRF for current depth level:
-        funcCrfPlt(vecX,
-                   lstFit[idxIn][idxDpth, :],
-                   vecCon,
-                   lstDpthMne[idxIn][:, idxDpth],
-                   lstDpthSem[idxIn][:, idxDpth],
-                   strPthOtTmp,
-                   varXmin=varXmin,
-                   varXmax=varXmax,
-                   varYmin=varYmin,
-                   varYmax=varYmax,
-                   strLblX=strLblX,
-                   strLblY=strLblY,
-                   strTtle=strTtleTmp,
-                   varDpi=80.0,
-                   strMdl=strMdlTmp,
-                   idxDpth=idxDpth
-                   )
-
+        plt_crf(vecX,
+                lstFit[idxIn][idxDpth, :],
+                strPthOtTmp,
+                vecEmpX=vecCon,
+                vecEmpYMne=lstDpthMne[idxIn][:, idxDpth],
+                vecEmpYSem=lstDpthSem[idxIn][:, idxDpth],
+                varXmin=varXmin,
+                varXmax=varXmax,
+                varYmin=varYmin,
+                varYmax=varYmax,
+                strLblX=strLblX,
+                strLblY=strLblY,
+                strTtle=strTtleTmp,
+                varDpi=80.0,
+                lgcLgnd=True,
+                strMdl=strMdlTmp)
 
 # ----------------------------------------------------------------------------
 # *** Plot response at half maximum contrast across depth

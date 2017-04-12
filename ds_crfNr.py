@@ -32,17 +32,50 @@ Reference
 # You should have received a copy of the GNU General Public License along with
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
 import numpy as np
 from ds_crfPlot import plt_crf
 
-# Neuronal contrast response function, following the 'Naka-Rushton equation'
-# (see Niemeyer & Paradiso, 2016).
-#    - varR is the neuronal response (in spikes/s)
-#    - varC is contrast
-#    - varRmax is the maximum neural response
-#    - varC50 is the contrast that gives a half-maximal response
-#    - varN in the exponent, i.e. the parameter to be fitted
-def funcCrf(varC, varRmax, varC50, varN):
+
+def crf_hyper(varC, varRmax, varC50, varN):
+    """
+    Hyperbolic ratio function.
+
+    Parameters
+    ----------
+    varC : float
+        Stimulus contrast (input parameter).
+    varRmax : float
+        The maximum neural response (saturation point). (Free parameter to be
+        fitted.)
+    varC50 : float
+        The contrast that gives a half-maximal response, know as
+        semisaturation contrast. The semisaturation constant moves the curve
+        horizontally and provides a good index of the contrast sensitivity at
+        half the maximum response. (Free parameter to be fitted.)
+    varN : float
+        Exponent. It specifies the rate of change, or slope, of the function.
+        (Free parameter to be fitted.)
+
+    Returns
+    -------
+    varR : float
+        Neuronal response.
+
+    Notes
+    -----
+    Hyperbolic ratio function, a function used to model the contrast response
+    of visual neurons. Also known as Naka-Rushton equation.
+
+    References
+    ----------
+    - Albrecht, D. G., & Hamilton, D. B. (1982). Striate cortex of monkey and
+      cat: contrast response function. Journal of neurophysiology, 48(1),
+      217-237.
+    - Niemeyer, J. E., & Paradiso, M. A. (2017). Contrast sensitivity, V1
+      neural activity, and natural vision. Journal of neurophysiology, 117(2),
+      492-508.
+    """
     varR = (varRmax
             * np.power(varC, varN)
             / (np.power(varC, varN) + np.power(varC50, varN)))
@@ -51,14 +84,14 @@ def funcCrf(varC, varRmax, varC50, varN):
 
 # *** Define parameters
 
-strPthOt = '/home/john/Desktop/tmp/hyperbolic_ratio.png'
+strPthOt = '/home/john/Desktop/hyperbolic_ratio.png'
 
 # *** Response parameters
 
 # Maximum response:
 varRmax = 5.0
 # Contrast that gives a half-maximal response:
-varC50 = 0.8
+varC50 = 0.5
 # Average baseline firing rate:
 # varM = 0.1
 # Exponent:
@@ -83,7 +116,7 @@ strMdl = ('R(C) = '
 vecMdlX = np.linspace(0.0, 1.0, num=1000.0, endpoint=True)
 
 # Modelled response (y-values as a function of contrast):
-vecMdlY = funcCrf(vecMdlX, varRmax, varC50, varN)
+vecMdlY = crf_hyper(vecMdlX, varRmax, varC50, varN)
 
 # *** Plot data
 

@@ -37,13 +37,17 @@ import matplotlib.pyplot as plt
 # ----------------------------------------------------------------------------
 # *** Define parameters
 
+# Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
+# function).
+strFunc = 'hyper'
+
 # Path of draining-corrected depth-profiles:
 dicPthDpth = {'V1': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected.npy',  #noqa
               'V2': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2_corrected.npy'}  #noqa
 
 # Stimulus luminance contrast levels. NOTE: Should be between zero and one.
 # When using precent (i.e. from zero to 100), the search for the luminance at
-# half maximum response below would need to be adjusted.
+# half maximum response would need to be adjusted.
 vecCon = np.array([0.025, 0.061, 0.163, 0.72])
 
 # Output path for plot:
@@ -61,21 +65,32 @@ varYmax = 1.5
 strLblX = 'Luminance contrast'
 strLblY = 'fMRI signal change [a.u.]'
 
+# File type for CRF plots:
+strFleTyp = '.png'
+
 # Title for contrast response plots
 strTtle = ''
 
 # Figure scaling factor:
 varDpi = 80.0
 
-# Lower limits for parameters (factor, exponent):
-vecLimA = np.array([0.0, 0.0])
+# Lower limits for parameters (factor, exponent) - for power function:
+vecLimPowLw = np.array([0.0, 0.0])
+# Upper limits for parameters (factor, exponent) - for power function:
+vecLimPowUp = np.array([10.0, 1.0])
 
-# Upper limits for parameters (factor, exponent):
-vecLimB = np.array([10.0, 1.0])
+# Lower limits for parameters (maximum response, semisaturation contrast, and
+# exponent) - for hyperbolic function:
+vecLimHypLw = np.array([0.0, 0.0, 0.0])
+# Upper limits for parameters (maximum response, semisaturation contrast, and
+# exponent) - for hyperbolic function:
+vecLimHypUp = np.array([np.inf, np.inf, np.inf])
+# vecLimHypUp = np.array([10.0, np.inf, np.inf])
 
 
 # ----------------------------------------------------------------------------
 # *** Define contrast reponse function
+
 
 # Contrast-fMRI-response function as defined in Boynton et al. (1999).
 #   - varR is response
@@ -84,7 +99,7 @@ vecLimB = np.array([10.0, 1.0])
 #   - varQ - determines shape of contrast-response function, typical value: 2.0
 #   - varS - ?
 #   - varA - Scaling factor
-# def funcCrf(varC, varS, varA):
+# def crf_fmri(varC, varS, varA):
 #    """Contrast-fMRI-response function as defined in Boynton et al. (1999)"""
 #    # varR = varS * np.log(varC) + varA
 #    varP = 0.3
@@ -95,10 +110,78 @@ vecLimB = np.array([10.0, 1.0])
 #                            )
 #    return varR
 
+
 # Power function:
-def funcCrf(varC, varA, varB):
-    """Contrast-fMRI-response function."""
+def crf_power(varC, varA, varB):
+    """
+    Power contrast response function.
+
+    Parameters
+    ----------
+    varC : float
+        Stimulus contrast (input parameter).
+    varA : float
+        Factor. Specifies overall response amplitude.
+    varB : float
+        Exponent. Specifies the rate of change, or slope, of the function.
+        (Free parameter to be fitted.)
+
+    Returns
+    -------
+    varR : float
+        Neuronal response.
+
+    Notes
+    -----
+    Simple power function. Can be used to model the contrast response of
+    visual neurons.
+    """
     varR = varA * np.power(varC, varB)
+    return varR
+
+
+def crf_hyper(varC, varRmax, varC50, varN):
+    """
+    Hyperbolic ratio contrast response function.
+
+    Parameters
+    ----------
+    varC : float
+        Stimulus contrast (input parameter).
+    varRmax : float
+        The maximum neural response (saturation point). (Free parameter to be
+        fitted.)
+    varC50 : float
+        The contrast that gives a half-maximal response, know as
+        semisaturation contrast. The semisaturation constant moves the curve
+        horizontally and provides a good index of the contrast sensitivity at
+        half the maximum response. (Free parameter to be fitted.)
+    varN : float
+        Exponent. Specifies the rate of change, or slope, of the function.
+        (Free parameter to be fitted.)
+
+    Returns
+    -------
+    varR : float
+        Neuronal response.
+
+    Notes
+    -----
+    Hyperbolic ratio function, a function used to model the contrast response
+    of visual neurons. Also known as Naka-Rushton equation.
+
+    References
+    ----------
+    - Albrecht, D. G., & Hamilton, D. B. (1982). Striate cortex of monkey and
+      cat: contrast response function. Journal of neurophysiology, 48(1),
+      217-237.
+    - Niemeyer, J. E., & Paradiso, M. A. (2017). Contrast sensitivity, V1
+      neural activity, and natural vision. Journal of neurophysiology, 117(2),
+      492-508.
+    """
+    varR = (varRmax
+            * np.power(varC, varN)
+            / (np.power(varC, varN) + np.power(varC50, varN)))
     return varR
 
 
@@ -150,6 +233,9 @@ for idxIn in range(0, varNumIn):
 # ----------------------------------------------------------------------------
 # *** Fit CRF across depth levels
 
+# Append function type to output file:
+strPthOt = (strPthOt + '_' + strFunc)
+
 # Number of x-values for which to solve the function:
 varNumX = 1000
 
@@ -169,7 +255,7 @@ lstHlfMaxCont = [np.zeros((1, varNumDpth)) for i in range(varNumIn)]
 lstRes = [np.zeros((varNumCon, varNumDpth)) for i in range(varNumIn)]
 
 # Loop through ROIs (i.e. V1 and V2):
-for idxIn in range(0, varNumIn):
+for idxIn in range(0, varNumIn):  #noqa
 
     # We fit the contrast response function separately for all depth levels.
 
@@ -178,38 +264,66 @@ for idxIn in range(0, varNumIn):
 
         # --------------------------------------------------------------------
         # *** Fit contrast reponse function
-        vecModelPar, vecModelCov = curve_fit(funcCrf,
+
+        if strFunc == 'power':
+            vecMdlPar, vecMdlCov = curve_fit(crf_power,
                                              vecCon,
                                              lstDpthMne[idxIn][:, idxDpth],
                                              maxfev=100000,
-                                             bounds=(vecLimA, vecLimB),
+                                             bounds=(vecLimPowLw, vecLimPowUp),
                                              p0=(0.5, 0.5))
+
+        elif strFunc == 'hyper':
+            vecMdlPar, vecMdlCov = curve_fit(crf_hyper,
+                                             vecCon,
+                                             lstDpthMne[idxIn][:, idxDpth],
+                                             maxfev=100000,
+                                             bounds=(vecLimHypLw, vecLimHypUp),
+                                             p0=(0.01, 0.01, 0.5))
 
         # --------------------------------------------------------------------
         # *** Apply reponse function
 
         # Calculate fitted y-values:
-        lstFit[idxIn][idxDpth, :] = funcCrf(vecX,
-                                            vecModelPar[0],
-                                            vecModelPar[1])
+        if strFunc == 'power':
+            lstFit[idxIn][idxDpth, :] = crf_power(vecX,
+                                                  vecMdlPar[0],
+                                                  vecMdlPar[1])
+        elif strFunc == 'hyper':
+            lstFit[idxIn][idxDpth, :] = crf_hyper(vecX,
+                                                  vecMdlPar[0],
+                                                  vecMdlPar[1],
+                                                  vecMdlPar[2])
 
         # --------------------------------------------------------------------
         # *** Calculate response at half maximum contrast
 
         # The response at half maximum contrast (i.e. at a luminance contrast
         # of 50%):
-        lstHlfMaxResp[idxIn][0, idxDpth] = funcCrf(0.5,
-                                                   vecModelPar[0],
-                                                   vecModelPar[1])
+        if strFunc == 'power':
+            lstHlfMaxResp[idxIn][0, idxDpth] = crf_power(0.5,
+                                                         vecMdlPar[0],
+                                                         vecMdlPar[1])
+        elif strFunc == 'hyper':
+            lstHlfMaxResp[idxIn][0, idxDpth] = crf_hyper(0.5,
+                                                         vecMdlPar[0],
+                                                         vecMdlPar[1],
+                                                         vecMdlPar[2])
 
         # --------------------------------------------------------------------
         # *** Calculate contrast at half maximum response
 
         # The maximum response (defined as the response at 100% luminance
         # contrast):
-        varResp50 = funcCrf(1.0,
-                            vecModelPar[0],
-                            vecModelPar[1])
+        if strFunc == 'power':
+            varResp50 = crf_power(1.0,
+                                  vecMdlPar[0],
+                                  vecMdlPar[1])
+        elif strFunc == 'hyper':
+            varResp50 = crf_hyper(1.0,
+                                  vecMdlPar[0],
+                                  vecMdlPar[1],
+                                  vecMdlPar[2])
 
         # Half maximum response:
         varResp50 = np.multiply(varResp50, 0.5)
@@ -231,9 +345,15 @@ for idxIn in range(0, varNumIn):
         # reached:
         while np.less(varRespTmp, varResp50):
             varHlfMaxCont += 0.000001
-            varRespTmp = funcCrf(varHlfMaxCont,
-                                 vecModelPar[0],
-                                 vecModelPar[1])
+            if strFunc == 'power':
+                varRespTmp = crf_power(varHlfMaxCont,
+                                       vecMdlPar[0],
+                                       vecMdlPar[1])
+            elif strFunc == 'hyper':
+                varRespTmp = crf_hyper(varHlfMaxCont,
+                                       vecMdlPar[0],
+                                       vecMdlPar[1],
+                                       vecMdlPar[2])
         lstHlfMaxCont[idxIn][0, idxDpth] = varHlfMaxCont
 
         # --------------------------------------------------------------------
@@ -246,7 +366,15 @@ for idxIn in range(0, varNumIn):
         for idxCon in range(0, varNumCon):
 
             # Model prediction for current contrast level:
-            varTmp = funcCrf(vecCon[idxCon], vecModelPar[0], vecModelPar[1])
+            if strFunc == 'power':
+                varTmp = crf_power(vecCon[idxCon],
+                                   vecMdlPar[0],
+                                   vecMdlPar[1])
+            elif strFunc == 'hyper':
+                varTmp = crf_hyper(vecCon[idxCon],
+                                   vecMdlPar[0],
+                                   vecMdlPar[1],
+                                   vecMdlPar[2])
 
             # Residual = absolute of difference between prediction and
             #            measurement
@@ -258,13 +386,31 @@ for idxIn in range(0, varNumIn):
         # *** Plot contrast response functions
 
         # Create string for model parameters of exponential function:
-        varParamA = np.around(vecModelPar[0], decimals=2)
-        varParamB = np.around(vecModelPar[1], decimals=2)
-        strMdlTmp = ('Model: R(C) = '
-                     + str(varParamA)
-                     + ' * C ^ '
-                     + str(varParamB)
-                     )
+        if strFunc == 'power':
+            varParamA = np.around(vecMdlPar[0], decimals=2)
+            varParamB = np.around(vecMdlPar[1], decimals=2)
+            strMdlTmp = ('Model: R(C) = '
+                         + str(varParamA)
+                         + ' * C ^ '
+                         + str(varParamB)
+                         )
+        elif strFunc == 'hyper':
+            varRmax = np.around(vecMdlPar[0], decimals=2)
+            varC50 = np.around(vecMdlPar[1], decimals=2)
+            varN = np.around(vecMdlPar[2], decimals=2)
+            strMdlTmp = ('R(C) = '
+                         + str(varRmax)
+                         + ' * (C^'
+                         + str(varN)
+                         + ' / (C^'
+                         + str(varN)
+                         + ' + '
+                         + str(varC50)
+                         + '^'
+                         + str(varN)
+                         + '))'
+                         )
+
         # strModel = ('R(C) = '
         #             + str(varParamA)
         #             + ' * C^(' + str(varP)
@@ -293,7 +439,7 @@ for idxIn in range(0, varNumIn):
                        + dicPthDpth.keys()[idxIn]
                        + '_dpth_'
                        + str(idxDpth)
-                       + '.svg')
+                       + strFleTyp)
 
         # Plot CRF for current depth level:
         plt_crf(vecX,
@@ -464,6 +610,4 @@ fig01.savefig((strPthOt + '_modelfit_bars.png'),
               edgecolor='w',
               transparent=False,
               frameon=None)
-
-
 # ----------------------------------------------------------------------------

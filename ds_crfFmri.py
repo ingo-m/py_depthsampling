@@ -39,11 +39,11 @@ import matplotlib.pyplot as plt
 
 # Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
 # function).
-strFunc = 'power'
+strFunc = 'hyper'
 
 # Path of draining-corrected depth-profiles:
-dicPthDpth = {'V1': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected.npy',  #noqa
-              'V2': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2_corrected.npy'}  #noqa
+dicPthDpth = {'V1': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy',  #noqa
+              'V2': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2.npy'}  #noqa
 
 # Stimulus luminance contrast levels. NOTE: Should be between zero and one.
 # When using precent (i.e. from zero to 100), the search for the luminance at
@@ -51,7 +51,7 @@ dicPthDpth = {'V1': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_c
 vecCon = np.array([0.025, 0.061, 0.163, 0.72])
 
 # Output path for plot:
-strPthOt = '/home/john/PhD/Tex/contrast_response/combined_corrected/crf'
+strPthOt = '/home/john/PhD/Tex/contrast_response/combined_uncorrected/crf'
 
 # Limits of x-axis for contrast response plots
 varXmin = 0.0
@@ -464,7 +464,7 @@ for idxIn in range(0, varNumIn):  #noqa
 
 # Label for axes:
 strXlabel = 'Cortical depth level (equivolume)'
-strYlabel = 'fMRI signal change [arbitrary units]'
+strYlabel = 'fMRI signal change [a.u.]'
 
 # Stack the vectors for the two ROIs (V1 & V2):
 aryHlfMaxResp = np.vstack(lstHlfMaxResp[:])
@@ -475,18 +475,20 @@ funcPltAcrDpth(aryHlfMaxResp,      # aryData[Condition, Depth]
                varNumIn,           # Number of conditions (separate lines)
                varDpi,             # Resolution of the output figure
                0.0,                # Minimum of Y axis
-               1.4,                # Maximum of Y axis
+               2.0,                # Maximum of Y axis
                False,              # Boolean: whether to convert y axis to %
                dicPthDpth.keys(),  # Labels for conditions (separate lines)
                strXlabel,          # Label on x axis
                strYlabel,          # Label on y axis
                'Response at half maximum contrast',  # Figure title
                True,               # Boolean: whether to plot a legend
-               (strPthOt + '_half_max_response.png'))
+               (strPthOt + '_half_max_response.png'),
+               varSizeX=2000.0,
+               varSizeY=1400.0)
 
 
 # ----------------------------------------------------------------------------
-# *** Plot contrast at half maximum response across depth
+# *** Plot semisaturation contrast
 
 # Label for axes:
 strXlabel = 'Cortical depth level (equivolume)'
@@ -514,10 +516,12 @@ funcPltAcrDpth(aryHlfMaxCont,      # aryData[Condition, Depth]
                dicPthDpth.keys(),  # Labels for conditions (separate lines)
                strXlabel,          # Label on x axis
                strYlabel,          # Label on y axis
-               'Contrast at half maximum response',  # Figure title
+               'Semisaturation contrast',  # Figure title
                True,               # Boolean: whether to plot a legend
-               (strPthOt + '_half_max_contrast.png'),
-               aryClr=aryClr)
+               (strPthOt + '_semisaturationcontrast.png'),
+               aryClr=aryClr,
+               varSizeX=2000.0,
+               varSizeY=1400.0)
 
 
 # ----------------------------------------------------------------------------
@@ -550,7 +554,7 @@ funcPltAcrDpth(aryResMne,          # aryData[Condition, Depth]
                varNumIn,           # Number of conditions (separate lines)
                varDpi,             # Resolution of the output figure
                0.0,                # Minimum of Y axis
-               0.08,                # Maximum of Y axis
+               0.09,               # Maximum of Y axis
                False,              # Boolean: whether to convert y axis to %
                dicPthDpth.keys(),  # Labels for conditions (separate lines)
                strXlabel,          # Label on x axis
@@ -622,4 +626,7 @@ fig01.savefig((strPthOt + '_modelfit_bars.png'),
               edgecolor='w',
               transparent=False,
               frameon=None)
+
+# Close figure:
+plt.close(fig01)
 # ----------------------------------------------------------------------------

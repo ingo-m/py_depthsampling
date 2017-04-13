@@ -1,6 +1,7 @@
 """
 Fit contrast response function for fMRI data.
 
+*** FOR TESTING PURPOSES ONLY ***
 *** This version fits the CRF separately for each subject. ***
 
 Function of the depth sampling pipeline.
@@ -378,12 +379,7 @@ for idxSub in range(0, varNumSubs):  #noqa
                     np.absolute(np.subtract(lstDpth[idxIn][idxSub, idxCon,
                     idxDpth], varTmp))  #noqa
 
-
-
-
-
-
-            # -----------------------------------------------------------------------------
+            # -----------------------------------------------------------------
             # *** Plot contrast response functions
 
             # Create string for model parameters of exponential function:
@@ -437,7 +433,8 @@ for idxSub in range(0, varNumSubs):  #noqa
                     strPthOtTmp,
                     vecEmpX=vecCon,
                     vecEmpYMne=lstDpth[idxIn][idxSub, :, idxDpth],
-                    vecEmpYSem=np.zeros((lstDpth[idxIn][idxSub, :, idxDpth].shape)),
+                    vecEmpYSem=np.zeros((lstDpth[idxIn]
+                                        [idxSub, :, idxDpth].shape)),
                     varXmin=varXmin,
                     varXmax=varXmax,
                     varYmin=varYmin,
@@ -448,12 +445,6 @@ for idxSub in range(0, varNumSubs):  #noqa
                     varDpi=80.0,
                     lgcLgnd=True,
                     strMdl=strMdlTmp)
-
-
-
-
-
-
 
 
 # -----------------------------------------------------------------------------

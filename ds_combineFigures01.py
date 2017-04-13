@@ -48,7 +48,7 @@ strFig04 = '/home/john/PhD/Tex/deconv/v2_model_1/deconv_v2_m1_afteracrsSubsMeanS
 strOt = '/home/john/PhD/Tex/deconv/summary.svg'
 
 # Create parent SVG figure:
-objFigPrnt = sg.SVGFigure(width='1950.0 pix', height='1450.0 pix')
+objFigPrnt = sg.SVGFigure(width='1700.0 pix', height='1550.0 pix')
 
 # Load figures:
 objFig01 = sg.fromfile(strFig01)
@@ -64,9 +64,9 @@ objPlt04 = objFig04.getroot()
 
 # Move plots:
 objPlt01.moveto(10.0, 1.0, scale=1.0)
-objPlt02.moveto(880.0, 1.0, scale=1.0)
+objPlt02.moveto(850.0, 1.0, scale=1.0)
 objPlt03.moveto(10.0, 700.0, scale=1.0)
-objPlt04.moveto(880.0, 700.0, scale=1.0)
+objPlt04.moveto(850.0, 700.0, scale=1.0)
 
 # Move redundant axis labels & legends:
 objTmp = objPlt01.find_id('text_3')

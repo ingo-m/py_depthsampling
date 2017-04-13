@@ -198,3 +198,6 @@ def plt_crf(vecMdlX,
                   orientation='landscape',
                   transparent=False,
                   frameon=None)
+
+    # Close figure:
+    plt.close(fig01)

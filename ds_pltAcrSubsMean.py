@@ -38,7 +38,9 @@ def funcPltAcrSubsMean(arySubDpthMns,
                        strYlabel,
                        strTitle,
                        strPltOtPre,
-                       strPltOtSuf):
+                       strPltOtSuf,
+                       varSizeX=1800.0,
+                       varSizeY=1600.0):
     """
     # Calculate & plot across-subjects mean.
 
@@ -86,9 +88,14 @@ def funcPltAcrSubsMean(arySubDpthMns,
     aryArcSubDpthConf = np.divide(np.std(arySubDpthMns, axis=0),
                                   np.sqrt(varNumSubs))
 
-    # Create figure:
-    fgr01 = plt.figure(figsize=(1200.0/varDpi, 800.0/varDpi),
+    # Figure dimensions:
+    varSizeX = 1800.0
+    varSizeY = 1600.0
+
+    fgr01 = plt.figure(figsize=((varSizeX * 0.5) / varDpi,
+                                (varSizeY * 0.5) / varDpi),
                        dpi=varDpi)
+
     # Create axis:
     axs01 = fgr01.add_subplot(111)
 
@@ -135,7 +142,7 @@ def funcPltAcrSubsMean(arySubDpthMns,
     axs01.spines['left'].set_visible(True)
 
     # Set x-axis range:
-    axs01.set_xlim([-1, varNumDpth])
+    axs01.set_xlim([-0.2, (varNumDpth - 0.8)])
     # Set y-axis range:
     axs01.set_ylim([varAcrSubsYmin, varAcrSubsYmax])
 
@@ -183,6 +190,9 @@ def funcPltAcrSubsMean(arySubDpthMns,
 
     # File name for figure:
     strPltOt = strPltOtPre + 'acrsSubsMeanShading' + strPltOtSuf
+
+    # Make plot & axis labels fit into figure:
+    plt.tight_layout(pad=0.5)
 
     # Save figure:
     fgr01.savefig(strPltOt,

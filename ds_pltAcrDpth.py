@@ -40,6 +40,8 @@ def funcPltAcrDpth(aryData,     # Data to be plotted: aryData[Condition, Depth]
                    strTitle,    # Figure title
                    lgcLgnd,     # Boolean: whether to plot a legend
                    strPath,     # Output path for the figure
+                   varSizeX=1800.0,  # Figure x dimension
+                   varSizeY=1600.0,  # Figure y dimension
                    aryClr=None):   # Array for line colours aryClr[idxCon, RGB]
     """
     Plot values across depth level, separately for conditions.
@@ -48,7 +50,8 @@ def funcPltAcrDpth(aryData,     # Data to be plotted: aryData[Condition, Depth]
     depth levels (x-axis), separately for conditions (separate lines).
     """
     # Create figure:
-    fgr01 = plt.figure(figsize=(1200.0/varDpi, 800.0/varDpi),
+    fgr01 = plt.figure(figsize=((varSizeX * 0.5) / varDpi,
+                                (varSizeY * 0.5) / varDpi),
                        dpi=varDpi)
 
     # Create axis:
@@ -100,7 +103,7 @@ def funcPltAcrDpth(aryData,     # Data to be plotted: aryData[Condition, Depth]
     axs01.spines['left'].set_visible(True)
 
     # Set x-axis range:
-    axs01.set_xlim([-0.5, (varNumDpth - 0.5)])
+    axs01.set_xlim([-0.2, (varNumDpth - 0.8)])
     # Set y-axis range:
     axs01.set_ylim([varYmin, varYmax])
 

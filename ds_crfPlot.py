@@ -28,7 +28,8 @@ import matplotlib.pyplot as plt
 def plt_crf(vecMdlX,
             vecMdlY,
             strPthOt,
-            vecMdlYerr=None,
+            vecMdlYCnfLw=None,
+            vecMdlYCnfUp=None,
             vecEmpX=None,
             vecEmpYMne=None,
             vecEmpYSem=None,
@@ -55,8 +56,10 @@ def plt_crf(vecMdlX,
         Modelled response (y-values as a function of contrast).
     strPthOt : str
         Output path for plot.
-    vecMdlYerr : None or np.array
-        Error (e.g. SEM) for model fit. Optional.
+    vecMdlYCnfLw : None or np.array
+        Lower bound of the confidence interval of the model fit. Optional.
+    vecMdlYCnfUp : None or np.array
+        Upper bound of the confidence interval of the model fit. Optional.
     vecEmpX : np.array
         Empirical stimulus luminance contrast levels (i.e. x-values at which
         a response has been measured).
@@ -121,10 +124,10 @@ def plt_crf(vecMdlX,
                        antialiased=True,
                        zorder=2)
 
-    if vecMdlYerr is not None:
+    if (vecMdlYCnfLw is not None) and (vecMdlYCnfUp is not None):
         plot02 = axs01.fill_between(vecMdlX,  #noqa
-                                    np.subtract(vecMdlY, vecMdlYerr),
-                                    np.add(vecMdlY, vecMdlYerr),
+                                    vecMdlYCnfLw,
+                                    vecMdlYCnfUp,
                                     alpha=0.4,
                                     edgecolor=[0.9, 0.1, 0.1],
                                     facecolor=[0.9, 0.1, 0.1],

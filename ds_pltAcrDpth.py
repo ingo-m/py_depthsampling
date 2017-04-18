@@ -42,7 +42,9 @@ def funcPltAcrDpth(aryData,     # Data to be plotted: aryData[Condition, Depth]
                    strPath,     # Output path for the figure
                    varSizeX=1800.0,  # Figure x dimension
                    varSizeY=1600.0,  # Figure y dimension
-                   aryClr=None):   # Array for line colours aryClr[idxCon, RGB]
+                   aryClr=None,      # Line colours aryClr[idxCon, RGB]
+                   aryCnfLw=None,
+                   aryCnfUp=None):
     """
     Plot values across depth level, separately for conditions.
 
@@ -83,18 +85,29 @@ def funcPltAcrDpth(aryData,     # Data to be plotted: aryData[Condition, Depth]
                            linewidth=9.0,
                            antialiased=True)
 
-        # Plot error shading:
-        plot02 = axs01.fill_between(vecX,  #noqa
-                                    np.subtract(aryData[idxCon, :],
-                                                aryError[idxCon, :]),
-                                    np.add(aryData[idxCon, :],
-                                           aryError[idxCon, :]),
-                                    alpha=0.4,
-                                    edgecolor=vecClrTmp,
-                                    facecolor=vecClrTmp,
-                                    linewidth=0,
-                                    # linestyle='dashdot',
-                                    antialiased=True)
+        # If no confidence intervals have been supplied, plot SEM:
+        if (aryCnfLw is None) or (aryCnfUp is None):
+            # Plot error shading:
+            plot02 = axs01.fill_between(vecX,  #noqa
+                                        np.subtract(aryData[idxCon, :],
+                                                    aryError[idxCon, :]),
+                                        np.add(aryData[idxCon, :],
+                                               aryError[idxCon, :]),
+                                        alpha=0.4,
+                                        edgecolor=vecClrTmp,
+                                        facecolor=vecClrTmp,
+                                        linewidth=0,
+                                        antialiased=True)
+        else:
+            # Plot error shading - confidence intervals:
+            plot02 = axs01.fill_between(vecX,  #noqa
+                                        aryCnfLw[idxCon, :],
+                                        aryCnfUp[idxCon, :],
+                                        alpha=0.4,
+                                        edgecolor=vecClrTmp,
+                                        facecolor=vecClrTmp,
+                                        linewidth=0,
+                                        antialiased=True)
 
     # Reduce framing box:
     axs01.spines['top'].set_visible(False)

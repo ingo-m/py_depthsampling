@@ -53,7 +53,7 @@ dicPthDpth = {'V1': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.n
 vecEmpX = np.array([0.025, 0.061, 0.163, 0.72])
 
 # Output path for plot:
-strPthOt = '/home/john/PhD/Tex/contrast_response_boot/uncorrected/crf'
+strPthOt = '/home/john/PhD/Tex/contrast_response_boot/combined_uncorrected/crf'  #noqa
 
 # Limits of x-axis for contrast response plots
 varXmin = 0.0
@@ -61,7 +61,7 @@ varXmax = 1.0
 
 # Limits of y-axis for contrast response plots
 varYmin = 0.0
-varYmax = 1.5
+varYmax = 3.0
 
 # Axis labels
 strLblX = 'Luminance contrast'
@@ -93,19 +93,15 @@ vecLimHypLw = np.array([0.0, 0.0, 0.0])
 vecLimHypUp = np.array([np.inf, np.inf, np.inf])
 # vecLimHypUp = np.array([10.0, np.inf, np.inf])
 
-# Scaling factor for confidence interval (if varCfd = 1.0, the SEM is plotted,
-# if varCfd = 1.96, the 95% confidence interval is plotted)
-varCfd = 1.96
+# Lower & upper bound of percentile bootstrap (in percent):
+varCnfLw = 2.5
+varCnfUp = 97.5
 
 # Number of process to run in parallel:
 varPar = 10
 
-# We will sample subjects with replacement. How many subjects to sample on
-# each iteration:
-varNumSmp = 9
-
 # How many iterations (i.e. how often to sample):
-varNumIt = 1000
+varNumIt = 100
 
 # ----------------------------------------------------------------------------
 # *** Load depth profiles
@@ -134,6 +130,10 @@ print('---Preparing bootstrapping')
 
 # Number of subjects:
 varNumSubs = lstDpth[0].shape[0]
+
+# We will sample subjects with replacement. How many subjects to sample on
+# each iteration:
+varNumSmp = varNumSubs
 
 # Random array with subject indicies for bootstrapping of the form
 # aryRnd[varNumIt, varNumSmp]. Each row includes the indicies of the subjects
@@ -261,54 +261,66 @@ del(lstRes)
 
 print('---Averaing across iterations')
 
-# Initialise arrays for across-iteration averages & error:
+# Initialise arrays for across-iteration averages & confidence intervals:
+
 aryMdlYMne = np.zeros((varNumIn, varNumDpt, varNumX))
-aryMdlYSem = np.zeros((varNumIn, varNumDpt, varNumX))
+aryMdlYCnfLw = np.zeros((varNumIn, varNumDpt, varNumX))
+aryMdlYCnfUp = np.zeros((varNumIn, varNumDpt, varNumX))
+
 aryHlfMaxMne = np.zeros((varNumIn, varNumDpt))
-aryHlfMaxSem = np.zeros((varNumIn, varNumDpt))
+aryHlfMaxCnfLw = np.zeros((varNumIn, varNumDpt))
+aryHlfMaxCnfUp = np.zeros((varNumIn, varNumDpt))
+
 arySemiMne = np.zeros((varNumIn, varNumDpt))
-arySemiSem = np.zeros((varNumIn, varNumDpt))
+arySemiSCnfLw = np.zeros((varNumIn, varNumDpt))
+arySemiSCnfUp = np.zeros((varNumIn, varNumDpt))
+
 aryResMne01 = np.zeros((varNumIn, varNumCon, varNumDpt))
-aryResSem01 = np.zeros((varNumIn, varNumCon, varNumDpt))
+aryResCnfLw01 = np.zeros((varNumIn, varNumCon, varNumDpt))
+aryResCnfUp01 = np.zeros((varNumIn, varNumCon, varNumDpt))
 
 # Loop through ROIs (i.e. V1 and V2):
 for idxIn in range(0, varNumIn):
 
     # Mean modelled y-values:
-    aryMdlYMne[idxIn, :, :] = np.mean(aryMdlY[idxIn], axis=0)
-    # SEM / confidence interval:
-    aryMdlYSem[idxIn, :, :] = (
-                               (np.std(aryMdlY[idxIn], axis=0)
-                                / np.sqrt(varNumIt))
-                               * varCfd
-                               )
+    aryMdlYMne[idxIn, :, :] = np.mean(aryMdlY[idxIn, :, :, :], axis=0)
+    # Confidence interval:
+    aryMdlYCnfLw[idxIn, :, :] = np.percentile(aryMdlY[idxIn, :, :, :],
+                                              varCnfLw,
+                                              axis=0)
+    aryMdlYCnfUp[idxIn, :, :] = np.percentile(aryMdlY[idxIn, :, :, :],
+                                              varCnfUp,
+                                              axis=0)
 
     # Mean response at half-maximum contrast:
-    aryHlfMaxMne[idxIn, :] = np.mean(aryHlfMax[idxIn], axis=0)
-    # SEM / confidence interval:
-    aryHlfMaxSem[idxIn, :] = (
-                              (np.std(aryHlfMax[idxIn], axis=0)
-                               / np.sqrt(varNumIt))
-                              * varCfd
-                              )
+    aryHlfMaxMne[idxIn, :] = np.mean(aryHlfMax[idxIn, :, :], axis=0)
+    # Confidence interval:
+    aryHlfMaxCnfLw[idxIn, :] = np.percentile(aryHlfMax[idxIn, :, :],
+                                             varCnfLw,
+                                             axis=0)
+    aryHlfMaxCnfUp[idxIn, :] = np.percentile(aryHlfMax[idxIn, :, :],
+                                             varCnfUp,
+                                             axis=0)
 
     # Mean semi-saturation contrast:
-    arySemiMne[idxIn, :] = np.mean(arySemi[idxIn], axis=0)
-    # SEM / confidence interval:
-    arySemiSem[idxIn, :] = (
-                            (np.std(arySemi[idxIn], axis=0)
-                             / np.sqrt(varNumIt))
-                            * varCfd
-                            )
+    arySemiMne[idxIn, :] = np.mean(arySemi[idxIn, :, :], axis=0)
+    # Confidence interval:
+    arySemiSCnfLw[idxIn, :] = np.percentile(arySemi[idxIn, :, :],
+                                            varCnfLw,
+                                            axis=0)
+    arySemiSCnfUp[idxIn, :] = np.percentile(arySemi[idxIn, :, :],
+                                            varCnfUp,
+                                            axis=0)
 
     # Mean residuals:
-    aryResMne01[idxIn, :, :] = np.mean(aryRes[idxIn], axis=0)
-    # SEM / confidence interval:
-    aryResSem01[idxIn, :, :] = (
-                                (np.std(aryRes[idxIn], axis=0)
-                                 / np.sqrt(varNumIt))
-                                * varCfd
-                                )
+    aryResMne01[idxIn, :, :] = np.mean(aryRes[idxIn, :, :, :], axis=0)
+    # Confidence interval:
+    aryResCnfLw01[idxIn, :, :] = np.percentile(aryRes[idxIn, :, :, :],
+                                               varCnfLw,
+                                               axis=0)
+    aryResCnfUp01[idxIn, :, :] = np.percentile(aryRes[idxIn, :, :, :],
+                                               varCnfUp,
+                                               axis=0)
 
 del(aryMdlY)
 del(aryHlfMax)
@@ -329,12 +341,10 @@ for idxIn in range(0, varNumIn):
 
     # Across-subjects mean of empirical contrast responses:
     vecEmpYMne = np.mean(lstDpth[idxIn], axis=0)
-    # SEM / confidence interval:
-    vecEmpYSem = (
-                  (np.std(lstDpth[idxIn], axis=0)
-                   / np.sqrt(varNumSubs))
-                  * varCfd
-                  )
+    # SEM:
+    vecEmpYSem = np.divide(np.std(lstDpth[idxIn], axis=0),
+                           np.sqrt(varNumSubs)
+                           )
 
     # Loop through depth levels:
     for idxDpt in range(0, varNumDpt):
@@ -385,7 +395,8 @@ for idxIn in range(0, varNumIn):
         plt_crf(vecMdlX,
                 aryMdlYMne[idxIn, idxDpt, :],
                 strPthOtTmp,
-                vecMdlYerr=aryMdlYSem[idxIn, idxDpt, :],
+                vecMdlYCnfLw=aryMdlYCnfLw[idxIn, idxDpt, :],
+                vecMdlYCnfUp=aryMdlYCnfUp[idxIn, idxDpt, :],
                 vecEmpX=vecEmpX,
                 vecEmpYMne=vecEmpYMne[:, idxDpt],
                 vecEmpYSem=vecEmpYSem[:, idxDpt],
@@ -407,7 +418,7 @@ strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'fMRI signal change [a.u.]'
 
 funcPltAcrDpth(aryHlfMaxMne,       # aryData[Condition, Depth]
-               aryHlfMaxSem,       # aryError[Con., Depth]
+               0,                  # aryError[Con., Depth]
                varNumDpt,          # Number of depth levels (on the x-axis)
                varNumIn,           # Number of conditions (separate lines)
                varDpi,             # Resolution of the output figure
@@ -421,7 +432,9 @@ funcPltAcrDpth(aryHlfMaxMne,       # aryData[Condition, Depth]
                True,               # Boolean: whether to plot a legend
                (strPthOt + '_' + strFunc + '_half_max_response.png'),
                varSizeX=2000.0,
-               varSizeY=1400.0)
+               varSizeY=1400.0,
+               aryCnfLw=aryHlfMaxCnfLw,
+               aryCnfUp=aryHlfMaxCnfUp)
 
 
 # ----------------------------------------------------------------------------
@@ -434,14 +447,15 @@ strYlabel = 'Percent luminance contrast'
 # Convert contrast values to percent (otherwise rounding will be a problem for
 # y-axis values):
 arySemiMne = np.multiply(arySemiMne, 100.0)
-arySemiSem = np.multiply(arySemiSem, 100.0)
+arySemiSCnfLw = np.multiply(arySemiSCnfLw, 100.0)
+arySemiSCnfUp = np.multiply(arySemiSCnfUp, 100.0)
 
 # Line colours:
 aryClr = np.array([[0.2, 0.2, 0.9],
                    [0.9, 0.2, 0.2]])
 
 funcPltAcrDpth(arySemiMne,         # aryData[Condition, Depth]
-               arySemiSem,         # aryError[Con., Depth]
+               0,                  # aryError[Con., Depth]
                varNumDpt,          # Number of depth levels (on the x-axis)
                varNumIn,           # Number of conditions (separate lines)
                varDpi,             # Resolution of the output figure
@@ -456,22 +470,32 @@ funcPltAcrDpth(arySemiMne,         # aryData[Condition, Depth]
                (strPthOt + '_' + strFunc + '_semisaturationcontrast.png'),
                aryClr=aryClr,
                varSizeX=2000.0,
-               varSizeY=1400.0)
+               varSizeY=1400.0,
+               aryCnfLw=arySemiSCnfLw,
+               aryCnfUp=arySemiSCnfUp)
 
 
 # ----------------------------------------------------------------------------
 # *** Plot residual variance across depth
 
-# Mean residual variance across conditions:
-aryResMne02 = np.mean(aryResMne01, axis=1)
-aryResSem02 = np.mean(aryResSem01, axis=1)
+# aryRes = np.zeros((varNumIn, varNumIt, varNumCon, varNumDpt))
+
+# Mean residual variance across iterations & conditions:
+aryResMne02 = np.mean(aryRes, axis=(1, 2))
+# Confidence interval:
+aryResCnfLw02 = np.percentile(aryRes,
+                              varCnfLw,
+                              axis=(1, 2))
+aryResCnfUp02 = np.percentile(aryRes,
+                              varCnfUp,
+                              axis=(1, 2))
 
 # Label for axes:
 strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'Residual variance'
 
 funcPltAcrDpth(aryResMne02,        # aryData[Condition, Depth]
-               aryResSem02,        # aryError[Condition, Depth]
+               0,                  # aryError[Condition, Depth]
                varNumDpt,          # Number of depth levels (on the x-axis)
                varNumIn,           # Number of conditions (separate lines)
                varDpi,             # Resolution of the output figure
@@ -483,7 +507,9 @@ funcPltAcrDpth(aryResMne02,        # aryData[Condition, Depth]
                strYlabel,          # Label on y axis
                'Model fit across cortical depth',  # Figure title
                True,               # Boolean: whether to plot a legend
-               (strPthOt + '_' + strFunc + '_modelfit.png'))
+               (strPthOt + '_' + strFunc + '_modelfit.png'),
+               aryCnfLw=aryResCnfLw02,
+               aryCnfUp=aryResCnfUp02)
 
 
 # ----------------------------------------------------------------------------
@@ -495,15 +521,28 @@ funcPltAcrDpth(aryResMne02,        # aryData[Condition, Depth]
 # Vector with x coordinates of the left sides of the bars:
 vecBarX = np.arange(1.0, (varNumIn + 1.0))
 
-# Y data for bars - mean residuals across depth levels (data already averaged
-# across iterations & conditions):
-aryResMne03 = np.mean(aryResMne01, axis=(1, 2))
-# Y data for bars - SEM:
-aryResSem03 = (
-               (np.std(aryResMne01, axis=(1, 2))
-                / np.sqrt(varNumIt))
-               * varCfd
-               )
+# Y data for bars - mean residuals across iterations, conditions, and depth
+# levels:
+aryResMne03 = np.mean(aryRes, axis=(1, 2, 3))
+# Confidence interval:
+aryResCnfLw03 = np.percentile(aryRes,
+                              varCnfLw,
+                              axis=(1, 2, 3))
+aryResCnfUp03 = np.percentile(aryRes,
+                              varCnfUp,
+                              axis=(1, 2, 3))
+
+# Upper limit of y-axis (needs to be calculated before scaling of confidence
+# interval):
+varYmaxBar = np.around(np.max(aryResCnfUp03), decimals=2)
+
+# Error bars are plotted as deviation from mean, so we have take difference
+# between mean and confidence interval:
+aryResCnfLw03 = np.absolute(np.subtract(aryResMne03, aryResCnfLw03))
+aryResCnfUp03 = np.absolute(np.subtract(aryResMne03, aryResCnfUp03))
+
+# Stack confidence intervals:
+aryResCnf03 = np.array((aryResCnfLw03, aryResCnfUp03))
 
 # fig01 = plt.figure()
 # axs01 = fig01.add_subplot(111, aspect='100.0')
@@ -522,15 +561,14 @@ plt01 = axs01.bar(vecBarX,
                   width=0.8,
                   color=(0.3, 0.3, 0.8),
                   tick_label=dicPthDpth.keys(),
-                  yerr=aryResSem03)
+                  yerr=aryResCnf03)
 
 # Limits of axes:
 varYminBar = 0.0
-varYmaxBar = np.around(np.max(aryResMne03), decimals=2)
 axs01.set_ylim([varYminBar, varYmaxBar + 0.005])
 
 # Which y values to label with ticks:
-vecYlbl = np.linspace(varYminBar, varYmaxBar, num=4, endpoint=True)
+vecYlbl = np.linspace(varYminBar, varYmaxBar, num=6, endpoint=True)
 vecYlbl = np.around(vecYlbl, decimals=2)
 # Set ticks:
 axs01.set_yticks(vecYlbl)

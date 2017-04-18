@@ -188,7 +188,7 @@ def crf_par(idxPrc,
                  aryRes[idxIn, idxIt, :, idxDpt]) = crf_fit(vecEmpX,
                                                             aryEmpY,
                                                             strFunc='power',
-                                                            varNumX=1000,
+                                                            varNumX=varNumX,
                                                             varXmin=0.0,
                                                             varXmax=1.0)
 

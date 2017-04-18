@@ -1,16 +1,13 @@
 """
-Fit contrast response function for fMRI data.
+Fit contrast response function to fMRI data.
 
 *** FOR TESTING PURPOSES ONLY ***
-*** This version fits the CRF separately for each subject. ***
+This version fits the CRF separately for each subject. Unstable.
 
 Function of the depth sampling pipeline.
 
-The purpose of this function is to apply fit a contrast response function to
-fMRI depth profiles, separately for each depth level.
-
-The contrast response function used here is that proposed by Boynton et al.
-(1999). This contrast response function is specifically design for fMRI data.
+The purpose of this function is to fit a contrast response function to fMRI
+depth profiles, separately for each cortical depth level.
 """
 
 # Part of py_depthsampling library

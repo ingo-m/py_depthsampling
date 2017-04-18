@@ -1,13 +1,13 @@
 """
-Fit contrast response function for fMRI data.
+Fit contrast response function to fMRI data.
+
+*** VERSION 01 ***
+Fitting on across-subjects average, no across-subjects confidence intervals.
 
 Function of the depth sampling pipeline.
 
-The purpose of this function is to apply fit a contrast response function to
-fMRI depth profiles, separately for each depth level.
-
-The contrast response function used here is that proposed by Boynton et al.
-(1999). This contrast response function is specifically design for fMRI data.
+The purpose of this function is to fit a contrast response function to fMRI
+depth profiles, separately for each cortical depth level.
 """
 
 # Part of py_depthsampling library
@@ -31,6 +31,8 @@ import numpy as np
 from scipy.optimize import curve_fit
 from ds_pltAcrDpth import funcPltAcrDpth
 from ds_crfPlot import plt_crf
+from ds_crfFunc import crf_power
+from ds_crfFunc import crf_hyper
 import matplotlib.pyplot as plt
 
 
@@ -48,7 +50,7 @@ dicPthDpth = {'V1': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.n
 # Stimulus luminance contrast levels. NOTE: Should be between zero and one.
 # When using precent (i.e. from zero to 100), the search for the luminance at
 # half maximum response would need to be adjusted.
-vecCon = np.array([0.025, 0.061, 0.163, 0.72])
+vecEmpX = np.array([0.025, 0.061, 0.163, 0.72])
 
 # Output path for plot:
 strPthOt = '/home/john/PhD/Tex/contrast_response/combined_uncorrected/crf'
@@ -86,103 +88,6 @@ vecLimHypLw = np.array([0.0, 0.0, 0.0])
 # exponent) - for hyperbolic function:
 vecLimHypUp = np.array([np.inf, np.inf, np.inf])
 # vecLimHypUp = np.array([10.0, np.inf, np.inf])
-
-
-# ----------------------------------------------------------------------------
-# *** Define contrast reponse function
-
-
-# Contrast-fMRI-response function as defined in Boynton et al. (1999).
-#   - varR is response
-#   - varC is stimulus contrast
-#   - varP - determines shape of contrast-response function, typical value: 0.3
-#   - varQ - determines shape of contrast-response function, typical value: 2.0
-#   - varS - ?
-#   - varA - Scaling factor
-# def crf_fmri(varC, varS, varA):
-#    """Contrast-fMRI-response function as defined in Boynton et al. (1999)"""
-#    # varR = varS * np.log(varC) + varA
-#    varP = 0.3
-#    varQ = 2.0
-#    varR = varA * np.divide(
-#                            np.power(varC, (varP + varQ)),
-#                            (np.power(varC, varQ) + np.power(varS, varQ))
-#                            )
-#    return varR
-
-
-# Power function:
-def crf_power(varC, varA, varB):
-    """
-    Power contrast response function.
-
-    Parameters
-    ----------
-    varC : float
-        Stimulus contrast (input parameter).
-    varA : float
-        Factor. Specifies overall response amplitude.
-    varB : float
-        Exponent. Specifies the rate of change, or slope, of the function.
-        (Free parameter to be fitted.)
-
-    Returns
-    -------
-    varR : float
-        Neuronal response.
-
-    Notes
-    -----
-    Simple power function. Can be used to model the contrast response of
-    visual neurons.
-    """
-    varR = varA * np.power(varC, varB)
-    return varR
-
-
-def crf_hyper(varC, varRmax, varC50, varN):
-    """
-    Hyperbolic ratio contrast response function.
-
-    Parameters
-    ----------
-    varC : float
-        Stimulus contrast (input parameter).
-    varRmax : float
-        The maximum neural response (saturation point). (Free parameter to be
-        fitted.)
-    varC50 : float
-        The contrast that gives a half-maximal response, know as
-        semisaturation contrast. The semisaturation constant moves the curve
-        horizontally and provides a good index of the contrast sensitivity at
-        half the maximum response. (Free parameter to be fitted.)
-    varN : float
-        Exponent. Specifies the rate of change, or slope, of the function.
-        (Free parameter to be fitted.)
-
-    Returns
-    -------
-    varR : float
-        Neuronal response.
-
-    Notes
-    -----
-    Hyperbolic ratio function, a function used to model the contrast response
-    of visual neurons. Also known as Naka-Rushton equation.
-
-    References
-    ----------
-    - Albrecht, D. G., & Hamilton, D. B. (1982). Striate cortex of monkey and
-      cat: contrast response function. Journal of neurophysiology, 48(1),
-      217-237.
-    - Niemeyer, J. E., & Paradiso, M. A. (2017). Contrast sensitivity, V1
-      neural activity, and natural vision. Journal of neurophysiology, 117(2),
-      492-508.
-    """
-    varR = (varRmax
-            * np.power(varC, varN)
-            / (np.power(varC, varN) + np.power(varC50, varN)))
-    return varR
 
 
 # ----------------------------------------------------------------------------
@@ -240,7 +145,7 @@ strPthOt = (strPthOt + '_' + strFunc)
 varNumX = 1000
 
 # Vector for which the function will be fitted:
-vecX = np.linspace(varXmin, varXmax, num=varNumX, endpoint=True)
+vecMdlX = np.linspace(varXmin, varXmax, num=varNumX, endpoint=True)
 
 # List of vectors for y-values of fitted function (for each depth level):
 lstFit = [np.zeros((varNumDpth, varNumX)) for i in range(varNumIn)]
@@ -267,7 +172,7 @@ for idxIn in range(0, varNumIn):  #noqa
 
         if strFunc == 'power':
             vecMdlPar, vecMdlCov = curve_fit(crf_power,
-                                             vecCon,
+                                             vecEmpX,
                                              lstDpthMne[idxIn][:, idxDpth],
                                              maxfev=100000,
                                              bounds=(vecLimPowLw, vecLimPowUp),
@@ -275,7 +180,7 @@ for idxIn in range(0, varNumIn):  #noqa
 
         elif strFunc == 'hyper':
             vecMdlPar, vecMdlCov = curve_fit(crf_hyper,
-                                             vecCon,
+                                             vecEmpX,
                                              lstDpthMne[idxIn][:, idxDpth],
                                              maxfev=100000,
                                              bounds=(vecLimHypLw, vecLimHypUp),
@@ -286,11 +191,11 @@ for idxIn in range(0, varNumIn):  #noqa
 
         # Calculate fitted y-values:
         if strFunc == 'power':
-            lstFit[idxIn][idxDpth, :] = crf_power(vecX,
+            lstFit[idxIn][idxDpth, :] = crf_power(vecMdlX,
                                                   vecMdlPar[0],
                                                   vecMdlPar[1])
         elif strFunc == 'hyper':
-            lstFit[idxIn][idxDpth, :] = crf_hyper(vecX,
+            lstFit[idxIn][idxDpth, :] = crf_hyper(vecMdlX,
                                                   vecMdlPar[0],
                                                   vecMdlPar[1],
                                                   vecMdlPar[2])
@@ -367,11 +272,11 @@ for idxIn in range(0, varNumIn):  #noqa
 
             # Model prediction for current contrast level:
             if strFunc == 'power':
-                varTmp = crf_power(vecCon[idxCon],
+                varTmp = crf_power(vecEmpX[idxCon],
                                    vecMdlPar[0],
                                    vecMdlPar[1])
             elif strFunc == 'hyper':
-                varTmp = crf_hyper(vecCon[idxCon],
+                varTmp = crf_hyper(vecEmpX[idxCon],
                                    vecMdlPar[0],
                                    vecMdlPar[1],
                                    vecMdlPar[2])
@@ -442,10 +347,10 @@ for idxIn in range(0, varNumIn):  #noqa
                        + strFleTyp)
 
         # Plot CRF for current depth level:
-        plt_crf(vecX,
+        plt_crf(vecMdlX,
                 lstFit[idxIn][idxDpth, :],
                 strPthOtTmp,
-                vecEmpX=vecCon,
+                vecEmpX=vecEmpX,
                 vecEmpYMne=lstDpthMne[idxIn][:, idxDpth],
                 vecEmpYSem=lstDpthSem[idxIn][:, idxDpth],
                 varXmin=varXmin,

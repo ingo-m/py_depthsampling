@@ -1,16 +1,13 @@
 """
-Fit contrast response function for fMRI data.
+Fit contrast response function to fMRI data.
 
-*** WORK IN PROGRESS ***
 *** BOOTSTAPPING VERSION ***
+This version bootstraps the across-subjects CRF fitting.
 
 Function of the depth sampling pipeline.
 
-The purpose of this function is to apply fit a contrast response function to
-fMRI depth profiles, separately for each depth level.
-
-The contrast response function used here is that proposed by Boynton et al.
-(1999). This contrast response function is specifically design for fMRI data.
+The purpose of this function is to fit a contrast response function to fMRI
+depth profiles, separately for each cortical depth level.
 """
 
 # Part of py_depthsampling library
@@ -31,32 +28,29 @@ The contrast response function used here is that proposed by Boynton et al.
 
 
 import numpy as np
-
+import matplotlib.pyplot as plt
 from ds_pltAcrDpth import funcPltAcrDpth
 from ds_crfPlot import plt_crf
-import matplotlib.pyplot as plt
-
+from ds_crfFit import crf_fit
 
 # ----------------------------------------------------------------------------
 # *** Define parameters
 
 # Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
 # function).
-strFunc = 'hyper'
+strFunc = 'power'
 
 # Path of draining-corrected depth-profiles:
-# dicPthDpth = {'V1': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy',  #noqa
-#               'V2': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2.npy'}  #noqa
-dicPthDpth = {'V1': '/Users/john/Desktop/Higher_Level_Analysis/v1_corrected.npy',  #noqa
-              'V2': '/Users/john/Desktop/Higher_Level_Analysis/v2_corrected.npy'}  #noqa
+dicPthDpth = {'V1': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy',  #noqa
+              'V2': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2.npy'}  #noqa
 
 # Stimulus luminance contrast levels. NOTE: Should be between zero and one.
-# When using precent (i.e. from zero to 100), the search for the luminance at
+# When using percent (i.e. from zero to 100), the search for the luminance at
 # half maximum response would need to be adjusted.
-vecCon = np.array([0.025, 0.061, 0.163, 0.72])
+vecEmpX = np.array([0.025, 0.061, 0.163, 0.72])
 
 # Output path for plot:
-strPthOt = '/Users/john/Desktop/crf'
+strPthOt = '/home/john/PhD/Tex/contrast_response_boot/crf'
 
 # Limits of x-axis for contrast response plots
 varXmin = 0.0
@@ -79,6 +73,10 @@ strTtle = ''
 # Figure scaling factor:
 varDpi = 80.0
 
+# Number of x-values for which to solve the function when calculating model
+# fit:
+varNumX = 1000
+
 # Lower limits for parameters (factor, exponent) - for power function:
 vecLimPowLw = np.array([0.0, 0.0])
 # Upper limits for parameters (factor, exponent) - for power function:
@@ -92,102 +90,9 @@ vecLimHypLw = np.array([0.0, 0.0, 0.0])
 vecLimHypUp = np.array([np.inf, np.inf, np.inf])
 # vecLimHypUp = np.array([10.0, np.inf, np.inf])
 
-
-# ----------------------------------------------------------------------------
-# *** Define contrast reponse function
-
-
-# Contrast-fMRI-response function as defined in Boynton et al. (1999).
-#   - varR is response
-#   - varC is stimulus contrast
-#   - varP - determines shape of contrast-response function, typical value: 0.3
-#   - varQ - determines shape of contrast-response function, typical value: 2.0
-#   - varS - ?
-#   - varA - Scaling factor
-# def crf_fmri(varC, varS, varA):
-#    """Contrast-fMRI-response function as defined in Boynton et al. (1999)"""
-#    # varR = varS * np.log(varC) + varA
-#    varP = 0.3
-#    varQ = 2.0
-#    varR = varA * np.divide(
-#                            np.power(varC, (varP + varQ)),
-#                            (np.power(varC, varQ) + np.power(varS, varQ))
-#                            )
-#    return varR
-
-
-# Power function:
-def crf_power(varC, varA, varB):
-    """
-    Power contrast response function.
-
-    Parameters
-    ----------
-    varC : float
-        Stimulus contrast (input parameter).
-    varA : float
-        Factor. Specifies overall response amplitude.
-    varB : float
-        Exponent. Specifies the rate of change, or slope, of the function.
-        (Free parameter to be fitted.)
-
-    Returns
-    -------
-    varR : float
-        Neuronal response.
-
-    Notes
-    -----
-    Simple power function. Can be used to model the contrast response of
-    visual neurons.
-    """
-    varR = varA * np.power(varC, varB)
-    return varR
-
-
-def crf_hyper(varC, varRmax, varC50, varN):
-    """
-    Hyperbolic ratio contrast response function.
-
-    Parameters
-    ----------
-    varC : float
-        Stimulus contrast (input parameter).
-    varRmax : float
-        The maximum neural response (saturation point). (Free parameter to be
-        fitted.)
-    varC50 : float
-        The contrast that gives a half-maximal response, know as
-        semisaturation contrast. The semisaturation constant moves the curve
-        horizontally and provides a good index of the contrast sensitivity at
-        half the maximum response. (Free parameter to be fitted.)
-    varN : float
-        Exponent. Specifies the rate of change, or slope, of the function.
-        (Free parameter to be fitted.)
-
-    Returns
-    -------
-    varR : float
-        Neuronal response.
-
-    Notes
-    -----
-    Hyperbolic ratio function, a function used to model the contrast response
-    of visual neurons. Also known as Naka-Rushton equation.
-
-    References
-    ----------
-    - Albrecht, D. G., & Hamilton, D. B. (1982). Striate cortex of monkey and
-      cat: contrast response function. Journal of neurophysiology, 48(1),
-      217-237.
-    - Niemeyer, J. E., & Paradiso, M. A. (2017). Contrast sensitivity, V1
-      neural activity, and natural vision. Journal of neurophysiology, 117(2),
-      492-508.
-    """
-    varR = (varRmax
-            * np.power(varC, varN)
-            / (np.power(varC, varN) + np.power(varC50, varN)))
-    return varR
+# Scaling factor for confidence interval (if varCfd = 1.0, the SEM is plotted,
+# if varCfd = 1.96, the 95% confidence interval is plotted)
+varCfd = 1.96
 
 
 # ----------------------------------------------------------------------------
@@ -202,9 +107,8 @@ lstDpth = [None] * varNumIn
 # Loop through ROIs (i.e. V1 and V2):
 for idxIn in range(0, varNumIn):
     # Load array with single-subject corrected depth profiles, of the form
-    # aryDpth[idxSub, idxCondition, idxDpth].
+    # aryDpth[idxSub, idxCondition, idxDpt].
     lstDpth[idxIn] = np.load(dicPthDpth.values()[idxIn])
-
 
 
 # ----------------------------------------------------------------------------
@@ -215,7 +119,7 @@ for idxIn in range(0, varNumIn):
 varNumSmp = 9
 
 # How many iterations (i.e. how often to sample):
-varNumIt = 1000
+varNumIt = 10
 
 # Number of subjects:
 varNumSubs = lstDpth[0].shape[0]
@@ -227,91 +131,190 @@ aryRnd = np.random.randint(0,
                            high=varNumSubs,
                            size=(varNumIt, varNumSmp))
 
-
-
-
-
-# List for arrays with mean depth data for ROIs (i.e. for V1 and V2):
-lstDpthMne = [None] * varNumIn
-
-# List for arrays with SEM depth data for ROIs (i.e. for V1 and V2):
-lstDpthSem = [None] * varNumIn
+# Number of conditions:
+varNumCon = lstDpth[idxIn].shape[1] # same as vecEmpX.shape[0]
 
 # Number of depth levels:
-varNumDpth = lstDpth[idxIn].shape[2]
+varNumDpt = lstDpth[idxIn].shape[2]
+
+# Arrays for y-values of fitted function (for each iteration & depth level):
+aryMdlY = np.zeros((varNumIn, varNumIt, varNumDpt, varNumX))
+
+# Array for responses at half maximum contrast:
+aryHlfMax = np.zeros((varNumIn, varNumIt, varNumDpt))
+
+# List of vectors for semisaturation contrast:
+arySemi = np.zeros((varNumIn, varNumIt, varNumDpt))
+
+# List of arrays for residual variance:
+aryRes = np.zeros((varNumIn, varNumIt, varNumCon, varNumDpt))
 
 
+# ----------------------------------------------------------------------------
+# *** Fit contrast response function
 
 # Loop through ROIs (i.e. V1 and V2):
 for idxIn in range(0, varNumIn):
 
+    print('------ROI: ' + dicPthDpth.keys()[idxIn])
 
-        # ------------------------------------------------------------------------
-        # *** Plot contrast response functions
+    # Loop through bootstrapping iterations:
+    for idxIt in range(0, varNumIt):
 
-        # Create string for model parameters of exponential function:
-        if strFunc == 'power':
-            varParamA = np.around(vecMdlPar[0], decimals=2)
-            varParamB = np.around(vecMdlPar[1], decimals=2)
-            strMdlTmp = ('Model: R(C) = '
-                         + str(varParamA)
-                         + ' * C ^ '
-                         + str(varParamB)
-                         )
-        elif strFunc == 'hyper':
-            varRmax = np.around(vecMdlPar[0], decimals=2)
-            varC50 = np.around(vecMdlPar[1], decimals=2)
-            varN = np.around(vecMdlPar[2], decimals=2)
-            strMdlTmp = ('R(C) = '
-                         + str(varRmax)
-                         + ' * (C^'
-                         + str(varN)
-                         + ' / (C^'
-                         + str(varN)
-                         + ' + '
-                         + str(varC50)
-                         + '^'
-                         + str(varN)
-                         + '))'
-                         )
+        print('---------Iteration: ' + str(idxIt))
 
-        # strModel = ('R(C) = '
-        #             + str(varParamA)
-        #             + ' * C^(' + str(varP)
-        #             + '+'
-        #             + str(varQ)
-        #             + ') '
-        #             + '/ '
-        #             + '(C^'
-        #             + str(varQ)
-        #             + ' + '
-        #             + str(varParamB)
-        #             + '^'
-        #             + str(varQ)
-        #             + ')'
-        #             )
+        # Indicies of subjects to sample on current iteration:
+        vecSmpl = aryRnd[idxIt, :]
+
+        # Loop through depth levels:
+        for idxDpt in range(0, varNumDpt):
+
+            # Access contrast response profiles of current subset of subjects
+            # and current depth level:
+            aryEmpY = lstDpth[idxIn][vecSmpl, :, idxDpt]
+
+            # Fit CRF:
+            aryMdlY[idxIn, idxIt, idxDpt, :], \
+            aryHlfMax[idxIn, idxIt, idxDpt], \
+            arySemi[idxIn, idxIt, idxDpt], \
+            aryRes[idxIn, idxIt, :, idxDpt] = crf_fit(vecEmpX,
+                                                      aryEmpY,
+                                                      strFunc='power',
+                                                      varNumX=1000,
+                                                      varXmin=0.0,
+                                                      varXmax=1.0)
+
+
+# ----------------------------------------------------------------------------
+# *** Average across iterations
+
+# Initialise arrays for across-iteration averages & error:
+aryMdlYMne = np.zeros((varNumIn, varNumDpt, varNumX))
+aryMdlYSem = np.zeros((varNumIn, varNumDpt, varNumX))
+aryHlfMaxMne = np.zeros((varNumIn, varNumDpt))
+aryHlfMaxSem = np.zeros((varNumIn, varNumDpt))    
+arySemiMne = np.zeros((varNumIn, varNumDpt))
+arySemiSem = np.zeros((varNumIn, varNumDpt))
+aryResMne01 = np.zeros((varNumIn, varNumCon, varNumDpt))
+aryResSem01 = np.zeros((varNumIn, varNumCon, varNumDpt))
+    
+# Loop through ROIs (i.e. V1 and V2):
+for idxIn in range(0, varNumIn):
+
+    # Mean modelled y-values:
+    aryMdlYMne[idxIn, :, :] = np.mean(aryMdlY[idxIn], axis=0)
+    # SEM / confidence interval:
+    aryMdlYSem[idxIn, :, :] = (
+                               (np.std(aryMdlY[idxIn], axis=0)
+                               / np.sqrt(varNumIt))
+                               * varCfd
+                               )
+
+    # Mean response at half-maximum contrast:
+    aryHlfMaxMne[idxIn, :] = np.mean(aryHlfMax[idxIn], axis=0)
+    # SEM / confidence interval:
+    aryHlfMaxSem[idxIn, :] = (
+                              (np.std(aryHlfMax[idxIn], axis=0)
+                              / np.sqrt(varNumIt))
+                              * varCfd
+                              )
+
+    # Mean semi-saturation contrast:
+    arySemiMne[idxIn, :] = np.mean(arySemi[idxIn], axis=0)
+    # SEM / confidence interval:
+    arySemiSem[idxIn, :] = (
+                            (np.std(arySemi[idxIn], axis=0)
+                            / np.sqrt(varNumIt))
+                            * varCfd
+                            )
+
+
+    # Mean residuals:
+    aryResMne01[idxIn, :, :] = np.mean(aryRes[idxIn], axis=0)
+    # SEM / confidence interval:
+    aryResSem01[idxIn, :, :] = (
+                                (np.std(aryRes[idxIn], axis=0)
+                                / np.sqrt(varNumIt))
+                                * varCfd
+                                )
+
+del(aryMdlY)
+del(aryHlfMax)
+del(arySemi)
+# del(aryRes)
+
+
+# ------------------------------------------------------------------------
+# *** Plot contrast response functions
+
+# Vector for which the function has been fitted:
+vecMdlX = np.linspace(varXmin, varXmax, num=varNumX, endpoint=True)
+
+# Loop through ROIs (i.e. V1 and V2):
+for idxIn in range(0, varNumIn):
+
+    # Across-subjects mean of empirical contrast responses:
+    vecEmpYMne = np.mean(lstDpth[idxIn], axis=0)
+    # SEM / confidence interval:
+    vecEmpYSem = (
+                  (np.std(lstDpth[idxIn], axis=0)
+                  / np.sqrt(varNumSubs))
+                  * varCfd
+                  )
+
+    # Loop through depth levels:
+    for idxDpt in range(0, varNumDpt):
+
+#        # Create string for model parameters of exponential function:
+#        if strFunc == 'power':
+#            varParamA = np.around(vecMdlPar[0], decimals=2)
+#            varParamB = np.around(vecMdlPar[1], decimals=2)
+#            strMdlTmp = ('Model: R(C) = '
+#                         + str(varParamA)
+#                         + ' * C ^ '
+#                         + str(varParamB)
+#                         )
+#        elif strFunc == 'hyper':
+#            varRmax = np.around(vecMdlPar[0], decimals=2)
+#            varC50 = np.around(vecMdlPar[1], decimals=2)
+#            varN = np.around(vecMdlPar[2], decimals=2)
+#            strMdlTmp = ('R(C) = '
+#                         + str(varRmax)
+#                         + ' * (C^'
+#                         + str(varN)
+#                         + ' / (C^'
+#                         + str(varN)
+#                         + ' + '
+#                         + str(varC50)
+#                         + '^'
+#                         + str(varN)
+#                         + '))'
+#                         )
 
         # Title for current CRF plot:
         strTtleTmp = (strTtle
                       + dicPthDpth.keys()[idxIn]
                       + ' , depth level: '
-                      + str(idxDpth))
+                      + str(idxDpt))
 
         # Output path for current plot:
         strPthOtTmp = (strPthOt
                        + '_'
+                       + strFunc
+                       + '_'
                        + dicPthDpth.keys()[idxIn]
                        + '_dpth_'
-                       + str(idxDpth)
+                       + str(idxDpt)
                        + strFleTyp)
 
         # Plot CRF for current depth level:
-        plt_crf(vecX,
-                lstFit[idxIn][idxDpth, :],
+        plt_crf(vecMdlX,
+                aryMdlYMne[idxIn, idxDpt, :],
                 strPthOtTmp,
-                vecEmpX=vecCon,
-                vecEmpYMne=lstDpthMne[idxIn][:, idxDpth],
-                vecEmpYSem=lstDpthSem[idxIn][:, idxDpth],
+                vecMdlYerr=aryMdlYSem[idxIn, idxDpt, :],
+                vecEmpX=vecEmpX,
+                vecEmpYMne=vecEmpYMne[:, idxDpt],
+                vecEmpYSem=vecEmpYSem[:, idxDpt],
                 varXmin=varXmin,
                 varXmax=varXmax,
                 varYmin=varYmin,
@@ -320,8 +323,7 @@ for idxIn in range(0, varNumIn):
                 strLblY=strLblY,
                 strTtle=strTtleTmp,
                 varDpi=80.0,
-                lgcLgnd=True,
-                strMdl=strMdlTmp)
+                lgcLgnd=True)
 
 # ----------------------------------------------------------------------------
 # *** Plot response at half maximum contrast across depth
@@ -330,12 +332,9 @@ for idxIn in range(0, varNumIn):
 strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'fMRI signal change [a.u.]'
 
-# Stack the vectors for the two ROIs (V1 & V2):
-aryHlfMaxResp = np.vstack(lstHlfMaxResp[:])
-
-funcPltAcrDpth(aryHlfMaxResp,      # aryData[Condition, Depth]
-               np.zeros(np.shape(aryHlfMaxResp)),  # aryError[Con., Depth]
-               varNumDpth,         # Number of depth levels (on the x-axis)
+funcPltAcrDpth(aryHlfMaxMne,       # aryData[Condition, Depth]
+               aryHlfMaxSem,       # aryError[Con., Depth]
+               varNumDpt,          # Number of depth levels (on the x-axis)
                varNumIn,           # Number of conditions (separate lines)
                varDpi,             # Resolution of the output figure
                0.0,                # Minimum of Y axis
@@ -346,7 +345,7 @@ funcPltAcrDpth(aryHlfMaxResp,      # aryData[Condition, Depth]
                strYlabel,          # Label on y axis
                'Response at half maximum contrast',  # Figure title
                True,               # Boolean: whether to plot a legend
-               (strPthOt + '_half_max_response.png'),
+               (strPthOt + '_' + strFunc + '_half_max_response.png'),
                varSizeX=2000.0,
                varSizeY=1400.0)
 
@@ -358,31 +357,29 @@ funcPltAcrDpth(aryHlfMaxResp,      # aryData[Condition, Depth]
 strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'Percent luminance contrast'
 
-# Stack the vectors for the two ROIs (V1 & V2):
-aryHlfMaxCont = np.vstack(lstHlfMaxCont[:])
-
 # Convert contrast values to percent (otherwise rounding will be a problem for
 # y-axis values):
-aryHlfMaxCont = np.multiply(aryHlfMaxCont, 100.0)
+arySemiMne = np.multiply(arySemiMne, 100.0)
+arySemiSem = np.multiply(arySemiSem, 100.0)
 
 # Line colours:
 aryClr = np.array([[0.2, 0.2, 0.9],
                    [0.9, 0.2, 0.2]])
 
-funcPltAcrDpth(aryHlfMaxCont,      # aryData[Condition, Depth]
-               np.zeros(np.shape(aryHlfMaxCont)),  # aryError[Con., Depth]
-               varNumDpth,         # Number of depth levels (on the x-axis)
+funcPltAcrDpth(arySemiMne,         # aryData[Condition, Depth]
+               arySemiSem,         # aryError[Con., Depth]
+               varNumDpt,          # Number of depth levels (on the x-axis)
                varNumIn,           # Number of conditions (separate lines)
                varDpi,             # Resolution of the output figure
                0.0,                # Minimum of Y axis
-               10.0,                # Maximum of Y axis
+               10.0,               # Maximum of Y axis
                False,              # Boolean: whether to convert y axis to %
                dicPthDpth.keys(),  # Labels for conditions (separate lines)
                strXlabel,          # Label on x axis
                strYlabel,          # Label on y axis
                'Semisaturation contrast',  # Figure title
                True,               # Boolean: whether to plot a legend
-               (strPthOt + '_semisaturationcontrast.png'),
+               (strPthOt + '_' + strFunc + '_semisaturationcontrast.png'),
                aryClr=aryClr,
                varSizeX=2000.0,
                varSizeY=1400.0)
@@ -391,30 +388,17 @@ funcPltAcrDpth(aryHlfMaxCont,      # aryData[Condition, Depth]
 # ----------------------------------------------------------------------------
 # *** Plot residual variance across depth
 
-# Lists for mean & SEM of residuals (across conditions):
-lstResMne = [None] * varNumIn
-lstResSem = [None] * varNumIn
-
 # Mean residual variance across conditions:
-for idxIn in range(0, varNumIn):
-    # Mean residuals (across conditions):
-    lstResMne[idxIn] = np.mean(lstRes[idxIn], axis=0, keepdims=True)
-    # Standard error of the mean:
-    lstResSem[idxIn] = np.divide(np.std(lstRes[idxIn], axis=0),
-                                 np.sqrt(varNumCon))
-    lstResSem[idxIn] = np.array(lstResSem[idxIn], ndmin=2)
-
-# Stack the vectors for the two ROIs (V1 & V2):
-aryResMne = np.vstack(lstResMne[:])
-aryResSem = np.vstack(lstResSem[:])
+aryResMne02 = np.mean(aryResMne01, axis=1)
+aryResSem02 = np.mean(aryResSem01, axis=1)
 
 # Label for axes:
 strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'Residual variance'
 
-funcPltAcrDpth(aryResMne,          # aryData[Condition, Depth]
-               aryResSem,          # aryError[Condition, Depth]
-               varNumDpth,         # Number of depth levels (on the x-axis)
+funcPltAcrDpth(aryResMne02,        # aryData[Condition, Depth]
+               aryResSem02,        # aryError[Condition, Depth]
+               varNumDpt,          # Number of depth levels (on the x-axis)
                varNumIn,           # Number of conditions (separate lines)
                varDpi,             # Resolution of the output figure
                0.0,                # Minimum of Y axis
@@ -425,7 +409,8 @@ funcPltAcrDpth(aryResMne,          # aryData[Condition, Depth]
                strYlabel,          # Label on y axis
                'Model fit across cortical depth',  # Figure title
                True,               # Boolean: whether to plot a legend
-               (strPthOt + '_modelfit.png'))
+               (strPthOt + '_' + strFunc + '_modelfit.png'))
+
 
 # ----------------------------------------------------------------------------
 # *** Plot mean residual variance
@@ -436,12 +421,15 @@ funcPltAcrDpth(aryResMne,          # aryData[Condition, Depth]
 # Vector with x coordinates of the left sides of the bars:
 vecBarX = np.arange(1.0, (varNumIn + 1.0))
 
-# Y data for bars - mean residuals across depth levels (data are averaged
-# across conditions so far):
-aryResMneMne = np.mean(aryResMne, axis=1)
+# Y data for bars - mean residuals across depth levels (data already averaged
+# across iterations & conditions):
+aryResMne03 = np.mean(aryResMne01, axis=(1, 2))
 # Y data for bars - SEM:
-aryResMneSem = np.divide(np.std(aryResMne, axis=1),
-                         np.sqrt(varNumDpth))
+aryResSem03 = (
+               (np.std(aryResMne01, axis=(1, 2))
+               / np.sqrt(varNumIt))
+               * varCfd
+               )
 
 # fig01 = plt.figure()
 # axs01 = fig01.add_subplot(111, aspect='100.0')
@@ -456,15 +444,15 @@ fig01 = plt.figure(figsize=((varSizeX * 0.5) / varDpi,
                    dpi=varDpi)
 axs01 = fig01.add_subplot(111)
 plt01 = axs01.bar(vecBarX,
-                  aryResMneMne,
+                  aryResMne03,
                   width=0.8,
                   color=(0.3, 0.3, 0.8),
                   tick_label=dicPthDpth.keys(),
-                  yerr=aryResMneSem)
+                  yerr=aryResSem03)
 
 # Limits of axes:
 varYminBar = 0.0
-varYmaxBar = np.around(np.max(aryResMneMne), decimals=2)
+varYmaxBar = np.around(np.max(aryResMne03), decimals=2)
 axs01.set_ylim([varYminBar, varYmaxBar + 0.005])
 
 # Which y values to label with ticks:
@@ -484,7 +472,7 @@ axs01.set_title('Model fit', fontsize=14)
 plt.tight_layout(pad=0.5)
 
 # Save figure:
-fig01.savefig((strPthOt + '_modelfit_bars.png'),
+fig01.savefig((strPthOt + '_' + strFunc + '_modelfit_bars.png'),
               dpi=(varDpi * 2.0),
               facecolor='w',
               edgecolor='w',

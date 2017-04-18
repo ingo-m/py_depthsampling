@@ -1,8 +1,8 @@
 """
 Fit contrast response function to fMRI data.
 
-*** FOR TESTING PURPOSES ONLY ***
-This version fits the CRF separately for each subject. Unstable.
+*** LEGACY VERSION - SUBJECTS SEPARATELY - FOR TESTING PURPOSES ONLY ***
+This version fits the CRF separately for each subject. Unstable results.
 
 Function of the depth sampling pipeline.
 

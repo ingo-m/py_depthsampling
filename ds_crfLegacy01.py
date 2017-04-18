@@ -1,8 +1,9 @@
 """
 Fit contrast response function to fMRI data.
 
-*** VERSION 01 ***
-Fitting on across-subjects average, no across-subjects confidence intervals.
+*** LEGACY VERSION ***
+Fitting of CRF on across-subjects average, therefore no across-subjects
+variance, standard error and/or confidence intervals can be calculated.
 
 Function of the depth sampling pipeline.
 

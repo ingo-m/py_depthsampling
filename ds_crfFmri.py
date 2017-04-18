@@ -1,13 +1,14 @@
 """
 Fit contrast response function to fMRI data.
 
-*** BOOTSTAPPING VERSION ***
-This version bootstraps the across-subjects CRF fitting.
-
 Function of the depth sampling pipeline.
 
 The purpose of this function is to fit a contrast response function to fMRI
-depth profiles, separately for each cortical depth level.
+depth profiles, separately for each cortical depth level. In order to obtain
+an estimate of the across-subjects variability, the fitting is performed
+repeatedly on a random subset of subjects (bootstrapping, with replacement).
+This ensure stable results (which would not be the case when fitting CRF for
+each subject individually).
 """
 
 # Part of py_depthsampling library

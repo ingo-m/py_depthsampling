@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Function of the depth sampling pipeline.
-"""
+"""Function of the depth sampling pipeline."""
 
 # Part of py_depthsampling library
 # Copyright (C) 2017  Ingo Marquardt
@@ -25,7 +23,7 @@ from ds_crfFunc import crf_power
 from ds_crfFunc import crf_hyper
 
 
-def crf_fit(vecEmpX,
+def crf_fit(vecEmpX,  #noqa
             aryEmpY,
             strFunc='power',
             varNumX=1000,
@@ -59,15 +57,12 @@ def crf_fit(vecEmpX,
     vecMdlY : np.array
         Fitted y-values (predicted response based on CRF model), of the form
         vecMdlY[varNumX]
-
     varHlfMax : float
-        Predicted response at 50% contrast based on CRF model.
-
+        Predicted response at 50 percent contrast based on CRF model.
     varSemi : float
-        Semisaturation contrast (predicted contrast needed to elicit 50% of
-        the response amplitude that would be expected with a 100% contrast
-        stimulus).
-
+        Semisaturation contrast (predicted contrast needed to elicit 50 percent
+        of the response amplitude that would be expected with a 100 percent
+        contrast stimulus).
     vecRes : np.array
         Residual variance at empirical contrast levels (of the form
         vecRes[varNumCon]).
@@ -90,7 +85,6 @@ def crf_fit(vecEmpX,
     # Standard error of the mean (across subjects):
     # aryEmpYSem = np.divide(np.std(aryEmpY, axis=0),
     #                               np.sqrt(varNumSubs))
-
 
     # *** Fit contrast reponse function
 
@@ -142,9 +136,8 @@ def crf_fit(vecEmpX,
                             vecMdlPar[1],
                             vecMdlPar[2])
 
-
     # *** Calculate response at 50% contrast
-    
+
     # The response at half maximum contrast (i.e. at a luminance contrast of
     # 50%):
     if strFunc == 'power':
@@ -157,9 +150,8 @@ def crf_fit(vecEmpX,
                               vecMdlPar[1],
                               vecMdlPar[2])
 
-
     # *** Calculate semisaturation contrast
-    
+
     # The maximum response (defined as the response at 100% luminance
     # contrast):
     if strFunc == 'power':
@@ -202,7 +194,6 @@ def crf_fit(vecEmpX,
                                    vecMdlPar[1],
                                    vecMdlPar[2])
 
-    
     # *** Calculate residual variance
 
     # Array for residual variance:

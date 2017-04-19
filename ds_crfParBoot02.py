@@ -21,14 +21,9 @@ import numpy as np
 from ds_crfFit import crf_fit
 
 
-def crf_par(idxPrc,
-            lstDpth,
-            vecEmpX,
-            aryRnd,
-            varNumX,
-            queOut):
+def crf_par_02(idxPrc, lstDpth, vecEmpX, aryRnd, varNumX, queOut):
     """
-    Parallelise fitting of contrast response function.
+    Parallelised bootstrapping of contrast response function, level 2.
 
     Parameters
     ----------
@@ -75,6 +70,10 @@ def crf_par(idxPrc,
 
     Notes
     -----
+    This function is supposed to be called in parallel, using the
+    multiprocessing module. This function calls a function which performs
+    the actual least squares fitting.
+    
     Function of the depth sampling pipeline.
     """
     # ----------------------------------------------------------------------------

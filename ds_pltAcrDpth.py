@@ -42,6 +42,7 @@ def funcPltAcrDpth(aryData,     # Data to be plotted: aryData[Condition, Depth]
                    strPath,     # Output path for the figure
                    varSizeX=1800.0,  # Figure x dimension
                    varSizeY=1600.0,  # Figure y dimension
+                   varNumLblY=5,
                    aryClr=None,      # Line colours aryClr[idxCon, RGB]
                    aryCnfLw=None,
                    aryCnfUp=None):
@@ -129,7 +130,7 @@ def funcPltAcrDpth(aryData,     # Data to be plotted: aryData[Condition, Depth]
     axs01.set_xticklabels(['WM', 'CSF'])
 
     # Which y values to label with ticks:
-    vecYlbl = np.linspace(varYmin, varYmax, num=5, endpoint=True)
+    vecYlbl = np.linspace(varYmin, varYmax, num=varNumLblY, endpoint=True)
     # vecYlbl = np.arange(varYmin, varYmax, 0.02)
     # Round:
     # vecYlbl = np.around(vecYlbl, decimals=2)

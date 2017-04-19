@@ -28,16 +28,24 @@ each subject individually).
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import cPickle as pickle
 import numpy as np
-import multiprocessing as mp
 import matplotlib.pyplot as plt
-from ds_crfPar import crf_par
+from ds_crfParBoot01 import crf_par_01
 from ds_pltAcrDpth import funcPltAcrDpth
 from ds_crfPlot import plt_crf
 
 
 # ----------------------------------------------------------------------------
 # *** Define parameters
+
+# Use existing bootstrap or create new one('load' or 'create')?
+strSwitch = 'create'
+
+# Pickle to load bootstrap from / save bootstrap to:
+strPthPkl = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/bootstrap_uncorrected.pickle'  #noqa
+
+# Pickle file to load bootstrapping results from
 
 # Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
 # function).
@@ -61,7 +69,7 @@ varXmax = 1.0
 
 # Limits of y-axis for contrast response plots
 varYmin = 0.0
-varYmax = 3.0
+varYmax = 2.5
 
 # Axis labels
 strLblX = 'Luminance contrast'
@@ -98,168 +106,77 @@ varCnfLw = 2.5
 varCnfUp = 97.5
 
 # Number of process to run in parallel:
-varPar = 10
+varPar = 11
 
 # How many iterations (i.e. how often to sample):
-varNumIt = 100
+varNumIt = 10000
+
 
 # ----------------------------------------------------------------------------
-# *** Load depth profiles
+# *** Load / create bootstrap
 
 print('-CRF fitting')
-
-print('---Loading data')
 
 # Number of inputs:
 varNumIn = len(dicPthDpth.values())
 
-# List for arrays with depth data for ROIs (i.e. for V1 and V2):
-lstDpth = [None] * varNumIn
+if strSwitch == 'load':
+    
+    print('---Loading bootstrapping results from pickle')
 
-# Loop through ROIs (i.e. V1 and V2):
-for idxIn in range(0, varNumIn):
-    # Load array with single-subject corrected depth profiles, of the form
-    # aryDpth[idxSub, idxCondition, idxDpt].
-    lstDpth[idxIn] = np.load(dicPthDpth.values()[idxIn])
+    # Load previously prepared pickle:
+    lstPkl = pickle.load(open(strPthPkl, "rb"))
+    lstDpth, aryMdlY, aryHlfMax, arySemi, aryRes = lstPkl[:]
 
+elif strSwitch == 'create':
 
-# ----------------------------------------------------------------------------
-# *** Prepare bootstrapping
+    # ------------------------------------------------------------------------
+    # *** Load depth profiles
 
-print('---Preparing bootstrapping')
+    print('---Loading depth profiles')
 
-# Number of subjects:
-varNumSubs = lstDpth[0].shape[0]
+    # List for arrays with depth data for ROIs (i.e. for V1 and V2):
+    lstDpth = [None] * varNumIn
 
-# We will sample subjects with replacement. How many subjects to sample on
-# each iteration:
-varNumSmp = varNumSubs
+    # Loop through ROIs (i.e. V1 and V2):
+    for idxIn in range(0, varNumIn):
+        # Load array with single-subject corrected depth profiles, of the form
+        # aryDpth[idxSub, idxCondition, idxDpt].
+        lstDpth[idxIn] = np.load(dicPthDpth.values()[idxIn])
 
-# Random array with subject indicies for bootstrapping of the form
-# aryRnd[varNumIt, varNumSmp]. Each row includes the indicies of the subjects
-# to the sampled on that iteration.
-aryRnd = np.random.randint(0,
-                           high=varNumSubs,
-                           size=(varNumIt, varNumSmp))
+    # ------------------------------------------------------------------------
+    # *** Parallelised CRF bootstrapping
 
+    aryMdlY, aryHlfMax, arySemi, aryRes = crf_par_01(lstDpth,
+                                                     vecEmpX,
+                                                     varNumIt=varNumIt,
+                                                     varPar=varPar,
+                                                     varNumX=varNumX)
 
-# ----------------------------------------------------------------------------
-# *** Parallelised CRF fitting
+    # ------------------------------------------------------------------------
+    # *** Save results
 
-print('---Creating parallel processes')
+    print('---Saving bootstrapping results as pickle')
 
-# Number of conditions:
-varNumCon = lstDpth[idxIn].shape[1]  # same as vecEmpX.shape[0]
-
-# Number of depth levels:
-varNumDpt = lstDpth[idxIn].shape[2]
-
-# Empty list for results:
-lstOut = [None for i in range(varPar)]
-
-# Empty list for processes:
-lstPrc = [None for i in range(varPar)]
-
-# Create a queue to put the results in:
-queOut = mp.Queue()
-
-# List into which the chunks of the randomisation-array for the parallel
-# processes will be put:
-lstRnd = [None for i in range(varPar)]
-
-# Vector with the indicies at which the randomisation-array will be separated
-# in order to be chunked up for the parallel processes:
-vecIdxChnks = np.linspace(0,
-                          varNumIt,
-                          num=varPar,
-                          endpoint=False)
-vecIdxChnks = np.hstack((vecIdxChnks, varNumIt))
-
-# Put randomisation indicies into chunks:
-for idxChnk in range(0, varPar):
-    # Index of first iteration to be included in current chunk:
-    varTmpChnkSrt = int(vecIdxChnks[idxChnk])
-    # Index of last iteration to be included in current chunk:
-    varTmpChnkEnd = int(vecIdxChnks[(idxChnk+1)])
-    # Put array into list:
-    lstRnd[idxChnk] = aryRnd[varTmpChnkSrt:varTmpChnkEnd, :]
-
-# We don't need the original array with the functional data anymore:
-del(aryRnd)
-
-# Create processes:
-for idxPrc in range(0, varPar):
-    lstPrc[idxPrc] = mp.Process(target=crf_par,
-                                args=(idxPrc,
-                                      lstDpth,
-                                      vecEmpX,
-                                      lstRnd[idxPrc],
-                                      varNumX,
-                                      queOut))
-    # Daemon (kills processes when exiting):
-    lstPrc[idxPrc].Daemon = True
-
-# Start processes:
-for idxPrc in range(0, varPar):
-    lstPrc[idxPrc].start()
-
-# Collect results from queue:
-for idxPrc in range(0, varPar):
-    lstOut[idxPrc] = queOut.get(True)
-
-# Join processes:
-for idxPrc in range(0, varPar):
-    lstPrc[idxPrc].join()
-
-print('---Collecting results from parallel processes')
-
-# List for results from parallel processes, in order to join the results:
-lstMdlY = [None for i in range(varPar)]
-lstHlfMax = [None for i in range(varPar)]
-lstSemi = [None for i in range(varPar)]
-lstRes = [None for i in range(varPar)]
-
-# Put output into correct order:
-for idxPrc in range(0, varPar):
-
-    # Index of results (first item in output list):
-    varTmpIdx = lstOut[idxPrc][0]
-
-    # Put fitting results into list, in correct order:
-    lstMdlY[varTmpIdx] = lstOut[idxPrc][1]
-    lstHlfMax[varTmpIdx] = lstOut[idxPrc][2]
-    lstSemi[varTmpIdx] = lstOut[idxPrc][3]
-    lstRes[varTmpIdx] = lstOut[idxPrc][4]
-
-# Concatenate output vectors (into the same order as the voxels that were
-# included in the fitting):
-
-# Arrays for y-values of fitted function (for each iteration & depth level):
-# aryMdlY = np.zeros((varNumIn, varNumIt, varNumDpt, varNumX))
-# Array for responses at half maximum contrast:
-# aryHlfMax = np.zeros((varNumIn, varNumIt, varNumDpt))
-# List of vectors for semisaturation contrast:
-# arySemi = np.zeros((varNumIn, varNumIt, varNumDpt))
-# List of arrays for residual variance:
-# aryRes = np.zeros((varNumIn, varNumIt, varNumCon, varNumDpt))
-for idxPrc in range(0, varPar):
-    aryMdlY = np.concatenate(lstMdlY, axis=1)
-    aryHlfMax = np.concatenate(lstHlfMax, axis=1)
-    arySemi = np.concatenate(lstSemi, axis=1)
-    aryRes = np.concatenate(lstRes, axis=1)
-
-# Delete unneeded large objects:
-del(lstOut)
-del(lstMdlY)
-del(lstHlfMax)
-del(lstSemi)
-del(lstRes)
+    # Put results into list and save as pickle:
+    lstPkl = [lstDpth, aryMdlY, aryHlfMax, arySemi, aryRes]
+    pickle.dump(lstPkl, open(strPthPkl, "wb"))
 
 
 # ----------------------------------------------------------------------------
 # *** Average across iterations
 
 print('---Averaing across iterations')
+
+# Number of subjects:
+varNumSubs = lstDpth[0].shape[0]
+
+# Number of conditions:
+varNumCon = lstDpth[0].shape[1]  # same as vecEmpX.shape[0]
+
+# Number of depth levels:
+varNumDpt = lstDpth[0].shape[2]
+
 
 # Initialise arrays for across-iteration averages & confidence intervals:
 
@@ -275,9 +192,9 @@ arySemiMne = np.zeros((varNumIn, varNumDpt))
 arySemiSCnfLw = np.zeros((varNumIn, varNumDpt))
 arySemiSCnfUp = np.zeros((varNumIn, varNumDpt))
 
-aryResMne01 = np.zeros((varNumIn, varNumCon, varNumDpt))
-aryResCnfLw01 = np.zeros((varNumIn, varNumCon, varNumDpt))
-aryResCnfUp01 = np.zeros((varNumIn, varNumCon, varNumDpt))
+#aryResMne01 = np.zeros((varNumIn, varNumCon, varNumDpt))
+#aryResCnfLw01 = np.zeros((varNumIn, varNumCon, varNumDpt))
+#aryResCnfUp01 = np.zeros((varNumIn, varNumCon, varNumDpt))
 
 # Loop through ROIs (i.e. V1 and V2):
 for idxIn in range(0, varNumIn):
@@ -312,19 +229,19 @@ for idxIn in range(0, varNumIn):
                                             varCnfUp,
                                             axis=0)
 
-    # Mean residuals:
-    aryResMne01[idxIn, :, :] = np.mean(aryRes[idxIn, :, :, :], axis=0)
-    # Confidence interval:
-    aryResCnfLw01[idxIn, :, :] = np.percentile(aryRes[idxIn, :, :, :],
-                                               varCnfLw,
-                                               axis=0)
-    aryResCnfUp01[idxIn, :, :] = np.percentile(aryRes[idxIn, :, :, :],
-                                               varCnfUp,
-                                               axis=0)
+#    # Mean residuals:
+#    aryResMne01[idxIn, :, :] = np.mean(aryRes[idxIn, :, :, :], axis=0)
+#    # Confidence interval:
+#    aryResCnfLw01[idxIn, :, :] = np.percentile(aryRes[idxIn, :, :, :],
+#                                               varCnfLw,
+#                                               axis=0)
+#    aryResCnfUp01[idxIn, :, :] = np.percentile(aryRes[idxIn, :, :, :],
+#                                               varCnfUp,
+#                                               axis=0)
 
-del(aryMdlY)
-del(aryHlfMax)
-del(arySemi)
+# del(aryMdlY)
+# del(aryHlfMax)
+# del(arySemi)
 # del(aryRes)
 
 
@@ -460,7 +377,7 @@ funcPltAcrDpth(arySemiMne,         # aryData[Condition, Depth]
                varNumIn,           # Number of conditions (separate lines)
                varDpi,             # Resolution of the output figure
                0.0,                # Minimum of Y axis
-               10.0,               # Maximum of Y axis
+               15.0,               # Maximum of Y axis
                False,              # Boolean: whether to convert y axis to %
                dicPthDpth.keys(),  # Labels for conditions (separate lines)
                strXlabel,          # Label on x axis
@@ -471,6 +388,7 @@ funcPltAcrDpth(arySemiMne,         # aryData[Condition, Depth]
                aryClr=aryClr,
                varSizeX=2000.0,
                varSizeY=1400.0,
+               varNumLblY=4,
                aryCnfLw=arySemiSCnfLw,
                aryCnfUp=arySemiSCnfUp)
 
@@ -478,17 +396,21 @@ funcPltAcrDpth(arySemiMne,         # aryData[Condition, Depth]
 # ----------------------------------------------------------------------------
 # *** Plot residual variance across depth
 
-# aryRes = np.zeros((varNumIn, varNumIt, varNumCon, varNumDpt))
+# aryRes[idxRoi, idxIteration, idxCondition, idxDpt]
 
-# Mean residual variance across iterations & conditions:
-aryResMne02 = np.mean(aryRes, axis=(1, 2))
-# Confidence interval:
-aryResCnfLw02 = np.percentile(aryRes,
+# Mean residual variance across conditions:
+aryResMne01 = np.mean(aryRes, axis=2)
+# Confidence interval - we are interested in the variability across
+# iterations, not across conditions, therefore we calculate the confidence
+# interval based on the mean across conditions:
+aryResCnfLw02 = np.percentile(aryResMne01,
                               varCnfLw,
-                              axis=(1, 2))
-aryResCnfUp02 = np.percentile(aryRes,
+                              axis=1)
+aryResCnfUp02 = np.percentile(aryResMne01,
                               varCnfUp,
-                              axis=(1, 2))
+                              axis=1)
+# Mean residual variance across iterations:
+aryResMne02 = np.mean(aryResMne01, axis=1)
 
 # Label for axes:
 strXlabel = 'Cortical depth level (equivolume)'
@@ -515,37 +437,44 @@ funcPltAcrDpth(aryResMne02,        # aryData[Condition, Depth]
 # ----------------------------------------------------------------------------
 # *** Plot mean residual variance
 
+# aryRes[idxRoi, idxIteration, idxCondition, idxDpt]
+
 # Plot of mean residuals for V1 and V2 (average across depth levels and
 # conditions).
 
-# Vector with x coordinates of the left sides of the bars:
-vecBarX = np.arange(1.0, (varNumIn + 1.0))
-
-# Y data for bars - mean residuals across iterations, conditions, and depth
-# levels:
-aryResMne03 = np.mean(aryRes, axis=(1, 2, 3))
-# Confidence interval:
-aryResCnfLw03 = np.percentile(aryRes,
+# Mean residuals across conditions and depth levels (needed to calculate
+# confidence intervals):
+aryResMne03 = np.mean(aryRes, axis=(2, 3))
+# Confidence interval - we are interested in the variability across
+# iterations, not across conditions and/or depth levels, therefore we
+# calculate the confidence interval based on the mean across conditions and
+# depth levels:
+aryResCnfLw04 = np.percentile(aryResMne03,
                               varCnfLw,
-                              axis=(1, 2, 3))
-aryResCnfUp03 = np.percentile(aryRes,
+                              axis=1)
+aryResCnfUp04 = np.percentile(aryResMne03,
                               varCnfUp,
-                              axis=(1, 2, 3))
+                              axis=1)
+# Mean residuals across iterations (y data for bars):
+aryResMne04 = np.mean(aryResMne03, axis=1)
 
 # Upper limit of y-axis (needs to be calculated before scaling of confidence
 # interval):
-varYmaxBar = np.around(np.max(aryResCnfUp03), decimals=2)
+varYmaxBar = np.around(np.max(aryResCnfUp04), decimals=2)
 
 # Error bars are plotted as deviation from mean, so we have take difference
 # between mean and confidence interval:
-aryResCnfLw03 = np.absolute(np.subtract(aryResMne03, aryResCnfLw03))
-aryResCnfUp03 = np.absolute(np.subtract(aryResMne03, aryResCnfUp03))
+aryResCnfLw04 = np.absolute(np.subtract(aryResMne04, aryResCnfLw04))
+aryResCnfUp04 = np.absolute(np.subtract(aryResMne04, aryResCnfUp04))
 
 # Stack confidence intervals:
-aryResCnf03 = np.array((aryResCnfLw03, aryResCnfUp03))
+aryResCnf04 = np.array((aryResCnfLw04, aryResCnfUp04))
 
 # fig01 = plt.figure()
 # axs01 = fig01.add_subplot(111, aspect='100.0')
+
+# Vector with x coordinates of the left sides of the bars:
+vecBarX = np.arange(1.0, (varNumIn + 1.0))
 
 # Figure dimensions:
 varSizeX = 400.0
@@ -557,18 +486,18 @@ fig01 = plt.figure(figsize=((varSizeX * 0.5) / varDpi,
                    dpi=varDpi)
 axs01 = fig01.add_subplot(111)
 plt01 = axs01.bar(vecBarX,
-                  aryResMne03,
+                  aryResMne04,
                   width=0.8,
                   color=(0.3, 0.3, 0.8),
                   tick_label=dicPthDpth.keys(),
-                  yerr=aryResCnf03)
+                  yerr=aryResCnf04)
 
 # Limits of axes:
 varYminBar = 0.0
 axs01.set_ylim([varYminBar, varYmaxBar + 0.005])
 
 # Which y values to label with ticks:
-vecYlbl = np.linspace(varYminBar, varYmaxBar, num=6, endpoint=True)
+vecYlbl = np.linspace(varYminBar, varYmaxBar, num=8, endpoint=True)
 vecYlbl = np.around(vecYlbl, decimals=2)
 # Set ticks:
 axs01.set_yticks(vecYlbl)

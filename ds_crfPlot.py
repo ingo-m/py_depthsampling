@@ -150,7 +150,7 @@ def plt_crf(vecMdlX,
     axs01.set_ylim([varYmin, varYmax])
 
     # Which y values to label with ticks:
-    vecYlbl = np.linspace(varYmin, varYmax, num=4, endpoint=True)
+    vecYlbl = np.linspace(varYmin, varYmax, num=6, endpoint=True)
     # Round:
     # vecYlbl = np.around(vecYlbl, decimals=2)
     # Set y-axis ticks:

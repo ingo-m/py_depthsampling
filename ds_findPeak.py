@@ -21,10 +21,7 @@ import numpy as np
 from scipy.interpolate import interp1d
 from scipy.ndimage.filters import gaussian_filter1d
 
-# aryDpth = np.save('/home/john/Desktop/aryDpth.npy', aryHlfMax)
-# aryDpth = np.load('/home/john/Desktop/aryDpth.npy')[0, :, :]
-# varNumIntp=1000
-# varSd=0.05
+from scipy.signal import argrelextrema
 
 def find_peak(aryDpth, varNumIntp=100, varSd=0.05):
     """
@@ -90,26 +87,35 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05):
                                     order=0,
                                     mode='nearest')
 
-    # Calculate second derivative along depth-dimension:
-    aryDpthGrd = np.gradient(aryDpthSmth, axis=1)
-    # aryDpthGrd = np.gradient(aryDpthGrd, axis=1)
+    # Order of the search for the local maximum: how many points on each side
+    # to use for the comparison to consider.
+    varNumOrd = int(np.around((np.float64(varNumIntp) * 0.01),
+                              decimals=0))
 
-    # Absolute of gradient:
-    # aryDpthGrdAbs = np.absolute(aryDpthGrd)
-    
-    # Index of minimum:
-    # vecPeak = np.argmin(aryDpthGrdAbs, axis=1)
-    vecPeak = np.argmax(aryDpthGrd, axis=1)
+    # Identify peaks (the algorithm procudes a tuple of two arrays, the first
+    # with the indicies of cases (i.e. bootstrap iterations) for which a peak
+    # was identified, the second with the indicies of the peak - we are only
+    # interested in the second array):
+    vecPeak = argrelextrema(aryDpthSmth,
+                             np.greater,
+                             axis=1,
+                             order=varNumOrd,
+                             mode='clip')[1]
+
+    # Number of cases (i.e. bootstrap iterations):
+    varNumIt = aryDpth.shape[0]
+
+    # Number of cases for which a peak was found:
+    varNumPeaks = vecPeak.shape[0]
+
+    print(('------Identified peaks in '
+           + str(varNumPeaks)
+           + ' out of '
+           + str(varNumIt)
+           + ' cases.'))
 
     # Convert the indicies of minimum value into relative position (i.e.
     # relative cortical depth):
     vecPeak = np.divide(vecPeak, np.float64(varNumIntp))
 
     return vecPeak
-
-#aa1 = aryDpth[7832, :]
-#aa2 = aryDpthIntp[7832, :]
-#aa3 = aryDpthSmth[7832, :]
-#aa4 = aryDpthGrd[7832, :]
-#aa5 = aryDpthGrdAbs[7832, :]
-#aa6 = vecPeak[7832]

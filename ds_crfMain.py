@@ -44,7 +44,7 @@ from ds_findPeak import find_peak
 strSwitch = 'load'
 
 # Pickle to load bootstrap from / save bootstrap to:
-strPthPkl = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/bootstrap_corrected.pickle'  #noqa
+strPthPkl = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/bootstrap_uncorrected.pickle'  #noqa
 
 # Pickle file to load bootstrapping results from
 
@@ -53,8 +53,8 @@ strPthPkl = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/bootstrap_co
 strFunc = 'power'
 
 # Path of draining-corrected depth-profiles:
-dicPthDpth = {'V1': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected.npy',  #noqa
-              'V2': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2_corrected.npy'}  #noqa
+dicPthDpth = {'V1': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy',  #noqa
+              'V2': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2.npy'}  #noqa
 
 # Stimulus luminance contrast levels. NOTE: Should be between zero and one.
 # When using percent (i.e. from zero to 100), the search for the luminance at
@@ -62,7 +62,7 @@ dicPthDpth = {'V1': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_c
 vecEmpX = np.array([0.025, 0.061, 0.163, 0.72])
 
 # Output path for plot:
-strPthOt = '/home/john/PhD/Tex/contrast_response_boot/combined_corrected/crf'  #noqa
+strPthOt = '/home/john/PhD/Tex/contrast_response_boot/combined_uncorrected/crf'  #noqa
 
 # Limits of x-axis for contrast response plots
 varXmin = 0.0
@@ -229,80 +229,118 @@ for idxIn in range(0, varNumIn):
 # ----------------------------------------------------------------------------
 # *** Find peak of response at half maximum contrast
 
-# Arrays for relative position of peaks:
-aryPeakHlfMax = np.zeros((varNumIn, varNumIt))
+print('---Searching peak of response at half maximum contrast')
 
-# Arrays for confidence itnerval of relative peak position:
-aryPeakHlfMaxCnf = np.zeros((varNumIn, 2))
+# List for arrays for relative position of peaks:
+lstPeakHlfMax = [None] * varNumIn
+
+# Loop through ROIs (i.e. V1 and V2):
+for idxIn in range(0, varNumIn):
+    # Find peaks for response at half maximum for all bootstrapping
+    # iterations:
+    lstPeakHlfMax[idxIn] = find_peak(aryHlfMax[idxIn, :, :],
+                                     varNumIntp=1000,
+                                     varSd=0.05)
+
+# Array for relative peak positions:
+vecPeakHlfMaxMed = np.zeros((varNumIn))
+
+# Array for confidence itnerval of relative peak position:
+aryPeakHlfMaxCnf = np.zeros((2, varNumIn))
 
 # Loop through ROIs (i.e. V1 and V2):
 for idxIn in range(0, varNumIn):
 
-    # Find peaks for response at half maximum for all bootstrapping
-    # iterations:
-    aryPeakHlfMax[idxIn, :] = find_peak(aryHlfMax[idxIn, :, :],
-                                        varNumIntp=1000,
-                                        varSd=0.05)
+    # Median relative peak position for response at half maximum:
+    vecPeakHlfMaxMed[idxIn] = np.median(lstPeakHlfMax[idxIn], axis=0)
 
-# Median relative peak position for response at half maximum:
-vecPeakHlfMaxMed= np.mean(aryPeakHlfMax, axis=1)
-# Lower bound of confidence itnerval of relative peak position:
-aryPeakHlfMaxCnf[0, :] = np.percentile(aryPeakHlfMax,
-                                       varCnfLw,
-                                       axis=1)
-# Upper bound of confidence itnerval of relative peak position:
-aryPeakHlfMaxCnf[1, :] = np.percentile(aryPeakHlfMax,
-                                       varCnfUp,
-                                       axis=1)
+    # Lower bound of confidence interval of relative peak position:
+    aryPeakHlfMaxCnf[0, idxIn] = np.percentile(lstPeakHlfMax[idxIn],
+                                               varCnfLw,
+                                               axis=0)
+    # Upper bound of confidence interval of relative peak position:
+    aryPeakHlfMaxCnf[1, idxIn] = np.percentile(lstPeakHlfMax[idxIn],
+                                               varCnfUp,
+                                               axis=0)
 
 
 # ----------------------------------------------------------------------------
 # *** Find peak of semisaturation contrast
 
-# Arrays for relative position of peaks:
-aryPeakSemi = np.zeros((varNumIn, varNumIt))
+print('---Searching peak of semisaturation contrast')
 
-# Arrays for confidence itnerval of relative peak position:
-aryPeakSemiCnf = np.zeros((varNumIn, 2))
+# List for arrays for relative position of peaks:
+lstPeakSemi = [None] * varNumIn
+
+# Loop through ROIs (i.e. V1 and V2):
+for idxIn in range(0, varNumIn):
+    # Find peaks for response at half maximum for all bootstrapping
+    # iterations:
+    lstPeakSemi[idxIn] = find_peak(arySemi[idxIn, :, :],
+                                   varNumIntp=1000,
+                                   varSd=0.05)
+
+# Array for relative peak positions:
+vecPeakSemiMed = np.zeros((varNumIn))
+
+# Array for confidence itnerval of relative peak position:
+aryPeakSemiCnf = np.zeros((2, varNumIn))
 
 # Loop through ROIs (i.e. V1 and V2):
 for idxIn in range(0, varNumIn):
 
-    # Find peaks for semisaturation contrast for all bootstrapping
-    # iterations:
-    aryPeakSemi[idxIn, :] = find_peak(arySemi[idxIn, :, :],
-                                      varNumIntp=1000,
-                                      varSd=0.05)
+    # Median relative peak position for semisaturation contrast:
+    vecPeakSemiMed[idxIn] = np.median(lstPeakSemi[idxIn], axis=0)
 
-# Median relative peak position for semisaturation contrast:
-vecPeakSemiMed = np.mean(aryPeakSemi, axis=1)
-# Lower bound of confidence itnerval of relative peak position:
-aryPeakSemiCnf[0, :] = np.percentile(aryPeakSemi,
-                                     varCnfLw,
-                                     axis=1)
-# Upper bound of confidence itnerval of relative peak position:
-aryPeakSemiCnf[1, :] = np.percentile(aryPeakSemi,
-                                     varCnfUp,
-                                     axis=1)
+    # Lower bound of confidence interval of relative peak position:
+    aryPeakSemiCnf[0, idxIn] = np.percentile(lstPeakSemi[idxIn],
+                                             varCnfLw,
+                                             axis=0)
+    # Upper bound of confidence interval of relative peak position:
+    aryPeakSemiCnf[1, idxIn] = np.percentile(lstPeakSemi[idxIn],
+                                             varCnfUp,
+                                             axis=0)
 
 
 # ----------------------------------------------------------------------------
 # *** Plot peak of response at half maximum contrast
 
-aryPeakHlfMaxCnfScld = np.zeros(aryPeakHlfMaxCnf.shape)
+print('---Plotting results')
 
-# Error bars are plotted as deviation from mean, so we have take difference
-# between mean and confidence interval, separately for the ROIs:
+# Error bars are plotted as deviation from mean, so we have to take the
+# difference between mean and confidence interval, separately for the ROIs:
+aryPeakHlfMaxCnfScld = np.zeros(aryPeakHlfMaxCnf.shape)
 for idxIn in range(0, varNumIn):
     aryPeakHlfMaxCnfScld[:, idxIn] = np.subtract(aryPeakHlfMaxCnf[:, idxIn],
                                                  vecPeakHlfMaxMed[idxIn])
+# The error bars need the absolute deviation as input:
+aryPeakHlfMaxCnfScld = np.absolute(aryPeakHlfMaxCnfScld)
+
+#for idx01 in range(0, aryPeakHlfMaxCnfScld.shape[0]):
+#    for idx02 in range(0, aryPeakHlfMaxCnfScld.shape[1]):
+#        varTmp = aryPeakHlfMaxCnfScld[idx01, idx02]
+#        # if np.less(np.absolute(varTmp), 0.01):
+#        if np.less(varTmp, 0.0):
+#            aryPeakHlfMaxCnfScld[idx01, idx02] = 0.1
+#        if np.greater(varTmp, 0.0):
+#            aryPeakHlfMaxCnfScld[idx01, idx02] = 0.2
+
+# Height of bars:
+varBarH = 0.3
+# Spacing between bars:
+varBarS = 0.2
 
 # Vector with y coordinates of the bars:
-vecBarY = np.linspace(1.0, varNumIn, num=varNumIn)
+vecBarY = np.linspace((varBarH * 0.5 + varBarS),
+                       (varBarS * varNumIn
+                        + (varBarH * (varNumIn * 0.5)
+                        + varBarH * 0.5)),
+                       num=varNumIn,
+                       endpoint=True)
 
 # Figure dimensions:
 varSizeX = 700.0
-varSizeY = 400.0
+varSizeY = 300.0
 
 # Create plot:
 fig01 = plt.figure(figsize=((varSizeX * 0.5) / varDpi,
@@ -312,16 +350,16 @@ axs01 = fig01.add_subplot(111)
 
 plt01 = axs01.barh(vecBarY,
                    vecPeakHlfMaxMed,
-                   height=0.8,
-                   color=(0.3, 0.3, 0.8),
+                   height=varBarH,
+                   color=(0.1, 0.4, 0.9),
+                   align='center',
                    tick_label=dicPthDpth.keys(),
-                   yerr=aryPeakHlfMaxCnfScld)
-
-#plt01 = axs01.boxplot(aryPeakHlfMax.T,
-#                      vert=False,
-#                      whis=[varCnfLw, varCnfUp],
-#                      labels=dicPthDpth.keys(),
-#                      widths=0.5)
+                   xerr=aryPeakHlfMaxCnfScld,
+                   error_kw=dict(elinewidth=2.5,
+                                 capsize=0.0,
+                                 capthick=0.0,
+                                 ecolor=(0.05, 0.05, 0.05))
+                   )
 
 # Reduce framing box:
 axs01.spines['top'].set_visible(False)
@@ -330,18 +368,18 @@ axs01.spines['bottom'].set_visible(True)
 axs01.spines['left'].set_visible(True)
 
 # Set x-axis range:
-axs01.set_xlim([-0.05, 1.05])
+axs01.set_xlim([0.0, 1.0])
 # Set y-axis range:
-axs01.set_ylim([0.9, (varNumIn + 0.1)])
+axs01.set_ylim([0.0, (varNumIn * (varBarH + varBarS) + varBarS)])
 
 # Which x values to label with ticks (WM & CSF boundary):
-axs01.set_xticks([0.0, 1.0])
+axs01.set_xticks([0.05, 0.95])
 
 # Set tick labels for x ticks:
 axs01.set_xticklabels(['WM', 'CSF'])
 
 # Title:
-axs01.set_title('Half maximum response peak', fontsize=14)
+axs01.set_title('Peak of response at 50% contrast', fontsize=14)
 
 # Make plot & axis labels fit into figure:
 plt.tight_layout(pad=0.5)
@@ -358,21 +396,91 @@ fig01.savefig((strPthOt + '_' + strFunc + '_half_max_response_box.png'),
 plt.close(fig01)
 
 
+# ----------------------------------------------------------------------------
+# *** Plot peak of semisaturation contrast
 
+# Error bars are plotted as deviation from mean, so we have to take the
+# difference between mean and confidence interval, separately for the ROIs:
+aryPeakSemiCnfScld = np.zeros(aryPeakSemiCnf.shape)
+for idxIn in range(0, varNumIn):
+    aryPeakSemiCnfScld[:, idxIn] = np.subtract(aryPeakSemiCnf[:, idxIn],
+                                               vecPeakSemiMed[idxIn])
+# The error bars need the absolute deviation as input:
+aryPeakSemiCnfScld = np.absolute(aryPeakSemiCnfScld)
 
+# Height of bars:
+varBarH = 0.3
+# Spacing between bars:
+varBarS = 0.2
 
+# Vector with y coordinates of the bars:
+vecBarY = np.linspace((varBarH * 0.5 + varBarS),
+                       (varBarS * varNumIn
+                        + (varBarH * (varNumIn * 0.5)
+                        + varBarH * 0.5)),
+                       num=varNumIn,
+                       endpoint=True)
 
+# Figure dimensions:
+varSizeX = 700.0
+varSizeY = 300.0
 
+# Create plot:
+fig01 = plt.figure(figsize=((varSizeX * 0.5) / varDpi,
+                            (varSizeY * 0.5) / varDpi),
+                   dpi=varDpi)
+axs01 = fig01.add_subplot(111)
 
+plt01 = axs01.barh(vecBarY,
+                   vecPeakSemiMed,
+                   height=varBarH,
+                   color=(0.1, 0.4, 0.9),
+                   align='center',
+                   tick_label=dicPthDpth.keys(),
+                   xerr=aryPeakSemiCnfScld,
+                   error_kw=dict(elinewidth=2.5,
+                                 capsize=0.0,
+                                 capthick=0.0,
+                                 ecolor=(0.05, 0.05, 0.05))
+                   )
 
+# Reduce framing box:
+axs01.spines['top'].set_visible(False)
+axs01.spines['right'].set_visible(False)
+axs01.spines['bottom'].set_visible(True)
+axs01.spines['left'].set_visible(True)
 
+# Set x-axis range:
+axs01.set_xlim([0.0, 1.0])
+# Set y-axis range:
+axs01.set_ylim([0.0, (varNumIn * (varBarH + varBarS) + varBarS)])
 
+# Which x values to label with ticks (WM & CSF boundary):
+axs01.set_xticks([0.05, 0.95])
+
+# Set tick labels for x ticks:
+axs01.set_xticklabels(['WM', 'CSF'])
+
+# Title:
+axs01.set_title('Peak of semisaturation contrast', fontsize=14)
+
+# Make plot & axis labels fit into figure:
+plt.tight_layout(pad=0.5)
+
+# Save figure:
+fig01.savefig((strPthOt + '_' + strFunc + '_semisaturationcontrast_box.png'),
+              dpi=(varDpi * 2.0),
+              facecolor='w',
+              edgecolor='w',
+              transparent=False,
+              frameon=None)
+
+# Close figure:
+plt.close(fig01)
 
 
 # ------------------------------------------------------------------------
 # *** Plot contrast response functions
-
-print('---Plotting results')
 
 # Vector for which the function has been fitted:
 vecMdlX = np.linspace(varXmin, varXmax, num=varNumX, endpoint=True)
@@ -469,7 +577,7 @@ funcPltAcrDpth(aryHlfMaxMne,       # aryData[Condition, Depth]
                dicPthDpth.keys(),  # Labels for conditions (separate lines)
                strXlabel,          # Label on x axis
                strYlabel,          # Label on y axis
-               'Response at half maximum contrast',  # Figure title
+               'Response at 50% contrast',  # Figure title
                True,               # Boolean: whether to plot a legend
                (strPthOt + '_' + strFunc + '_half_max_response.png'),
                varSizeX=2000.0,
@@ -612,7 +720,7 @@ axs01 = fig01.add_subplot(111)
 plt01 = axs01.bar(vecBarX,
                   aryResMne04,
                   width=0.8,
-                  color=(0.3, 0.3, 0.8),
+                  color=(0.1, 0.4, 0.9),
                   tick_label=dicPthDpth.keys(),
                   yerr=aryResCnf04)
 

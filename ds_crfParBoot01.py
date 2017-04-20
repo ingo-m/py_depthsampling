@@ -22,7 +22,8 @@ import multiprocessing as mp
 from ds_crfParBoot02 import crf_par_02
 
 
-def crf_par_01(lstDpth, vecEmpX, varNumIt=1000, varPar=10, varNumX=1000):
+def crf_par_01(lstDpth, vecEmpX, strFunc='power', varNumIt=1000, varPar=10,
+               varNumX=1000):
     """
     Parallelised bootstrapping of contrast response function, level 1.
 
@@ -35,6 +36,9 @@ def crf_par_01(lstDpth, vecEmpX, varNumIt=1000, varPar=10, varNumX=1000):
         Empirical x-values at which model will be fitted (e.g. stimulus
         contrast levels at which stimuli were presented), of the form
         vecEmpX[idxCon].
+    strFunc : str
+        Which contrast response function to fit. 'power' for power function, or
+        'hyper' for hyperbolic ratio function.
     varNumIt : int
         Number of bootstrapping iterations (i.e. how many times to sample).
     varPar : int
@@ -130,6 +134,7 @@ def crf_par_01(lstDpth, vecEmpX, varNumIt=1000, varPar=10, varNumX=1000):
                                     args=(idxPrc,
                                           lstDpth,
                                           vecEmpX,
+                                          strFunc,
                                           lstRnd[idxPrc],
                                           varNumX,
                                           queOut))

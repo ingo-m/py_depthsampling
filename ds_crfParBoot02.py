@@ -21,7 +21,7 @@ import numpy as np
 from ds_crfFit import crf_fit
 
 
-def crf_par_02(idxPrc, lstDpth, vecEmpX, aryRnd, varNumX, queOut):
+def crf_par_02(idxPrc, lstDpth, vecEmpX, strFunc, aryRnd, varNumX, queOut):
     """
     Parallelised bootstrapping of contrast response function, level 2.
 
@@ -37,6 +37,9 @@ def crf_par_02(idxPrc, lstDpth, vecEmpX, aryRnd, varNumX, queOut):
         Empirical x-values at which model will be fitted (e.g. stimulus
         contrast levels at which stimuli were presented), of the form
         vecEmpX[idxCon].
+    strFunc : str
+        Which contrast response function to fit. 'power' for power function, or
+        'hyper' for hyperbolic ratio function.
     aryRnd : np.array
         Array with randomised subject indicies for bootstrapping of the form
         aryRnd[idxIteration, varNumSamples]. Each row includes the indicies of

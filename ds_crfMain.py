@@ -43,9 +43,14 @@ from ds_findPeak import find_peak
 # Use existing bootstrap or create new one('load' or 'create')?
 strSwitch = 'load'
 
+# Corrected or  uncorrected depth profiles?
+strCrct = 'corrected'
+
 # Pickle to load bootstrap from / save bootstrap to:
-strPthPkl = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/bootstrap_uncorrected.pickle'  #noqa
-# strPthPkl = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/bootstrap_corrected.pickle'  #noqa
+if strCrct == 'uncorrected':
+    strPthPkl = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/bootstrap_uncorrected_power.pickle'  #noqa
+if strCrct == 'corrected':
+    strPthPkl = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/bootstrap_corrected_power.pickle'  #noqa
 
 # Pickle file to load bootstrapping results from
 
@@ -54,10 +59,12 @@ strPthPkl = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/bootstrap_un
 strFunc = 'power'
 
 # Path of draining-corrected depth-profiles:
-dicPthDpth = {'V1': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy',  #noqa
-              'V2': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2.npy'}  #noqa
-# dicPthDpth = {'V1': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected.npy',  #noqa
-#               'V2': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2_corrected.npy'}  #noqa
+if strCrct == 'uncorrected':
+    dicPthDpth = {'V1': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy',  #noqa
+                  'V2': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2.npy'}  #noqa
+if strCrct == 'corrected':
+    dicPthDpth = {'V1': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected.npy',  #noqa
+                  'V2': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2_corrected.npy'}  #noqa
 
 # Stimulus luminance contrast levels. NOTE: Should be between zero and one.
 # When using percent (i.e. from zero to 100), the search for the luminance at
@@ -65,8 +72,10 @@ dicPthDpth = {'V1': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.n
 vecEmpX = np.array([0.025, 0.061, 0.163, 0.72])
 
 # Output path for plot:
-strPthOt = '/home/john/PhD/Tex/contrast_response_boot/combined_uncorrected/crf'  #noqa
-# strPthOt = '/home/john/PhD/Tex/contrast_response_boot/combined_corrected/crf'  #noqa
+if strCrct == 'uncorrected':
+    strPthOt = '/home/john/PhD/Tex/contrast_response_boot/combined_uncorrected/crf'  #noqa
+if strCrct == 'corrected':
+    strPthOt = '/home/john/PhD/Tex/contrast_response_boot/combined_corrected/crf'  #noqa
 
 # Limits of x-axis for contrast response plots
 varXmin = 0.0
@@ -81,7 +90,7 @@ strLblX = 'Luminance contrast'
 strLblY = 'fMRI signal change [a.u.]'
 
 # File type for CRF plots:
-strFleTyp = '.png'
+strFleTyp = '.svg'
 
 # Title for contrast response plots
 strTtle = ''
@@ -154,6 +163,7 @@ elif strSwitch == 'create':
 
     aryMdlY, aryHlfMax, arySemi, aryRes = crf_par_01(lstDpth,
                                                      vecEmpX,
+                                                     strFunc=strFunc,
                                                      varNumIt=varNumIt,
                                                      varPar=varPar,
                                                      varNumX=varNumX)
@@ -379,7 +389,8 @@ axs01.set_title('Peak of response at 50% contrast', fontsize=14)
 plt.tight_layout(pad=0.5)
 
 # Save figure:
-fig01.savefig((strPthOt + '_' + strFunc + '_half_max_response_box.png'),
+fig01.savefig((strPthOt + '_' + strFunc + '_half_max_response_box'
+               + strFleTyp),
               dpi=(varDpi * 2.0),
               facecolor='w',
               edgecolor='w',
@@ -461,7 +472,8 @@ axs01.set_title('Peak of semisaturation contrast', fontsize=14)
 plt.tight_layout(pad=0.5)
 
 # Save figure:
-fig01.savefig((strPthOt + '_' + strFunc + '_semisaturationcontrast_box.png'),
+fig01.savefig((strPthOt + '_' + strFunc + '_semisaturationcontrast_box'
+               + strFleTyp),
               dpi=(varDpi * 2.0),
               facecolor='w',
               edgecolor='w',
@@ -576,7 +588,7 @@ funcPltAcrDpth(aryHlfMaxMne,       # aryData[Condition, Depth]
                strYlabel,          # Label on y axis
                'Response at 50% contrast',  # Figure title
                True,               # Boolean: whether to plot a legend
-               (strPthOt + '_' + strFunc + '_half_max_response.png'),
+               (strPthOt + '_' + strFunc + '_half_max_response' + strFleTyp),
                varSizeX=2000.0,
                varSizeY=1400.0,
                aryCnfLw=aryHlfMaxCnfLw,
@@ -613,7 +625,8 @@ funcPltAcrDpth(arySemiMne,         # aryData[Condition, Depth]
                strYlabel,          # Label on y axis
                'Semisaturation contrast',  # Figure title
                True,               # Boolean: whether to plot a legend
-               (strPthOt + '_' + strFunc + '_semisaturationcontrast.png'),
+               (strPthOt + '_' + strFunc + '_semisaturationcontrast'
+                + strFleTyp),
                aryClr=aryClr,
                varSizeX=2000.0,
                varSizeY=1400.0,
@@ -658,7 +671,7 @@ funcPltAcrDpth(aryResMne02,        # aryData[Condition, Depth]
                strYlabel,          # Label on y axis
                'Model fit across cortical depth',  # Figure title
                True,               # Boolean: whether to plot a legend
-               (strPthOt + '_' + strFunc + '_modelfit.png'),
+               (strPthOt + '_' + strFunc + '_modelfit' + strFleTyp),
                aryCnfLw=aryResCnfLw02,
                aryCnfUp=aryResCnfUp02)
 
@@ -742,7 +755,7 @@ axs01.set_title('Model fit', fontsize=14)
 plt.tight_layout(pad=0.5)
 
 # Save figure:
-fig01.savefig((strPthOt + '_' + strFunc + '_modelfit_bars.png'),
+fig01.savefig((strPthOt + '_' + strFunc + '_modelfit_bars' + strFleTyp),
               dpi=(varDpi * 2.0),
               facecolor='w',
               edgecolor='w',

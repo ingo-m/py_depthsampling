@@ -58,12 +58,13 @@ def crf_par_02(idxPrc, lstDpth, vecEmpX, aryRnd, varNumX, queOut):
         Fitted y-values (predicted response based on CRF model), of the form
         aryMdlY[idxRoi, idxIteration, idxDpt, idxContrast]
     aryHlfMax : np.array
-        Predicted response at 50% contrast based on CRF model. Array of the
-        form aryHlfMax[idxRoi, idxIteration, idxDpt].
+        Predicted response at 50 percent contrast based on CRF model. Array of
+        the form aryHlfMax[idxRoi, idxIteration, idxDpt].
     arySemi : np.array
-        Semisaturation contrast (predicted contrast needed to elicit 50% of
-        the response amplitude that would be expected with a 100% contrast
-        stimulus). Array of the form arySemi[idxRoi, idxIteration, idxDpt].
+        Semisaturation contrast (predicted contrast needed to elicit 50 percent
+        of the response amplitude that would be expected with a 100 percent
+        contrast stimulus). Array of the form
+        arySemi[idxRoi, idxIteration, idxDpt].
     aryRes : np.array
         Residual variance at empirical contrast levels. Array of the form
         aryRes[idxRoi, idxIteration, idxCondition, idxDpt].
@@ -73,7 +74,7 @@ def crf_par_02(idxPrc, lstDpth, vecEmpX, aryRnd, varNumX, queOut):
     This function is supposed to be called in parallel, using the
     multiprocessing module. This function calls a function which performs
     the actual least squares fitting.
-    
+
     Function of the depth sampling pipeline.
     """
     # ----------------------------------------------------------------------------

@@ -122,7 +122,7 @@ print('-CRF fitting')
 varNumIn = len(dicPthDpth.values())
 
 if strSwitch == 'load':
-    
+
     print('---Loading bootstrapping results from pickle')
 
     # Load previously prepared pickle:
@@ -316,15 +316,6 @@ for idxIn in range(0, varNumIn):
 # The error bars need the absolute deviation as input:
 aryPeakHlfMaxCnfScld = np.absolute(aryPeakHlfMaxCnfScld)
 
-#for idx01 in range(0, aryPeakHlfMaxCnfScld.shape[0]):
-#    for idx02 in range(0, aryPeakHlfMaxCnfScld.shape[1]):
-#        varTmp = aryPeakHlfMaxCnfScld[idx01, idx02]
-#        # if np.less(np.absolute(varTmp), 0.01):
-#        if np.less(varTmp, 0.0):
-#            aryPeakHlfMaxCnfScld[idx01, idx02] = 0.1
-#        if np.greater(varTmp, 0.0):
-#            aryPeakHlfMaxCnfScld[idx01, idx02] = 0.2
-
 # Height of bars:
 varBarH = 0.3
 # Spacing between bars:
@@ -332,11 +323,10 @@ varBarS = 0.2
 
 # Vector with y coordinates of the bars:
 vecBarY = np.linspace((varBarH * 0.5 + varBarS),
-                       (varBarS * varNumIn
-                        + (varBarH * (varNumIn * 0.5)
-                        + varBarH * 0.5)),
-                       num=varNumIn,
-                       endpoint=True)
+                      (varBarS * varNumIn
+                       + (varBarH * (varNumIn * 0.5) + varBarH * 0.5)),
+                      num=varNumIn,
+                      endpoint=True)
 
 # Figure dimensions:
 varSizeX = 700.0
@@ -415,11 +405,10 @@ varBarS = 0.2
 
 # Vector with y coordinates of the bars:
 vecBarY = np.linspace((varBarH * 0.5 + varBarS),
-                       (varBarS * varNumIn
-                        + (varBarH * (varNumIn * 0.5)
-                        + varBarH * 0.5)),
-                       num=varNumIn,
-                       endpoint=True)
+                      (varBarS * varNumIn
+                       + (varBarH * (varNumIn * 0.5) + varBarH * 0.5)),
+                      num=varNumIn,
+                      endpoint=True)
 
 # Figure dimensions:
 varSizeX = 700.0

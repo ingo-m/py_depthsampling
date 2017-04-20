@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Function of the depth sampling pipeline.
-
-@author: Ingo Marquardt, 07.04.2017
-"""
+"""Function of the depth sampling pipeline."""
 
 # Part of py_depthsampling library
 # Copyright (C) 2017  Ingo Marquardt

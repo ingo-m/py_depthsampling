@@ -20,8 +20,8 @@
 import numpy as np
 from scipy.interpolate import interp1d
 from scipy.ndimage.filters import gaussian_filter1d
-
 from scipy.signal import argrelextrema
+
 
 def find_peak(aryDpth, varNumIntp=100, varSd=0.05):
     """
@@ -55,7 +55,7 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05):
     Depth profiles are upsampled and smoothed with a Gaussian kernel. The peak
     is defined as the maximum of the first derivative of the interpoalted,
     smoothed depth profile.
-    
+
     Function of the depth sampling pipeline.
     """
     # Identify number of depth levels:
@@ -97,10 +97,10 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05):
     # was identified, the second with the indicies of the peak - we are only
     # interested in the second array):
     vecPeak = argrelextrema(aryDpthSmth,
-                             np.greater,
-                             axis=1,
-                             order=varNumOrd,
-                             mode='clip')[1]
+                            np.greater,
+                            axis=1,
+                            order=varNumOrd,
+                            mode='clip')[1]
 
     # Number of cases (i.e. bootstrap iterations):
     varNumIt = aryDpth.shape[0]

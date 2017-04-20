@@ -45,6 +45,7 @@ strSwitch = 'load'
 
 # Pickle to load bootstrap from / save bootstrap to:
 strPthPkl = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/bootstrap_uncorrected.pickle'  #noqa
+# strPthPkl = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/bootstrap_corrected.pickle'  #noqa
 
 # Pickle file to load bootstrapping results from
 
@@ -55,6 +56,8 @@ strFunc = 'power'
 # Path of draining-corrected depth-profiles:
 dicPthDpth = {'V1': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy',  #noqa
               'V2': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2.npy'}  #noqa
+# dicPthDpth = {'V1': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected.npy',  #noqa
+#               'V2': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2_corrected.npy'}  #noqa
 
 # Stimulus luminance contrast levels. NOTE: Should be between zero and one.
 # When using percent (i.e. from zero to 100), the search for the luminance at
@@ -63,6 +66,7 @@ vecEmpX = np.array([0.025, 0.061, 0.163, 0.72])
 
 # Output path for plot:
 strPthOt = '/home/john/PhD/Tex/contrast_response_boot/combined_uncorrected/crf'  #noqa
+# strPthOt = '/home/john/PhD/Tex/contrast_response_boot/combined_corrected/crf'  #noqa
 
 # Limits of x-axis for contrast response plots
 varXmin = 0.0
@@ -195,8 +199,8 @@ arySemiSCnfUp = np.zeros((varNumIn, varNumDpt))
 # Loop through ROIs (i.e. V1 and V2):
 for idxIn in range(0, varNumIn):
 
-    # Mean modelled y-values:
-    aryMdlYMne[idxIn, :, :] = np.mean(aryMdlY[idxIn, :, :, :], axis=0)
+    # Median modelled y-values:
+    aryMdlYMne[idxIn, :, :] = np.median(aryMdlY[idxIn, :, :, :], axis=0)
     # Confidence interval:
     aryMdlYCnfLw[idxIn, :, :] = np.percentile(aryMdlY[idxIn, :, :, :],
                                               varCnfLw,
@@ -205,8 +209,8 @@ for idxIn in range(0, varNumIn):
                                               varCnfUp,
                                               axis=0)
 
-    # Mean response at half-maximum contrast:
-    aryHlfMaxMne[idxIn, :] = np.mean(aryHlfMax[idxIn, :, :], axis=0)
+    # Median response at half-maximum contrast:
+    aryHlfMaxMne[idxIn, :] = np.median(aryHlfMax[idxIn, :, :], axis=0)
     # Confidence interval:
     aryHlfMaxCnfLw[idxIn, :] = np.percentile(aryHlfMax[idxIn, :, :],
                                              varCnfLw,
@@ -215,8 +219,8 @@ for idxIn in range(0, varNumIn):
                                              varCnfUp,
                                              axis=0)
 
-    # Mean semi-saturation contrast:
-    arySemiMne[idxIn, :] = np.mean(arySemi[idxIn, :, :], axis=0)
+    # Median semi-saturation contrast:
+    arySemiMne[idxIn, :] = np.median(arySemi[idxIn, :, :], axis=0)
     # Confidence interval:
     arySemiSCnfLw[idxIn, :] = np.percentile(arySemi[idxIn, :, :],
                                             varCnfLw,
@@ -317,7 +321,7 @@ for idxIn in range(0, varNumIn):
 aryPeakHlfMaxCnfScld = np.absolute(aryPeakHlfMaxCnfScld)
 
 # Height of bars:
-varBarH = 0.3
+varBarH = 0.35
 # Spacing between bars:
 varBarS = 0.2
 
@@ -341,21 +345,21 @@ axs01 = fig01.add_subplot(111)
 plt01 = axs01.barh(vecBarY,
                    vecPeakHlfMaxMed,
                    height=varBarH,
-                   color=(0.1, 0.4, 0.9),
+                   color=(0.1, 0.5, 0.75),
                    align='center',
                    tick_label=dicPthDpth.keys(),
                    xerr=aryPeakHlfMaxCnfScld,
                    error_kw=dict(elinewidth=2.5,
                                  capsize=0.0,
                                  capthick=0.0,
-                                 ecolor=(0.05, 0.05, 0.05))
+                                 ecolor=(0.1, 0.1, 0.1))
                    )
 
 # Reduce framing box:
-axs01.spines['top'].set_visible(False)
-axs01.spines['right'].set_visible(False)
-axs01.spines['bottom'].set_visible(True)
-axs01.spines['left'].set_visible(True)
+# axs01.spines['top'].set_visible(False)
+# axs01.spines['right'].set_visible(False)
+# axs01.spines['bottom'].set_visible(True)
+# axs01.spines['left'].set_visible(True)
 
 # Set x-axis range:
 axs01.set_xlim([0.0, 1.0])
@@ -399,7 +403,7 @@ for idxIn in range(0, varNumIn):
 aryPeakSemiCnfScld = np.absolute(aryPeakSemiCnfScld)
 
 # Height of bars:
-varBarH = 0.3
+varBarH = 0.35
 # Spacing between bars:
 varBarS = 0.2
 
@@ -423,21 +427,21 @@ axs01 = fig01.add_subplot(111)
 plt01 = axs01.barh(vecBarY,
                    vecPeakSemiMed,
                    height=varBarH,
-                   color=(0.1, 0.4, 0.9),
+                   color=(0.1, 0.5, 0.75),
                    align='center',
                    tick_label=dicPthDpth.keys(),
                    xerr=aryPeakSemiCnfScld,
                    error_kw=dict(elinewidth=2.5,
                                  capsize=0.0,
                                  capthick=0.0,
-                                 ecolor=(0.05, 0.05, 0.05))
+                                 ecolor=(0.1, 0.1, 0.1))
                    )
 
 # Reduce framing box:
-axs01.spines['top'].set_visible(False)
-axs01.spines['right'].set_visible(False)
-axs01.spines['bottom'].set_visible(True)
-axs01.spines['left'].set_visible(True)
+# axs01.spines['top'].set_visible(False)
+# axs01.spines['right'].set_visible(False)
+# axs01.spines['bottom'].set_visible(True)
+# axs01.spines['left'].set_visible(True)
 
 # Set x-axis range:
 axs01.set_xlim([0.0, 1.0])
@@ -516,8 +520,12 @@ for idxIn in range(0, varNumIn):
         # Title for current CRF plot:
         strTtleTmp = (strTtle
                       + dicPthDpth.keys()[idxIn]
-                      + ' , depth level: '
-                      + str(idxDpt))
+                      + ', depth level: '
+                      + str(np.around(np.divide(np.float64(idxDpt),
+                                                np.float64(varNumDpt - 1)),
+                                      decimals=1)
+                            )
+                      )
 
         # Output path for current plot:
         strPthOtTmp = (strPthOt
@@ -584,9 +592,9 @@ strYlabel = 'Percent luminance contrast'
 
 # Convert contrast values to percent (otherwise rounding will be a problem for
 # y-axis values):
-arySemiMne = np.multiply(arySemiMne, 100.0)
-arySemiSCnfLw = np.multiply(arySemiSCnfLw, 100.0)
-arySemiSCnfUp = np.multiply(arySemiSCnfUp, 100.0)
+# arySemiMne = np.multiply(arySemiMne, 100.0)
+# arySemiSCnfLw = np.multiply(arySemiSCnfLw, 100.0)
+# arySemiSCnfUp = np.multiply(arySemiSCnfUp, 100.0)
 
 # Line colours:
 aryClr = np.array([[0.2, 0.2, 0.9],
@@ -598,8 +606,8 @@ funcPltAcrDpth(arySemiMne,         # aryData[Condition, Depth]
                varNumIn,           # Number of conditions (separate lines)
                varDpi,             # Resolution of the output figure
                0.0,                # Minimum of Y axis
-               15.0,               # Maximum of Y axis
-               False,              # Boolean: whether to convert y axis to %
+               0.25,               # Maximum of Y axis
+               True,              # Boolean: whether to convert y axis to %
                dicPthDpth.keys(),  # Labels for conditions (separate lines)
                strXlabel,          # Label on x axis
                strYlabel,          # Label on y axis
@@ -609,7 +617,7 @@ funcPltAcrDpth(arySemiMne,         # aryData[Condition, Depth]
                aryClr=aryClr,
                varSizeX=2000.0,
                varSizeY=1400.0,
-               varNumLblY=4,
+               varNumLblY=6,
                aryCnfLw=arySemiSCnfLw,
                aryCnfUp=arySemiSCnfUp)
 
@@ -709,7 +717,7 @@ axs01 = fig01.add_subplot(111)
 plt01 = axs01.bar(vecBarX,
                   aryResMne04,
                   width=0.8,
-                  color=(0.1, 0.4, 0.9),
+                  color=(0.1, 0.5, 0.75),
                   tick_label=dicPthDpth.keys(),
                   yerr=aryResCnf04)
 

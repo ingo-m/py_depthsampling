@@ -41,6 +41,9 @@ def crf_fit(vecEmpX,  #noqa
     aryEmpY : np.array
         Empirical y-values to fit (e.g. measured response), of the form
         aryEmpY[idxSub, idxCon]
+    strFunc : str
+        Which function to fit ('power' for power function, 'hyper' for
+        hyperbolic ratio). See respective module for more details.
     varNumX : int
         Number of x-values for which to solve the function when calculating
         model fit.
@@ -48,9 +51,6 @@ def crf_fit(vecEmpX,  #noqa
         Minimum x-value for which function will be fitted.
     varXmax : float
         Maximum x-value for which function will be fitted.
-    strFunc : str
-        Which function to fit ('power' for power function, 'hyper' for
-        hyperbolic ratio). See respective module for more details.
 
     Returns
     -------

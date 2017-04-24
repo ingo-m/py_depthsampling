@@ -190,7 +190,7 @@ def crf_par_02(idxPrc, lstDpth, vecEmpX, strFunc, aryRnd, varNumX, queOut):
                  arySemi[idxIn, idxIt, idxDpt],
                  aryRes[idxIn, idxIt, :, idxDpt]) = crf_fit(vecEmpX,
                                                             aryEmpY,
-                                                            strFunc='power',
+                                                            strFunc=strFunc,
                                                             varNumX=varNumX,
                                                             varXmin=0.0,
                                                             varXmax=1.0)

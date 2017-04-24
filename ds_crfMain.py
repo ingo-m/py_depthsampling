@@ -31,6 +31,7 @@ each subject individually).
 import cPickle as pickle
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.stats import ttest_rel
 from ds_crfParBoot01 import crf_par_01
 from ds_pltAcrDpth import funcPltAcrDpth
 from ds_crfPlot import plt_crf
@@ -687,6 +688,18 @@ funcPltAcrDpth(aryResMne02,        # aryData[Condition, Depth]
 # Mean residuals across conditions and depth levels (needed to calculate
 # confidence intervals):
 aryResMne03 = np.mean(aryRes, axis=(2, 3))
+
+print('---T-test for difference in residual variance of the CRF model '
+      + 'between V1 and V2')
+# Paired samples t-test for a difference in residual variance between V1 and
+# V2. The same bootstrapped samples were used for V1 and V2. We compare the
+# residual variance between V1 and V2 in across (paired) bootstrap iterations,
+# therefore the paired samples t-test is appropriate.
+varT, varP = ttest_rel(aryResMne03[1, :],
+                       aryResMne03[0, :])
+print('------t-statistic: ' + str(np.around(varT, decimals=3)))
+print('------p-value:     ' + str(np.around(varP, decimals=5)))
+
 # Confidence interval - we are interested in the variability across
 # iterations, not across conditions and/or depth levels, therefore we
 # calculate the confidence interval based on the mean across conditions and

@@ -40,10 +40,11 @@ def funcPltAcrDpth(aryData,     # Data to be plotted: aryData[Condition, Depth]
                    strTitle,    # Figure title
                    lgcLgnd,     # Boolean: whether to plot a legend
                    strPath,     # Output path for the figure
-                   varSizeX=1800.0,  # Figure x dimension
-                   varSizeY=1600.0,  # Figure y dimension
-                   varNumLblY=5,
-                   aryClr=None,      # Line colours aryClr[idxCon, RGB]
+                   varSizeX=1800.0,     # Figure x dimension
+                   varSizeY=1600.0,     # Figure y dimension
+                   varNumLblY=5,        # Number of labels on y axis
+                   varPadY=(0.0, 0.0),  # Padding around labelled values on y
+                   aryClr=None,         # Line colours aryClr[idxCon, RGB]
                    aryCnfLw=None,
                    aryCnfUp=None):
     """
@@ -119,7 +120,8 @@ def funcPltAcrDpth(aryData,     # Data to be plotted: aryData[Condition, Depth]
     # Set x-axis range:
     axs01.set_xlim([-0.2, (varNumDpth - 0.8)])
     # Set y-axis range:
-    axs01.set_ylim([varYmin, varYmax])
+    axs01.set_ylim([(varYmin - varPadY[0]),
+                    (varYmax + varPadY[1])])
 
     # Which x values to label with ticks (WM & CSF boundary):
     axs01.set_xticks([-0.1, (varNumDpth - 0.9)])
@@ -131,9 +133,9 @@ def funcPltAcrDpth(aryData,     # Data to be plotted: aryData[Condition, Depth]
 
     # Which y values to label with ticks:
     vecYlbl = np.linspace(varYmin, varYmax, num=varNumLblY, endpoint=True)
-    # vecYlbl = np.arange(varYmin, varYmax, 0.02)
     # Round:
     # vecYlbl = np.around(vecYlbl, decimals=2)
+
     # Set ticks:
     axs01.set_yticks(vecYlbl)
     # Convert labels to percent?

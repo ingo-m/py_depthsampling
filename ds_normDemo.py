@@ -42,10 +42,10 @@ varBumpAmp = 1.0
 varBumpWidth = 8.0
 
 # Figure scaling factor:
-varDpi = 75.0
+varDpi = 80.0
 
 # Output folder:
-strPthOt = '/home/john/Desktop/dpthPltScling/plots/'
+strPthOt = '/home/john/PhD/Tex/dpth_norm_demo/plots/'
 # -----------------------------------------------------------------------------
 
 
@@ -69,94 +69,97 @@ arySin = np.multiply(arySin, varBumpAmp)
 # -----------------------------------------------------------------------------
 # *** Create condition profiles
 
+# Create linear & sinusoidal components
+
 # Linear & sinusiodal term additive:
-aryTmp01 = np.add(np.add(aryLin, 0.0),
-                  np.add(arySin, 0.0))
-aryTmp02 = np.add(np.add(aryLin, 1.0),
-                  np.add(arySin, 1.0))
-aryTmp03 = np.add(np.add(aryLin, 2.0),
-                  np.add(arySin, 2.0))
-aryTmp04 = np.add(np.add(aryLin, 3.0),
-                  np.add(arySin, 3.0))
-aryDemoAdd = np.vstack((aryTmp01,
-                        aryTmp02,
-                        aryTmp03,
-                        aryTmp04))
-# aryDemoAdd = aryDemoAdd.T
+aryDemoAddLin = np.array((np.add(aryLin, 0.0),
+                          np.add(aryLin, 1.0),
+                          np.add(aryLin, 2.0),
+                          np.add(aryLin, 3.0)))
+aryDemoAddSin = np.array((np.add(arySin, 0.0),
+                          np.add(arySin, 1.0),
+                          np.add(arySin, 2.0),
+                          np.add(arySin, 3.0)))
 
 # Linear & sinusiodal term multiplicative:
-aryTmp01 = np.add(np.multiply(aryLin, 1.0),
-                  np.multiply(arySin, 1.0))
-aryTmp02 = np.add(np.multiply(aryLin, 2.0),
-                  np.multiply(arySin, 2.0))
-aryTmp03 = np.add(np.multiply(aryLin, 3.0),
-                  np.multiply(arySin, 3.0))
-aryTmp04 = np.add(np.multiply(aryLin, 4.0),
-                  np.multiply(arySin, 4.0))
-aryDemoMul = np.vstack((aryTmp01,
-                        aryTmp02,
-                        aryTmp03,
-                        aryTmp04))
-# aryDemoMul = aryDemoMul.T
+aryDemoMulLin = np.array((np.multiply(aryLin, 1.0),
+                          np.multiply(aryLin, 2.0),
+                          np.multiply(aryLin, 3.0),
+                          np.multiply(aryLin, 4.0)))
+aryDemoMulSin = np.array((np.multiply(arySin, 1.0),
+                          np.multiply(arySin, 2.0),
+                          np.multiply(arySin, 3.0),
+                          np.multiply(arySin, 4.0)))
 
 # Linear is additive, sinusoidal is multiplicative:
-aryTmp01 = np.add(np.add(aryLin, 0.0),
-                  np.multiply(arySin, 1.0))
-aryTmp02 = np.add(np.add(aryLin, 1.0),
-                  np.multiply(arySin, 2.0))
-aryTmp03 = np.add(np.add(aryLin, 2.0),
-                  np.multiply(arySin, 3.0))
-aryTmp04 = np.add(np.add(aryLin, 3.0),
-                  np.multiply(arySin, 4.0))
-aryDemoMix01 = np.vstack((aryTmp01,
-                          aryTmp02,
-                          aryTmp03,
-                          aryTmp04))
-# aryDemoMix01 = aryDemoMix01.T
+aryDemoMix01Lin = np.array((np.add(aryLin, 0.0),
+                            np.add(aryLin, 1.0),
+                            np.add(aryLin, 2.0),
+                            np.add(aryLin, 3.0)))
+aryDemoMix01Sin = np.array((np.multiply(arySin, 1.0),
+                            np.multiply(arySin, 2.0),
+                            np.multiply(arySin, 3.0),
+                            np.multiply(arySin, 4.0)))
+
 
 # Linear is multiplicative, sinusoidal is additive:
-aryTmp01 = np.add(np.multiply(aryLin, 1.0),
-                  np.add(arySin, 0.0))
-aryTmp02 = np.add(np.multiply(aryLin, 2.0),
-                  np.add(arySin, 1.0))
-aryTmp03 = np.add(np.multiply(aryLin, 3.0),
-                  np.add(arySin, 2.0))
-aryTmp04 = np.add(np.multiply(aryLin, 4.0),
-                  np.add(arySin, 3.0))
-aryDemoMix02 = np.vstack((aryTmp01,
-                          aryTmp02,
-                          aryTmp03,
-                          aryTmp04))
-# aryDemoMix02 = aryDemoMix01.T
+aryDemoMix02Lin = np.array((np.multiply(aryLin, 1.0),
+                            np.multiply(aryLin, 2.0),
+                            np.multiply(aryLin, 3.0),
+                            np.multiply(aryLin, 4.0)))
+aryDemoMix02Sin = np.array((np.add(arySin, 0.0),
+                            np.add(arySin, 1.0),
+                            np.add(arySin, 2.0),
+                            np.add(arySin, 3.0)))
 
-# Scale all profiles, so that they range from 0.5 to 3.5 (just for
-# visualisation):
-aryDemoMul = np.divide(aryDemoMul,
-                       np.multiply(np.max(aryDemoMul),
-                                   0.34))
-aryDemoAdd = np.divide(aryDemoAdd,
-                       np.multiply(np.max(aryDemoAdd),
-                                   0.34))
-aryDemoMix01 = np.divide(aryDemoMix01,
-                         np.multiply(np.max(aryDemoMix01),
-                                     0.34))
+# Put profiles into list for plotting:
+lstLin = [aryDemoAddLin, aryDemoMulLin, aryDemoMix01Lin, aryDemoMix02Lin]
+lstSin = [aryDemoAddSin, aryDemoMulSin, aryDemoMix01Sin, aryDemoMix02Sin]
 
-aryDemoMix02 = np.divide(aryDemoMix02,
-                         np.multiply(np.max(aryDemoMix02),
-                                     0.34))
 
-aryDemoMul = np.add(aryDemoMul, 0.5)
-aryDemoAdd = np.add(aryDemoAdd, 0.5)
-aryDemoMix01 = np.add(aryDemoMix01, 0.5)
-aryDemoMix02 = np.add(aryDemoMix02, 0.5)
+# Scale linear & sinusoidal components (so that final plots have comparabale
+# range):
+for idxPlt in range(len(lstLin)):
+    # Maximum of linear profiles:
+    varTmpMax = np.max(lstLin[idxPlt])
+    # Scale maximum:
+    lstLin[idxPlt] = np.multiply(np.divide(lstLin[idxPlt],
+                                           varTmpMax),
+                                 2.0)
+    # Scale minimum:
+    lstLin[idxPlt] = np.add(lstLin[idxPlt], 0.5)
+
+    # Maximum of sinusoidal profiles:
+    varTmpMax = np.max(lstSin[idxPlt])
+    # Scale maximum:
+    lstSin[idxPlt] = np.multiply(np.divide(lstSin[idxPlt],
+                                           varTmpMax),
+                                 2.0)
+    # Scale minimum:
+    lstSin[idxPlt] = np.add(lstSin[idxPlt], 0.5)
+
+# Create combined profiles from linear & sinusoidal terms:
+lstComb = [None] * len(lstLin)
+for idxPlt in range(len(lstLin)):
+    lstComb[idxPlt] = np.add(lstLin[idxPlt],
+                             lstSin[idxPlt])
+
+# Plot titles:
+lstTtl = ['Linear & sinusiodal term additive',
+          'Linear & sinusiodal term multiplicative',
+          'Linear additive, sinusoidal multiplicative',
+          'Linear multiplicative, sinusoidal additive']
 # -----------------------------------------------------------------------------
 
 
 # -----------------------------------------------------------------------------
 # *** Plot profile templates
 
+# Plot counter:
+varCnt = 1
+
 # Array with values for error bars:
-aryError = np.zeros(aryDemoAdd.shape)
+aryError = np.zeros(lstComb[0].shape)
 aryError = np.add(aryError, 0.01)
 
 # Label on x axis
@@ -177,15 +180,18 @@ funcPltAcrDpth(aryTmp,
                varNumDpth,
                1,
                (varDpi * 2.0),
-               -0.1,
-               1.1,
+               0.0,
+               1.0,
                False,
                lstConLbl,
                strXlabel,
                strYlabel,
                'Linear term',
                False,
-               (strPthOt + 'plt_01.svg'))
+               (strPthOt + 'plt_' + str(varCnt).zfill(2) + '.svg'),
+               varPadY=(0.1, 0.1))
+
+varCnt += 1
 
 # Scale sinusoidal term and add 2nd dimension:
 aryTmp = np.array([np.divide(arySin, varBumpAmp)], ndmin=2)
@@ -196,167 +202,170 @@ funcPltAcrDpth(aryTmp,
                varNumDpth,
                1,
                (varDpi * 2.0),
-               -0.1,
-               1.1,
+               0.0,
+               1.0,
                False,
                lstConLbl,
                strXlabel,
                strYlabel,
                'Sinusoidal term',
                False,
-               (strPthOt + 'plt_02.svg'))
+               (strPthOt + 'plt_' + str(varCnt).zfill(2) + '.svg'),
+               varPadY=(0.1, 0.1))
+
+varCnt += 1
 # -----------------------------------------------------------------------------
 
 
 # -----------------------------------------------------------------------------
 # *** Create plots before normalisation
 
-# Array with values for error bars:
-aryError = np.zeros(aryDemoAdd.shape)
-aryError = np.add(aryError, 0.1)
+for idxPlt in range(len(lstComb)):
 
-# Plot profiles:
-funcPltAcrDpth(aryDemoAdd,
-               aryError,
-               varNumDpth,
-               4,
-               varDpi,
-               0.0,
-               4.0,
-               False,
-               lstConLbl,
-               strXlabel,
-               strYlabel,
-               'Linear & sinusiodal term additive',
-               False,
-               (strPthOt + 'plt_03.svg'))
+    # Plot linear component:
+    funcPltAcrDpth(lstLin[idxPlt],
+                   aryError,
+                   varNumDpth,
+                   4,
+                   (varDpi * 2.0),
+                   0.5,
+                   2.5,
+                   False,
+                   lstConLbl,
+                   strXlabel,
+                   strYlabel,
+                   '',
+                   False,
+                   (strPthOt + 'plt_' + str(varCnt).zfill(2) + '.svg'),
+                   varPadY=(0.2, 0.2),
+                   varNumLblY=3)
+    varCnt += 1
 
-funcPltAcrDpth(aryDemoMul,
-               aryError,
-               varNumDpth,
-               4,
-               varDpi,
-               0.0,
-               4.0,
-               False,
-               lstConLbl,
-               strXlabel,
-               strYlabel,
-               'Linear & sinusiodal term multiplicative',
-               False,
-               (strPthOt + 'plt_04.svg'))
+    # Plot sinusoidal component:
+    funcPltAcrDpth(lstSin[idxPlt],
+                   aryError,
+                   varNumDpth,
+                   4,
+                   (varDpi * 2.0),
+                   0.5,
+                   2.5,
+                   False,
+                   lstConLbl,
+                   strXlabel,
+                   strYlabel,
+                   '',
+                   False,
+                   (strPthOt + 'plt_' + str(varCnt).zfill(2) + '.svg'),
+                   varPadY=(0.2, 0.2),
+                   varNumLblY=3)
+    varCnt += 1
 
-funcPltAcrDpth(aryDemoMix01,
-               aryError,
-               varNumDpth,
-               4,
-               varDpi,
-               0.0,
-               4.0,
-               False,
-               lstConLbl,
-               strXlabel,
-               strYlabel,
-               'Linear = add., sinusoidal = mult.',
-               False,
-               (strPthOt + 'plt_05.svg'))
+    # Plot combined profile:
+    funcPltAcrDpth(lstComb[idxPlt],
+                   aryError,
+                   varNumDpth,
+                   4,
+                   varDpi,
+                   1.0,
+                   5.0,
+                   False,
+                   lstConLbl,
+                   strXlabel,
+                   strYlabel,
+                   lstTtl[idxPlt],
+                   False,
+                   (strPthOt + 'plt_' + str(varCnt).zfill(2) + '.svg'),
+                   varSizeX=1600.0,
+                   varSizeY=1200.0,
+                   varPadY=(0.2, 0.2),
+                   varNumLblY=5)
+    varCnt += 1
+# -----------------------------------------------------------------------------
 
-funcPltAcrDpth(aryDemoMix02,
-               aryError,
-               varNumDpth,
-               4,
-               varDpi,
-               0.0,
-               4.0,
-               False,
-               lstConLbl,
-               strXlabel,
-               strYlabel,
-               'Linear = mult., sinusoidal = add.',
-               False,
-               (strPthOt + 'plt_06.svg'))
+
+# -----------------------------------------------------------------------------
+# *** Normalise by subtraction
+
+lstCombNormSub = [None] * len(lstComb)
+
+for idxPlt in range(len(lstComb)):
+
+    # Profile of first stimulus condition:
+    vecNorm = np.array(lstComb[idxPlt][0, :], ndmin=2)
+
+    # Divide all conditions by first condition:
+    lstCombNormSub[idxPlt] = np.subtract(lstComb[idxPlt],
+                                         vecNorm)
+# -----------------------------------------------------------------------------
+
+
+# -----------------------------------------------------------------------------
+# *** Create plots after normalisation by subtraction
+
+for idxPlt in range(len(lstComb)):
+
+    # Plot combined profile:
+    funcPltAcrDpth(lstCombNormSub[idxPlt],
+                   aryError,
+                   varNumDpth,
+                   4,
+                   varDpi,
+                   0.0,
+                   3.0,
+                   False,
+                   lstConLbl,
+                   strXlabel,
+                   strYlabel,
+                   lstTtl[idxPlt],
+                   False,
+                   (strPthOt + 'plt_' + str(varCnt).zfill(2) + '.svg'),
+                   varSizeX=1600.0,
+                   varSizeY=1200.0,
+                   varPadY=(0.2, 0.2),
+                   varNumLblY=4)
+    varCnt += 1
 # -----------------------------------------------------------------------------
 
 
 # -----------------------------------------------------------------------------
 # *** Normalise by division
 
-# Divide all depth profiles by the profile of first stimulus condition:
-vecNorm = np.array(aryDemoAdd[0, :], ndmin=2)
-aryDemoAdd = np.divide(aryDemoAdd, vecNorm)
+lstCombNormDiv = [None] * len(lstComb)
 
-vecNorm = np.array(aryDemoMul[0, :], ndmin=2)
-aryDemoMul = np.divide(aryDemoMul, vecNorm)
+for idxPlt in range(len(lstComb)):
 
-vecNorm = np.array(aryDemoMix01[0, :], ndmin=2)
-aryDemoMix01 = np.divide(aryDemoMix01, vecNorm)
+    # Profile of first stimulus condition:
+    vecNorm = np.array(lstComb[idxPlt][0, :], ndmin=2)
 
-vecNorm = np.array(aryDemoMix02[0, :], ndmin=2)
-aryDemoMix02 = np.divide(aryDemoMix02, vecNorm)
+    # Divide all conditions by first condition:
+    lstCombNormDiv[idxPlt] = np.divide(lstComb[idxPlt],
+                                       vecNorm)
 # -----------------------------------------------------------------------------
 
 
 # -----------------------------------------------------------------------------
-# *** Create plots after normalisation
+# *** Create plots after normalisation by division
 
-# Plot profiles:
-funcPltAcrDpth(aryDemoAdd,
-               aryError,
-               varNumDpth,
-               4,
-               varDpi,
-               0.0,
-               4.0,
-               False,
-               lstConLbl,
-               strXlabel,
-               strYlabel,
-               'Linear & sinusiodal term additive',
-               False,
-               (strPthOt + 'plt_07.svg'))
+for idxPlt in range(len(lstComb)):
 
-funcPltAcrDpth(aryDemoMul,
-               aryError,
-               varNumDpth,
-               4,
-               varDpi,
-               0.0,
-               4.0,
-               False,
-               lstConLbl,
-               strXlabel,
-               strYlabel,
-               'Linear & sinusiodal term multiplicative',
-               False,
-               (strPthOt + 'plt_08.svg'))
-
-funcPltAcrDpth(aryDemoMix01,
-               aryError,
-               varNumDpth,
-               4,
-               varDpi,
-               0.0,
-               4.0,
-               False,
-               lstConLbl,
-               strXlabel,
-               strYlabel,
-               'Linear = add., sinusoidal = mult.',
-               False,
-               (strPthOt + 'plt_09.svg'))
-
-funcPltAcrDpth(aryDemoMix02,
-               aryError,
-               varNumDpth,
-               4,
-               varDpi,
-               0.0,
-               4.0,
-               False,
-               lstConLbl,
-               strXlabel,
-               strYlabel,
-               'Linear = mult., sinusoidal = add.',
-               False,
-               (strPthOt + 'plt_10.svg'))
+    # Plot combined profile:
+    funcPltAcrDpth(lstCombNormDiv[idxPlt],
+                   aryError,
+                   varNumDpth,
+                   4,
+                   varDpi,
+                   1.0,
+                   4.0,
+                   False,
+                   lstConLbl,
+                   strXlabel,
+                   strYlabel,
+                   lstTtl[idxPlt],
+                   False,
+                   (strPthOt + 'plt_' + str(varCnt).zfill(2) + '.svg'),
+                   varSizeX=1600.0,
+                   varSizeY=1200.0,
+                   varPadY=(0.2, 0.2),
+                   varNumLblY=4)
+    varCnt += 1
 # -----------------------------------------------------------------------------

@@ -153,7 +153,7 @@ lstTtl = ['Linear & sinusiodal term additive',
 
 
 # -----------------------------------------------------------------------------
-# *** Plot profile templates
+# *** Preparations
 
 # Plot counter:
 varCnt = 1
@@ -170,50 +170,6 @@ strYlabel = 'Signal change'
 
 # Condition labels:
 lstConLbl = ['72.0%', '16.3%', '6.1%', '2.5%']
-
-# Scale linear term and add 2nd dimension:
-aryTmp = np.array([np.multiply(aryLin, 1.0)], ndmin=2)
-
-# Plot linear term:
-funcPltAcrDpth(aryTmp,
-               aryError,
-               varNumDpth,
-               1,
-               (varDpi * 2.0),
-               0.0,
-               1.0,
-               False,
-               lstConLbl,
-               strXlabel,
-               strYlabel,
-               'Linear term',
-               False,
-               (strPthOt + 'plt_' + str(varCnt).zfill(2) + '.svg'),
-               varPadY=(0.1, 0.1))
-
-varCnt += 1
-
-# Scale sinusoidal term and add 2nd dimension:
-aryTmp = np.array([np.divide(arySin, varBumpAmp)], ndmin=2)
-
-# Plot sinusoidal term:
-funcPltAcrDpth(aryTmp,
-               aryError,
-               varNumDpth,
-               1,
-               (varDpi * 2.0),
-               0.0,
-               1.0,
-               False,
-               lstConLbl,
-               strXlabel,
-               strYlabel,
-               'Sinusoidal term',
-               False,
-               (strPthOt + 'plt_' + str(varCnt).zfill(2) + '.svg'),
-               varPadY=(0.1, 0.1))
-
-varCnt += 1
 # -----------------------------------------------------------------------------
 
 
@@ -272,7 +228,7 @@ for idxPlt in range(len(lstComb)):
                    lstConLbl,
                    strXlabel,
                    strYlabel,
-                   lstTtl[idxPlt],
+                   '',  # lstTtl[idxPlt],
                    False,
                    (strPthOt + 'plt_' + str(varCnt).zfill(2) + '.svg'),
                    varSizeX=1600.0,
@@ -316,7 +272,7 @@ for idxPlt in range(len(lstComb)):
                    lstConLbl,
                    strXlabel,
                    strYlabel,
-                   lstTtl[idxPlt],
+                   '',  # lstTtl[idxPlt],
                    False,
                    (strPthOt + 'plt_' + str(varCnt).zfill(2) + '.svg'),
                    varSizeX=1600.0,
@@ -360,7 +316,7 @@ for idxPlt in range(len(lstComb)):
                    lstConLbl,
                    strXlabel,
                    strYlabel,
-                   lstTtl[idxPlt],
+                   '',  # lstTtl[idxPlt],
                    False,
                    (strPthOt + 'plt_' + str(varCnt).zfill(2) + '.svg'),
                    varSizeX=1600.0,
@@ -368,4 +324,53 @@ for idxPlt in range(len(lstComb)):
                    varPadY=(0.2, 0.2),
                    varNumLblY=4)
     varCnt += 1
+# -----------------------------------------------------------------------------
+
+
+# -----------------------------------------------------------------------------
+# *** Linear & sinusoidal element plots
+
+# Scale linear term and add 2nd dimension:
+aryTmp = np.array([np.multiply(aryLin, 1.0)], ndmin=2)
+
+# Plot linear term:
+funcPltAcrDpth(aryTmp,
+               aryError,
+               varNumDpth,
+               1,
+               (varDpi * 2.0),
+               0.0,
+               1.0,
+               False,
+               lstConLbl,
+               strXlabel,
+               strYlabel,
+               'Linear term',
+               False,
+               (strPthOt + 'plt_' + str(varCnt).zfill(2) + '.svg'),
+               varPadY=(0.1, 0.1))
+
+varCnt += 1
+
+# Scale sinusoidal term and add 2nd dimension:
+aryTmp = np.array([np.divide(arySin, varBumpAmp)], ndmin=2)
+
+# Plot sinusoidal term:
+funcPltAcrDpth(aryTmp,
+               aryError,
+               varNumDpth,
+               1,
+               (varDpi * 2.0),
+               0.0,
+               1.0,
+               False,
+               lstConLbl,
+               strXlabel,
+               strYlabel,
+               'Sinusoidal term',
+               False,
+               (strPthOt + 'plt_' + str(varCnt).zfill(2) + '.svg'),
+               varPadY=(0.1, 0.1))
+
+varCnt += 1
 # -----------------------------------------------------------------------------

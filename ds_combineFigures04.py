@@ -48,7 +48,7 @@ lstPths = [(strPthBase + str(x).zfill(2) + '.svg') for x in range(1, 21)]
 strOt = '/home/john/PhD/Tex/dpth_norm_demo/plots/summary.svg'  #noqa
 
 # Create parent SVG figure:
-objFigPrnt = sg.SVGFigure(width='2000.0 pix', height='2000.0 pix')
+objFigPrnt = sg.SVGFigure(width='4350.0 pix', height='2800.0 pix')
 
 # Load figures:
 lstFigs = [None for i in range(len(lstPths))]
@@ -60,6 +60,9 @@ lstPlts = [None for i in range(len(lstPths))]
 for idxPlt in range(len(lstPths)):
     lstPlts[idxPlt] = lstFigs[idxPlt].getroot()
 
+# x offset (of all elements):
+varOffsetX = 250.0
+
 # x size of element plots:
 varEleSzeX = 506.0
 # y size of element plots:
@@ -67,7 +70,7 @@ varEleSzeY = 450.0
 # x distance between element plots:
 varEleDistX = 10.0
 # y distance between element plots:
-varEleDistY = 50.0
+varEleDistY = 150.0
 
 # y size of combined plots:
 varCombSzeY = 675.0
@@ -83,7 +86,7 @@ varSclComb = 1.3
 # X positions for subplots:
 lstPosX = [None] * len(lstPlts)
 
-varPosTmp = 0.0
+varPosTmp = varOffsetX
 
 # For the first 12 plots every third plot is a combined plot with a deviating
 # x-position, we use a counter & if condition to handle this:
@@ -105,18 +108,18 @@ for idxPlt in range(0, 12):
         varCnt = 0
 
 # Loop through remaining plots (profiles normalisation by subtraction):
-varPosTmp = 0
+varPosTmp = varOffsetX
 for idxPlt in range(12, 16):
     varPosTmp += varEleDistX
     lstPosX[idxPlt] = varPosTmp
-    varPosTmp += (1.0 * varEleSzeX + 1.0 * varEleSzeX)
+    varPosTmp += (2.0 * varEleSzeX + 1.0 * varEleDistX)
 
 # Loop through remaining plots (profiles normalisation by division):
-varPosTmp = 0
+varPosTmp = varOffsetX
 for idxPlt in range(16, 20):
     varPosTmp += varEleDistX
     lstPosX[idxPlt] = varPosTmp
-    varPosTmp += (1.0 * varEleSzeX + 1.0 * varEleSzeX)
+    varPosTmp += (2.0 * varEleSzeX + 1.0 * varEleDistX)
 
 # ----------------------------------------------------------------------------
 # *** Y-positions
@@ -202,19 +205,28 @@ for idxPlt in range(len(lstPths)):
 
 
 # ----------------------------------------------------------------------------
-# *** Add column & row text labels
+# *** Add column text labels
 
-strTxt01 = 'Linear & sinusiodal term additive'
-objTxt01 = sg.TextElement(20,
-                          20,
-                          strTxt01,
-                          size=80,  # font="Verdana",  # DejaVuSans
-                          weight="bold")
+# Titles:
+lstTtl = ['Lin. & sin. terms additive',
+          'Lin. & sin. terms multiplicative',
+          'Lin. additive, sin. multiplicative',
+          'Lin. multiplicative, sin. additive']
 
+# Title x positions:
+lstTtlPosX = [lstPosX[0], lstPosX[3], lstPosX[6], lstPosX[9]]
 
-strTxt02 = 'Linear & sinusiodal term multiplicative'
-strTxt03 = 'Linear additive, sinusoidal multiplicative'
-strTxt04 = 'Linear multiplicative, sinusoidal additive'
+# List for text objects:
+lstTxtObj = [None] * len(lstTtl)
+
+# Loop through plot labels:
+for idxPlt in range(len(lstTtl)):
+    # Place text object:
+    lstTxtObj[idxPlt] = sg.TextElement((lstTtlPosX[idxPlt] + 20.0),
+                                       80,
+                                       lstTtl[idxPlt],
+                                       size=50,  # font="DejaVuSans"
+                                       weight="bold")
 
 
 # ----------------------------------------------------------------------------
@@ -257,14 +269,11 @@ for idxPlt in range(len(lstPlts)):
 # ----------------------------------------------------------------------------
 # *** Save figure
 
-# Create parent SVG figure:
-objFigPrnt = sg.SVGFigure(width='4150.0 pix', height='2600.0 pix')
-
 # Append plots to parent figure object:
 objFigPrnt.append(lstPlts)
 
 # Append text to parent figure object:
-objFigPrnt.append([objTxt01])
+objFigPrnt.append(lstTxtObj)
 
 # Save new parent SVG file:
 objFigPrnt.save(strOt)

@@ -47,17 +47,15 @@ strSwitch = 'load'
 # Corrected or  uncorrected depth profiles?
 strCrct = 'corrected'
 
-# Pickle to load bootstrap from / save bootstrap to:
-if strCrct == 'uncorrected':
-    strPthPkl = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/bootstrap_uncorrected_power.pickle'  #noqa
-if strCrct == 'corrected':
-    strPthPkl = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/bootstrap_corrected_power.pickle'  #noqa
-
-# Pickle file to load bootstrapping results from
-
 # Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
 # function).
 strFunc = 'power'
+
+# Pickle to load bootstrap from / save bootstrap to (corrected/uncorrected and
+# power/hyper left open):
+strPthPkl = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/bootstrap_{}_{}.pickle'  #noqa
+
+strPthPkl = strPthPkl.format(strCrct, strFunc)
 
 # Path of draining-corrected depth-profiles:
 if strCrct == 'uncorrected':

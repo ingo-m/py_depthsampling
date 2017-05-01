@@ -113,7 +113,6 @@ lgcSlct03 = True
 # supposed to contain one set of data values for each depth level.
 strVtkSlct03 = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/R2_multi.vtk'  #noqa
 # Threshold for vertex selection:
-# varThrSlct03 = 0.16
 varThrSlct03 = 0.12
 
 # (4)
@@ -165,25 +164,24 @@ varNumLne = 2
 strTitle = strRoi.upper()
 
 # Limits of y-axis for single subject plots (list of tuples, [(Ymin, Ymax)]):
-# lstLimY = [(0.0, 2.5)] * len(lstSubIds)
-lstLimY = [(0.0, 1200.0)] * len(lstSubIds)
+lstLimY = [(0.0, 2.5)] * len(lstSubIds)
+# lstLimY = [(0.0, 1200.0)] * len(lstSubIds)
 
 # Limits of y-axis for across subject plot:
 varAcrSubsYmin = -0.05
-# varAcrSubsYmax = 2.0
-varAcrSubsYmax = 1200.0
+varAcrSubsYmax = 2.0
+# varAcrSubsYmax = 1200.0
 
 # Label for axes:
 strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'fMRI signal change [arbitrary units]'
 
 # Output path for plots - prfix:
-# strPltOtPre = '/home/john/PhD/Tex/tex_pe/plots_{}/'.format(strRoi)
-strPltOtPre = '/home/john/PhD/Tex/tex_pe_not_norm/plots_{}/'.format(strRoi)
+strPltOtPre = '/home/john/PhD/Tex/tex_pe/plots_{}/'.format(strRoi)
+# strPltOtPre = '/home/john/PhD/Tex/tex_pe_not_norm/plots_{}/'.format(strRoi)
 
 # Output path for plots - suffix:
-strPltOtSuf = '_depthplot_1000_R2multi_0p16.png'
-# strPltOtSuf = '_depthplot_1000_combmean_7000.png'
+strPltOtSuf = '_R2multi_0p12_combinedmean_7000_z_1000.png'
 
 # Figure scaling factor:
 varDpi = 80.0
@@ -196,7 +194,7 @@ varDpi = 80.0
 varNormIdx = 0
 
 # Normalise by division?
-lgcNormDiv = False
+lgcNormDiv = True
 
 # Linear regression?
 lgcLinReg = False
@@ -210,8 +208,6 @@ vecLinRegMdl = np.array([-3.0, -1.0, 1.0, 3.0])
 varLinRegP = 0.001
 
 # Range of y-axis for regression plots:
-# varLinRegYmin = 0.09
-# varLinRegYmax = 0.18
 varLinRegYmin = 0.0
 varLinRegYmax = 0.18
 
@@ -219,7 +215,7 @@ varLinRegYmax = 0.18
 strLinRegYlabel = 'Regression coefficient'
 
 # Output path for depth samling results (within subject means):
-strDpthMeans = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}_not_norm.npy'.format(strRoi)  #noqa
+strDpthMeans = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}.npy'.format(strRoi)  #noqa
 
 # Maximum number of processes to run in parallel: *** NOT IMPLEMENTED
 # varPar = 10

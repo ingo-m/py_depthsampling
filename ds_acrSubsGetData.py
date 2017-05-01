@@ -279,7 +279,11 @@ def funcAcrSubGetSubsData(idxPrc,        # Process ID  #noqa
     strPltOt = strPltOtPre + strSubId + strPltOtSuf
 
     # Title, including information about number of vertices:
-    strTitleTmp = (strTitle + ', ' + str(varNumInc) + ' vertices')
+    strTitleTmp = (strTitle
+                   + ', '
+                   + str(varNumInc)
+                   + ' vertices, z>'
+                   + str(np.around(varThrZcon, decimals=2)))
 
     funcPltAcrDpth(aryDpthMean,  # Data: aryData[Condition, Depth]
                    aryDpthConf,  # Error shading: aryError[Condition, Depth]

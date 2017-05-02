@@ -80,13 +80,13 @@ def funcPltAcrSubsMean(arySubDpthMns,
     # Calculate 95% confidence interval for the mean, obtained by multiplying
     # the standard error of the mean (SEM) by 1.96. We obtain  the SEM by
     # dividing the standard deviation by the squareroot of the sample size n.
-    # aryArcSubDpthConf = np.multiply(np.divide(np.std(arySubDpthMns, axis=0),
-    #                                           np.sqrt(varNumSubs)),
-    #                                 1.96)
+    aryArcSubDpthConf = np.multiply(np.divide(np.std(arySubDpthMns, axis=0),
+                                              np.sqrt(varNumSubs)),
+                                    1.96)
 
     # Calculate standard error of the mean.
-    aryArcSubDpthConf = np.divide(np.std(arySubDpthMns, axis=0),
-                                  np.sqrt(varNumSubs))
+    # aryArcSubDpthConf = np.divide(np.std(arySubDpthMns, axis=0),
+    #                               np.sqrt(varNumSubs))
 
     # Figure dimensions:
     varSizeX = 1800.0

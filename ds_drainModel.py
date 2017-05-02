@@ -86,15 +86,12 @@ strRoi = 'v1'
 
 # Path of depth-profile to correct:
 strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}.npy'.format(strRoi)  #noqa
-# strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}_not_norm.npy'.format(strRoi)  #noqa
 
 # Output path for corrected depth-profiles:
 strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}_corrected.npy'.format(strRoi)  #noqa
-# strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}_not_norm_corrected.npy'.format(strRoi)  #noqa
 
 # Output path & prefix for plots:
 strPthPltOt = '/home/john/PhD/Tex/deconv/{}_model_{}/deconv_{}_m{}_'.format(strRoi, str(varMdl), strRoi, str(varMdl))  #noqa
-# strPthPltOt = '/home/john/PhD/Tex/deconv_not_norm/{}_model_{}/deconv_{}_m{}_'.format(strRoi, str(varMdl), strRoi, str(varMdl))  #noqa
 
 # File type suffix for plot:
 strFlTp = '.svg'
@@ -278,8 +275,5 @@ funcPltAcrSubsMean(aryNrnSnSb,
                    strTmpTtl,
                    strTmpPth,
                    strFlTp)
-
-# aryEmp5 = np.mean(aryEmp5SnSb, axis=0).T
-# aryNrn = np.mean(aryNrnSnSb, axis=0).T
 
 print('-Done.')

@@ -26,32 +26,81 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 
 
-def funcPltAcrDpth(aryData,     # Data to be plotted: aryData[Condition, Depth]
-                   aryError,    # Error shading: aryError[Condition, Depth]
-                   varNumDpth,  # Number of depth levels (on the x-axis)
-                   varNumCon,   # Number of conditions (separate lines)
-                   varDpi,      # Resolution of the output figure
-                   varYmin,     # Minimum of Y axis
-                   varYmax,     # Maximum of Y axis
-                   lgcCnvPrct,  # Boolean: whether to convert y axis to %
-                   lstConLbl,   # Labels for conditions (separate lines)
-                   strXlabel,   # Label on x axis
-                   strYlabel,   # Label on y axis
-                   strTitle,    # Figure title
-                   lgcLgnd,     # Boolean: whether to plot a legend
-                   strPath,     # Output path for the figure
-                   varSizeX=1800.0,     # Figure x dimension
-                   varSizeY=1600.0,     # Figure y dimension
-                   varNumLblY=5,        # Number of labels on y axis
-                   varPadY=(0.0, 0.0),  # Padding around labelled values on y
-                   aryClr=None,         # Line colours aryClr[idxCon, RGB]
-                   aryCnfLw=None,
-                   aryCnfUp=None):
+def funcPltAcrDpth(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
+                   varYmax, lgcCnvPrct, lstConLbl, strXlabel, strYlabel,
+                   strTitle, lgcLgnd, strPath, varSizeX=1800.0,
+                   varSizeY=1600.0, varNumLblY=5, varPadY=(0.0, 0.0),
+                   aryClr=None, aryCnfLw=None, aryCnfUp=None):
     """
-    Plot values across depth level, separately for conditions.
+    Plot data across depth level, with separate lines for variable number of
+    conditions.
 
-    The purpose of this function is to plot data & error bars across cortical
-    depth levels (x-axis), separately for conditions (separate lines).
+    Parameters
+    ----------
+    aryData : np.array
+        Data to be plotted. Numpy array of the form aryData[Condition, Depth].
+    aryError : np.array or None
+        Error in the data to be plotted (e.g. SEM). Numpy array of the form
+        aryError[Condition, Depth]. The values will be added & subtracted from
+        the values in aryData, and the region in between will be shaded.
+        Alternatively, (possibly assymetric) confidence intervals can be
+        provided (see below); in that case aryError is ignored.
+    varNumDpth : int
+        Number of depth levels (depth levels will be represented on the
+        x-axis).
+    varNumCon : int
+        Number of conditions (conditions will be represented as separate lines
+        in the plot).
+    varDpi : float
+        Resolution of the output figure.
+    varYmin : float
+        Minimum of Y axis.
+    varYmax : float
+        Maximum of Y axis.
+    lgcCnvPrct : bool
+        Whether to convert y axis to percent.
+    lstConLbl : list
+        List of strings with labels for conditions.
+    strXlabel : str
+        Label on x axis.
+    strYlabel : str
+        Label on y axis
+    strTitle : str
+        Figure title
+    lgcLgnd : bool
+        Whether to plot a legend.
+    strPath : str
+        Output path for the figure
+    varSizeX : float
+        Width of output figure.
+    varSizeY : float
+        Height of figure.
+    varNumLblY : int
+        Number of labels on y axis.
+    varPadY : tuple
+        Padding around labelled values on y.
+    aryClr : np.array
+        Line colours. Numpy array of form aryClr[idxCon, 3]; where the first
+        dimension corresponds to the number of conditions, and the second
+        dimension corresponds to the three RGB values for each condition.
+    aryCnfLw : np.array
+        Lower bound of confidence interval. Numpy array of form
+        aryCnfLw[idxCondition, idxDepth]. If both aryCnfLw and aryCnfUp are
+        provided, confidence intervals are plotted and aryError is ignored.
+    aryCnfUp : np.array
+        Upper bound of confidence interval. Numpy array of form
+        aryCnfUp[idxCondition, idxDepth]. If both aryCnfLw and aryCnfUp are
+        provided, confidence intervals are plotted and aryError is ignored.
+
+    Returns
+    -------
+    None : None
+        This function has no return value.
+
+
+    The purpose of this function is to plot data & error intervals across
+    cortical depth levels (represented on the x-axis), separately for
+    conditions (separate lines).
     """
     # Create figure:
     fgr01 = plt.figure(figsize=((varSizeX * 0.5) / varDpi,

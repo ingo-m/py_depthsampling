@@ -26,13 +26,13 @@ from ds_pltAcrDpth import funcPltAcrDpth
 # varConLw=2.5
 # varConUp=97.5
 
+
 def bootPlot(objDpth, strPath, varNumIt=10000, varConLw=2.5, varConUp=97.5,
              strTtl='', strXlabel='Cortical depth level (equivolume)',
-             strYlabel = 'fMRI signal change [arbitrary units]',
+             strYlabel='fMRI signal change [arbitrary units]',
              lgcLgnd=False):
     """
-    Plot across-subject median cortical depth profiles with percentile
-    bootstrap confidence intervals.
+    Plot across-subject cortical depth profiles with confidence intervals.
 
     Parameters
     ----------
@@ -115,7 +115,7 @@ def bootPlot(objDpth, strPath, varNumIt=10000, varConLw=2.5, varConUp=97.5,
 
     # ------------------------------------------------------------------------
     # *** Bootstrap
-    
+
     # Loop through bootstrap iterations:
     for idxIt in range(varNumIt):
         # Indices of current bootstrap sample:

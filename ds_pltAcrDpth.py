@@ -32,8 +32,7 @@ def funcPltAcrDpth(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
                    varSizeY=1600.0, varNumLblY=5, varPadY=(0.0, 0.0),
                    aryClr=None, aryCnfLw=None, aryCnfUp=None):
     """
-    Plot data across depth level, with separate lines for variable number of
-    conditions.
+    Plot data across depth level for variable number of conditions.
 
     Parameters
     ----------

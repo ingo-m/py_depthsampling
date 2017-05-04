@@ -39,10 +39,10 @@ pip install svgutils
 import svgutils.transform as sg
 
 # Paths to figures:
-strFig01 = '/home/john/PhD/Tex/deconv/v1_model_1/deconv_v1_m1_beforeacrsSubsMeanShading.svg'  #noqa
-strFig02 = '/home/john/PhD/Tex/deconv/v1_model_1/deconv_v1_m1_afteracrsSubsMeanShading.svg'  #noqa
-strFig03 = '/home/john/PhD/Tex/deconv/v2_model_1/deconv_v2_m1_beforeacrsSubsMeanShading.svg'  #noqa
-strFig04 = '/home/john/PhD/Tex/deconv/v2_model_1/deconv_v2_m1_afteracrsSubsMeanShading.svg'  #noqa
+strFig01 = '/home/john/PhD/Tex/deconv/v1_model_1/deconv_v1_m1_before_acrsSubsMean.svg'  #noqa
+strFig02 = '/home/john/PhD/Tex/deconv/v1_model_1/deconv_v1_m1_after_acrsSubsMean.svg'  #noqa
+strFig03 = '/home/john/PhD/Tex/deconv/v2_model_1/deconv_v2_m1_before_acrsSubsMean.svg'  #noqa
+strFig04 = '/home/john/PhD/Tex/deconv/v2_model_1/deconv_v2_m1_after_acrsSubsMean.svg'  #noqa
 
 # Output path:
 strOt = '/home/john/PhD/Tex/deconv/summary.svg'

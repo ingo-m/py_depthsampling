@@ -45,7 +45,7 @@ from ds_findPeak import find_peak
 strSwitch = 'load'
 
 # Corrected or  uncorrected depth profiles?
-strCrct = 'corrected'
+strCrct = 'uncorrected'
 
 # Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
 # function).
@@ -465,7 +465,7 @@ axs01.set_xticks([0.05, 0.95])
 axs01.set_xticklabels(['WM', 'CSF'])
 
 # Title:
-axs01.set_title('Peak of semisaturation contrast', fontsize=14)
+axs01.set_title('Peak of semisaturation constant', fontsize=14)
 
 # Make plot & axis labels fit into figure:
 plt.tight_layout(pad=0.5)
@@ -608,9 +608,10 @@ strYlabel = 'Percent luminance contrast'
 # arySemiSCnfUp = np.multiply(arySemiSCnfUp, 100.0)
 
 # Line colours:
-aryClr = np.array([[0.2, 0.2, 0.9],
-                   [0.9, 0.2, 0.2]])
-
+aryClr = np.array([[15.0, 255.0, 135.0],
+                   [15.0, 15.0, 255.0]])
+aryClr = np.divide(aryClr, 255.0)
+    
 funcPltAcrDpth(arySemiMne,         # aryData[Condition, Depth]
                0,                  # aryError[Con., Depth]
                varNumDpt,          # Number of depth levels (on the x-axis)
@@ -622,7 +623,7 @@ funcPltAcrDpth(arySemiMne,         # aryData[Condition, Depth]
                dicPthDpth.keys(),  # Labels for conditions (separate lines)
                strXlabel,          # Label on x axis
                strYlabel,          # Label on y axis
-               'Semisaturation contrast',  # Figure title
+               'Semisaturation constant',  # Figure title
                True,               # Boolean: whether to plot a legend
                (strPthOt + '_' + strFunc + '_semisaturationcontrast'
                 + strFleTyp),

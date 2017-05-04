@@ -20,11 +20,11 @@
 import numpy as np
 from ds_pltAcrDpth import funcPltAcrDpth
 
-# objDpth = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy'
-# strPath = '/home/john/Desktop/tmp/tmp.png'
-# varNumIt=10000
-# varConLw=2.5
-# varConUp=97.5
+objDpth = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy'
+strPath = '/home/john/Desktop/tmp/tmp.png'
+varNumIt=10000
+varConLw=2.5
+varConUp=97.5
 
 
 def bootPlot(objDpth, strPath, varNumIt=10000, varConLw=2.5, varConUp=97.5,
@@ -69,8 +69,9 @@ def bootPlot(objDpth, strPath, varNumIt=10000, varConLw=2.5, varConUp=97.5,
     Plot across-subject median cortical depth profiles with percentile
     bootstrap confidence intervals. This function bootstraps (i.e. resamples
     with replacement) from an array of single-subject depth profiles,
-    calculates the median & percentile range across bootstrap iterations and
-    plots the resulting median & confidence intervals along the cortical depth.
+    calculates a confidence interval of the median across bootstrap iterations
+    and plots the empirical median & bootstrap confidence intervals along the
+    cortical depth.
 
     Function of the depth sampling pipeline.
     """
@@ -125,16 +126,13 @@ def bootPlot(objDpth, strPath, varNumIt=10000, varConLw=2.5, varConUp=97.5,
 
     # Median for each bootstrap sample (across subjects within the bootstrap
     # sample):
-    aryMedi01 = np.median(aryBoo, axis=1)
-
-    # Median across bootstrap samples:
-    aryMedi02 = np.median(aryMedi01, axis=0)
+    aryBooMed = np.median(aryBoo, axis=1)
 
     # Delete large bootstrap array:
     del(aryBoo)
 
     # Percentile bootstrap for median:
-    aryPrct = np.percentile(aryMedi01, (varConLw, varConUp), axis=0)
+    aryPrct = np.percentile(aryBooMed, (varConLw, varConUp), axis=0)
 
     # ------------------------------------------------------------------------
     # *** Plot result
@@ -146,14 +144,14 @@ def bootPlot(objDpth, strPath, varNumIt=10000, varConLw=2.5, varConUp=97.5,
     strXlabel = 'Cortical depth level (equivolume)'
     strYlabel = 'fMRI signal change [arbitrary units]'
 
-    # Mean?
-    # aryMedi02 = np.mean(aryDpth, axis=0)
+    # Empirical median:
+    aryEmpMed = np.median(aryDpth, axis=0)
 
-    funcPltAcrDpth(aryMedi02, None, varNumDpth, varNumCon, 80.0, 0.0, 2.0,
+    funcPltAcrDpth(aryEmpMed, None, varNumDpth, varNumCon, 80.0, 0.0, 2.0,
                    False, lstConLbl, strXlabel, strYlabel, strTtl, lgcLgnd,
                    strPath, varSizeX=1800.0, varSizeY=1600.0, varNumLblY=5,
                    varPadY=(0.1, 0.1), aryCnfLw=aryPrct[0, :, :],
                    aryCnfUp=aryPrct[1, :, :])
     # ------------------------------------------------------------------------
 
-# bootPlot(objDpth, strPath, strTtl='V1 before deconvolution', varNumIt=10000)
+bootPlot(objDpth, strPath, strTtl='V1 before deconvolution', varNumIt=10000)

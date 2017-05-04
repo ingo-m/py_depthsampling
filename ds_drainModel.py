@@ -242,7 +242,7 @@ np.save(strPthPrfOt,
 print('---Plot results')
 
 # Plot across-subjects mean before deconvolution:
-strTmpTtl = '{} Before deconvolution'.format(strRoi.upper())
+strTmpTtl = '{} before deconvolution'.format(strRoi.upper())
 strTmpPth = (strPthPltOt + 'before')
 funcPltAcrSubsMean(aryEmp5SnSb,
                    varNumSub,
@@ -260,7 +260,7 @@ funcPltAcrSubsMean(aryEmp5SnSb,
 
 
 # Across-subjects mean after deconvolution:
-strTmpTtl = '{} After deconvolution'.format(strRoi.upper())
+strTmpTtl = '{} after deconvolution'.format(strRoi.upper())
 strTmpPth = (strPthPltOt + 'after')
 funcPltAcrSubsMean(aryNrnSnSb,
                    varNumSub,

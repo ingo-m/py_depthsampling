@@ -189,7 +189,7 @@ def funcPltAcrSubsMean(arySubDpthMns,
     #                     linewidth=0.2)
 
     # File name for figure:
-    strPltOt = strPltOtPre + 'acrsSubsMeanShading' + strPltOtSuf
+    strPltOt = strPltOtPre + '_acrsSubsMean' + strPltOtSuf
 
     # Make plot & axis labels fit into figure:
     plt.tight_layout(pad=0.5)

@@ -43,7 +43,7 @@ def crf_par_02(idxPrc, lstDpth, vecEmpX, strFunc, aryRnd, varNumX, queOut):
     aryRnd : np.array
         Array with randomised subject indicies for bootstrapping of the form
         aryRnd[idxIteration, varNumSamples]. Each row includes the indicies of
-        the subjects to the sampled on that iteration.
+        the subjects to be sampled on that iteration.
     varNumX : int
         Number of x-values for which to solve the function when calculating
         model fit.

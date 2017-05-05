@@ -23,7 +23,7 @@ from scipy.ndimage.filters import gaussian_filter1d
 from scipy.signal import argrelextrema
 
 
-def find_peak(aryDpth, varNumIntp=100, varSd=0.05):
+def find_peak(aryDpth, varNumIntp=100, varSd=0.05, lgcPos=False):
     """
     Find peak in cortical depth profile.
 
@@ -34,15 +34,18 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05):
         corresponds to the number of depth profiles (e.g. bootstrapped
         versions of the depth profile) and the second dimension corresponds to
         cortical depth. The peak will be searched for along the second
-        dimensions, based on the first derivative of the depth profile along
-        this dimension.
+        dimensions.
     varNumIntp : int
         Number of points at which to interpolate depth profiles before
-        calculating the gradient.
+        searching for a peak.
     varSd : float
         Standard deviation of the Gaussian kernel used for smoothing, relative
         to cortical thickness (i.e. a value of 0.05 would result in a Gaussian
         with FWHM of 5 percent of the cortical thickness).
+    lgcPos : bool
+        Whether to return the indicies of the identified peaks, in addition to
+        the peak positions. (The positions may for example be needed for
+        pairwise comparisons between permutation conditions.)
 
     Returns
     -------
@@ -52,9 +55,8 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05):
 
     Notes
     -----
-    Depth profiles are upsampled and smoothed with a Gaussian kernel. The peak
-    is defined as the maximum of the first derivative of the interpoalted,
-    smoothed depth profile.
+    Depth profiles are upsampled and smoothed with a Gaussian kernel. The
+    function scipy.signal.argrelextrema is used to search for a peak.
 
     Function of the depth sampling pipeline.
     """
@@ -94,13 +96,12 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05):
 
     # Identify peaks (the algorithm procudes a tuple of two arrays, the first
     # with the indicies of cases (i.e. bootstrap iterations) for which a peak
-    # was identified, the second with the indicies of the peak - we are only
-    # interested in the second array):
-    vecPeak = argrelextrema(aryDpthSmth,
-                            np.greater,
-                            axis=1,
-                            order=varNumOrd,
-                            mode='clip')[1]
+    # was identified, the second with the indicies of the peak.
+    vecPos, vecPeak = argrelextrema(aryDpthSmth,
+                                    np.greater,
+                                    axis=1,
+                                    order=varNumOrd,
+                                    mode='clip')
 
     # Number of cases (i.e. bootstrap iterations):
     varNumIt = aryDpth.shape[0]
@@ -114,8 +115,11 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05):
            + str(varNumIt)
            + ' cases.'))
 
-    # Convert the indicies of minimum value into relative position (i.e.
+    # Convert the indicies of peak value into relative position (i.e.
     # relative cortical depth):
     vecPeak = np.divide(vecPeak, np.float64(varNumIntp))
 
-    return vecPeak
+    if lgcPos:
+        return vecPeak, vecPos
+    else:
+        return vecPeak

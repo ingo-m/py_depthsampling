@@ -44,15 +44,16 @@ Function of the depth sampling pipeline.
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
-import json
+# import json
 from ds_permCrf import perm_hlf_max_peak
+from ds_findPeak import find_peak
 
 
 # ----------------------------------------------------------------------------
 # *** Define parameters
 
 # Use existing resampling results or create new one ('load' or 'create')?
-strSwitch = 'create'
+strSwitch = 'load'
 
 # Corrected or  uncorrected depth profiles?
 strCrct = 'uncorrected'
@@ -61,11 +62,11 @@ strCrct = 'uncorrected'
 # function).
 strFunc = 'power'
 
-# JSON to load resampling from / save resampling to (corrected/uncorrected and
+# File to load resampling from / save resampling to (corrected/uncorrected and
 # power/hyper left open):
-strPthJson = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/crf_permutation_{}_{}.json'  #noqa
+strPthOut = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/crf_permutation_{}_{}.npz'  #noqa
 
-strPthJson = strPthJson.format(strCrct, strFunc)
+strPthOut = strPthOut.format(strCrct, strFunc)
 
 # Path of depth-profiles:
 if strCrct == 'uncorrected':
@@ -81,10 +82,10 @@ if strCrct == 'corrected':
 vecEmpX = np.array([0.025, 0.061, 0.163, 0.72])
 
 # Number of resampling iterations:
-varNumIt=2000
+varNumIt=3000
 
 # Number of processes to run in parallel:
-varPar=10
+varPar=11
 
 
 # ----------------------------------------------------------------------------
@@ -97,16 +98,27 @@ if strSwitch == 'load':
     print('---Loading bootstrapping results')
 
     # Load previously prepared file:
-    with open(strPthJson, 'r') as objJson:
-         lstJson = json.load(objJson)
+    # with open(strPthJson, 'r') as objJson:
+    #      lstJson = json.load(objJson)
 
     # Retrieve numpy arrays from nested list:
-    aryDpth01 = np.array(lstJson[0])
-    aryDpth02 = np.array(lstJson[1])
-    aryMdlY = np.array(lstJson[2])
-    aryHlfMax = np.array(lstJson[3])
-    arySemi = np.array(lstJson[4])
-    aryRes = np.array(lstJson[5])
+    # aryDpth01 = np.array(lstJson[0])
+    # aryDpth02 = np.array(lstJson[1])
+    # aryMdlY = np.array(lstJson[2])
+    # aryHlfMax = np.array(lstJson[3])
+    # arySemi = np.array(lstJson[4])
+    # aryRes = np.array(lstJson[5])
+
+    # Load data from npz file:
+    objNpz = np.load(strPthOut)
+
+    # Retrieve arrays from npz object (dictionary):
+    aryDpth01 = objNpz['aryDpth01']
+    aryDpth02 = objNpz['aryDpth02']
+    aryMdlY = objNpz['aryMdlY']
+    aryHlfMax = objNpz['aryHlfMax']
+    arySemi = objNpz['arySemi']
+    aryRes = objNpz['aryRes']
 
 elif strSwitch == 'create':
 
@@ -116,25 +128,96 @@ elif strSwitch == 'create':
     print('---Parallelised permutation & CRF fitting')
 
     aryDpth01, aryDpth02, aryMdlY, aryHlfMax, arySemi, aryRes = \
-        perm_hlf_max_peak(objDpth01, objDpth02, vecEmpX, strFunc='power',
-                          varNumIt=1000, varPar=10)
+        perm_hlf_max_peak(objDpth01, objDpth02, vecEmpX, strFunc=strFunc,
+                          varNumIt=varNumIt, varPar=varPar)
 
     # ------------------------------------------------------------------------
     # *** Save results
 
-    print('---Saving bootstrapping results as json object')
+    print('---Saving bootstrapping results as npz object')
 
     # Put results into nested list:
-    lstJson = [aryDpth01.tolist(),  # Original depth profiles V1
-               aryDpth02.tolist(),  # Original depth profiles V2
-               aryMdlY.tolist(),    # Fitted y-values
-               aryHlfMax.tolist(),  # Predicted response at 50% contrast
-               arySemi.tolist(),    # Semisaturation contrast
-               aryRes.tolist()]     # Residual variance
+    # lstJson = [aryDpth01.tolist(),  # Original depth profiles V1
+    #            aryDpth02.tolist(),  # Original depth profiles V2
+    #            aryMdlY.tolist(),    # Fitted y-values
+    #            aryHlfMax.tolist(),  # Predicted response at 50% contrast
+    #            arySemi.tolist(),    # Semisaturation contrast
+    #            aryRes.tolist()]     # Residual variance
 
     # Save results to disk:
-    with open(strPthJson, 'w') as objJson:
-         json.dump(lstJson, objJson)
+    # with open(strPthJson, 'w') as objJson:
+    #      json.dump(lstJson, objJson)
+
+    # Save result as npz object:
+    np.savez(strPthOut,
+             aryDpth01=aryDpth01,
+             aryDpth02=aryDpth02,
+             aryMdlY=aryMdlY,
+             aryHlfMax=aryHlfMax,
+             arySemi=arySemi,
+             aryRes=aryRes)
+
+
+# ----------------------------------------------------------------------------
+# *** Find peaks in contrast at half maximum profiles
+
+
+# Find peaks in first permutation group:
+vecPeaks01, vecPos01 = find_peak(aryHlfMax[0, :, :], lgcPos=True)
+
+# Find peaks in second permutation group:
+vecPeaks02, vecPos02 = find_peak(aryHlfMax[1, :, :], lgcPos=True)
+
+# Put peak locations together, array of the form aryPeak[idxIteration, idxRoi]:
+aryPeaks = np.zeros((varNumIt, 2))
+aryPeaks[vecPos01, 0] = vecPeaks01
+aryPeaks[vecPos02, 1] = vecPeaks02
+
+# Identify cases for which a peak has been identified for both groups:
+vecCon = np.greater(np.multiply(aryPeaks[:, 0], aryPeaks[:, 1]),
+                    0.0)
+
+# Select cases with peaks for both groups:
+vecPeaks01 = aryPeaks[vecCon, 0]
+vecPeaks02 = aryPeaks[vecCon, 1]
+
+
+# ----------------------------------------------------------------------------
+# *** Create null distribution
+
+# The mean difference in peak position between the two randomised groups is the  
+# null distribution.
+vecNull = np.subtract(vecPeaks01, vecPeaks02)
+
+
+# ----------------------------------------------------------------------------
+# *** Empirical mean difference
+
+# The peak difference on the full profile needs to be calculated for comparison
+# with the null distribution.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 print('-Done.')

@@ -57,7 +57,7 @@ strPthPkl = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/bootstrap_{}
 
 strPthPkl = strPthPkl.format(strCrct, strFunc)
 
-# Path of draining-corrected depth-profiles:
+# Path of depth-profiles:
 if strCrct == 'uncorrected':
     dicPthDpth = {'V1': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy',  #noqa
                   'V2': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2.npy'}  #noqa

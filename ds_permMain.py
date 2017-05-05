@@ -81,7 +81,7 @@ if strCrct == 'corrected':
 vecEmpX = np.array([0.025, 0.061, 0.163, 0.72])
 
 # Number of resampling iterations:
-varNumIt=1000
+varNumIt=2000
 
 # Number of processes to run in parallel:
 varPar=10
@@ -100,6 +100,14 @@ if strSwitch == 'load':
     with open(strPthJson, 'r') as objJson:
          lstJson = json.load(objJson)
 
+    # Retrieve numpy arrays from nested list:
+    aryDpth01 = np.array(lstJson[0])
+    aryDpth02 = np.array(lstJson[1])
+    aryMdlY = np.array(lstJson[2])
+    aryHlfMax = np.array(lstJson[3])
+    arySemi = np.array(lstJson[4])
+    aryRes = np.array(lstJson[5])
+
 elif strSwitch == 'create':
 
     # ------------------------------------------------------------------------
@@ -116,18 +124,17 @@ elif strSwitch == 'create':
 
     print('---Saving bootstrapping results as json object')
 
-    # Put results into list:
-    lstJson = [aryDpth01,  # Original depth profiles V1
-               aryDpth02,  # Original depth profiles V2
-               aryMdlY,    # Fitted y-values
-               aryHlfMax,  # Predicted response at 50 percent contrast
-               arySemi,    # Semisaturation contrast
-               aryRes]     # Residual variance
+    # Put results into nested list:
+    lstJson = [aryDpth01.tolist(),  # Original depth profiles V1
+               aryDpth02.tolist(),  # Original depth profiles V2
+               aryMdlY.tolist(),    # Fitted y-values
+               aryHlfMax.tolist(),  # Predicted response at 50% contrast
+               arySemi.tolist(),    # Semisaturation contrast
+               aryRes.tolist()]     # Residual variance
 
     # Save results to disk:
     with open(strPthJson, 'w') as objJson:
          json.dump(lstJson, objJson)
-
 
 
 print('-Done.')

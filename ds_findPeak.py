@@ -101,7 +101,7 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05, lgcPos=False):
                                     np.greater,
                                     axis=1,
                                     order=varNumOrd,
-                                    mode='clip')
+                                    mode='wrap')
 
     # Number of cases (i.e. bootstrap iterations):
     varNumIt = aryDpth.shape[0]

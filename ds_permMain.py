@@ -19,7 +19,7 @@ The procedure is as follow:
 - The response at half-maximum contrast is calculated from the fitted CRF.
 - The peak of the half-maximum contrast profile is identified for both
   randomised groups.
-- The mean difference in peak position between the two randomised groups is the  
+- The mean difference in peak position between the two randomised groups is the
   null distribution.
 - The peak difference on the full profile is calculated, and the permutation
   p-value with respect to the null distribution is produced.
@@ -44,16 +44,17 @@ Function of the depth sampling pipeline.
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
-# import json
+import multiprocessing as mp
 from ds_permCrf import perm_hlf_max_peak
 from ds_findPeak import find_peak
+from ds_crfParBoot02 import crf_par_02
 
 
 # ----------------------------------------------------------------------------
 # *** Define parameters
 
 # Use existing resampling results or create new one ('load' or 'create')?
-strSwitch = 'load'
+strSwitch = 'create'
 
 # Corrected or  uncorrected depth profiles?
 strCrct = 'uncorrected'
@@ -64,28 +65,37 @@ strFunc = 'power'
 
 # File to load resampling from / save resampling to (corrected/uncorrected and
 # power/hyper left open):
-strPthOut = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/crf_permutation_{}_{}.npz'  #noqa
+# strPthOut = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/crf_permutation_{}_{}.npz'  #noqa
+strPthOut = '/Users/john/Desktop/tmp/crf_permutation_{}_{}.npz'  #noqa
 
 strPthOut = strPthOut.format(strCrct, strFunc)
 
 # Path of depth-profiles:
 if strCrct == 'uncorrected':
-    objDpth01 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy'  #noqa
-    objDpth02 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2.npy'  #noqa
+    # objDpth01 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy'  #noqa
+    # objDpth02 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2.npy'  #noqa
+    objDpth01 = '/Users/john/Dropbox/Sonstiges/Higher_Level_Analysis/v1.npy'  #noqa
+    objDpth02 = '/Users/john/Dropbox/Sonstiges/Higher_Level_Analysis/v2.npy'  #noqa
 if strCrct == 'corrected':
-    objDpth01 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected.npy'  #noqa
-    objDpth02 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2_corrected.npy'  #noqa
+    # objDpth01 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected.npy'  #noqa
+    # objDpth02 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2_corrected.npy'  #noqa
+    objDpth01 = '/Users/john/Dropbox/Sonstiges/Higher_Level_Analysis/v1_corrected.npy'  #noqa
+    objDpth02 = '/Users/john/Dropbox/Sonstiges/Higher_Level_Analysis/v2_corrected.npy'  #noqa
 
 # Stimulus luminance contrast levels. NOTE: Should be between zero and one.
 # When using percent (i.e. from zero to 100), the search for the luminance at
 # half maximum response would need to be adjusted.
 vecEmpX = np.array([0.025, 0.061, 0.163, 0.72])
 
+# Number of x-values for which to solve the function when calculating model
+# fit:
+varNumX = 1000
+
 # Number of resampling iterations:
-varNumIt=3000
+varNumIt = 3000
 
 # Number of processes to run in parallel:
-varPar=11
+varPar = 4
 
 
 # ----------------------------------------------------------------------------
@@ -161,6 +171,7 @@ elif strSwitch == 'create':
 # ----------------------------------------------------------------------------
 # *** Find peaks in contrast at half maximum profiles
 
+print('---Find peaks in resampled contrast-at-half-maximum profiles')
 
 # Find peaks in first permutation group:
 vecPeaks01, vecPos01 = find_peak(aryHlfMax[0, :, :], lgcPos=True)
@@ -185,7 +196,9 @@ vecPeaks02 = aryPeaks[vecCon, 1]
 # ----------------------------------------------------------------------------
 # *** Create null distribution
 
-# The mean difference in peak position between the two randomised groups is the  
+print('---Create null distribution')
+
+# The mean difference in peak position between the two randomised groups is the
 # null distribution.
 vecNull = np.subtract(vecPeaks01, vecPeaks02)
 
@@ -193,31 +206,89 @@ vecNull = np.subtract(vecPeaks01, vecPeaks02)
 # ----------------------------------------------------------------------------
 # *** Empirical mean difference
 
+print('---Find peaks in empirical contrast-at-half-maximum profiles')
+
 # The peak difference on the full profile needs to be calculated for comparison
 # with the null distribution.
 
+# Number of subject:
+varNumSubs = aryDpth01.shape[0]
+
+# Put ROI depth arrays into list:
+lstDpth = [aryDpth01,
+           aryDpth02]
+
+# Create a queue to put the results in:
+queOut = mp.Queue()
+
+# Pseudo-randomisation array to use the bootstrapping function to get empirical
+# CRF fit:
+aryRnd = np.arange(0, varNumSubs, 1)
+aryRnd = np.array(aryRnd, ndmin=2)
+
+# Fit contrast response function on empirical depth profiles:
+crf_par_02(0,
+           lstDpth,
+           vecEmpX,
+           strFunc,
+           aryRnd,
+           varNumX,
+           queOut)
+
+# Retrieve results from queue:
+lstCrf = queOut.get(True)
+_, aryEmpMdlY, aryEmpHlfMax, aryEmpSemi, aryEmpRes = lstCrf
+
+# Find peaks in empirical CRF fit:
+vecEmpPeaks01 = find_peak(aryEmpHlfMax[0, :, :])
+print(('------Peak in empirical contrast-at-half-maximum profile, ROI 1: '
+       + str(np.around(np.multiply(vecEmpPeaks01[0], 100.0), 2))
+       + '%'))
+
+# Find peaks in second permutation group:
+vecEmpPeaks02 = find_peak(aryEmpHlfMax[1, :, :])
+print(('------Peak in empirical contrast-at-half-maximum profile, ROI 2: '
+       + str(np.around(np.multiply(vecEmpPeaks02[0], 100.0), 2))
+       + '%'))
+
+# Absolute peak difference in empirical profiles:
+varPeakDiff = np.absolute(np.subtract(vecEmpPeaks01, vecEmpPeaks02))
+
+
+# ----------------------------------------------------------------------------
+# *** Calculate p-value
+
+print('---Calculate p-value')
+
+# Absolute of the mean difference in peak position between the two randomised
+# groups (null distribution).
+vecNullAbs = np.absolute(vecNull)
+
+# Number of resampled cases with absolute peak position difference that is at
+# least as large as the empirical peak difference (permutation p-value):
+varNumGe = np.sum(np.greater_equal(vecNullAbs, varPeakDiff))
+
+print('------Number of resampled cases with absolute peak position')
+print('      difference that is at least as large as the empirical peak')
+print(('      difference: '
+      + str(varNumGe)))
+
+# Total number of resampled cases with identified peak position:
+varNumPk = np.shape(vecNull)[0]
+
+print('------Total number of resampled cases with identified peak position:')
+print(('      ' + str(varNumPk)))
+
+# Ratio of resampled cases with absolute peak position difference that is at
+# least as large as the empirical peak difference (permutation p-value):
+varP = np.divide(float(varNumGe), float(varNumPk))
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+print('------Permutation p-value for equality of distributions of peak')
+print('      position of contrast-at-half-maximum response depth profiles')
+print(('      between the two ROIs: '
+       + str(np.around(varP, decimals=5))))
+# ----------------------------------------------------------------------------
 
 print('-Done.')

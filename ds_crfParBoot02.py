@@ -21,7 +21,7 @@ import numpy as np
 from ds_crfFit import crf_fit
 
 
-def crf_par_02(idxPrc, lstDpth, vecEmpX, strFunc, aryRnd, varNumX, queOut):
+def crf_par_02(idxPrc, aryDpth, vecEmpX, strFunc, aryRnd, varNumX, queOut):
     """
     Parallelised bootstrapping of contrast response function, level 2.
 
@@ -30,9 +30,9 @@ def crf_par_02(idxPrc, lstDpth, vecEmpX, strFunc, aryRnd, varNumX, queOut):
     idxPrc : int
         Process ID of parallel process. Needed to put output in order in
         parent function.
-    lstDpth : list
-        List of arrays with empirical response data, of the form
-        lstDpth[idxRoi][idxSub, idxCon, idxDpt].
+    aryDpth : np.array
+        Array with empirical response data, of the form
+        aryDpth[idxRoi, idxSub, idxCon, idxDpt].
     vecEmpX : np.array
         Empirical x-values at which model will be fitted (e.g. stimulus
         contrast levels at which stimuli were presented), of the form
@@ -84,13 +84,13 @@ def crf_par_02(idxPrc, lstDpth, vecEmpX, strFunc, aryRnd, varNumX, queOut):
     # *** Fit contrast response function
 
     # Number of inputs (ROIs, e.g. V1 & V2):
-    varNumIn = len(lstDpth)
+    varNumIn = aryDpth.shape[0]
 
     # Number of conditions:
-    varNumCon = lstDpth[0].shape[1]  # same as vecEmpX.shape[0]
+    varNumCon = aryDpth.shape[2]
 
     # Number of depth levels:
-    varNumDpt = lstDpth[0].shape[2]
+    varNumDpt = aryDpth.shape[3]
 
     # Number of iterations (for bootstrapping):
     varNumIt = aryRnd.shape[0]
@@ -182,7 +182,7 @@ def crf_par_02(idxPrc, lstDpth, vecEmpX, strFunc, aryRnd, varNumX, queOut):
 
                 # Access contrast response profiles of current subset of
                 # subjects and current depth level:
-                aryEmpY = lstDpth[idxIn][vecSmpl, :, idxDpt]
+                aryEmpY = aryDpth[idxIn, vecSmpl, :, idxDpt]
 
                 # Fit CRF:
                 (aryMdlY[idxIn, idxIt, idxDpt, :],

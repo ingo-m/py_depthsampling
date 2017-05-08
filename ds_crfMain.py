@@ -28,7 +28,6 @@ each subject individually).
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import cPickle as pickle
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import ttest_rel
@@ -41,21 +40,21 @@ from ds_findPeak import find_peak
 # ----------------------------------------------------------------------------
 # *** Define parameters
 
-# Use existing bootstrap or create new one('load' or 'create')?
+# Load existing bootstrap or create new one ('load' or 'create')?
 strSwitch = 'load'
 
 # Corrected or  uncorrected depth profiles?
-strCrct = 'corrected'
+strCrct = 'uncorrected'
 
 # Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
 # function).
 strFunc = 'power'
 
-# Pickle to load bootstrap from / save bootstrap to (corrected/uncorrected and
+# File to load bootstrap from / save bootstrap to (corrected/uncorrected and
 # power/hyper left open):
-strPthPkl = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/bootstrap_{}_{}.pickle'  #noqa
+strPthNpz = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/bootstrap_{}_{}.npz'  #noqa
 
-strPthPkl = strPthPkl.format(strCrct, strFunc)
+strPthNpz = strPthNpz.format(strCrct, strFunc)
 
 # Path of depth-profiles:
 if strCrct == 'uncorrected':
@@ -135,11 +134,17 @@ varNumIn = len(dicPthDpth.values())
 
 if strSwitch == 'load':
 
-    print('---Loading bootstrapping results from pickle')
+    print('---Loading bootstrapping results from file')
 
-    # Load previously prepared pickle:
-    lstPkl = pickle.load(open(strPthPkl, "rb"))
-    lstDpth, aryMdlY, aryHlfMax, arySemi, aryRes = lstPkl[:]
+    # Load data from npz file:
+    objNpz = np.load(strPthNpz)
+
+    # Retrieve arrays from npz object (dictionary):
+    aryDpth = objNpz['aryDpth']
+    aryMdlY = objNpz['aryMdlY']
+    aryHlfMax = objNpz['aryHlfMax']
+    arySemi = objNpz['arySemi']
+    aryRes = objNpz['aryRes']
 
 elif strSwitch == 'create':
 
@@ -153,14 +158,33 @@ elif strSwitch == 'create':
 
     # Loop through ROIs (i.e. V1 and V2):
     for idxIn in range(0, varNumIn):
+
         # Load array with single-subject corrected depth profiles, of the form
-        # aryDpth[idxSub, idxCondition, idxDpt].
+        # aryDpth[idxSub, idxCondition, idxDpt]. Array is first placed into
+        # list, because we don't know the dimensions of the array yet, so we
+        # can't preallocate the final np array yet.
         lstDpth[idxIn] = np.load(dicPthDpth.values()[idxIn])
+
+    # Number of subjects:
+    varNumSubs = lstDpth[0].shape[0]
+
+    # Number of conditions:
+    varNumCon = lstDpth[0].shape[1]  # same as vecEmpX.shape[0]
+
+    # Number of depth levels:
+    varNumDpt = lstDpth[0].shape[2]
+
+    # Now that we know the data dimensions, we can relocate the data from a
+    # list of arrays to an array (so that all relevant data can be saved to
+    # disk in npz format later): aryDpth[idxRoi, idxSub, idxCondition, idxDpt]
+    aryDpth = np.zeros((varNumIn, varNumSubs, varNumCon, varNumDpt))
+    for idxIn in range(0, varNumIn):
+        aryDpth[idxIn, :, :, :] = lstDpth[idxIn]
 
     # ------------------------------------------------------------------------
     # *** Parallelised CRF bootstrapping
 
-    aryMdlY, aryHlfMax, arySemi, aryRes = crf_par_01(lstDpth,
+    aryMdlY, aryHlfMax, arySemi, aryRes = crf_par_01(aryDpth,
                                                      vecEmpX,
                                                      strFunc=strFunc,
                                                      varNumIt=varNumIt,
@@ -170,11 +194,15 @@ elif strSwitch == 'create':
     # ------------------------------------------------------------------------
     # *** Save results
 
-    print('---Saving bootstrapping results as pickle')
+    print('---Saving bootstrapping results to file')
 
-    # Put results into list and save as pickle:
-    lstPkl = [lstDpth, aryMdlY, aryHlfMax, arySemi, aryRes]
-    pickle.dump(lstPkl, open(strPthPkl, "wb"))
+    # Save result as npz object:
+    np.savez(strPthNpz,
+             aryDpth=aryDpth,
+             aryMdlY=aryMdlY,
+             aryHlfMax=aryHlfMax,
+             arySemi=arySemi,
+             aryRes=aryRes)
 
 
 # ----------------------------------------------------------------------------
@@ -183,13 +211,13 @@ elif strSwitch == 'create':
 print('---Averaing across iterations')
 
 # Number of subjects:
-varNumSubs = lstDpth[0].shape[0]
+varNumSubs = aryDpth.shape[1]
 
 # Number of conditions:
-varNumCon = lstDpth[0].shape[1]  # same as vecEmpX.shape[0]
+varNumCon = aryDpth.shape[2]
 
 # Number of depth levels:
-varNumDpt = lstDpth[0].shape[2]
+varNumDpt = aryDpth.shape[3]
 
 # Initialise arrays for across-iteration averages & confidence intervals:
 
@@ -252,8 +280,7 @@ for idxIn in range(0, varNumIn):
     # Find peaks for response at half maximum for all bootstrapping
     # iterations:
     lstPeakHlfMax[idxIn] = find_peak(aryHlfMax[idxIn, :, :],
-                                     varNumIntp=1000,
-                                     varSd=0.05)
+                                     varNumIntp=1000)
 
 # Array for relative peak positions:
 vecPeakHlfMaxMed = np.zeros((varNumIn))
@@ -290,8 +317,7 @@ for idxIn in range(0, varNumIn):
     # Find peaks for response at half maximum for all bootstrapping
     # iterations:
     lstPeakSemi[idxIn] = find_peak(arySemi[idxIn, :, :],
-                                   varNumIntp=1000,
-                                   varSd=0.05)
+                                   varNumIntp=1000)
 
 # Array for relative peak positions:
 vecPeakSemiMed = np.zeros((varNumIn))
@@ -371,12 +397,12 @@ plt01 = axs01.barh(vecBarY,
 # axs01.spines['left'].set_visible(True)
 
 # Set x-axis range:
-axs01.set_xlim([0.0, 1.0])
+axs01.set_xlim([0.0, 1.05])
 # Set y-axis range:
 axs01.set_ylim([0.0, (varNumIn * (varBarH + varBarS) + varBarS)])
 
 # Which x values to label with ticks (WM & CSF boundary):
-axs01.set_xticks([0.05, 0.95])
+axs01.set_xticks([0.0, 1.0])
 
 # Set tick labels for x ticks:
 axs01.set_xticklabels(['WM', 'CSF'])
@@ -493,9 +519,9 @@ vecMdlX = np.linspace(varXmin, varXmax, num=varNumX, endpoint=True)
 for idxIn in range(0, varNumIn):
 
     # Across-subjects mean of empirical contrast responses:
-    vecEmpYMne = np.mean(lstDpth[idxIn], axis=0)
+    vecEmpYMne = np.mean(aryDpth[idxIn, :, :, :], axis=0)
     # SEM:
-    vecEmpYSem = np.divide(np.std(lstDpth[idxIn], axis=0),
+    vecEmpYSem = np.divide(np.std(aryDpth[idxIn, :, :, :], axis=0),
                            np.sqrt(varNumSubs)
                            )
 

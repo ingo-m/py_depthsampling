@@ -203,9 +203,15 @@ print('---Find peaks in empirical contrast-at-half-maximum profiles')
 # Number of subject:
 varNumSubs = aryDpth01.shape[0]
 
-# Put ROI depth arrays into list:
-lstDpth = [aryDpth01,
-           aryDpth02]
+# Number of conditions:
+varNumCon = aryDpth01.shape[1]
+
+# Number of depth levels:
+varNumDpt = aryDpth01.shape[2]
+
+# Put the two ROI depth profile arrays into one array of the form
+# aryDpth[idxRoi, idxSub, idxCondition, idxDpt]
+aryDpth = np.array([aryDpth01, aryDpth02])
 
 # Create a queue to put the results in:
 queOut = mp.Queue()
@@ -217,7 +223,7 @@ aryRnd = np.array(aryRnd, ndmin=2)
 
 # Fit contrast response function on empirical depth profiles:
 crf_par_02(0,
-           lstDpth,
+           aryDpth,
            vecEmpX,
            strFunc,
            aryRnd,

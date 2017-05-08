@@ -22,16 +22,16 @@ import multiprocessing as mp
 from ds_crfParBoot02 import crf_par_02
 
 
-def crf_par_01(lstDpth, vecEmpX, strFunc='power', varNumIt=1000, varPar=10,
+def crf_par_01(aryDpth, vecEmpX, strFunc='power', varNumIt=1000, varPar=10,
                varNumX=1000):
     """
     Parallelised bootstrapping of contrast response function, level 1.
 
     Parameters
     ----------
-    lstDpth : list
-        List of arrays with empirical response data, of the form
-        lstDpth[idxRoi][idxSub, idxCon, idxDpt].
+    aryDpth : np.array
+        Array with empirical response data, of the form
+        aryDpth[idxRoi, idxSub, idxCon, idxDpt].
     vecEmpX : np.array
         Empirical x-values at which model will be fitted (e.g. stimulus
         contrast levels at which stimuli were presented), of the form
@@ -77,7 +77,7 @@ def crf_par_01(lstDpth, vecEmpX, strFunc='power', varNumIt=1000, varPar=10,
     print('---Preparing bootstrapping')
 
     # Number of subjects:
-    varNumSubs = lstDpth[0].shape[0]
+    varNumSubs = aryDpth.shape[0]
 
     # We will sample subjects with replacement. How many subjects to sample on
     # each iteration:
@@ -132,7 +132,7 @@ def crf_par_01(lstDpth, vecEmpX, strFunc='power', varNumIt=1000, varPar=10,
     for idxPrc in range(0, varPar):
         lstPrc[idxPrc] = mp.Process(target=crf_par_02,
                                     args=(idxPrc,
-                                          lstDpth,
+                                          aryDpth,
                                           vecEmpX,
                                           strFunc,
                                           lstRnd[idxPrc],

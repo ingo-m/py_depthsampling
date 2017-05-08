@@ -193,7 +193,8 @@ def crf_par_02(idxPrc, aryDpth, vecEmpX, strFunc, aryRnd, varNumX, queOut):
                                                             strFunc=strFunc,
                                                             varNumX=varNumX,
                                                             varXmin=0.0,
-                                                            varXmax=1.0)
+                                                            varXmax=1.0,
+                                                            strAvr='median')
 
     # Output list:
     lstOut = [idxPrc, aryMdlY, aryHlfMax, arySemi, aryRes]

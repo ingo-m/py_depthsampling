@@ -23,12 +23,8 @@ from ds_crfFunc import crf_power
 from ds_crfFunc import crf_hyper
 
 
-def crf_fit(vecEmpX,  #noqa
-            aryEmpY,
-            strFunc='power',
-            varNumX=1000,
-            varXmin=0.0,
-            varXmax=1.0):
+def crf_fit(vecEmpX, aryEmpY, strFunc='power', varNumX=1000, varXmin=0.0,
+            varXmax=1.0, strAvr='mean'):
     """
     Fit contrast response function.
 
@@ -51,6 +47,8 @@ def crf_fit(vecEmpX,  #noqa
         Minimum x-value for which function will be fitted.
     varXmax : float
         Maximum x-value for which function will be fitted.
+    strAvr : str
+        How to calculate the average of the y-values; 'mean' or 'median'.
 
     Returns
     -------
@@ -79,8 +77,12 @@ def crf_fit(vecEmpX,  #noqa
     # Number of conditions:
     varNumCon = vecEmpX.shape[0]
 
-    # Across-subjects mean for measured response:
-    vecEmpYMne = np.mean(aryEmpY, axis=0)
+    if strAvr == 'mean':
+        # Across-subjects mean for measured response:
+        vecEmpYMne = np.mean(aryEmpY, axis=0)
+    elif strAvr == 'median':
+        # Across-subjects median for measured response:
+        vecEmpYMne = np.median(aryEmpY, axis=0)
 
     # Standard error of the mean (across subjects):
     # aryEmpYSem = np.divide(np.std(aryEmpY, axis=0),

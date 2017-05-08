@@ -29,9 +29,11 @@ each subject individually).
 
 
 import numpy as np
+import multiprocessing as mp
 import matplotlib.pyplot as plt
 from scipy.stats import ttest_rel
 from ds_crfParBoot01 import crf_par_01
+from ds_crfParBoot02 import crf_par_02
 from ds_pltAcrDpth import funcPltAcrDpth
 from ds_crfPlot import plt_crf
 from ds_findPeak import find_peak
@@ -268,6 +270,36 @@ for idxIn in range(0, varNumIn):
 
 
 # ----------------------------------------------------------------------------
+# *** CRF fitting on full dataset
+
+print('---CRF fitting on full dataset')
+
+# We fit the CRF model on the median of the full dataset:
+aryDpthEmpMed = np.median(aryDpth, axis=1, keepdims=True)
+
+# Create a queue to put the results in:
+queOut = mp.Queue()
+
+# Pseudo-randomisation array to use the bootstrapping function to get empirical
+# CRF fit:
+# aryRnd = np.arange(0, varNumSubs, 1)
+aryRnd = np.array((0), ndmin=2)
+
+# Fit contrast response function on empirical depth profiles:
+crf_par_02(0,
+           aryDpthEmpMed,
+           vecEmpX,
+           strFunc,
+           aryRnd,
+           varNumX,
+           queOut)
+
+# Retrieve results from queue:
+lstCrf = queOut.get(True)
+_, aryEmpMdlY, aryEmpHlfMax, aryEmpSemi, aryEmpRes = lstCrf
+
+
+# ----------------------------------------------------------------------------
 # *** Find peak of response at half maximum contrast
 
 print('---Searching peak of response at half maximum contrast')
@@ -280,7 +312,8 @@ for idxIn in range(0, varNumIn):
     # Find peaks for response at half maximum for all bootstrapping
     # iterations:
     lstPeakHlfMax[idxIn] = find_peak(aryHlfMax[idxIn, :, :],
-                                     varNumIntp=1000)
+                                     varNumIntp=1000,
+                                     varSd=0.05)
 
 # Array for relative peak positions:
 vecPeakHlfMaxMed = np.zeros((varNumIn))
@@ -600,7 +633,7 @@ for idxIn in range(0, varNumIn):
 strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'fMRI signal change [a.u.]'
 
-funcPltAcrDpth(aryHlfMaxMne,       # aryData[Condition, Depth]
+funcPltAcrDpth(aryEmpHlfMax[:, 0, :],  # aryData[Condition, Depth]
                0,                  # aryError[Con., Depth]
                varNumDpt,          # Number of depth levels (on the x-axis)
                varNumIn,           # Number of conditions (separate lines)
@@ -638,7 +671,7 @@ aryClr = np.array([[15.0, 255.0, 135.0],
                    [15.0, 15.0, 255.0]])
 aryClr = np.divide(aryClr, 255.0)
 
-funcPltAcrDpth(arySemiMne,         # aryData[Condition, Depth]
+funcPltAcrDpth(aryEmpSemi[:, 0, :],  # aryData[Condition, Depth]
                0,                  # aryError[Con., Depth]
                varNumDpt,          # Number of depth levels (on the x-axis)
                varNumIn,           # Number of conditions (separate lines)

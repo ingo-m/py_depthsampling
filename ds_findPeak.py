@@ -23,7 +23,7 @@ from scipy.ndimage.filters import gaussian_filter1d
 from scipy.signal import argrelextrema
 
 
-def find_peak(aryDpth, varNumIntp=100, varSd=0.05, lgcPos=False):
+def find_peak(aryDpth, varNumIntp=100, varSd=0.05):
     """
     Find peak in cortical depth profile.
 
@@ -42,16 +42,13 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05, lgcPos=False):
         Standard deviation of the Gaussian kernel used for smoothing, relative
         to cortical thickness (i.e. a value of 0.05 would result in a Gaussian
         with FWHM of 5 percent of the cortical thickness).
-    lgcPos : bool
-        Whether to return the indicies of the identified peaks, in addition to
-        the peak positions. (The positions may for example be needed for
-        pairwise comparisons between permutation conditions.)
 
     Returns
     -------
     vecMin : np.array
-        Relative position of the peak (between 0.0 and 1.0). 1D array with
-        length equal to the number of depth profiles of the input array.
+        Relative position of the peak (between 0.0 and 1.0) for each depth
+        profile. 1D array with length equal to the number of depth profiles of
+        the input array.
 
     Notes
     -----
@@ -60,6 +57,9 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05, lgcPos=False):
 
     Function of the depth sampling pipeline.
     """
+    # Number of depth profiles (e.g. resampling iterations):
+    varNumIt = aryDpth.shape[0]
+
     # Identify number of depth levels:
     varNumDpth = aryDpth.shape[1]
 
@@ -101,25 +101,44 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05, lgcPos=False):
                                     np.greater,
                                     axis=1,
                                     order=varNumOrd,
-                                    mode='wrap')
-
-    # Number of cases (i.e. bootstrap iterations):
-    varNumIt = aryDpth.shape[0]
+                                    mode='clip')
 
     # Number of cases for which a peak was found:
     varNumPeaks = vecPeak.shape[0]
 
-    print(('------Identified peaks in '
+    print(('------Identified local maxima in '
            + str(varNumPeaks)
+           + ' out of '
+           + str(varNumIt)
+           + ' cases.'))
+
+    # Create vector with one peak position per case (for depth profiles that
+    # are monotonically increasing, no local maximum can be identified). There
+    # peak it their maximum value.
+    vecPeak2 = np.zeros((varNumIt), dtype=np.int64)
+    vecPeak2[vecPos] = vecPeak
+
+    # Cases for which no loacl maximum has been identified (depth profiles with
+    # monotonic increase):
+    vecPosMono = np.equal(vecPeak2, 0)
+
+    # Identifty position of global maximum:
+    vecMax = np.argmax(aryDpthSmth, axis=1)
+
+    # Replace zeros with global maximum for respective cases:
+    vecPeak2[vecPosMono] = vecMax[vecPosMono]
+
+    # Number of cases for which a local or global maxima was found:
+    varNumPeaks2 = vecPeak2.shape[0]
+
+    print(('------Identified local or global maxima in '
+           + str(varNumPeaks2)
            + ' out of '
            + str(varNumIt)
            + ' cases.'))
 
     # Convert the indicies of peak value into relative position (i.e.
     # relative cortical depth):
-    vecPeak = np.divide(vecPeak, np.float64(varNumIntp))
+    vecPeak2 = np.divide(vecPeak2, np.float64(varNumIntp))
 
-    if lgcPos:
-        return vecPeak, vecPos
-    else:
-        return vecPeak
+    return vecPeak2

@@ -45,7 +45,7 @@ from ds_findPeak import find_peak
 strSwitch = 'load'
 
 # Corrected or  uncorrected depth profiles?
-strCrct = 'uncorrected'
+strCrct = 'corrected'
 
 # Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
 # function).
@@ -611,7 +611,7 @@ strYlabel = 'Percent luminance contrast'
 aryClr = np.array([[15.0, 255.0, 135.0],
                    [15.0, 15.0, 255.0]])
 aryClr = np.divide(aryClr, 255.0)
-    
+
 funcPltAcrDpth(arySemiMne,         # aryData[Condition, Depth]
                0,                  # aryError[Con., Depth]
                varNumDpt,          # Number of depth levels (on the x-axis)

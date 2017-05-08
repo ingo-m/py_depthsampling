@@ -54,10 +54,10 @@ from ds_crfParBoot02 import crf_par_02
 # *** Define parameters
 
 # Use existing resampling results or create new one ('load' or 'create')?
-strSwitch = 'create'
+strSwitch = 'load'
 
 # Corrected or  uncorrected depth profiles?
-strCrct = 'uncorrected'
+strCrct = 'corrected'
 
 # Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
 # function).
@@ -65,22 +65,22 @@ strFunc = 'power'
 
 # File to load resampling from / save resampling to (corrected/uncorrected and
 # power/hyper left open):
-# strPthOut = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/crf_permutation_{}_{}.npz'  #noqa
-strPthOut = '/Users/john/Desktop/tmp/crf_permutation_{}_{}.npz'  #noqa
+strPthOut = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/crf_permutation_{}_{}.npz'  #noqa
+# strPthOut = '/Users/john/Desktop/tmp/crf_permutation_{}_{}.npz'  #noqa
 
 strPthOut = strPthOut.format(strCrct, strFunc)
 
 # Path of depth-profiles:
 if strCrct == 'uncorrected':
-    # objDpth01 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy'  #noqa
-    # objDpth02 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2.npy'  #noqa
-    objDpth01 = '/Users/john/Dropbox/Sonstiges/Higher_Level_Analysis/v1.npy'  #noqa
-    objDpth02 = '/Users/john/Dropbox/Sonstiges/Higher_Level_Analysis/v2.npy'  #noqa
+    objDpth01 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy'  #noqa
+    objDpth02 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2.npy'  #noqa
+    # objDpth01 = '/Users/john/Dropbox/Sonstiges/Higher_Level_Analysis/v1.npy'  #noqa
+    # objDpth02 = '/Users/john/Dropbox/Sonstiges/Higher_Level_Analysis/v2.npy'  #noqa
 if strCrct == 'corrected':
-    # objDpth01 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected.npy'  #noqa
-    # objDpth02 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2_corrected.npy'  #noqa
-    objDpth01 = '/Users/john/Dropbox/Sonstiges/Higher_Level_Analysis/v1_corrected.npy'  #noqa
-    objDpth02 = '/Users/john/Dropbox/Sonstiges/Higher_Level_Analysis/v2_corrected.npy'  #noqa
+    objDpth01 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected.npy'  #noqa
+    objDpth02 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2_corrected.npy'  #noqa
+    # objDpth01 = '/Users/john/Dropbox/Sonstiges/Higher_Level_Analysis/v1_corrected.npy'  #noqa
+    # objDpth02 = '/Users/john/Dropbox/Sonstiges/Higher_Level_Analysis/v2_corrected.npy'  #noqa
 
 # Stimulus luminance contrast levels. NOTE: Should be between zero and one.
 # When using percent (i.e. from zero to 100), the search for the luminance at
@@ -92,10 +92,10 @@ vecEmpX = np.array([0.025, 0.061, 0.163, 0.72])
 varNumX = 1000
 
 # Number of resampling iterations:
-varNumIt = 3000
+varNumIt = 1000
 
 # Number of processes to run in parallel:
-varPar = 4
+varPar = 11
 
 
 # ----------------------------------------------------------------------------
@@ -171,26 +171,15 @@ elif strSwitch == 'create':
 # ----------------------------------------------------------------------------
 # *** Find peaks in contrast at half maximum profiles
 
-print('---Find peaks in resampled contrast-at-half-maximum profiles')
+print('---Find peaks in resampled contrast-at-half-maximum profiles, ROI 1')
 
 # Find peaks in first permutation group:
-vecPeaks01, vecPos01 = find_peak(aryHlfMax[0, :, :], lgcPos=True)
+vecPeaks01 = find_peak(aryHlfMax[0, :, :])
+
+print('---Find peaks in resampled contrast-at-half-maximum profiles, ROI 2')
 
 # Find peaks in second permutation group:
-vecPeaks02, vecPos02 = find_peak(aryHlfMax[1, :, :], lgcPos=True)
-
-# Put peak locations together, array of the form aryPeak[idxIteration, idxRoi]:
-aryPeaks = np.zeros((varNumIt, 2))
-aryPeaks[vecPos01, 0] = vecPeaks01
-aryPeaks[vecPos02, 1] = vecPeaks02
-
-# Identify cases for which a peak has been identified for both groups:
-vecCon = np.greater(np.multiply(aryPeaks[:, 0], aryPeaks[:, 1]),
-                    0.0)
-
-# Select cases with peaks for both groups:
-vecPeaks01 = aryPeaks[vecCon, 0]
-vecPeaks02 = aryPeaks[vecCon, 1]
+vecPeaks02 = find_peak(aryHlfMax[1, :, :])
 
 
 # ----------------------------------------------------------------------------
@@ -282,8 +271,6 @@ print(('      ' + str(varNumPk)))
 # Ratio of resampled cases with absolute peak position difference that is at
 # least as large as the empirical peak difference (permutation p-value):
 varP = np.divide(float(varNumGe), float(varNumPk))
-
-
 
 print('------Permutation p-value for equality of distributions of peak')
 print('      position of contrast-at-half-maximum response depth profiles')

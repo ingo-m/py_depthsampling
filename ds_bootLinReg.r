@@ -1,18 +1,16 @@
-"
-Parametric bootstraping of linear regerssion.
-
-Input: array created with ds_testSemi.py, of the form aryEmpSemiR[idxDpt, 3],
-where the first dimension corresponds to the number of (cortical depth levels
-* number of ROIs), and the second dimension corresponds to three columns for
-the linear model, representing: the signal (i.e. the semisaturation constant,
-which is the idenpendent variable), the depth level (1st dependent variable)
-and the ROI membership (2nd dependent variable).
-
-Requires: RcppCNPy library.
-
-For more information see
-https://stats.stackexchange.com/questions/83012/how-to-obtain-p-values-of-coefficients-from-bootstrap-regression
-"
+# Parametric bootstraping of linear regerssion.
+#
+# Input: array created with ds_testSemi.py, of the form aryEmpSemiR[idxDpt, 3],
+# where the first dimension corresponds to the number of (cortical depth levels
+# * number of ROIs), and the second dimension corresponds to three columns for
+# the linear model, representing: the signal (i.e. the semisaturation constant,
+# which is the idenpendent variable), the depth level (1st dependent variable)
+# and the ROI membership (2nd dependent variable).
+#
+# Requires: RcppCNPy library.
+#
+# For more information see
+# https://stats.stackexchange.com/questions/83012/how-to-obtain-p-values-of-coefficients-from-bootstrap-regression
 
 library(RcppCNPy)
 
@@ -29,7 +27,10 @@ datEmpSemi  <- data.frame(aryEmpSemi)
 colnames(datEmpSemi) <- c('Signal', 'Depth', 'ROI')
 
 # Number of iterations:
-varNumIt    <- 1000
+varNumIt    <- 100000
+
+print('---Number of iterations:')
+print(varNumIt)
 
 # Linear model:
 mdlLin      <- lm(Signal ~ Depth + ROI, datEmpSemi)
@@ -42,7 +43,7 @@ varNumPe    <- length(vecPe)
 
 # Array for bootstrapping results. Columns correspond to iterations, rows
 # correspond to the three parameter estimates for each iteration.
-aryBoot     <- matrix(rep(0, varNumPe * varNumIt), ncol<-varNumPe)
+aryBoot     <- matrix(rep(0, varNumPe * varNumIt), ncol=varNumPe)
 
 # Loop through iterations:
 for (idxIt in 1:varNumIt) {

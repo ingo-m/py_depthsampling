@@ -43,10 +43,10 @@ from ds_findPeak import find_peak
 # *** Define parameters
 
 # Load existing bootstrap or create new one ('load' or 'create')?
-strSwitch = 'load'
+strSwitch = 'create'
 
 # Corrected or  uncorrected depth profiles?
-strCrct = 'uncorrected'
+strCrct = 'corrected'
 
 # Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
 # function).
@@ -123,7 +123,7 @@ varCnfUp = 97.5
 varPar = 11
 
 # How many iterations (i.e. how often to sample):
-varNumIt = 10000
+varNumIt = 1000
 
 
 # ----------------------------------------------------------------------------
@@ -633,7 +633,8 @@ for idxIn in range(0, varNumIn):
 strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'fMRI signal change [a.u.]'
 
-funcPltAcrDpth(aryEmpHlfMax[:, 0, :],  # aryData[Condition, Depth]
+#funcPltAcrDpth(aryEmpHlfMax[:, 0, :],  # aryData[Condition, Depth]
+funcPltAcrDpth(aryHlfMaxMne,       # aryData[Condition, Depth]
                0,                  # aryError[Con., Depth]
                varNumDpt,          # Number of depth levels (on the x-axis)
                varNumIn,           # Number of conditions (separate lines)
@@ -671,7 +672,8 @@ aryClr = np.array([[15.0, 255.0, 135.0],
                    [15.0, 15.0, 255.0]])
 aryClr = np.divide(aryClr, 255.0)
 
-funcPltAcrDpth(aryEmpSemi[:, 0, :],  # aryData[Condition, Depth]
+# funcPltAcrDpth(aryEmpSemi[:, 0, :],  # aryData[Condition, Depth]
+funcPltAcrDpth(arySemiMne,         # aryData[Condition, Depth]
                0,                  # aryError[Con., Depth]
                varNumDpt,          # Number of depth levels (on the x-axis)
                varNumIn,           # Number of conditions (separate lines)

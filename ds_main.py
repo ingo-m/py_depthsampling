@@ -66,7 +66,7 @@ print('-Visualisation of depth sampling results')
 # *** Define parameters
 
 # Region of interest ('v1' or 'v2'):
-strRoi = 'v1'
+strRoi = 'v2'
 
 # List of subject identifiers:
 lstSubIds = ['20150930',

@@ -284,7 +284,7 @@ def funcSlctVrtcs(varNumCon,      # Number of conditions  #noqa
 
             # Increase z-conjunction-threshold for next interation of the
             # while-loop:
-            varThrZcon = varThrZcon + 0.001
+            varThrZcon = varThrZcon + 0.0001
 
             # Create boolean array for z-conjunction criterion:
             aryLgcZcon = np.ones((lstDpthData02[0].shape[0],

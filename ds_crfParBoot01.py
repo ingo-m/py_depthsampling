@@ -77,7 +77,7 @@ def crf_par_01(aryDpth, vecEmpX, strFunc='power', varNumIt=1000, varPar=10,
     print('---Preparing bootstrapping')
 
     # Number of subjects:
-    varNumSubs = aryDpth.shape[0]
+    varNumSubs = aryDpth.shape[1]
 
     # We will sample subjects with replacement. How many subjects to sample on
     # each iteration:

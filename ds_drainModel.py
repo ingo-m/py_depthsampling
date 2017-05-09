@@ -82,7 +82,7 @@ from ds_drainModelDecon03 import depth_deconv_03
 varMdl = 1
 
 # ROI (V1 or V2):
-strRoi = 'v1'
+strRoi = 'v2'
 
 # Path of depth-profile to correct:
 strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}.npy'.format(strRoi)  #noqa
@@ -243,7 +243,7 @@ print('---Plot results')
 
 # Plot across-subjects mean before deconvolution:
 strTmpTtl = '{} before deconvolution'.format(strRoi.upper())
-strTmpPth = (strPthPltOt + 'before')
+strTmpPth = (strPthPltOt + 'before_')
 funcPltAcrSubsMean(aryEmp5SnSb,
                    varNumSub,
                    5,
@@ -261,7 +261,7 @@ funcPltAcrSubsMean(aryEmp5SnSb,
 
 # Across-subjects mean after deconvolution:
 strTmpTtl = '{} after deconvolution'.format(strRoi.upper())
-strTmpPth = (strPthPltOt + 'after')
+strTmpPth = (strPthPltOt + 'after_')
 funcPltAcrSubsMean(aryNrnSnSb,
                    varNumSub,
                    5,

@@ -42,7 +42,7 @@ varNumPe    <- length(vecPe)
 
 # Array for bootstrapping results. Columns correspond to iterations, rows
 # correspond to the three parameter estimates for each iteration.
-aryBoot     <- matrix(rep(0, varNumPe * varNumIt), ncol=varNumPe)
+aryBoot     <- matrix(rep(0, varNumPe * varNumIt), ncol<-varNumPe)
 
 # Loop through iterations:
 for (idxIt in 1:varNumIt) {
@@ -58,17 +58,19 @@ for (idxIt in 1:varNumIt) {
 # (1) Intercept
 
 # Mean parameter estimate across bootstrap iterations:
-varPe01Mne = mean(aryBoot[,1])
+varPe01Mne <- mean(aryBoot[,1])
 # Absolute difference between the PE of each iteration and the mean PE across
 # iterations (null distribution, i.e. distribution of the PE assuming that the
 # mean value of the PE is zero):
-vecPe01Abs =  abs(aryBoot[,1] - mean(varPe01Mne))
+vecPe01Abs <-  abs(aryBoot[,1] - mean(varPe01Mne))
 # Logical test: For each iteration, is the PE from the null distribution greater
 # than the PE found on the full model?
-vecPe01Lgc = vecPe01Abs > abs(vecPe[1])
+vecPe01Lgc <- vecPe01Abs > abs(vecPe[1])
 # Ratio of iterations with bootstrapped PE under H0 greater than empirical PE
 # (p-value):
-varPe01P = mean(vecPe01Lgc)
+varPe01P <- mean(vecPe01Lgc)
+# Fix decimal places:
+varPe01P <- format(round(varPe01P, 5), nsmall = 5)
 # Confidence interval for PE:
 vecPe01Conf <- quantile(aryBoot[,1], c(.025, 0.975))
 
@@ -81,21 +83,23 @@ print(vecPe01Conf)
 # (2) Cortical depth level
 
 # Mean parameter estimate across bootstrap iterations:
-varPe02Mne = mean(aryBoot[,2])
+varPe02Mne <- mean(aryBoot[,2])
 # Absolute difference between the PE of each iteration and the mean PE across
 # iterations (null distribution, i.e. distribution of the PE assuming that the
 # mean value of the PE is zero):
-vecPe02Abs =  abs(aryBoot[,2] - mean(varPe02Mne))
+vecPe02Abs <-  abs(aryBoot[,2] - mean(varPe02Mne))
 # Logical test: For each iteration, is the PE from the null distribution greater
 # than the PE found on the full model?
-vecPe02Lgc = vecPe02Abs > abs(vecPe[2])
+vecPe02Lgc <- vecPe02Abs > abs(vecPe[2])
 # Ratio of iterations with bootstrapped PE under H0 greater than empirical PE
 # (p-value):
-varPe02P = mean(vecPe02Lgc)
+varPe02P <- mean(vecPe02Lgc)
+# Fix decimal places:
+varPe02P <- format(round(varPe02P, 5), nsmall = 5)
 # Confidence interval for PE:
 vecPe02Conf <- quantile(aryBoot[,2], c(.025, 0.975))
 
-print('---Intercept:')
+print('---Cortical depth level:')
 print('------p-value:')
 print(varPe02P)
 print('------Confidence interval:')
@@ -104,21 +108,23 @@ print(vecPe02Conf)
 # (3) ROI
 
 # Mean parameter estimate across bootstrap iterations:
-varPe03Mne = mean(aryBoot[,3])
+varPe03Mne <- mean(aryBoot[,3])
 # Absolute difference between the PE of each iteration and the mean PE across
 # iterations (null distribution, i.e. distribution of the PE assuming that the
 # mean value of the PE is zero):
-vecPe03Abs =  abs(aryBoot[,3] - mean(varPe03Mne))
+vecPe03Abs <-  abs(aryBoot[,3] - mean(varPe03Mne))
 # Logical test: For each iteration, is the PE from the null distribution greater
 # than the PE found on the full model?
-vecPe03Lgc = vecPe03Abs > abs(vecPe[3])
+vecPe03Lgc <- vecPe03Abs > abs(vecPe[3])
 # Ratio of iterations with bootstrapped PE under H0 greater than empirical PE
 # (p-value):
-varPe03P = mean(vecPe03Lgc)
+varPe03P <- mean(vecPe03Lgc)
+# Fix decimal places:
+varPe03P <- format(round(varPe03P, 5), nsmall = 5)
 # Confidence interval for PE:
 vecPe03Conf <- quantile(aryBoot[,3], c(.025, 0.975))
 
-print('---Intercept:')
+print('---ROI:')
 print('------p-value:')
 print(varPe03P)
 print('------Confidence interval:')

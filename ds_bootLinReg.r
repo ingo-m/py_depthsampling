@@ -16,6 +16,8 @@ https://stats.stackexchange.com/questions/83012/how-to-obtain-p-values-of-coeffi
 
 library(RcppCNPy)
 
+print('-Parametric bootstraping of linear regerssion on depth profiles.')
+
 # Load empirical semisaturation constant from disk (i.e. semisaturation constant
 # fitted on the full dataset; needs to be created with ds_crfMain.py):
 aryEmpSemi  <- npyLoad('/Users/john/Dropbox/Sonstiges/Higher_Level_Analysis/aryEmpSemi_corrected_power.npy')
@@ -27,7 +29,7 @@ datEmpSemi  <- data.frame(aryEmpSemi)
 colnames(datEmpSemi) <- c('Signal', 'Depth', 'ROI')
 
 # Number of iterations:
-varNumIt    <- 10000
+varNumIt    <- 1000
 
 # Linear model:
 mdlLin      <- lm(Signal ~ Depth + ROI, datEmpSemi)
@@ -53,12 +55,71 @@ for (idxIt in 1:varNumIt) {
 
 # There are three coefficient: (1) intercept, (2) depth, (3) ROI.
 
-# Get the p-values for coefficient
-P_val1 <-mean( abs(aryBoot[,1] - mean(aryBoot[,1]) )> abs( vecPe[1]))
-P_val2 <-mean( abs(aryBoot[,2] - mean(aryBoot[,2]) )> abs( vecPe[2]))
-P_val3 <-mean( abs(aryBoot[,3] - mean(aryBoot[,3]) )> abs( vecPe[3]))
+# (1) Intercept
 
-#and some parametric bootstrap confidence intervals (2.5%, 97.5%)
-ConfInt1 <- quantile(aryBoot[,1], c(.025, 0.975))
-ConfInt2 <- quantile(aryBoot[,2], c(.025, 0.975))
-ConfInt3 <- quantile(aryBoot[,3], c(.025, 0.975))
+# Mean parameter estimate across bootstrap iterations:
+varPe01Mne = mean(aryBoot[,1])
+# Absolute difference between the PE of each iteration and the mean PE across
+# iterations (null distribution, i.e. distribution of the PE assuming that the
+# mean value of the PE is zero):
+vecPe01Abs =  abs(aryBoot[,1] - mean(varPe01Mne))
+# Logical test: For each iteration, is the PE from the null distribution greater
+# than the PE found on the full model?
+vecPe01Lgc = vecPe01Abs > abs(vecPe[1])
+# Ratio of iterations with bootstrapped PE under H0 greater than empirical PE
+# (p-value):
+varPe01P = mean(vecPe01Lgc)
+# Confidence interval for PE:
+vecPe01Conf <- quantile(aryBoot[,1], c(.025, 0.975))
+
+print('---Intercept:')
+print('------p-value:')
+print(varPe01P)
+print('------Confidence interval:')
+print(vecPe01Conf)
+
+# (2) Cortical depth level
+
+# Mean parameter estimate across bootstrap iterations:
+varPe02Mne = mean(aryBoot[,2])
+# Absolute difference between the PE of each iteration and the mean PE across
+# iterations (null distribution, i.e. distribution of the PE assuming that the
+# mean value of the PE is zero):
+vecPe02Abs =  abs(aryBoot[,2] - mean(varPe02Mne))
+# Logical test: For each iteration, is the PE from the null distribution greater
+# than the PE found on the full model?
+vecPe02Lgc = vecPe02Abs > abs(vecPe[2])
+# Ratio of iterations with bootstrapped PE under H0 greater than empirical PE
+# (p-value):
+varPe02P = mean(vecPe02Lgc)
+# Confidence interval for PE:
+vecPe02Conf <- quantile(aryBoot[,2], c(.025, 0.975))
+
+print('---Intercept:')
+print('------p-value:')
+print(varPe02P)
+print('------Confidence interval:')
+print(vecPe02Conf)
+
+# (3) ROI
+
+# Mean parameter estimate across bootstrap iterations:
+varPe03Mne = mean(aryBoot[,3])
+# Absolute difference between the PE of each iteration and the mean PE across
+# iterations (null distribution, i.e. distribution of the PE assuming that the
+# mean value of the PE is zero):
+vecPe03Abs =  abs(aryBoot[,3] - mean(varPe03Mne))
+# Logical test: For each iteration, is the PE from the null distribution greater
+# than the PE found on the full model?
+vecPe03Lgc = vecPe03Abs > abs(vecPe[3])
+# Ratio of iterations with bootstrapped PE under H0 greater than empirical PE
+# (p-value):
+varPe03P = mean(vecPe03Lgc)
+# Confidence interval for PE:
+vecPe03Conf <- quantile(aryBoot[,3], c(.025, 0.975))
+
+print('---Intercept:')
+print('------p-value:')
+print(varPe03P)
+print('------Confidence interval:')
+print(vecPe03Conf)

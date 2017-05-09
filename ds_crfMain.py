@@ -43,10 +43,10 @@ from ds_findPeak import find_peak
 # *** Define parameters
 
 # Load existing bootstrap or create new one ('load' or 'create')?
-strSwitch = 'create'
+strSwitch = 'load'
 
 # Corrected or  uncorrected depth profiles?
-strCrct = 'corrected'
+strCrct = 'uncorrected'
 
 # Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
 # function).
@@ -123,7 +123,7 @@ varCnfUp = 97.5
 varPar = 11
 
 # How many iterations (i.e. how often to sample):
-varNumIt = 1000
+varNumIt = 10000
 
 
 # ----------------------------------------------------------------------------
@@ -430,7 +430,7 @@ plt01 = axs01.barh(vecBarY,
 # axs01.spines['left'].set_visible(True)
 
 # Set x-axis range:
-axs01.set_xlim([0.0, 1.05])
+axs01.set_xlim([-0.05, 1.05])
 # Set y-axis range:
 axs01.set_ylim([0.0, (varNumIn * (varBarH + varBarS) + varBarS)])
 

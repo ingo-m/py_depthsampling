@@ -92,7 +92,7 @@ vecEmpX = np.array([0.025, 0.061, 0.163, 0.72])
 varNumX = 1000
 
 # Number of resampling iterations:
-varNumIt = 1000
+varNumIt = 10000
 
 # Number of processes to run in parallel:
 varPar = 11

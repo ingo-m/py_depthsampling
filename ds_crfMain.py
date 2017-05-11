@@ -46,7 +46,7 @@ from ds_findPeak import find_peak
 strSwitch = 'load'
 
 # Corrected or  uncorrected depth profiles?
-strCrct = 'uncorrected'
+strCrct = 'corrected'
 
 # Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
 # function).
@@ -430,7 +430,7 @@ plt01 = axs01.barh(vecBarY,
 # axs01.spines['left'].set_visible(True)
 
 # Set x-axis range:
-axs01.set_xlim([-0.05, 1.05])
+axs01.set_xlim([0.0, 1.05])
 # Set y-axis range:
 axs01.set_ylim([0.0, (varNumIn * (varBarH + varBarS) + varBarS)])
 

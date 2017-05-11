@@ -13,7 +13,10 @@ variance or both not being equal).
 The permutations need to be provided first (they can be created using
 ds_permMain).
 
+PART 2 - PREPARE BOOTSTRAPPING LINEAR REGRESSION
 
+The bootstrap linear regression is performed in R. Here, we only prepare an npy
+file (containing a np array) that can be read by R and used for the analysis.
 
 Function of the depth sampling pipeline.
 """
@@ -43,11 +46,11 @@ from ds_crfParBoot02 import crf_par_02
 # *** Define parameters
 
 # Corrected or  uncorrected depth profiles?
-strCrct = 'corrected'
+strCrct = 'uncorrected'
 
 # Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
 # function).
-strFunc = 'power'
+strFunc = 'hyper'
 
 # File to load resampling from:
 strPthOut = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/crf_permutation_{}_{}.npz'  #noqa

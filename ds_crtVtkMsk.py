@@ -94,7 +94,7 @@ def funcCrtVtkMsk(strSubId,      # Data struc - Subject ID
     # *** Replace vtk data with mask
 
     # Change header (file name):
-    lstVtkData[1] = (strSubId + '_vertec_inclusion_mask')
+    lstVtkData[1] = (strSubId + '_vertex_inclusion_mask')
 
     # We change the string that precedes the numerical vertex data. The first
     # word (probably 'SCALARS') we leave as it is (needs to be supplied as
@@ -161,7 +161,7 @@ def funcCrtVtkMsk(strSubId,      # Data struc - Subject ID
     strRoi = os.path.splitext(os.path.split(strCsvRoi)[-1])[0]
 
     # Add output file name:
-    strVtkOt = (strVtkOt + '/' + strSubId + '_vertec_inclusion_mask_' +
+    strVtkOt = (strVtkOt + '/' + strSubId + '_vertex_inclusion_mask_' +
                 strRoi + '.vtk')
 
     # Create output csv object:

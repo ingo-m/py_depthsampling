@@ -71,7 +71,7 @@ lstSubId = ['20150930',
 lstCon = ['01', '02', '03', '04']
 
 # Base name of vertex inclusion masks (subject ID, subject ID, & ROI left open):
-strVtkMsk = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/{}_vertec_inclusion_mask_{}.vtk'  #noqa
+strVtkMsk = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/{}_vertex_inclusion_mask_{}.vtk'  #noqa
 
 # Base name of single-volume vtk meshes that together make up the timecourse
 # (subject ID, stimulus level, and volume index left open):

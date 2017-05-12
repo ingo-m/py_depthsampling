@@ -30,7 +30,7 @@ def funcPltAcrDpth(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
                    varYmax, lgcCnvPrct, lstConLbl, strXlabel, strYlabel,
                    strTitle, lgcLgnd, strPath, varSizeX=1800.0,
                    varSizeY=1600.0, varNumLblY=5, varPadY=(0.0, 0.0),
-                   aryClr=None, aryCnfLw=None, aryCnfUp=None):
+                   aryClr=None, aryCnfLw=None, aryCnfUp=None, lstVrt=None):
     """
     Plot data across depth level for variable number of conditions.
 
@@ -90,6 +90,13 @@ def funcPltAcrDpth(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
         Upper bound of confidence interval. Numpy array of form
         aryCnfUp[idxCondition, idxDepth]. If both aryCnfLw and aryCnfUp are
         provided, confidence intervals are plotted and aryError is ignored.
+    lstVrt : None or list
+        If a list of values is provided, vertical lines are plotted at the
+        respective relative positions along the cortical depth. For instance,
+        if the value 0.3 is provided, a vertical line is plotted at 30% of the
+        cortical depth. If lstVrt and aryClr are provided, they need to contain
+        the same number of conditions (i.e. lstVrt needs to contain the same
+        number of values as the size of the first dimension of aryClr).
 
     Returns
     -------
@@ -158,6 +165,37 @@ def funcPltAcrDpth(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
                                         facecolor=vecClrTmp,
                                         linewidth=0,
                                         antialiased=True)
+
+    # Plot vertical lines (e.g. representing peak position):
+    if lstVrt != None:
+ 
+        # Use same colours as for lines:
+        if aryClr is None:
+            # Prepare colour map:
+            objClrNorm = colors.Normalize(vmin=0, vmax=(varNumCon - 1))
+            objCmap = plt.cm.winter
+        
+        # Loop through list with line positions:
+        varNumVrt = len(lstVrt)
+        for idxVrt in range(0, varNumVrt):
+
+            # Adjust colour of current vertical line:
+            if aryClr is None:
+                # Adjust the colour of current line:
+                vecClrTmp = objCmap(objClrNorm(varNumVrt - 1 - idxVrt))
+            else:
+                vecClrTmp = aryClr[idxVrt, :]
+
+            # Apsolute Position of vertical line (input values refer to
+            # relative position):
+            varVrtTmp = lstVrt[idxVrt] * (float(varNumDpth) - 1.0)
+
+            # Plot vertical line:
+            axs01.axvline(varVrtTmp,
+                          color=vecClrTmp,
+                          linewidth=8.0,
+                          linestyle='--',
+                          antialiased=True)
 
     # Reduce framing box:
     axs01.spines['top'].set_visible(False)

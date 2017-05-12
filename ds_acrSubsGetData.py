@@ -22,8 +22,6 @@ Function of the depth sampling pipeline.
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np  # noqa
-# import matplotlib.pyplot as plt
-# import matplotlib.colors as colors
 from ds_loadCsvRoi import funcLoadCsvRoi
 from ds_loadVtkSingle import funcLoadVtkSingle
 from ds_loadVtkMulti import funcLoadVtkMulti

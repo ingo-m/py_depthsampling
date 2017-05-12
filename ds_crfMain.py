@@ -50,7 +50,7 @@ strCrct = 'corrected'
 
 # Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
 # function).
-strFunc = 'power'
+strFunc = 'hyper'
 
 # File to load bootstrap from / save bootstrap to (corrected/uncorrected and
 # power/hyper left open):
@@ -377,13 +377,9 @@ for idxIn in range(0, varNumIn):
 # ----------------------------------------------------------------------------
 # *** Plot peak of response at half maximum contrast (violin plot)
 
-###################
-### HISTOGRAM ? ###
-###################
-
 # Figure dimensions:
-varSizeX = 700.0
-varSizeY = 300.0
+varSizeX = 1000.0
+varSizeY = 400.0
 
 # Create plot:
 fig01 = plt.figure(figsize=((varSizeX * 0.5) / varDpi,
@@ -392,7 +388,7 @@ fig01 = plt.figure(figsize=((varSizeX * 0.5) / varDpi,
 axs01 = fig01.add_subplot(111)
 
 
-plt01 = axs01.violinplot(lstPeakHlfMax,
+plt01 = axs01.violinplot((lstPeakHlfMax[0], lstPeakHlfMax[1]),
                          vert=False,
                          showmedians=True,
                          showmeans=False,
@@ -709,7 +705,8 @@ funcPltAcrDpth(aryHlfMaxMne,       # aryData[Condition, Depth]
                varSizeX=2000.0,
                varSizeY=1400.0,
                aryCnfLw=aryHlfMaxCnfLw,
-               aryCnfUp=aryHlfMaxCnfUp)
+               aryCnfUp=aryHlfMaxCnfUp,
+               lstVrt=list(vecPeakHlfMaxMed))
 
 
 # ----------------------------------------------------------------------------

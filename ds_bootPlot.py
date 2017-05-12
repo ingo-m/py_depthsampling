@@ -20,12 +20,6 @@
 import numpy as np
 from ds_pltAcrDpth import funcPltAcrDpth
 
-objDpth = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy'
-strPath = '/home/john/Desktop/tmp/tmp.png'
-varNumIt=10000
-varConLw=2.5
-varConUp=97.5
-
 
 def bootPlot(objDpth, strPath, varNumIt=10000, varConLw=2.5, varConUp=97.5,
              strTtl='', strXlabel='Cortical depth level (equivolume)',
@@ -154,4 +148,3 @@ def bootPlot(objDpth, strPath, varNumIt=10000, varConLw=2.5, varConUp=97.5,
                    aryCnfUp=aryPrct[1, :, :])
     # ------------------------------------------------------------------------
 
-bootPlot(objDpth, strPath, strTtl='V1 before deconvolution', varNumIt=10000)

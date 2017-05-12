@@ -46,7 +46,7 @@ from ds_crfParBoot02 import crf_par_02
 # *** Define parameters
 
 # Corrected or  uncorrected depth profiles?
-strCrct = 'uncorrected'
+strCrct = 'corrected'
 
 # Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
 # function).

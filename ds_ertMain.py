@@ -46,11 +46,14 @@ from ds_ertPlt import funcPltErt
 
 # Load data from previously prepared pickle? If 'False', data is loaded from
 # vtk meshes and saved as pickle.
-lgcPic = False
+lgcPic = True
+
+# ROI ('v1' or 'v2'):
+strRoi = 'v1'
 
 # Name of pickle file from which to load time course data or save time course
-# data to:
-strPthPic = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/era_v2.pickle'  #noqa
+# data to (ROI name left open):
+strPthPic = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/era_{}.pickle'  #noqa
 
 # List of subject IDs:
 lstSubId = ['20150930',
@@ -67,8 +70,8 @@ lstSubId = ['20150930',
 # Condition levels (used to complete file names):
 lstCon = ['01', '02', '03', '04']
 
-# Base name of vertex inclusion masks (subject ID left open):
-strVtkMsk = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/{}_vertec_inclusion_mask_v2.vtk'  #noqa
+# Base name of vertex inclusion masks (subject ID, subject ID, & ROI left open):
+strVtkMsk = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/{}_vertec_inclusion_mask_{}.vtk'  #noqa
 
 # Base name of single-volume vtk meshes that together make up the timecourse
 # (subject ID, stimulus level, and volume index left open):
@@ -118,8 +121,8 @@ lgcLgnd01 = False
 # Plot legend - across subject plots:
 lgcLgnd02 = False
 
-# Output path for plots - prfix:
-strPltOtPre = '/home/john/PhD/Tex/tex_era/plots_v2/'
+# Output path for plots - prfix (ROI left open):
+strPltOtPre = '/home/john/PhD/Tex/tex_era/plots_{}/'
 # Output path for plots - suffix:
 strPltOtSuf = '_ert.svg'
 
@@ -132,6 +135,10 @@ varDpi = 70.0
 # *** Load data
 
 print('-Event-related timecourses depth sampling')
+
+# Complete strings:
+strPthPic = strPthPic.format(strRoi)
+strPltOtPre = strPltOtPre.format(strRoi)
 
 # Number of subjects:
 varNumSub = len(lstSubId)
@@ -165,7 +172,7 @@ else:
         print(('------Subject: ' + strSubID))
 
         # Complete file path of vertex inclusion mask for current subject:
-        strVtkMskTmp = strVtkMsk.format(strSubID, strSubID)
+        strVtkMskTmp = strVtkMsk.format(strSubID, strSubID, strRoi)
 
         # Load data for current subject (returns array of the form:
         # aryRoiErt[varNumCon, varNumDpth, varNumVol]):
@@ -201,46 +208,49 @@ for strSubID, aryRoiErt in dicAllSubsRoiErt.items():
 # *****************************************************************************
 # *** Plot single subjet results
 
-print('---Ploting single-subjects event-related averages')
+if False:
 
-# Loop through subjects:
-for strSubID, aryRoiErt in dicAllSubsRoiErt.items():
+    print('---Ploting single-subjects event-related averages')
 
-    # Loop through depth levels (we only create plots for three depth levels):
-    for idxDpth in [0, 5, 10]:
+    # Loop through subjects:
+    for strSubID, aryRoiErt in dicAllSubsRoiErt.items():
 
-        # Title for plot:
-        strTmpTtl = (strSubID + ' ERA, depth level ' + str(idxDpth))
+        # Loop through depth levels (we only create plots for three depth
+        # levels):
+        for idxDpth in [0, 5, 10]:
 
-        # Output filename:
-        strTmpPth = (strPltOtPre + strSubID + '_dpth_' + str(idxDpth)
-                     + strPltOtSuf)
+            # Title for plot:
+            strTmpTtl = (strSubID + ' ERA, depth level ' + str(idxDpth))
 
-        # We don't have the variances across trials (within subjects),
-        # therefore we create an empty array as a placeholder. NOTE: This
-        # should be replaced by between-trial variance once the depth sampling
-        # is fully scriptable.
-        aryDummy = np.zeros(aryRoiErt[:, idxDpth, :].shape)
+            # Output filename:
+            strTmpPth = (strPltOtPre + strSubID + '_dpth_' + str(idxDpth)
+                         + strPltOtSuf)
 
-        # We create one plot per depth-level.
-        funcPltErt(aryRoiErt[:, idxDpth, :],
-                   aryDummy,
-                   varNumDpth,
-                   varNumCon,
-                   varNumVol,
-                   varDpi,
-                   varAcrSubsYmin,
-                   varAcrSubsYmax,
-                   varStimStrt,
-                   varStimEnd,
-                   varTr,
-                   lstConLbl,
-                   lgcLgnd01,
-                   strXlabel,
-                   strYlabel,
-                   lgcCnvPrct,
-                   strTmpTtl,
-                   strTmpPth)
+            # We don't have the variances across trials (within subjects),
+            # therefore we create an empty array as a placeholder. NOTE: This
+            # should be replaced by between-trial variance once the depth
+            # sampling is fully scriptable.
+            aryDummy = np.zeros(aryRoiErt[:, idxDpth, :].shape)
+
+            # We create one plot per depth-level.
+            funcPltErt(aryRoiErt[:, idxDpth, :],
+                       aryDummy,
+                       varNumDpth,
+                       varNumCon,
+                       varNumVol,
+                       varDpi,
+                       varAcrSubsYmin,
+                       varAcrSubsYmax,
+                       varStimStrt,
+                       varStimEnd,
+                       varTr,
+                       lstConLbl,
+                       lgcLgnd01,
+                       strXlabel,
+                       strYlabel,
+                       lgcCnvPrct,
+                       strTmpTtl,
+                       strTmpPth)
 # *****************************************************************************
 
 

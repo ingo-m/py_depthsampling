@@ -41,9 +41,12 @@ from ds_pltAcrDpth import funcPltAcrDpth
 # *****************************************************************************
 # *** Define parameters
 
+# ROI ('v1' or 'v2'):
+strRoi = 'v1'
+
 # Name of npy file from which to load time course data or save time course data
-# to:
-strPthPic = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/era_v1.pickle'  #noqa
+# to (ROI left open):
+strPthPic = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/era_{}.pickle'  #noqa
 
 # Number of subjects:
 varNumSub = 10
@@ -72,16 +75,16 @@ tplIdxMin = (10, 11)
 # lstConLbl = ['2.5%', '6.1%', '16.3%', '72.0%']
 lstConLbl = ['72.0%', '16.3%', '6.1%', '2.5%']
 
-# Title for single-subject positive response plot:
-strTtl04 = 'Positive response V1'
+# Title for single-subject positive response plot (ROI left open):
+strTtl04 = 'Positive response {}'
 # Limits of y-axis for ratio-across-depth plot:
 varYmin04 = 0.0
 varYmax04 = 0.1
 # Label for axes:
 strXlabel04 = 'Cortical depth level'
 strYlabel04 = 'Percent signal change'
-# Output path for ratio-across-depth plots (subject ID left open):
-strPathOut04 = '/home/john/Desktop/tex_era/plots_v1/{}_main_resp_acr_dpths.png'
+# Output path for ratio-across-depth plots (ROI & subject ID left open):
+strPathOut04 = '/home/john/PhD/Tex/tex_era/plots_{}/{}_main_resp_acr_dpths.png'
 # Plot legend?
 lgcLgnd04 = True
 
@@ -93,8 +96,8 @@ varYmax01 = 2.0
 # Label for axes:
 strXlabel01 = 'Cortical depth level'
 strYlabel01 = 'Percent signal change'
-# Output path for ratio-across-depth plots:
-strPathOut01 = '/home/john/Desktop/tex_era/plots_v1/main_resp_acr_dpths.png'
+# Output path for ratio-across-depth plots (ROI left open):
+strPathOut01 = '/home/john/PhD/Tex/tex_era/plots_{}/main_resp_acr_dpths.png'
 # Plot legend?
 lgcLgnd01 = True
 
@@ -107,12 +110,12 @@ varYmax02 = 0.02
 strXlabel02 = 'Cortical depth level'
 strYlabel02 = 'Percent signal change'
 # Output path for ratio-across-depth plots:
-strPathOut02 = '/home/john/Desktop/tex_era/plots_v1/undrsht_acr_dpths.png'
+strPathOut02 = '/home/john/PhD/Tex/tex_era/plots_{}/undrsht_acr_dpths.png'
 # Plot legend?
 lgcLgnd02 = False
 
 # Title for ratio-across-depth plot:
-strTtl03 = 'Ratio positive response / undershoot V1'
+strTtl03 = 'Ratio positive response / undershoot {}'
 # Limits of y-axis for ratio-across-depth plot:
 varYmin03 = 1.0
 varYmax03 = 1.12
@@ -120,7 +123,7 @@ varYmax03 = 1.12
 strXlabel03 = 'Cortical depth level'
 strYlabel03 = 'Ratio'
 # Output path for ratio-across-depth plots:
-strPathOut03 = '/home/john/Desktop/tex_era/plots_v1/ratio_acr_dpths_not_demeaned.png'  #noqa
+strPathOut03 = '/home/john/PhD/Tex/tex_era/plots_{}/ratio_acr_dpths_not_demeaned.png'  #noqa
 # Plot legend?
 lgcLgnd03 = False
 
@@ -133,6 +136,14 @@ varDpi = 80.0
 # *** Load data
 
 print('-Depth-dependent BOLD ERT plots')
+
+# Complete strings:
+strPthPic = strPthPic.format(strRoi)
+strPathOut01 = strPathOut01.format(strRoi)
+strPathOut02 = strPathOut02.format(strRoi)
+strPathOut03 = strPathOut03.format(strRoi)
+strTtl03 = strTtl03.format(strRoi.upper())
+strTtl04 = strTtl04.format(strRoi.upper())
 
 # Number of conditions:
 # varNumCon = len(lstCsvPath[0])
@@ -292,7 +303,7 @@ for strSubID, aryRoiErt in dicAllSubsRoiErt.items():
                    strYlabel04,  # Label on y axis
                    strTtl04,     # Figure title
                    lgcLgnd04,    # Boolean: whether to plot a legend
-                   strPathOut04.format(strSubID))  # Output path figure
+                   strPathOut04.format(strRoi, strSubID))  # Output path figure
 # *****************************************************************************
 
 

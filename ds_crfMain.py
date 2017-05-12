@@ -375,7 +375,65 @@ for idxIn in range(0, varNumIn):
 
 
 # ----------------------------------------------------------------------------
-# *** Plot peak of response at half maximum contrast
+# *** Plot peak of response at half maximum contrast (violin plot)
+
+###################
+### HISTOGRAM ? ###
+###################
+
+# Figure dimensions:
+varSizeX = 700.0
+varSizeY = 300.0
+
+# Create plot:
+fig01 = plt.figure(figsize=((varSizeX * 0.5) / varDpi,
+                            (varSizeY * 0.5) / varDpi),
+                   dpi=varDpi)
+axs01 = fig01.add_subplot(111)
+
+
+plt01 = axs01.violinplot(lstPeakHlfMax,
+                         vert=False,
+                         showmedians=True,
+                         showmeans=False,
+                         showextrema=False)
+#plt01 = axs01.boxplot(lstPeakHlfMax,
+#                      vert=False,
+#                      sym='',
+#                      widths=0.5)
+
+# Set x-axis range:
+axs01.set_xlim([-0.05, 1.05])
+# Set y-axis range:
+# axs01.set_ylim([0.0, (varNumIn * (varBarH + varBarS) + varBarS)])
+
+# Which x values to label with ticks (WM & CSF boundary):
+axs01.set_xticks([0.0, 1.0])
+
+# Set tick labels for x ticks:
+axs01.set_xticklabels(['WM', 'CSF'])
+
+# Title:
+axs01.set_title('Peak of response at 50% contrast', fontsize=14)
+
+# Make plot & axis labels fit into figure:
+plt.tight_layout(pad=0.5)
+
+# Save figure:
+fig01.savefig((strPthOt + '_' + strFunc + '_half_max_response_violin'
+               + strFleTyp),
+              dpi=(varDpi * 2.0),
+              facecolor='w',
+              edgecolor='w',
+              transparent=False,
+              frameon=None)
+
+# Close figure:
+plt.close(fig01)
+
+
+# ----------------------------------------------------------------------------
+# *** Plot peak of response at half maximum contrast (bar plot)
 
 print('---Plotting results')
 

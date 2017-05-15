@@ -41,7 +41,7 @@ print('-Visualisation of depth sampling results')
 # *** Define parameters
 
 # Region of interest ('v1' or 'v2'):
-strRoi = 'v1'
+strRoi = 'v2'
 
 # Path of vtk file with vertex inclusion mask (with subject ID, subject ID, &
 # ROI left open; needs to be generated with ds_main.py):
@@ -60,7 +60,7 @@ lstSubIds = ['20150930',
              '20161219_02']
 
 # Base path of vtk files with depth-sampled data (with subject ID left open):
-strVtkDpth = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/SD.vtk'
+strVtkDpth = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/tSNR.vtk'
 
 # Number of cortical depths:
 varNumDpth = 11
@@ -76,15 +76,15 @@ varNumLne = 2
 strTitle = strRoi.upper()
 
 # Limits of y-axis for across subject plot:
-varYmin = 0.3
-varYmax = 0.9
+varYmin = 0.0
+varYmax = 25.0
 
 # Label for axes:
 strXlabel = 'Cortical depth level (equivolume)'
-strYlabel = 'SD'
+strYlabel = 'tSNR'
 
 # Output path for plot:
-strPltOt = '/home/john/PhD/Tex/tex_pe/plots_{}/SD.svg'.format(strRoi)
+strPltOt = '/home/john/PhD/Tex/tex_pe/plots_{}/tSNR.svg'.format(strRoi)
 
 # Figure scaling factor:
 varDpi = 80.0
@@ -93,7 +93,7 @@ varDpi = 80.0
 lgcNormDiv = True
 
 # Output path for depth samling results (subject means):
-strDpthMeans = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}_SD.npy'.format(strRoi)  #noqa
+strDpthMeans = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}_tSNR.npy'.format(strRoi)  #noqa
 
 # Maximum number of processes to run in parallel: *** NOT IMPLEMENTED
 # varPar = 10
@@ -294,7 +294,7 @@ aryDpthMne = np.median(aryDpth, axis=0, keepdims=True)
 # Create plot:
 funcPltAcrDpth(aryDpthMne, None, varNumDpth, 1, 80.0, varYmin, varYmax, False,
                [''], strXlabel, strYlabel, strRoi.upper(), False, strPltOt,
-               varSizeX=1800.0, varSizeY=1600.0, varNumLblY=6,
+               varSizeX=1800.0, varSizeY=1600.0, varNumLblY=5,
                varPadY=(0.1, 0.1), aryCnfLw=aryPrctLw, aryCnfUp=aryPrctUp)
 
 

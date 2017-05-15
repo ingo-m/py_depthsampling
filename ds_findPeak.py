@@ -91,7 +91,7 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05):
 
     # Order of the search for the local maximum: how many points on each side
     # to use for the comparison to consider.
-    varNumOrd = int(np.around((np.float64(varNumIntp) * 0.01),
+    varNumOrd = int(np.around((np.float64(varNumIntp) * 0.1),
                               decimals=0))
 
     # Identify peaks (the algorithm procudes a tuple of two arrays, the first

@@ -31,7 +31,6 @@ each subject individually).
 import numpy as np
 import multiprocessing as mp
 import matplotlib.pyplot as plt
-from scipy.stats import ttest_rel
 from ds_crfParBoot01 import crf_par_01
 from ds_crfParBoot02 import crf_par_02
 from ds_pltAcrDpth import funcPltAcrDpth
@@ -50,7 +49,7 @@ strCrct = 'corrected'
 
 # Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
 # function).
-strFunc = 'hyper'
+strFunc = 'power'
 
 # File to load bootstrap from / save bootstrap to (corrected/uncorrected and
 # power/hyper left open):
@@ -130,6 +129,8 @@ varNumIt = 10000
 # *** Load / create bootstrap
 
 print('-CRF fitting')
+
+print(('--' + strCrct.upper() + ' profiles, ' + strFunc + ' CRF.'))
 
 # Number of inputs:
 varNumIn = len(dicPthDpth.values())
@@ -335,6 +336,13 @@ for idxIn in range(0, varNumIn):
     aryPeakHlfMaxCnf[1, idxIn] = np.percentile(lstPeakHlfMax[idxIn],
                                                varCnfUp,
                                                axis=0)
+
+print('---Median relative peak position for response at half maximum,')
+print(('------' + strCrct.upper() + ' profiles, ' + strFunc + ' CRF:'))
+for idxIn in range(0, varNumIn):
+    strTmp = ('---------ROI ' + str(idxIn + 1) + ': '
+              + str(np.around(vecPeakHlfMaxMed[idxIn], decimals=3)))
+    print(strTmp)
 
 
 # ----------------------------------------------------------------------------
@@ -803,17 +811,6 @@ funcPltAcrDpth(aryResMne02,        # aryData[Condition, Depth]
 # Mean residuals across conditions and depth levels (needed to calculate
 # confidence intervals):
 aryResMne03 = np.mean(aryRes, axis=(2, 3))
-
-print('---T-test for difference in residual variance of the CRF model '
-      + 'between V1 and V2')
-# Paired samples t-test for a difference in residual variance between V1 and
-# V2. The same bootstrapped samples were used for V1 and V2. We compare the
-# residual variance between V1 and V2 in across (paired) bootstrap iterations,
-# therefore the paired samples t-test is appropriate.
-varT, varP = ttest_rel(aryResMne03[1, :],
-                       aryResMne03[0, :])
-print('------t-statistic: ' + str(np.around(varT, decimals=3)))
-print('------p-value:     ' + str(np.around(varP, decimals=5)))
 
 # Confidence interval - we are interested in the variability across
 # iterations, not across conditions and/or depth levels, therefore we

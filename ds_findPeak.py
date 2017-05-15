@@ -23,7 +23,7 @@ from scipy.ndimage.filters import gaussian_filter1d
 from scipy.signal import argrelextrema
 
 
-def find_peak(aryDpth, varNumIntp=100, varSd=0.05):
+def find_peak(aryDpth, varNumIntp=100, varSd=0.05, lgcStat=True):
     """
     Find peak in cortical depth profile.
 
@@ -42,6 +42,8 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05):
         Standard deviation of the Gaussian kernel used for smoothing, relative
         to cortical thickness (i.e. a value of 0.05 would result in a Gaussian
         with FWHM of 5 percent of the cortical thickness).
+    lgcStat : bool
+        Whether to print status messages.
 
     Returns
     -------
@@ -106,11 +108,12 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05):
     # Number of cases for which a peak was found:
     varNumPeaks = vecPeak.shape[0]
 
-    print(('------Identified local maxima in '
-           + str(varNumPeaks)
-           + ' out of '
-           + str(varNumIt)
-           + ' cases.'))
+    if lgcStat:
+        print(('------Identified local maxima in '
+               + str(varNumPeaks)
+               + ' out of '
+               + str(varNumIt)
+               + ' cases.'))
 
     # Create vector with one peak position per case (for depth profiles that
     # are monotonically increasing, no local maximum can be identified). There
@@ -131,11 +134,12 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05):
     # Number of cases for which a local or global maxima was found:
     varNumPeaks2 = vecPeak2.shape[0]
 
-    print(('------Identified local or global maxima in '
-           + str(varNumPeaks2)
-           + ' out of '
-           + str(varNumIt)
-           + ' cases.'))
+    if lgcStat:
+        print(('------Identified local or global maxima in '
+               + str(varNumPeaks2)
+               + ' out of '
+               + str(varNumIt)
+               + ' cases.'))
 
     # Convert the indicies of peak value into relative position (i.e.
     # relative cortical depth):

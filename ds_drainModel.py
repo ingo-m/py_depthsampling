@@ -74,6 +74,8 @@ from ds_pltAcrSubsMean import funcPltAcrSubsMean
 from ds_drainModelDecon01 import depth_deconv_01
 from ds_drainModelDecon02 import depth_deconv_02
 from ds_drainModelDecon03 import depth_deconv_03
+from ds_findPeak import find_peak
+
 
 # ----------------------------------------------------------------------------
 # *** Define parameters
@@ -234,6 +236,94 @@ for idxSub in range(0, varNumSub):
 # aryNrnSnSb[idxSub, idxCondition, idxDpth].
 np.save(strPthPrfOt,
         aryNrnSnSb)
+
+
+# ----------------------------------------------------------------------------
+# *** Peak positions
+
+print('---Peak positions in depth profiles')
+
+# We bootstrap the peak finding. Peak finding needs to be performed both
+# before and after deconvolution, separately for all stimulus conditions.
+
+# Number of bootstrapping iterations:
+varNumIt = 10000
+
+# Lower & upper bound of percentile bootstrap (in percent):
+varCnfLw = 2.5
+varCnfUp = 97.5
+
+# Random array with subject indicies for bootstrapping of the form
+# aryRnd[varNumIt, varNumSmp]. Each row includes the indicies of the
+# subjects to the sampled on that iteration.
+aryRnd = np.random.randint(0,
+                           high=varNumSub,
+                           size=(varNumIt, varNumSub))
+
+# Loop before/after deconvolution:
+for idxDec in range(2):
+
+    if idxDec == 0:
+        print('------UNCORRECTED')
+    if idxDec == 1:
+        print('------CORRECTED')
+
+    # Array for peak positins before deconvolution, of the form
+    # aryPks01[idxCondition, idxIteration]
+    aryPks01 = np.zeros((2, varNumCon, varNumIt))
+        
+    # Array for actual bootstrap samples:
+    aryBoo = np.zeros((varNumIt, 5))
+    
+    # Loop through conditions:
+    for idxCon in range(0, varNumCon):
+    
+        # Create array with bootstrap samples:
+        for idxIt in range(0, varNumIt):
+
+            # Before deconvolution:
+            if idxDec== 0:
+                # Take mean across subjects in bootstrap samples:
+                aryBoo[idxIt, :] = np.mean(aryEmp5SnSb[aryRnd[idxIt, :],
+                                                       idxCon,
+                                                       :],
+                                           axis=0)
+
+            # After deconvolution:
+            if idxDec== 1:
+                # Take mean across subjects in bootstrap samples:
+                aryBoo[idxIt, :] = np.mean(aryNrnSnSb[aryRnd[idxIt, :],
+                                                      idxCon,
+                                                      :],
+                                           axis=0)
+    
+        # Find peaks:
+        aryPks01[idxDec, idxCon, :] = find_peak(aryBoo,
+                                                varNumIntp=100,
+                                                varSd=0.05,
+                                                lgcStat=False)
+    
+        # Median peak position:
+        varTmpMed = np.median(aryPks01[idxDec, idxCon, :])
+    
+        # Confidence interval (percentile bootstrap):
+        varTmpCnfLw = np.percentile(aryPks01[idxDec, idxCon, :], varCnfLw)
+        varTmpCnfUp = np.percentile(aryPks01[idxDec, idxCon, :], varCnfUp)
+    
+        # Print result:
+        strTmp = ('---------Median peak position: '
+                  + str(np.around(varTmpMed, decimals=2)))
+        print(strTmp)
+        strTmp = ('---------Percentile bootstrap '
+                  + str(np.around(varCnfLw, decimals=1))
+                  + '%: '
+                  + str(np.around(varTmpCnfLw, decimals=2)))
+        print(strTmp)
+        strTmp = ('---------Percentile bootstrap '
+                  + str(np.around(varCnfUp, decimals=1))
+                  + '%: '
+                  + str(np.around(varTmpCnfUp, decimals=2)))
+        print(strTmp)
 
 
 # ----------------------------------------------------------------------------

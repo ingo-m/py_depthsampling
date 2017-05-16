@@ -829,6 +829,8 @@ aryResMne04 = np.mean(aryResMne03, axis=1)
 # interval):
 varYmaxBar = np.around(np.max(aryResCnfUp04), decimals=2)
 
+varYmaxBar = 0.06
+
 # Error bars are plotted as deviation from mean, so we have take difference
 # between mean and confidence interval:
 aryResCnfLw04 = np.absolute(np.subtract(aryResMne04, aryResCnfLw04))
@@ -856,8 +858,7 @@ plt01 = axs01.bar(vecBarX,
                   aryResMne04,
                   width=0.8,
                   color=(0.1, 0.5, 0.75),
-                  tick_label=dicPthDpth.keys(),
-                  yerr=aryResCnf04)
+                  tick_label=dicPthDpth.keys())  # yerr=aryResCnf04)
 
 # Limits of axes:
 varYminBar = 0.0

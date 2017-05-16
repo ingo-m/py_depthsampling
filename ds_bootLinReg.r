@@ -18,7 +18,8 @@ print('-Parametric bootstraping of linear regerssion on depth profiles.')
 
 # Load empirical semisaturation constant from disk (i.e. semisaturation constant
 # fitted on the full dataset; needs to be created with ds_crfMain.py):
-aryEmpSemi  <- npyLoad('/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/aryEmpSemi_uncorrected_hyper.npy')
+#aryEmpSemi  <- npyLoad('/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/aryEmpSemi_uncorrected_hyper.npy')
+aryEmpSemi  <- npyLoad('/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/aryEmpResidual_corrected_power.npy')
 
 # Put data into data frame object:
 datEmpSemi  <- data.frame(aryEmpSemi)
@@ -27,7 +28,7 @@ datEmpSemi  <- data.frame(aryEmpSemi)
 colnames(datEmpSemi) <- c('Signal', 'Depth', 'ROI')
 
 # Number of iterations:
-varNumIt    <- 1000
+varNumIt    <- 100000
 
 print('---Number of iterations:')
 print(varNumIt)

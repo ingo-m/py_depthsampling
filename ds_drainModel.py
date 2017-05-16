@@ -239,14 +239,14 @@ np.save(strPthPrfOt,
 
 
 # ----------------------------------------------------------------------------
-# *** Peak positions
+# *** Peak positions percentile bootstrap
 
-print('---Peak positions in depth profiles')
+print('---Peak positions in depth profiles - percentile bootstrap')
 
 # We bootstrap the peak finding. Peak finding needs to be performed both
 # before and after deconvolution, separately for all stimulus conditions.
 
-# Number of bootstrapping iterations:
+# Number of resampling iterations:
 varNumIt = 10000
 
 # Lower & upper bound of percentile bootstrap (in percent):

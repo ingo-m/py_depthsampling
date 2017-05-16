@@ -5,9 +5,8 @@ Permutation test for difference in peak position for half-maximum response.
 The purpose of this script is to performe a permutation hypothesis test for a
 difference in the peak position in the cortical depth profiles of the response
 at half-maximum contrast between V1 and V2. More specifically, the equality of
-distributions of the peak positions is tested (i.e. the a possible difference
-could be due to a difference in means, variance, or the shape of the
-distribution).
+distributions of the peak positions is tested (i.e. a possible difference could
+be due to a difference in means, variance, or the shape of the distribution).
 
 The procedure is as follow:
 - Condition labels (i.e. V1 & V2) are permuted within subjects for each

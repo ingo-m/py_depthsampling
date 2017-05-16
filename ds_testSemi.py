@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Permutation & bootstrapping tests for semisaturation constant depth profiles.
+Permutation & bootstrapping tests on depth profiles.
+
+Can be used to test for differences in depth profiles between ROIs and for
+differences across cortical depth, e.g. on depth profiles of semisaturation
+constant bwetween V1 and V2. (Or, for instance, on residual variance depth
+profiles.)
 
 PART 1 - PERMUTATION TEST FOR DIFFERENCES BETWEEN ROIs
 
@@ -16,7 +21,7 @@ ds_permMain).
 PART 2 - PREPARE BOOTSTRAPPING LINEAR REGRESSION
 
 The bootstrap linear regression is performed in R. Here, we only prepare an npy
-file (containing a np array) that can be read by R and used for the analysis.
+file (containing an np array) that can be read by R.
 
 Function of the depth sampling pipeline.
 """
@@ -50,7 +55,7 @@ strCrct = 'corrected'
 
 # Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
 # function).
-strFunc = 'hyper'
+strFunc = 'power'
 
 # File to load resampling from:
 strPthOut = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/crf_permutation_{}_{}.npz'  #noqa
@@ -62,8 +67,15 @@ strPthOut = strPthOut.format(strCrct, strFunc)
 # half maximum response would need to be adjusted.
 vecEmpX = np.array([0.025, 0.061, 0.163, 0.72])
 
+# Test semisaturation constant depth profiles, or residual variance depth
+# profiles ('semi' or 'residuals')?
+strSwitch = 'residuals'
+
 # Output path for array to be analysed in R (bootstrap regerssion):
-strPthSemi = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/aryEmpSemi_{}_{}.npy'.format(strCrct, strFunc)  #noqa
+if strSwitch == 'semi':
+    strPthSemi = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/aryEmpSemi_{}_{}.npy'.format(strCrct, strFunc)  #noqa
+elif strSwitch == 'residuals':
+    strPthSemi = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/aryEmpResidual_{}_{}.npy'.format(strCrct, strFunc)  #noqa
 
 
 # ----------------------------------------------------------------------------
@@ -88,7 +100,7 @@ aryRes = objNpz['aryRes']
 # ----------------------------------------------------------------------------
 # *** Fit CRF on empirical profiles
 
-print('---Calculating mean difference on empirical depth profiles')
+print('---Fit CRF on empirical depth profiles')
 
 # The mean difference on the empirical profiles needs to be calculated for
 # comparison with the permutation distribution.
@@ -140,20 +152,33 @@ print('---PART 1 - PERMUTATION TEST FOR DIFFERENCES BETWEEN ROIs')
 # We test for differences in the mean semisaturation constant (mean across
 # cortical depth levels) between the two ROIs (e.g. V1 and V2).
 
-# Difference in mean semisaturaion constant across depth levels:
-varDiffSemiEmp = np.subtract(np.mean(aryEmpSemi[0, 0, :]),
-                             np.mean(aryEmpSemi[1, 0, :]))
+if strSwitch == 'semi':
 
-# Mean difference in permutation samples (null distribution):
-vecNull = np.subtract(np.mean(arySemi[0, :, :], axis=1),
-                      np.mean(arySemi[1, :, :], axis=1))
+    # Absolute difference in mean semisaturaion constant across depth levels:
+    varDiffEmp = np.absolute(np.subtract(np.mean(aryEmpSemi[0, 0, :]),
+                                         np.mean(aryEmpSemi[1, 0, :])))
+
+    # Mean difference in permutation samples (null distribution):
+    vecNull = np.subtract(np.mean(arySemi[0, :, :], axis=1),
+                          np.mean(arySemi[1, :, :], axis=1))
+
+
+elif strSwitch == 'residuals':
+
+    # Absolute difference in mean semisaturaion constant across depth levels:
+    varDiffEmp = np.absolute(np.subtract(np.mean(aryEmpRes[0, 0, :]),
+                                         np.mean(aryEmpRes[1, 0, :])))
+
+    # Mean difference in permutation samples (null distribution):
+    vecNull = np.subtract(np.mean(aryRes[0, :, :], axis=1),
+                          np.mean(aryRes[1, :, :], axis=1))
 
 # Absolute of the mean difference between the two randomised groups:
 vecNullAbs = np.absolute(vecNull)
 
 # Number of resampled cases with absolute mean difference that is at least as
 # large as the empirical mean difference (permutation p-value):
-varNumGe = np.sum(np.greater_equal(vecNullAbs, varDiffSemiEmp))
+varNumGe = np.sum(np.greater_equal(vecNullAbs, varDiffEmp))
 
 print('------Number of resampled cases with absolute mean difference that is')
 print(('      at least as large as the empirical mean difference: '

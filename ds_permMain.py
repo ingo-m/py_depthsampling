@@ -60,7 +60,7 @@ strCrct = 'corrected'
 
 # Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
 # function).
-strFunc = 'power'
+strFunc = 'hyper'
 
 # File to load resampling from / save resampling to (corrected/uncorrected and
 # power/hyper left open):
@@ -101,6 +101,8 @@ varPar = 11
 # *** Load / create resampling
 
 print('-Permutation CRF fitting')
+print(('--Profiles: ' + strCrct.upper()))
+print(('--Function: ' + strFunc))
 
 if strSwitch == 'load':
 

@@ -337,12 +337,12 @@ for idxIn in range(0, varNumIn):
                                                varCnfUp,
                                                axis=0)
 
-print('---Median relative peak position for response at half maximum,')
-print(('------' + strCrct.upper() + ' profiles, ' + strFunc + ' CRF:'))
-for idxIn in range(0, varNumIn):
-    strTmp = ('---------ROI ' + str(idxIn + 1) + ': '
-              + str(np.around(vecPeakHlfMaxMed[idxIn], decimals=3)))
-    print(strTmp)
+# print('---Median relative peak position for response at half maximum,')
+# print(('------' + strCrct.upper() + ' profiles, ' + strFunc + ' CRF:'))
+# for idxIn in range(0, varNumIn):
+#     strTmp = ('---------ROI ' + str(idxIn + 1) + ': '
+#               + str(np.around(vecPeakHlfMaxMed[idxIn], decimals=3)))
+#     print(strTmp)
 
 
 # ----------------------------------------------------------------------------

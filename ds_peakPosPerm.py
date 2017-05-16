@@ -65,7 +65,7 @@ if strCrct == 'corrected':
 # vecEmpX = np.array([0.025, 0.061, 0.163, 0.72])
 
 # Number of resampling iterations:
-varNumIt = 10000
+varNumIt = 500000
 
 
 # ----------------------------------------------------------------------------
@@ -74,6 +74,8 @@ varNumIt = 10000
 print('-Peak position permutation test')
 
 print(('--') + strCrct.upper() + ' depth profiles.')
+
+print(('--Resampling iterations: ' + str(varNumIt)))
 
 # Load depth profiles from npy files:
 aryDpth01 = np.load(objDpth01)

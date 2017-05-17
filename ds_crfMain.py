@@ -42,10 +42,10 @@ from ds_findPeak import find_peak
 # *** Define parameters
 
 # Load existing bootstrap or create new one ('load' or 'create')?
-strSwitch = 'load'
+strSwitch = 'create'
 
 # Corrected or  uncorrected depth profiles?
-strCrct = 'corrected'
+strCrct = 'uncorrected'
 
 # Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
 # function).
@@ -53,7 +53,7 @@ strFunc = 'power'
 
 # File to load bootstrap from / save bootstrap to (corrected/uncorrected and
 # power/hyper left open):
-strPthNpz = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/bootstrap_{}_{}.npz'  #noqa
+strPthNpz = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/bootstrap_100k_{}_{}.npz'  #noqa
 
 strPthNpz = strPthNpz.format(strCrct, strFunc)
 
@@ -122,7 +122,7 @@ varCnfUp = 97.5
 varPar = 11
 
 # How many iterations (i.e. how often to sample):
-varNumIt = 10000
+varNumIt = 100000
 
 
 # ----------------------------------------------------------------------------

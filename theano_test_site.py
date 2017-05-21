@@ -30,7 +30,7 @@ aryDpth = np.load('/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy
 aryDpth = np.array([aryDpth])
 vecEmpX = np.array([0.025, 0.061, 0.163, 0.72])
 strFunc='power'
-varNumIt=100
+varNumIt=100000
 varNumX=1000
 
 
@@ -107,23 +107,60 @@ aryRnd = np.random.randint(0,
                            high=varNumSubs,
                            size=(varNumIt, varNumSubs))
 
+## Initialise array for random samples:
+#aryDpthRnd = np.zeros((varNumIt, varNumIn, varNumSubs, varNumCon, varNumDpth))
+#
+## Fill array with resampled samples:
+#for idxIt in range(varNumIt):
+#    aryDpthRnd[idxIt, :, :, :, :] = aryDpth[:, aryRnd[idxIt, :], :, :]
+#
+## Take mean within random samples:
+#aryDpthRnd = np.mean(aryDpthRnd, axis=2)
+#
+## Total number of CRF models to fit:
+#varNumTtl = (varNumIn * varNumDpth * varNumIt)
+#
+## Reshape:
+#aryDpthRnd = np.reshape(aryDpthRnd, (varNumTtl, varNumCon))
+
 # Total number of CRF models to fit:
 varNumTtl = (varNumIn * varNumDpth * varNumIt)
 
 # Array for resampled samples:
-aryDpthRnd = np.zeros((varNumTtl, varNumCon))
+aryDpthRnd = np.zeros((varNumTtl, varNumSubs, varNumCon))
 
 # Fill array with resampled samples:
 varCnt = 0
 for idxIn in range(varNumIn):
     for idxIt in range(varNumIt):
         for idxDpth in range(varNumDpth):
-            aryDpthRnd[varCnt, :] = np.mean(aryDpth[idxIn,
-                                                    aryRnd[idxIt, :],
-                                                    :,
-                                                    idxDpth],
-                                            axis=0)
+            aryDpthRnd[varCnt, :, :] = aryDpth[idxIn,
+                                               aryRnd[idxIt, :],
+                                               :,
+                                               idxDpth]
+
             varCnt += 1
+
+# Take mean within random samples:
+aryDpthRnd = np.mean(aryDpthRnd, axis=1)
+
+## Total number of CRF models to fit:
+#varNumTtl = (varNumIn * varNumDpth * varNumIt)
+#
+## Array for resampled samples:
+#aryDpthRnd = np.zeros((varNumTtl, varNumCon))
+#
+## Fill array with resampled samples:
+#varCnt = 0
+#for idxIn in range(varNumIn):
+#    for idxIt in range(varNumIt):
+#        for idxDpth in range(varNumDpth):
+#            aryDpthRnd[varCnt, :] = np.mean(aryDpth[idxIn,
+#                                                    aryRnd[idxIt, :],
+#                                                    :,
+#                                                    idxDpth],
+#                                            axis=0)
+#            varCnt += 1
 
 
 # ------------------------------------------------------------------------
@@ -217,13 +254,12 @@ TobGrd01 = T.grad(cost=TobjCst, wrt=TvecA)
 TobGrd02 = T.grad(cost=TobjCst, wrt=TvecB)
 
 # How to update the cost function:
-TobjUp = [(TvecA, (TvecA - TobGrd01 * varLrnRt)),
-          (TvecB, (TvecB - TobGrd02 * varLrnRt))]
+lstUp = [(TvecA, (TvecA - TobGrd01 * varLrnRt)),
+         (TvecB, (TvecB - TobGrd02 * varLrnRt))]
 
 train = th.function(inputs=[TaryEmpX, TaryDpthRnd],
                     outputs=TobjCst,
-                    updates=TobjUp) #,
-#                    allow_input_downcast=True)
+                    updates=lstUp)  # allow_input_downcast=True)
 
 # Do not check input data type:
 # train.trust_input = True
@@ -254,4 +290,11 @@ varTme03 = varTme02 - varTme01
 print(('---Elapsed time: ' + str(varTme03) + 's for ' + str(varNumTtl)
        + ' iterations.'))
 # ------------------------------------------------------------------------
+
+# Correlation between results:
+varCor01 = np.corrcoef(aryMdlPar[:, 0], aryMdlParT[:, 0])[0][1]
+varCor02 = np.corrcoef(aryMdlPar[:, 1], aryMdlParT[:, 1])[0][1]
+
+print('---Correlation model parameter 01: ' + str(varCor01))
+print('---Correlation model parameter 02: ' + str(varCor02))
 

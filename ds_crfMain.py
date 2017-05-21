@@ -45,7 +45,7 @@ from ds_findPeak import find_peak
 strSwitch = 'create'
 
 # Corrected or  uncorrected depth profiles?
-strCrct = 'uncorrected'
+strCrct = 'corrected'
 
 # Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
 # function).
@@ -53,7 +53,13 @@ strFunc = 'power'
 
 # File to load bootstrap from / save bootstrap to (corrected/uncorrected and
 # power/hyper left open):
-strPthNpz = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/bootstrap_100k_{}_{}.npz'  #noqa
+
+
+
+# strPthNpz = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/bootstrap_100k_{}_{}.npz'  #noqa
+strPthNpz = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Higher_Level_Analysis/bootstrap_100k_{}_{}.npz'  #noqa
+
+
 
 strPthNpz = strPthNpz.format(strCrct, strFunc)
 

@@ -30,7 +30,7 @@ aryDpth = np.load('/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy
 aryDpth = np.array([aryDpth])
 vecEmpX = np.array([0.025, 0.061, 0.163, 0.72])
 strFunc='power'
-varNumIt=10
+varNumIt=100
 varNumX=1000
 
 
@@ -177,74 +177,74 @@ print(('---Elapsed time: ' + str(varTme03) + 's for ' + str(varNumTtl)
 
 print('---Theano CRF fitting')
 
-# Check time:
-varTme01 = time.time()
-
-# Change type to float 32:
-vecEmpX = vecEmpX.astype(np.float32)
-aryDpthRnd = aryDpthRnd.astype(np.float32)
-
+# Boradcast array with X data, and change data type to float 32:
+aryEmpX = np.broadcast_to(vecEmpX, (varNumTtl, vecEmpX.shape[0]))
+aryEmpX = aryEmpX.astype(th.config.floatX)
+aryDpthRnd = aryDpthRnd.astype(th.config.floatX)
 
 # Check time:
 varTme01 = time.time()
 
 # The CRF:
 # varR = varA * np.power(varC, varB)
+def model(aryC, vecA, vecB):
+   return T.mul(T.pow(aryC, vecB[:, None]), vecA[:, None])
 
-# Initial values for the factor A in the CRF:
-tShrA = th.shared(np.float32(0.5))
+# Initialise theano arrays for emprical X and Y data:
+TaryEmpX = T.matrix()
+TaryDpthRnd = T.matrix()
 
-# Initial values for the exponent B in the CRF:
-tShrB = th.shared(np.float32(0.5))
+# Initialise model parameters:
+vecA = np.ones((varNumTtl), dtype=th.config.floatX)
+vecB = np.ones((varNumTtl), dtype=th.config.floatX)
 
-# Theano vector for contrast values:
-tVecC = T.vector()
+# Create shared theano object for model parameters:
+TvecA = th.shared(vecA)
+TvecB = th.shared(vecB)
 
-# Theano vector for y-data (response):
-tVecR = T.vector()
 
-# The CRF fucntion (power function):
-tPred = T.mul(T.pow(tVecC, tShrB), tShrA)
-
-# The cost function:
-tCost = T.sum(T.pow(T.sub(tPred, tVecR), 2)) / (2 * varNumCon)
-
-# Gradients:
-tGradA = T.grad(tCost, tShrA)
-tGradB = T.grad(tCost, tShrB)
+y = model(TaryEmpX, TvecA, TvecB)
 
 # Learning rate:
-varLernRte = np.float32(0.01)
+varLrnRt = np.float32(0.01)
 
-# Number of learning steps:
-varSteps = 1000
+# Cost function:
+# cost = T.mean(T.sqr(y - Y))
+TobjCst = T.sum(T.sqr(T.sub(y, TaryDpthRnd)))
 
-# How to update parameters based on gradient:
-tUpdates = [(tShrA, (tShrA - varLernRte * tGradA)),
-            (tShrB, (tShrB - varLernRte * tGradB))]
+# Gradients for cost function
+TobGrd01 = T.grad(cost=TobjCst, wrt=TvecA)
+TobGrd02 = T.grad(cost=TobjCst, wrt=TvecB)
 
-# The function to train:
-tTrainFunc = th.function([tVecC, tVecR],
-                         tCost,
-                         updates=tUpdates
-                         )
+# How to update the cost function:
+TobjUp = [(TvecA, (TvecA - TobGrd01 * varLrnRt)),
+          (TvecB, (TvecB - TobGrd02 * varLrnRt))]
 
-# Array for theano model parameters, of the form
-# aryMdlParT[idxTotalIterations, freeModelParameters]:
-aryMdlParT = np.zeros((varNumTtl, 2)).astype(np.float32)
+train = th.function(inputs=[TaryEmpX, TaryDpthRnd],
+                    outputs=TobjCst,
+                    updates=TobjUp) #,
+#                    allow_input_downcast=True)
 
-# Loop through resampling iterations and fit function:
-for idxIt in range(0, varNumTtl):
+# Do not check input data type:
+# train.trust_input = True
 
-    # Loop through learning steps and train function:
-    for i in range(varSteps):
-        costM = tTrainFunc(vecEmpX, aryDpthRnd[idxIt, :])
+## Array for theano model parameters, of the form
+## aryMdlParT[idxTotalIterations, freeModelParameters]:
+aryMdlParT = np.zeros((varNumTtl, 2)).astype(th.config.floatX)
 
-    # Save model parameter A:
-    aryMdlParT[idxIt, 0] = tShrA.get_value()
 
-    # Save model parameter B:
-    aryMdlParT[idxIt, 1] = tShrB.get_value()
+## Loop through resampling iterations and fit function:
+# for idxIt01 in range(0, varNumTtl):
+
+for idxThn in range(1000):
+    train(aryEmpX, aryDpthRnd)
+
+# Save model parameter A:
+aryMdlParT[:, 0] = TvecA.get_value()
+
+# Save model parameter B:
+aryMdlParT[:, 1] = TvecB.get_value()
+
 
 # Check time:
 varTme02 = time.time()

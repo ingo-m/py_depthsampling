@@ -30,8 +30,11 @@ aryDpth = np.load('/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy
 aryDpth = np.array([aryDpth])
 vecEmpX = np.array([0.025, 0.061, 0.163, 0.72])
 strFunc='power'
-varNumIt=100000
+varNumIt=1000
 varNumX=1000
+
+varXmin=0.0
+varXmax=1.0
 
 
 #def crf_par_01_t(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
@@ -291,10 +294,149 @@ print(('---Elapsed time: ' + str(varTme03) + 's for ' + str(varNumTtl)
        + ' iterations.'))
 # ------------------------------------------------------------------------
 
+
+# ------------------------------------------------------------------------
+# *** Compare results
+
 # Correlation between results:
 varCor01 = np.corrcoef(aryMdlPar[:, 0], aryMdlParT[:, 0])[0][1]
 varCor02 = np.corrcoef(aryMdlPar[:, 1], aryMdlParT[:, 1])[0][1]
 
+varCor01 = np.around(varCor01, decimals=8)
+varCor02 = np.around(varCor02, decimals=8)
+
 print('---Correlation model parameter 01: ' + str(varCor01))
 print('---Correlation model parameter 02: ' + str(varCor02))
+# ------------------------------------------------------------------------
 
+
+# ------------------------------------------------------------------------
+# *** Apply CRF
+
+print('---Theano CRF evaluation')
+
+# Check time:
+varTme01 = time.time()
+
+# Vector for which the function will be fitted:
+vecMdlX = np.linspace(varXmin, varXmax, num=varNumX, endpoint=True)
+
+# Boradcast array with X data, and change data type to float 32:
+aryMdlX = np.broadcast_to(vecMdlX, (varNumTtl, varNumX))
+aryMdlX = aryMdlX.astype(th.config.floatX)
+
+
+# Change data type to float 32:
+aryMdlParT = aryMdlParT.astype(th.config.floatX)
+
+# Initialise theano arrays for mmodel X data:
+TaryMdlX = T.matrix()
+
+# Create shared theano object for fitted model parameters:
+TvecMdlParA = th.shared(aryMdlParT[:, 0])
+TvecMdlParB = th.shared(aryMdlParT[:, 1])
+
+# Model to evaluate, like before (i.e. similar to the model that was
+# optimised, but this time with the fitted parameter values as input):
+TobjMdlEval = model(TaryMdlX, TvecMdlParA, TvecMdlParB)
+
+# Function definition for evaluation:
+TcrfPwEval = th.function([TaryMdlX], TobjMdlEval)
+
+# Evaluate function (get predicted y values of CRF for all resampling
+# iterations). Returns arrays for y-values of fitted function (for each
+# iteration & depth  level), of the form aryMdlY[varNumTtl, varNumX]
+aryMdlY = TcrfPwEval(aryMdlX)
+
+# Check time:
+varTme02 = time.time()
+
+# Report time:
+varTme03 = varTme02 - varTme01
+print(('---Elapsed time: ' + str(varTme03) + 's for ' + str(varNumTtl)
+       + ' iterations.'))
+# ------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------
+# *** Calculate response at 50% contrast
+
+# Vector for which the function will be fitted (contrast = 0.5):
+vecMdl50 = np.ones((varNumTtl, 1))
+vecMdl50 = np.multiply(vecMdl50, 0.5)
+vecMdl50 = vecMdl50.astype(dtype=th.config.floatX)
+
+# Evaluate function. Returns array for responses at half maximum
+# contrast, of the form aryHlfMax[varNumTtl, 1]
+aryHlfMax = TcrfPwEval(vecMdl50)
+# ------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------
+# *** Calculate semisaturation contrast
+
+# We first need to calculate the response at 100% contrast.
+
+# Vector for which the function will be fitted (contrast = 1.0):
+vecMdl100 = np.ones((varNumTtl, 1))
+vecMdl100 = vecMdl100.astype(dtype=th.config.floatX)
+
+# Evaluate function. Returns array for responses at half maximum
+# contrast, of the form aryResp100[varNumTtl, 1]
+aryResp100 = TcrfPwEval(vecMdl100)
+
+# Half maximum response:
+aryResp50 = np.multiply(aryResp100, 0.5)
+aryResp50 = aryResp50.astype(dtype=th.config.floatX)
+
+# aryResp50 = aryResp50.flatten()
+
+# Initialise theano arrays for half maximum response:
+TaryResp50 = T.matrix()
+# TaryResp50 = T.vector()
+
+# Initialise vector for Semisaturation constant:
+arySemi = np.ones((varNumTtl,1 ))
+arySemi = np.multiply(arySemi, 0.5)
+arySemi = arySemi.astype(dtype=th.config.floatX)
+
+# Create shared theano object for model parameters:
+TarySemi = th.shared(arySemi)
+
+# Model for finding semisaturation contrast:
+TobjMdlSemi = model(TarySemi, TvecMdlParA, TvecMdlParB)
+
+# Cost function for finding semisaturation contrast:
+TobjCst = T.sum(T.sqr(T.sub(TobjMdlSemi[:], TaryResp50[:])))
+
+# Gradient for cost function
+TobGrdSemi = T.grad(cost=TobjCst, wrt=TarySemi)
+
+# How to update the cost function:
+lstUp = [(TarySemi, (TarySemi - TobGrdSemi * varLrnRt))]
+
+# Define the theano function that will be optimised:
+TcrfPwSemi = th.function(inputs=[TaryResp50],
+                         outputs=TobjCst,
+                         updates=lstUp)  # allow_input_downcast=True)
+
+# Optimise function:
+for idxThn in range(1000):
+    TcrfPwSemi(aryResp50)
+
+# Save semisaturation contrast:
+arySemi = TarySemi.get_value()
+# ------------------------------------------------------------------------
+
+
+aaa = np.mean(arySemi)
+
+
+
+
+# Array for responses at half maximum contrast:
+aryHlfMax = np.zeros((varNumTtl))
+# Array for semisaturation contrast:
+arySemi = np.zeros((varNumTtl))
+# Arrays for residual variance:
+aryRes = np.zeros((varNumTtl, varNumCon))

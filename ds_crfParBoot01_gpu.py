@@ -32,7 +32,7 @@ import theano.tensor as T
 
 
 def crf_par_01_t(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
-                 varNumX=1000):
+                 varNumX=1000, varXmin=0.0, varXmax=1.0):
     """
     Parallelised bootstrapping of contrast response function, level 1.
 
@@ -55,6 +55,10 @@ def crf_par_01_t(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
     varNumX : int
         Number of x-values for which to solve the function when calculating
         model fit.
+    varXmin : float
+        Minimum x-value for which function will be fitted.
+    varXmax : float
+        Maximum x-value for which function will be fitted.
 
     Returns
     -------
@@ -192,7 +196,7 @@ def crf_par_01_t(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
              (TvecB, (TvecB - TobGrd02 * varLrnRt))]
 
     # Define the theano function that will be optimised:
-    TcrfPw = th.function(inputs=[TaryEmpX, TaryDpthRnd],
+    TcrfPwOp = th.function(inputs=[TaryEmpX, TaryDpthRnd],
                         outputs=TobjCst,
                         updates=lstUp)  # allow_input_downcast=True)
 
@@ -205,7 +209,7 @@ def crf_par_01_t(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
 
     # Optimise function:
     for idxThn in range(1000):
-        TcrfPw(aryEmpX, aryDpthRnd)
+        TcrfPwOp(aryEmpX, aryDpthRnd)
 
     # Save model parameter A:
     aryMdlParT[:, 0] = TvecA.get_value()

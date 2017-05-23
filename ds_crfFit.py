@@ -208,17 +208,17 @@ def crf_fit(vecEmpX, aryEmpY, strFunc='power', varNumX=1000, varXmin=0.0,
 
         # Model prediction for current contrast level:
         if strFunc == 'power':
-            varTmp = crf_power(vecEmpX[idxCon],
+            vecTmp = crf_power(vecEmpX[idxCon],
                                vecMdlPar[0],
                                vecMdlPar[1])
         elif strFunc == 'hyper':
-            varTmp = crf_hyper(vecEmpX[idxCon],
+            vecTmp = crf_hyper(vecEmpX[idxCon],
                                vecMdlPar[0],
                                vecMdlPar[1],
                                vecMdlPar[2])
 
         # Residual = absolute of difference between prediction and
         #            measurement
-        vecRes[idxCon] = np.absolute(np.subtract(vecEmpYMne[idxCon], varTmp))
+        vecRes[idxCon] = np.absolute(np.subtract(vecEmpYMne[idxCon], vecTmp))
 
     return vecMdlY, varHlfMax, varSemi, vecRes

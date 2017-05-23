@@ -45,7 +45,7 @@ from ds_findPeak import find_peak
 strSwitch = 'create'
 
 # Corrected or  uncorrected depth profiles?
-strCrct = 'corrected'
+strCrct = 'uncorrected'
 
 # Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
 # function).
@@ -54,12 +54,9 @@ strFunc = 'power'
 # File to load bootstrap from / save bootstrap to (corrected/uncorrected and
 # power/hyper left open):
 
-
-
 # strPthNpz = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/bootstrap_100k_{}_{}.npz'  #noqa
-strPthNpz = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Higher_Level_Analysis/bootstrap_100k_{}_{}.npz'  #noqa
-
-
+# strPthNpz = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Higher_Level_Analysis/bootstrap_100k_{}_{}.npz'  #noqa
+strPthNpz = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/bootstrap_100k_th_{}_{}.npz'  #noqa
 
 strPthNpz = strPthNpz.format(strCrct, strFunc)
 
@@ -130,6 +127,14 @@ varPar = 11
 # How many iterations (i.e. how often to sample):
 varNumIt = 100000
 
+# Use GPU (currently only implemented for power function)?
+lgcGpu = True
+
+if strFunc == 'hyper':
+    lgcGpu = False
+if lgcGpu:
+    from ds_crfParBoot01_gpu import crf_par_01_gpu
+
 
 # ----------------------------------------------------------------------------
 # *** Load / create bootstrap
@@ -193,12 +198,20 @@ elif strSwitch == 'create':
     # ------------------------------------------------------------------------
     # *** Parallelised CRF bootstrapping
 
-    aryMdlY, aryHlfMax, arySemi, aryRes = crf_par_01(aryDpth,
-                                                     vecEmpX,
-                                                     strFunc=strFunc,
-                                                     varNumIt=varNumIt,
-                                                     varPar=varPar,
-                                                     varNumX=varNumX)
+    if lgcGpu:
+        aryMdlY, aryHlfMax, arySemi, aryRes = crf_par_01_gpu(aryDpth,
+                                                             vecEmpX,
+                                                             strFunc=strFunc,
+                                                             varNumIt=varNumIt,
+                                                             varNumX=varNumX)
+
+    else:
+        aryMdlY, aryHlfMax, arySemi, aryRes = crf_par_01(aryDpth,
+                                                         vecEmpX,
+                                                         strFunc=strFunc,
+                                                         varNumIt=varNumIt,
+                                                         varPar=varPar,
+                                                         varNumX=varNumX)
 
     # ------------------------------------------------------------------------
     # *** Save results

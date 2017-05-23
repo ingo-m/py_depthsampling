@@ -31,8 +31,8 @@ import theano.tensor as T
 #varNumX=1000
 
 
-def crf_par_01_t(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
-                 varNumX=1000, varXmin=0.0, varXmax=1.0):
+def crf_par_01_gpu(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
+                   varNumX=1000, varXmin=0.0, varXmax=1.0):
     """
     Parallelised bootstrapping of contrast response function, level 1.
 
@@ -64,7 +64,7 @@ def crf_par_01_t(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
     -------
     aryMdlY : np.array
         Fitted y-values (predicted response based on CRF model), of the form
-        aryMdlY[idxRoi, idxIteration, idxDpt, idxContrast]
+        aryMdlY[idxRoi, idxIteration, idxDpt, varNumX]
     aryHlfMax : np.array
         Predicted response at 50 percent contrast based on CRF model. Array of
         the form aryHlfMax[idxRoi, idxIteration, idxDpt].
@@ -145,7 +145,6 @@ def crf_par_01_t(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
     
     # Take mean within random samples:
     aryDpthRnd = np.mean(aryDpthRnd, axis=1)
-
 
     # ------------------------------------------------------------------------
     # *** Theano CRF fitting
@@ -228,160 +227,200 @@ def crf_par_01_t(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
     # ------------------------------------------------------------------------
     # *** Apply CRF
 
-    ### NOTE: This part can be optimised by using theano. ###
+    print('---Theano CRF evaluation')
 
-    # Arrays for y-values of fitted function (for each iteration & depth
-    # level):
-    aryMdlY = np.zeros((varNumTtl, varNumX))
-    # Array for responses at half maximum contrast:
-    aryHlfMax = np.zeros((varNumTtl))
-    # Array for semisaturation contrast:
-    arySemi = np.zeros((varNumTtl))
-    # Arrays for residual variance:
-    aryRes = np.zeros((varNumTtl, varNumCon))
+    # Check time:
+    varTme01 = time.time()
 
+    # Vector for which the function will be fitted:
+    vecMdlX = np.linspace(varXmin, varXmax, num=varNumX, endpoint=True)
 
+    # Boradcast array with X data, and change data type to float 32:
+    aryMdlX = np.broadcast_to(vecMdlX, (varNumTtl, varNumX))
+    aryMdlX = aryMdlX.astype(th.config.floatX)
 
+    # Change data type to float 32:
+    aryMdlParT = aryMdlParT.astype(th.config.floatX)
 
+    # Initialise theano arrays for mmodel X data:
+    TaryMdlX = T.matrix()
 
+    # Create shared theano object for fitted model parameters:
+    TvecMdlParA = th.shared(aryMdlParT[:, 0])
+    TvecMdlParB = th.shared(aryMdlParT[:, 1])
 
-    # Arrays for y-values of fitted function (for each iteration & depth
-    # level):
-    aryMdlY = np.zeros((varNumIn, varNumIt, varNumDpt, varNumX))
-    # Array for responses at half maximum contrast:
-    aryHlfMax = np.zeros((varNumIn, varNumIt, varNumDpt))
-    # Array for semisaturation contrast:
-    arySemi = np.zeros((varNumIn, varNumIt, varNumDpt))
-    # Arrays for residual variance:
-    aryRes = np.zeros((varNumIn, varNumIt, varNumCon, varNumDpt))
+    # Model to evaluate, like before (i.e. similar to the model that was
+    # optimised, but this time with the fitted parameter values as input):
+    TobjMdlEval = model(TaryMdlX, TvecMdlParA, TvecMdlParB)
 
-    # Reshaped array for model parameters:
-    aryMdlParShp = np.zeros((varNumIn, varNumIt, varNumDpt, 2))
+    # Function definition for evaluation:
+    TcrfPwEval = th.function([TaryMdlX], TobjMdlEval)
 
-    # Reshape model parameters:
+    # Evaluate function (get predicted y values of CRF for all resampling
+    # iterations). Returns arrays for y-values of fitted function (for each
+    # iteration & depth  level), of the form aryMdlY[varNumTtl, varNumX]
+    aryMdlY = TcrfPwEval(aryMdlX)
+
+    # Check time:
+    varTme02 = time.time()
+
+    # Report time:
+    varTme03 = varTme02 - varTme01
+    print(('---Elapsed time: ' + str(varTme03) + 's for ' + str(varNumTtl)
+           + ' iterations.'))
+
+    # ------------------------------------------------------------------------
+    # *** Calculate predicted response at 50% contrast
+
+    # Vector for which the function will be fitted (contrast = 0.5):
+    vecMdl50 = np.ones((varNumTtl, 1))
+    vecMdl50 = np.multiply(vecMdl50, 0.5)
+    vecMdl50 = vecMdl50.astype(dtype=th.config.floatX)
+
+    # Evaluate function. Returns array for responses at half maximum
+    # contrast, of the form aryHlfMax[varNumTtl, 1]
+    aryHlfMax = TcrfPwEval(vecMdl50)
+
+    # ------------------------------------------------------------------------
+    # *** Calculate predicted response at empirical contrast levels
+
+    # We calculate the predicted response at the actually tested empirical
+    # contrast levels in order to subsequently calculate the residual
+    # variance of the model fit at those contrast levels.
+
+    # Evaluate function (get predicted y values of CRF for empirically measured
+    # contrast values):
+    aryMdlEmpX = TcrfPwEval(aryEmpX)
+
+    # ------------------------------------------------------------------------
+    # *** Calculate semisaturation contrast
+
+    # We first need to calculate the response at 100% contrast.
+
+    # Vector for which the function will be fitted (contrast = 1.0):
+    vecMdl100 = np.ones((varNumTtl, 1))
+    vecMdl100 = vecMdl100.astype(dtype=th.config.floatX)
+
+    # Evaluate function. Returns array for responses at half maximum
+    # contrast, of the form aryResp100[varNumTtl, 1]
+    aryResp100 = TcrfPwEval(vecMdl100)
+
+    # Half maximum response:
+    aryResp50 = np.multiply(aryResp100, 0.5)
+    aryResp50 = aryResp50.astype(dtype=th.config.floatX)
+
+    # Initialise theano arrays for half maximum response:
+    TaryResp50 = T.matrix()
+
+    # Initialise vector for Semisaturation constant:
+    arySemi = np.ones((varNumTtl,1 ))
+    arySemi = np.multiply(arySemi, 0.5)
+    arySemi = arySemi.astype(dtype=th.config.floatX)
+
+    # Create shared theano object for model parameters:
+    TarySemi = th.shared(arySemi)
+
+    # Model for finding semisaturation contrast:
+    TobjMdlSemi = model(TarySemi, TvecMdlParA, TvecMdlParB)
+
+    # Cost function for finding semisaturation contrast:
+    TobjCst = T.sum(T.sqr(T.sub(TobjMdlSemi[:], TaryResp50[:])))
+
+    # Gradient for cost function
+    TobGrdSemi = T.grad(cost=TobjCst, wrt=TarySemi)
+
+    # How to update the cost function:
+    lstUp = [(TarySemi, (TarySemi - TobGrdSemi * varLrnRt))]
+
+    # Define the theano function that will be optimised:
+    TcrfPwSemi = th.function(inputs=[TaryResp50],
+                             outputs=TobjCst,
+                             updates=lstUp)  # allow_input_downcast=True)
+
+    # Optimise function:
+    for idxThn in range(1000):
+        TcrfPwSemi(aryResp50)
+
+    # Save semisaturation contrast:
+    arySemi = TarySemi.get_value()
+
+    # ------------------------------------------------------------------------
+    # *** Reshape
+
+    # Reshape array with fitted y-values, from
+    #     aryMdlY[varNumTtl, varNumX]
+    # to
+    #     aryMdlY[idxRoi, idxIteration, idxDpt, varNumX]
+    aryMdlYRs = np.zeros((varNumIn, varNumIt, varNumDpth, varNumCon, varNumX),
+                         dtype=th.config.floatX)
     varCnt = 0
     for idxIn in range(varNumIn):
         for idxIt in range(varNumIt):
             for idxDpth in range(varNumDpth):
-                # Put model parameters into reshaped array:
-                aryMdlParShp[idxIn, idxIt, idxDpth, :] = \
-                    aryDpthRnd[varCnt, :]
+                    aryMdlYRs[idxIn, idxIt, idxDpth, :] = aryMdlY[varCnt, :]
+                    varCnt += 1
+    del(aryMdlY)
+    aryMdlY = np.copy(aryMdlYRs)
+    del(aryMdlYRs)
+
+    # Reshape array with predicted response at 50 percent contrast, from
+    #     aryHlfMax[varNumTtl, 1]
+    # to
+    #     aryHlfMax[idxRoi, idxIteration, idxDpt]
+    aryHlfMaxRs = np.zeros((varNumIn, varNumIt, varNumDpth),
+                           dtype=th.config.floatX)
+    varCnt = 0
+    for idxIn in range(varNumIn):
+        for idxIt in range(varNumIt):
+            for idxDpth in range(varNumDpth):
+                aryHlfMaxRs[idxIn, idxIt, idxDpth] = aryHlfMax[varCnt, :]
                 varCnt += 1
+    del(aryHlfMax)
+    aryHlfMax = np.copy(aryHlfMaxRs)
+    del(aryHlfMaxRs)
 
+    # Reshape array with predicted response at 50 percent contrast, from
+    #     arySemi[varNumTtl, 1]
+    # to
+    #     arySemi[idxRoi, idxIteration, idxDpt]
+    arySemiRs = np.zeros((varNumIn, varNumIt, varNumDpth),
+                           dtype=th.config.floatX)
+    varCnt = 0
+    for idxIn in range(varNumIn):
+        for idxIt in range(varNumIt):
+            for idxDpth in range(varNumDpth):
+                arySemiRs[idxIn, idxIt, idxDpth] = arySemi[varCnt, :]
+                varCnt += 1
+    del(arySemi)
+    arySemi = np.copy(arySemiRs)
+    del(arySemiRs)
 
+    # Reshape array with predicted response at empirical constrast values, from
+    #     aryMdlEmpX[varNumTtl, varNumCon]
+    # to
+    #     aryMdlEmpX[idxRoi, idxIteration, idxCondition, idxDpt]
+    aryMdlEmpXRs = np.zeros((varNumIn, varNumIt, varNumCon, varNumDpth),
+                           dtype=th.config.floatX)
+    varCnt = 0
+    for idxIn in range(varNumIn):
+        for idxIt in range(varNumIt):
+            for idxDpth in range(varNumDpth):
+                aryMdlEmpXRs[idxIn, idxIt, :, idxDpth] = aryMdlEmpX[varCnt, :]
+                varCnt += 1
+    del(aryMdlEmpX)
+    aryMdlEmpX = np.copy(aryMdlEmpXRs)
+    del(aryMdlEmpXRs)
 
-
-    # Loop through iterations:
-    for idxIt in range(varNumTtl):
-        
-    # *** Apply reponse function
-
-    # Calculate fitted y-values:
-    if strFunc == 'power':
-        vecMdlY = crf_power(vecMdlX,
-                            vecMdlPar[0],
-                            vecMdlPar[1])
-    elif strFunc == 'hyper':
-        vecMdlY = crf_hyper(vecMdlX,
-                            vecMdlPar[0],
-                            vecMdlPar[1],
-                            vecMdlPar[2])
-
-    # *** Calculate response at 50% contrast
-
-    # The response at half maximum contrast (i.e. at a luminance contrast of
-    # 50%):
-    if strFunc == 'power':
-        varHlfMax = crf_power(0.5,
-                              vecMdlPar[0],
-                              vecMdlPar[1])
-    elif strFunc == 'hyper':
-        varHlfMax = crf_hyper(0.5,
-                              vecMdlPar[0],
-                              vecMdlPar[1],
-                              vecMdlPar[2])
-
-    # *** Calculate semisaturation contrast
-
-    # The maximum response (defined as the response at 100% luminance
-    # contrast):
-    if strFunc == 'power':
-        varResp50 = crf_power(1.0,
-                              vecMdlPar[0],
-                              vecMdlPar[1])
-    elif strFunc == 'hyper':
-        varResp50 = crf_hyper(1.0,
-                              vecMdlPar[0],
-                              vecMdlPar[1],
-                              vecMdlPar[2])
-
-    # Half maximum response:
-    varResp50 = np.multiply(varResp50, 0.5)
-
-    # Search for the luminance contrast level at half maximum response. A
-    # while loop is more practical than an analytic solution - it is easy
-    # to implement and reliable because of the contraint nature of the
-    # problem. The problem is contraint because the luminance contrast has
-    # to be between zero and one.
-
-    # Initial value for the semisaturation contrast (will be incremented until
-    # the half maximum response is reached).
-    varSemi = 0.0
-
-    # Initial value for the resposne.
-    varRespTmp = 0.0
-
-    # Increment the contrast level until the half maximum response is
-    # reached:
-    while np.less(varRespTmp, varResp50):
-        varSemi += 0.000001
-        if strFunc == 'power':
-            varRespTmp = crf_power(varSemi,
-                                   vecMdlPar[0],
-                                   vecMdlPar[1])
-        elif strFunc == 'hyper':
-            varRespTmp = crf_hyper(varSemi,
-                                   vecMdlPar[0],
-                                   vecMdlPar[1],
-                                   vecMdlPar[2])
-
+    # ------------------------------------------------------------------------
     # *** Calculate residual variance
 
-    # Array for residual variance:
-    vecRes = np.zeros(varNumCon)
+    # Mean across subjects of (full) empirical dataset:
+    aryEmpYMne = np.mean(aryDpth, axis=1)
+    aryEmpYMne = aryEmpYMne.astype(dtype=th.config.floatX)
 
-    # In order to assess the fit of the model, we calculate the deviation of
-    # the measured response from the fitted model (average across conditions).
-    # First we have to calculate the deviation for each condition.
-    for idxCon in range(0, varNumCon):
-
-        # Model prediction for current contrast level:
-        if strFunc == 'power':
-            varTmp = crf_power(vecEmpX[idxCon],
-                               vecMdlPar[0],
-                               vecMdlPar[1])
-        elif strFunc == 'hyper':
-            varTmp = crf_hyper(vecEmpX[idxCon],
-                               vecMdlPar[0],
-                               vecMdlPar[1],
-                               vecMdlPar[2])
-
-        # Residual = absolute of difference between prediction and
-        #            measurement
-        vecRes[idxCon] = np.absolute(np.subtract(vecEmpYMne[idxCon], varTmp))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    # Residual variance at empirical contrast levels. Array of the form
+    # aryRes[idxRoi, idxIteration, idxCondition, idxDpt].
+    aryRes = np.subtract(aryMdlEmpX,
+                         aryEmpYMne[:, None, :, :])
 
     return aryMdlY, aryHlfMax, arySemi, aryRes

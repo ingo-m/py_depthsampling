@@ -30,7 +30,7 @@ aryDpth = np.load('/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy
 aryDpth = np.array([aryDpth])
 vecEmpX = np.array([0.025, 0.061, 0.163, 0.72])
 strFunc='power'
-varNumIt=1000
+varNumIt=100
 varNumX=1000
 
 varXmin=0.0
@@ -359,7 +359,7 @@ print(('---Elapsed time: ' + str(varTme03) + 's for ' + str(varNumTtl)
 
 
 # ------------------------------------------------------------------------
-# *** Calculate response at 50% contrast
+# *** Calculate predicted response at 50% contrast
 
 # Vector for which the function will be fitted (contrast = 0.5):
 vecMdl50 = np.ones((varNumTtl, 1))
@@ -369,6 +369,19 @@ vecMdl50 = vecMdl50.astype(dtype=th.config.floatX)
 # Evaluate function. Returns array for responses at half maximum
 # contrast, of the form aryHlfMax[varNumTtl, 1]
 aryHlfMax = TcrfPwEval(vecMdl50)
+# ------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------
+# *** Calculate predicted response at empirical contrast levels
+
+# We calculate the predicted response at the actually tested empirical
+# contrast levels in order to subsequently calculate the residual
+# variance of the model fit at those contrast levels.
+
+# Evaluate function (get predicted y values of CRF for empirically measured
+# contrast values):
+aryMdlEmpX = TcrfPwEval(aryEmpX)
 # ------------------------------------------------------------------------
 
 
@@ -429,14 +442,91 @@ arySemi = TarySemi.get_value()
 # ------------------------------------------------------------------------
 
 
-aaa = np.mean(arySemi)
+# ------------------------------------------------------------------------
+# *** Reshape
+
+# Reshape array with fitted y-values, from
+#     aryMdlY[varNumTtl, varNumX]
+# to
+#     aryMdlY[idxRoi, idxIteration, idxDpt, varNumX]
+aryMdlYRs = np.zeros((varNumIn, varNumIt, varNumDpth, varNumCon, varNumX),
+                     dtype=th.config.floatX)
+varCnt = 0
+for idxIn in range(varNumIn):
+    for idxIt in range(varNumIt):
+        for idxDpth in range(varNumDpth):
+                aryMdlYRs[idxIn, idxIt, idxDpth, :] = aryMdlY[varCnt, :]
+                varCnt += 1
+del(aryMdlY)
+aryMdlY = np.copy(aryMdlYRs)
+del(aryMdlYRs)
+
+# Reshape array with predicted response at 50 percent contrast, from
+#     aryHlfMax[varNumTtl, 1]
+# to
+#     aryHlfMax[idxRoi, idxIteration, idxDpt]
+aryHlfMaxRs = np.zeros((varNumIn, varNumIt, varNumDpth),
+                       dtype=th.config.floatX)
+varCnt = 0
+for idxIn in range(varNumIn):
+    for idxIt in range(varNumIt):
+        for idxDpth in range(varNumDpth):
+            aryHlfMaxRs[idxIn, idxIt, idxDpth] = aryHlfMax[varCnt, :]
+            varCnt += 1
+del(aryHlfMax)
+aryHlfMax = np.copy(aryHlfMaxRs)
+del(aryHlfMaxRs)
+
+# Reshape array with predicted response at 50 percent contrast, from
+#     arySemi[varNumTtl, 1]
+# to
+#     arySemi[idxRoi, idxIteration, idxDpt]
+arySemiRs = np.zeros((varNumIn, varNumIt, varNumDpth),
+                       dtype=th.config.floatX)
+varCnt = 0
+for idxIn in range(varNumIn):
+    for idxIt in range(varNumIt):
+        for idxDpth in range(varNumDpth):
+            arySemiRs[idxIn, idxIt, idxDpth] = arySemi[varCnt, :]
+            varCnt += 1
+del(arySemi)
+arySemi = np.copy(arySemiRs)
+del(arySemiRs)
+
+# Reshape array with predicted response at empirical constrast values, from
+#     aryMdlEmpX[varNumTtl, varNumCon]
+# to
+#     aryMdlEmpX[idxRoi, idxIteration, idxCondition, idxDpt]
+aryMdlEmpXRs = np.zeros((varNumIn, varNumIt, varNumCon, varNumDpth),
+                       dtype=th.config.floatX)
+varCnt = 0
+for idxIn in range(varNumIn):
+    for idxIt in range(varNumIt):
+        for idxDpth in range(varNumDpth):
+            aryMdlEmpXRs[idxIn, idxIt, :, idxDpth] = aryMdlEmpX[varCnt, :]
+            varCnt += 1
+del(aryMdlEmpX)
+aryMdlEmpX = np.copy(aryMdlEmpXRs)
+del(aryMdlEmpXRs)
+# ------------------------------------------------------------------------
 
 
+# ------------------------------------------------------------------------
+# *** Calculate residual variance
 
+# Mean across subjects of (full) empirical dataset:
+aryEmpYMne = np.mean(aryDpth, axis=1)
+aryEmpYMne = aryEmpYMne.astype(dtype=th.config.floatX)
+
+# Residual variance at empirical contrast levels. Array of the form
+# aryRes[idxRoi, idxIteration, idxCondition, idxDpt].
+aryRes = np.subtract(aryMdlEmpX,
+                     aryEmpYMne[:, None, :, :])
+# ------------------------------------------------------------------------
 
 # Array for responses at half maximum contrast:
-aryHlfMax = np.zeros((varNumTtl))
+#aryHlfMax = np.zeros((varNumTtl))
 # Array for semisaturation contrast:
-arySemi = np.zeros((varNumTtl))
+#arySemi = np.zeros((varNumTtl))
 # Arrays for residual variance:
-aryRes = np.zeros((varNumTtl, varNumCon))
+#aryRes = np.zeros((varNumTtl, varNumCon))

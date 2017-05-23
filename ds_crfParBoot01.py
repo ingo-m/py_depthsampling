@@ -51,7 +51,9 @@ def crf_par_01(aryDpth, vecEmpX, strFunc='power', varNumIt=1000, varPar=10,
     -------
     aryMdlY : np.array
         Fitted y-values (predicted response based on CRF model), of the form
-        aryMdlY[idxRoi, idxIteration, idxDpt, idxContrast]
+        aryMdlY[idxRoi, idxIteration, idxDpt, varNumX], where varNumX is the
+        number of data points at which the fitted function is evaluated (e.g.
+        1000).
     aryHlfMax : np.array
         Predicted response at 50 percent contrast based on CRF model. Array of
         the form aryHlfMax[idxRoi, idxIteration, idxDpt].

@@ -22,7 +22,6 @@ import time
 import theano as th
 import theano.tensor as T
 
-
 #aryDpth = np.load('/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy')
 #aryDpth = np.array([aryDpth])
 #vecEmpX = np.array([0.025, 0.061, 0.163, 0.72])
@@ -32,7 +31,7 @@ import theano.tensor as T
 
 
 def crf_par_01_gpu(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
-                   varNumX=1000, varXmin=0.0, varXmax=1.0):
+                   varNumX=1000, varXmin=0.0, varXmax=1.0, varNumOp=10000000):
     """
     Parallelised bootstrapping of contrast response function, level 1.
 
@@ -59,12 +58,16 @@ def crf_par_01_gpu(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
         Minimum x-value for which function will be fitted.
     varXmax : float
         Maximum x-value for which function will be fitted.
+    varNumOp: int
+        Number of optimisation steps for function fitting.
 
     Returns
     -------
     aryMdlY : np.array
         Fitted y-values (predicted response based on CRF model), of the form
-        aryMdlY[idxRoi, idxIteration, idxDpt, varNumX]
+        aryMdlY[idxRoi, idxIteration, idxDpt, varNumX], where varNumX is the
+        number of data points at which the fitted function is evaluated (e.g.
+        1000).
     aryHlfMax : np.array
         Predicted response at 50 percent contrast based on CRF model. Array of
         the form aryHlfMax[idxRoi, idxIteration, idxDpt].
@@ -89,6 +92,9 @@ def crf_par_01_gpu(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
     # ------------------------------------------------------------------------
     # *** Prepare bootstrapping
     print('---Preparing bootstrapping')
+
+    # Check time:
+    varTme01 = time.time()
 
     # Number of ROIs:
     varNumIn = aryDpth.shape[0]
@@ -146,18 +152,26 @@ def crf_par_01_gpu(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
     # Take mean within random samples:
     aryDpthRnd = np.mean(aryDpthRnd, axis=1)
 
+    # Check time:
+    varTme02 = time.time()
+
+    # Report time:
+    varTme03 = np.around((varTme02 - varTme01), decimals=3)
+    print(('---Elapsed time: ' + str(varTme03) + ' s for ' + str(varNumTtl)
+           + ' iterations.'))
+
     # ------------------------------------------------------------------------
     # *** Theano CRF fitting
 
     print('---Theano CRF fitting')
 
+    # Check time:
+    varTme01 = time.time()
+
     # Boradcast array with X data, and change data type to float 32:
     aryEmpX = np.broadcast_to(vecEmpX, (varNumTtl, vecEmpX.shape[0]))
     aryEmpX = aryEmpX.astype(th.config.floatX)
     aryDpthRnd = aryDpthRnd.astype(th.config.floatX)
-
-    # Check time:
-    varTme01 = time.time()
 
     # The CRF:
     # varR = varA * np.power(varC, varB)
@@ -169,8 +183,12 @@ def crf_par_01_gpu(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
     TaryDpthRnd = T.matrix()
 
     # Initialise model parameters:
-    vecA = np.ones((varNumTtl), dtype=th.config.floatX)
-    vecB = np.ones((varNumTtl), dtype=th.config.floatX)
+    vecA = np.ones((varNumTtl))
+    vecB = np.ones((varNumTtl))
+    vecA = np.multiply(vecA, 0.5)
+    vecB = np.multiply(vecB, 0.5)
+    vecA = vecA.astype(dtype=th.config.floatX)
+    vecB = vecB.astype(dtype=th.config.floatX)
 
     # Create shared theano object for model parameters:
     TvecA = th.shared(vecA)
@@ -180,7 +198,7 @@ def crf_par_01_gpu(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
     TobjMdlPre = model(TaryEmpX, TvecA, TvecB)
 
     # Learning rate:
-    varLrnRt = np.float32(0.01)
+    varLrnRt = np.float32(0.00001)
 
     # Cost function:
     # cost = T.mean(T.sqr(y - Y))
@@ -207,7 +225,7 @@ def crf_par_01_gpu(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
     aryMdlParT = np.zeros((varNumTtl, 2)).astype(th.config.floatX)
 
     # Optimise function:
-    for idxThn in range(1000):
+    for idxThn in range(varNumOp):
         TcrfPwOp(aryEmpX, aryDpthRnd)
 
     # Save model parameter A:
@@ -220,8 +238,8 @@ def crf_par_01_gpu(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
     varTme02 = time.time()
 
     # Report time:
-    varTme03 = varTme02 - varTme01
-    print(('---Elapsed time: ' + str(varTme03) + 's for ' + str(varNumTtl)
+    varTme03 = np.around((varTme02 - varTme01), decimals=3)
+    print(('---Elapsed time: ' + str(varTme03) + ' s for ' + str(varNumTtl)
            + ' iterations.'))
 
     # ------------------------------------------------------------------------
@@ -265,8 +283,8 @@ def crf_par_01_gpu(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
     varTme02 = time.time()
 
     # Report time:
-    varTme03 = varTme02 - varTme01
-    print(('---Elapsed time: ' + str(varTme03) + 's for ' + str(varNumTtl)
+    varTme03 = np.around((varTme02 - varTme01), decimals=3)
+    print(('---Elapsed time: ' + str(varTme03) + ' s for ' + str(varNumTtl)
            + ' iterations.'))
 
     # ------------------------------------------------------------------------
@@ -285,15 +303,20 @@ def crf_par_01_gpu(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
     # *** Calculate predicted response at empirical contrast levels
 
     # We calculate the predicted response at the actually tested empirical
-    # contrast levels in order to subsequently calculate the residual
-    # variance of the model fit at those contrast levels.
+    # contrast levels in order to subsequently calculate the residual variance
+    # of the model fit at those contrast levels.
 
-    # Evaluate function (get predicted y values of CRF for empirically measured
-    # contrast values):
+    # Evaluate function (get predicted y values of CRF for empirically
+    # measured contrast values):
     aryMdlEmpX = TcrfPwEval(aryEmpX)
 
     # ------------------------------------------------------------------------
     # *** Calculate semisaturation contrast
+
+    print('---Calculating semisaturation contrast')
+
+    # Check time:
+    varTme01 = time.time()
 
     # We first need to calculate the response at 100% contrast.
 
@@ -313,8 +336,8 @@ def crf_par_01_gpu(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
     TaryResp50 = T.matrix()
 
     # Initialise vector for Semisaturation constant:
-    arySemi = np.ones((varNumTtl,1 ))
-    arySemi = np.multiply(arySemi, 0.5)
+    arySemi = np.ones((varNumTtl, 1))
+    arySemi = np.multiply(arySemi, 0.2)
     arySemi = arySemi.astype(dtype=th.config.floatX)
 
     # Create shared theano object for model parameters:
@@ -329,6 +352,9 @@ def crf_par_01_gpu(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
     # Gradient for cost function
     TobGrdSemi = T.grad(cost=TobjCst, wrt=TarySemi)
 
+    # Learning rate:
+    varLrnRt = np.float32(0.00001)
+
     # How to update the cost function:
     lstUp = [(TarySemi, (TarySemi - TobGrdSemi * varLrnRt))]
 
@@ -338,11 +364,19 @@ def crf_par_01_gpu(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
                              updates=lstUp)  # allow_input_downcast=True)
 
     # Optimise function:
-    for idxThn in range(1000):
+    for idxThn in range(varNumOp):
         TcrfPwSemi(aryResp50)
 
     # Save semisaturation contrast:
     arySemi = TarySemi.get_value()
+
+    # Check time:
+    varTme02 = time.time()
+
+    # Report time:
+    varTme03 = np.around((varTme02 - varTme01), decimals=3)
+    print(('---Elapsed time: ' + str(varTme03) + ' s for ' + str(varNumTtl)
+           + ' iterations.'))
 
     # ------------------------------------------------------------------------
     # *** Reshape
@@ -351,14 +385,14 @@ def crf_par_01_gpu(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
     #     aryMdlY[varNumTtl, varNumX]
     # to
     #     aryMdlY[idxRoi, idxIteration, idxDpt, varNumX]
-    aryMdlYRs = np.zeros((varNumIn, varNumIt, varNumDpth, varNumCon, varNumX),
+    aryMdlYRs = np.zeros((varNumIn, varNumIt, varNumDpth, varNumX),
                          dtype=th.config.floatX)
     varCnt = 0
     for idxIn in range(varNumIn):
         for idxIt in range(varNumIt):
             for idxDpth in range(varNumDpth):
-                    aryMdlYRs[idxIn, idxIt, idxDpth, :] = aryMdlY[varCnt, :]
-                    varCnt += 1
+                aryMdlYRs[idxIn, idxIt, idxDpth, :] = aryMdlY[varCnt, :]
+                varCnt += 1
     del(aryMdlY)
     aryMdlY = np.copy(aryMdlYRs)
     del(aryMdlYRs)
@@ -420,7 +454,10 @@ def crf_par_01_gpu(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
 
     # Residual variance at empirical contrast levels. Array of the form
     # aryRes[idxRoi, idxIteration, idxCondition, idxDpt].
-    aryRes = np.subtract(aryMdlEmpX,
-                         aryEmpYMne[:, None, :, :])
+    aryRes = np.absolute(np.subtract(aryMdlEmpX,
+                                     aryEmpYMne[:, None, :, :]))
+
+    # ------------------------------------------------------------------------
+    # *** Return
 
     return aryMdlY, aryHlfMax, arySemi, aryRes

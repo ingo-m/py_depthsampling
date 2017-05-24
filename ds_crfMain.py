@@ -125,7 +125,7 @@ varCnfUp = 97.5
 varPar = 11
 
 # How many iterations (i.e. how often to sample):
-varNumIt = 100000
+varNumIt = 10000
 
 # Use GPU (currently only implemented for power function)?
 lgcGpu = True

@@ -31,7 +31,7 @@ import theano.tensor as T
 
 
 def crf_par_01_gpu(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
-                   varNumX=1000, varXmin=0.0, varXmax=1.0, varNumOp=10000000):
+                   varNumX=1000, varXmin=0.0, varXmax=1.0, varNumOp=10000):
     """
     Parallelised bootstrapping of contrast response function, level 1.
 
@@ -198,7 +198,7 @@ def crf_par_01_gpu(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
     TobjMdlPre = model(TaryEmpX, TvecA, TvecB)
 
     # Learning rate:
-    varLrnRt = np.float32(0.00001)
+    varLrnRt = np.float32(0.0001)
 
     # Cost function:
     # cost = T.mean(T.sqr(y - Y))
@@ -353,7 +353,7 @@ def crf_par_01_gpu(aryDpth, vecEmpX, strFunc='power', varNumIt=1000,
     TobGrdSemi = T.grad(cost=TobjCst, wrt=TarySemi)
 
     # Learning rate:
-    varLrnRt = np.float32(0.00001)
+    varLrnRt = np.float32(0.0001)
 
     # How to update the cost function:
     lstUp = [(TarySemi, (TarySemi - TobGrdSemi * varLrnRt))]

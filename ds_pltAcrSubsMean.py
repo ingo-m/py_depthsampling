@@ -40,7 +40,8 @@ def funcPltAcrSubsMean(arySubDpthMns,
                        strPltOtPre,
                        strPltOtSuf,
                        varSizeX=1800.0,
-                       varSizeY=1600.0):
+                       varSizeY=1600.0,
+                       strErr='conf95'):
     """
     # Calculate & plot across-subjects mean.
 
@@ -73,20 +74,65 @@ def funcPltAcrSubsMean(arySubDpthMns,
         Path for saving plots (prefix)
     strPltOtSuf : str
         File type for saing plots (suffix)
+    varSizeX : float
+        Width of output figure.
+    varSizeY : float
+        Height of figure.
+    strErr : str
+        Which parameter to use for the error bar. Can be one of the following:
+        'conf95': Plot 95% confidence interval for the mean across subjects,
+                  obtained by multiplying the standard error of the mean (SEM)
+                  by 1.96 (default).
+        'sd':     Plot standard deviation across subjects, or, depending on
+                  the input, across iterations.
+        'sem':    Plot standard error of the mean.
+        'prct95': Plot limits of 2.5th and 97.5th percentile across subjects,
+                  or, depending on the input, across iterations. Because the
+                  percentile does not depend on the sample size n, this option
+                  is useful if the input to this function are not individual
+                  subject's depth profiles, but, for instance, depth profiles
+                  created by iteratively changing model assumtions to test
+                  the robustness of the results ('model 4' in ds_drainModel).
     """
     # Across-subjects mean:
     aryAcrSubDpthMean = np.mean(arySubDpthMns, axis=0)
 
-    # Calculate 95% confidence interval for the mean, obtained by multiplying
-    # the standard error of the mean (SEM) by 1.96. We obtain  the SEM by
-    # dividing the standard deviation by the squareroot of the sample size n.
-    aryArcSubDpthConf = np.multiply(np.divide(np.std(arySubDpthMns, axis=0),
-                                              np.sqrt(varNumSubs)),
-                                    1.96)
+    if strErr == 'conf95':
+        # Calculate 95% confidence interval for the mean, obtained by
+        # multiplying the standard error of the mean (SEM) by 1.96. We obtain
+        # the SEM by dividing the standard deviation by the squareroot of the
+        # sample size n.
+        aryArcSubDpthConf = np.multiply(np.divide(np.std(arySubDpthMns,
+                                                         axis=0),
+                                                  np.sqrt(varNumSubs)),
+                                        1.96)
+        # Lower bound (as deviation from the mean):
+        aryArcSubDpthConfLw = np.subtract(aryAcrSubDpthMean, aryArcSubDpthConf)
+        # Upper bound (as deviation from the mean):
+        aryArcSubDpthConfUp = np.add(aryAcrSubDpthMean, aryArcSubDpthConf)
 
-    # Calculate standard error of the mean.
-    # aryArcSubDpthConf = np.divide(np.std(arySubDpthMns, axis=0),
-    #                               np.sqrt(varNumSubs))
+    elif strErr == 'sd':
+        # Calculate standard deviation across subjects:
+        aryArcSubDpthConf = np.std(arySubDpthMns, axis=0)
+        # Lower bound (as deviation from the mean):
+        aryArcSubDpthConfLw = np.subtract(aryAcrSubDpthMean, aryArcSubDpthConf)
+        # Upper bound (as deviation from the mean):
+        aryArcSubDpthConfUp = np.add(aryAcrSubDpthMean, aryArcSubDpthConf)
+
+    elif strErr == 'sem':
+        # Calculate standard error of the mean.
+        aryArcSubDpthConf = np.divide(np.std(arySubDpthMns, axis=0),
+                                      np.sqrt(varNumSubs))
+        # Lower bound (as deviation from the mean):
+        aryArcSubDpthConfLw = np.subtract(aryAcrSubDpthMean, aryArcSubDpthConf)
+        # Upper bound (as deviation from the mean):
+        aryArcSubDpthConfUp = np.add(aryAcrSubDpthMean, aryArcSubDpthConf)
+
+    elif strErr == 'prct95':
+        # Calculate 2.5th percentile:
+        aryArcSubDpthConfLw = np.percentile(arySubDpthMns, 2.5, axis=0)
+        # Calculate 97.5th percentile:
+        aryArcSubDpthConfUp = np.percentile(arySubDpthMns, 97.5, axis=0)
 
     # Figure dimensions:
     varSizeX = 1800.0
@@ -122,12 +168,10 @@ def funcPltAcrSubsMean(arySubDpthMns,
                            linewidth=8.0,
                            antialiased=True)
 
-        # Plot error shading:
+        # Plot error shading.
         plot02 = axs01.fill_between(vecX,  #noqa
-                                    np.subtract(aryAcrSubDpthMean[idxIn, :],
-                                                aryArcSubDpthConf[idxIn, :]),
-                                    np.add(aryAcrSubDpthMean[idxIn, :],
-                                           aryArcSubDpthConf[idxIn, :]),
+                                    aryArcSubDpthConfLw[idxIn, :],
+                                    aryArcSubDpthConfUp[idxIn, :],
                                     alpha=0.4,
                                     edgecolor=vecClrTmp,
                                     facecolor=vecClrTmp,

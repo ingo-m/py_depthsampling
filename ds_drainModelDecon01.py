@@ -35,7 +35,7 @@ def depth_deconv_01(varNumCon, aryEmp5):
     varNumCon : int
         Number of conditions.
 
-       aryEmp5 : np.array
+    aryEmp5 : np.array
         Two-dimensional array with depth profiles defined at 5 depth levels,
         separately for each condition: aryEmp5[condition, depthlevel].
 

@@ -171,8 +171,8 @@ def crf_fit(vecEmpX, aryEmpY, strFunc='power', varNumX=1000, varXmin=0.0,
 
     # Search for the luminance contrast level at half maximum response. A
     # while loop is more practical than an analytic solution - it is easy
-    # to implement and reliable because of the contraint nature of the
-    # problem. The problem is contraint because the luminance contrast has
+    # to implement and reliable because of the constrained nature of the
+    # problem. The problem is constrained because the luminance contrast has
     # to be between zero and one.
 
     # Initial value for the semisaturation contrast (will be incremented until

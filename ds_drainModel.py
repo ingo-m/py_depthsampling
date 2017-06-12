@@ -28,6 +28,13 @@ functions for details):
     (2008). This option allows for different correction for V1 & extrastriate
     cortex.
 
+(4) Same as (1), i.e. only correcting draining effect, but with Gaussian random
+    error added to the draining effect assumed by Markuerkiaga et al. (2016).
+    The purpose of this is to test how sensitive the results are to violations
+    of the model assumptions. If this solution is selected, the error bars in
+    the plots do not represent the bootstrapped across-subjects variance, but
+    the variance across iterations of random-noise iterations.
+
 The following data from Markuerkiaga et al. (2016) is used in this script,
 irrespective of which draining effect model is choosen:
 
@@ -74,26 +81,30 @@ from ds_pltAcrSubsMean import funcPltAcrSubsMean
 from ds_drainModelDecon01 import depth_deconv_01
 from ds_drainModelDecon02 import depth_deconv_02
 from ds_drainModelDecon03 import depth_deconv_03
+from ds_drainModelDecon04 import depth_deconv_04
 from ds_findPeak import find_peak
 
 
 # ----------------------------------------------------------------------------
 # *** Define parameters
 
-# Which draining model to use (1, 2, or 3 - see above for details):
-varMdl = 1
+# Which draining model to use (1, 2, 3, or 4 - see above for details):
+varMdl = 4
 
 # ROI (V1 or V2):
 strRoi = 'v2'
 
 # Path of depth-profile to correct:
-strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}.npy'.format(strRoi)  #noqa
+strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}.npy'  #noqa
+strPthPrf = strPthPrf.format(strRoi)
 
 # Output path for corrected depth-profiles:
-strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}_corrected.npy'.format(strRoi)  #noqa
+strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}_corrected_model_{}.npy'  #noqa
+strPthPrfOt = strPthPrfOt.format(strRoi, str(varMdl))
 
 # Output path & prefix for plots:
-strPthPltOt = '/home/john/PhD/Tex/deconv/{}_model_{}/deconv_{}_m{}_'.format(strRoi, str(varMdl), strRoi, str(varMdl))  #noqa
+strPthPltOt = '/home/john/PhD/Tex/deconv/{}_model_{}/deconv_{}_m{}_'  #noqa
+strPthPltOt = strPthPltOt.format(strRoi, str(varMdl), strRoi, str(varMdl))
 
 # File type suffix for plot:
 strFlTp = '.svg'
@@ -117,6 +128,14 @@ strYlabel = 'fMRI signal change [arbitrary units]'
 
 # Condition labels:
 lstConLbl = ['2.5%', '6.1%', '16.3%', '72.0%']
+
+# Parameters specific to 'model 4' (i.e. random noise model):
+if varMdl == 4:
+    # How many random noise samples:
+    varNumIt = 10000
+    # How much noise (SD of Gaussian distribution to sample noise from, percent
+    # of noise to multiply the signal with):
+    varSd = 0.1
 
 
 # ----------------------------------------------------------------------------
@@ -149,7 +168,19 @@ print('---Subject-by-subject deconvolution')
 aryEmp5SnSb = np.zeros((varNumSub, varNumCon, 5))
 
 # Array for single-subject deconvolution result:
-aryNrnSnSb = np.zeros((varNumSub, varNumCon, 5))
+if varMdl != 4:
+    aryNrnSnSb = np.zeros((varNumSub, varNumCon, 5))
+
+elif varMdl == 4:
+    # The array for single-subject deconvolution result has an additional
+    # dimension in case of model 4 (number of iterations):
+    aryNrnSnSb = np.zeros((varNumSub, varNumIt, varNumCon, 5))
+    # Generate random noise for model 4:
+    aryNseRnd = np.random.randn(varNumIt, varNumCon, varNumDpth)
+    # Scale variance:
+    aryNseRnd = np.multiply(aryNseRnd, varSd)
+    # Centre at one:
+    aryNseRnd = np.add(aryNseRnd, 1.0)
 
 for idxSub in range(0, varNumSub):
 
@@ -210,12 +241,19 @@ for idxSub in range(0, varNumSub):
         aryNrnSnSb[idxSub, :, :] = depth_deconv_02(varNumCon,
                                                    aryEmp5SnSb[idxSub, :, :])
 
-    # (2) Deconvolution based on Markuerkiaga et al. (2016) & scaling based on
+    # (3) Deconvolution based on Markuerkiaga et al. (2016) & scaling based on
     #     Weber et al. (2008).
     elif varMdl == 3:
         aryNrnSnSb[idxSub, :, :] = depth_deconv_03(varNumCon,
                                                    aryEmp5SnSb[idxSub, :, :],
                                                    strRoi=strRoi)
+
+    # (4) Deconvolution based on Markuerkiaga et al. (2016), with random error.
+    elif varMdl == 4:
+            aryNrnSnSb[idxSub, :, :, :] = depth_deconv_04(varNumCon,
+                                                          aryEmp5,
+                                                          aryNseRnd)
+
 
     # -------------------------------------------------------------------------
     # *** Normalisation
@@ -241,89 +279,94 @@ np.save(strPthPrfOt,
 # ----------------------------------------------------------------------------
 # *** Peak positions percentile bootstrap
 
-print('---Peak positions in depth profiles - percentile bootstrap')
+# Bootstrapping in order to obtain an estimate of across-subjects variance is
+# not performed for model 4. (Model 4 is used to test the effect or random
+# error in the model assumptions.)
+if varMdl != 4:
 
-# We bootstrap the peak finding. Peak finding needs to be performed both
-# before and after deconvolution, separately for all stimulus conditions.
+    print('---Peak positions in depth profiles - percentile bootstrap')
 
-# Number of resampling iterations:
-varNumIt = 10000
+    # We bootstrap the peak finding. Peak finding needs to be performed both
+    # before and after deconvolution, separately for all stimulus conditions.
 
-# Lower & upper bound of percentile bootstrap (in percent):
-varCnfLw = 2.5
-varCnfUp = 97.5
+    # Number of resampling iterations:
+    varNumIt = 10000
 
-# Random array with subject indicies for bootstrapping of the form
-# aryRnd[varNumIt, varNumSmp]. Each row includes the indicies of the
-# subjects to the sampled on that iteration.
-aryRnd = np.random.randint(0,
-                           high=varNumSub,
-                           size=(varNumIt, varNumSub))
+    # Lower & upper bound of percentile bootstrap (in percent):
+    varCnfLw = 2.5
+    varCnfUp = 97.5
 
-# Loop before/after deconvolution:
-for idxDec in range(2):
+    # Random array with subject indicies for bootstrapping of the form
+    # aryRnd[varNumIt, varNumSmp]. Each row includes the indicies of the
+    # subjects to the sampled on that iteration.
+    aryRnd = np.random.randint(0,
+                               high=varNumSub,
+                               size=(varNumIt, varNumSub))
 
-    if idxDec == 0:
-        print('------UNCORRECTED')
-    if idxDec == 1:
-        print('------CORRECTED')
+    # Loop before/after deconvolution:
+    for idxDec in range(2):
 
-    # Array for peak positins before deconvolution, of the form
-    # aryPks01[idxCondition, idxIteration]
-    aryPks01 = np.zeros((2, varNumCon, varNumIt))
-        
-    # Array for actual bootstrap samples:
-    aryBoo = np.zeros((varNumIt, 5))
-    
-    # Loop through conditions:
-    for idxCon in range(0, varNumCon):
-    
-        # Create array with bootstrap samples:
-        for idxIt in range(0, varNumIt):
+        if idxDec == 0:
+            print('------UNCORRECTED')
+        if idxDec == 1:
+            print('------CORRECTED')
 
-            # Before deconvolution:
-            if idxDec== 0:
-                # Take mean across subjects in bootstrap samples:
-                aryBoo[idxIt, :] = np.mean(aryEmp5SnSb[aryRnd[idxIt, :],
-                                                       idxCon,
-                                                       :],
-                                           axis=0)
+        # Array for peak positins before deconvolution, of the form
+        # aryPks01[idxCondition, idxIteration]
+        aryPks01 = np.zeros((2, varNumCon, varNumIt))
 
-            # After deconvolution:
-            if idxDec== 1:
-                # Take mean across subjects in bootstrap samples:
-                aryBoo[idxIt, :] = np.mean(aryNrnSnSb[aryRnd[idxIt, :],
-                                                      idxCon,
-                                                      :],
-                                           axis=0)
-    
-        # Find peaks:
-        aryPks01[idxDec, idxCon, :] = find_peak(aryBoo,
-                                                varNumIntp=100,
-                                                varSd=0.05,
-                                                lgcStat=False)
-    
-        # Median peak position:
-        varTmpMed = np.median(aryPks01[idxDec, idxCon, :])
-    
-        # Confidence interval (percentile bootstrap):
-        varTmpCnfLw = np.percentile(aryPks01[idxDec, idxCon, :], varCnfLw)
-        varTmpCnfUp = np.percentile(aryPks01[idxDec, idxCon, :], varCnfUp)
-    
-        # Print result:
-        strTmp = ('---------Median peak position: '
-                  + str(np.around(varTmpMed, decimals=2)))
-        print(strTmp)
-        strTmp = ('---------Percentile bootstrap '
-                  + str(np.around(varCnfLw, decimals=1))
-                  + '%: '
-                  + str(np.around(varTmpCnfLw, decimals=2)))
-        print(strTmp)
-        strTmp = ('---------Percentile bootstrap '
-                  + str(np.around(varCnfUp, decimals=1))
-                  + '%: '
-                  + str(np.around(varTmpCnfUp, decimals=2)))
-        print(strTmp)
+        # Array for actual bootstrap samples:
+        aryBoo = np.zeros((varNumIt, 5))
+
+        # Loop through conditions:
+        for idxCon in range(0, varNumCon):
+
+            # Create array with bootstrap samples:
+            for idxIt in range(0, varNumIt):
+
+                # Before deconvolution:
+                if idxDec == 0:
+                    # Take mean across subjects in bootstrap samples:
+                    aryBoo[idxIt, :] = np.mean(aryEmp5SnSb[aryRnd[idxIt, :],
+                                                           idxCon,
+                                                           :],
+                                               axis=0)
+
+                # After deconvolution:
+                if idxDec == 1:
+                    # Take mean across subjects in bootstrap samples:
+                    aryBoo[idxIt, :] = np.mean(aryNrnSnSb[aryRnd[idxIt, :],
+                                                          idxCon,
+                                                          :],
+                                               axis=0)
+
+            # Find peaks:
+            aryPks01[idxDec, idxCon, :] = find_peak(aryBoo,
+                                                    varNumIntp=100,
+                                                    varSd=0.05,
+                                                    lgcStat=False)
+
+            # Median peak position:
+            varTmpMed = np.median(aryPks01[idxDec, idxCon, :])
+
+            # Confidence interval (percentile bootstrap):
+            varTmpCnfLw = np.percentile(aryPks01[idxDec, idxCon, :], varCnfLw)
+            varTmpCnfUp = np.percentile(aryPks01[idxDec, idxCon, :], varCnfUp)
+
+            # Print result:
+            strTmp = ('---------Median peak position: '
+                      + str(np.around(varTmpMed, decimals=2)))
+            print(strTmp)
+            strTmp = ('---------Percentile bootstrap '
+                      + str(np.around(varCnfLw, decimals=1))
+                      + '%: '
+                      + str(np.around(varTmpCnfLw, decimals=2)))
+            print(strTmp)
+            strTmp = ('---------Percentile bootstrap '
+                      + str(np.around(varCnfUp, decimals=1))
+                      + '%: '
+                      + str(np.around(varTmpCnfUp, decimals=2)))
+            print(strTmp)
 
 
 # ----------------------------------------------------------------------------
@@ -331,39 +374,71 @@ for idxDec in range(2):
 
 print('---Plot results')
 
-# Plot across-subjects mean before deconvolution:
-strTmpTtl = '{} before deconvolution'.format(strRoi.upper())
-strTmpPth = (strPthPltOt + 'before_')
-funcPltAcrSubsMean(aryEmp5SnSb,
-                   varNumSub,
-                   5,
-                   varNumCon,
-                   varDpi,
-                   varAcrSubsYmin01,
-                   varAcrSubsYmax01,
-                   lstConLbl,
-                   strXlabel,
-                   strYlabel,
-                   strTmpTtl,
-                   strTmpPth,
-                   strFlTp)
+if varMdl != 4:
+
+    # Plot across-subjects mean before deconvolution:
+    strTmpTtl = '{} before deconvolution'.format(strRoi.upper())
+    strTmpPth = (strPthPltOt + 'before_')
+    funcPltAcrSubsMean(aryEmp5SnSb,
+                       varNumSub,
+                       5,
+                       varNumCon,
+                       varDpi,
+                       varAcrSubsYmin01,
+                       varAcrSubsYmax01,
+                       lstConLbl,
+                       strXlabel,
+                       strYlabel,
+                       strTmpTtl,
+                       strTmpPth,
+                       strFlTp,
+                       strErr='conf95')
+
+    # Across-subjects mean after deconvolution:
+    strTmpTtl = '{} after deconvolution'.format(strRoi.upper())
+    strTmpPth = (strPthPltOt + 'after_')
+    funcPltAcrSubsMean(aryNrnSnSb,
+                       varNumSub,
+                       5,
+                       varNumCon,
+                       varDpi,
+                       varAcrSubsYmin02,
+                       varAcrSubsYmax02,
+                       lstConLbl,
+                       strXlabel,
+                       strYlabel,
+                       strTmpTtl,
+                       strTmpPth,
+                       strFlTp,
+                       strErr='conf95')
+
+elif varMdl == 4:
+
+    # For 'model 4', i.e. the random noise model, we are interested in the
+    # variance across random-noise iterations. We are *not* interested in the
+    # variance across subjects in this case. Because we used the same random
+    # noise across subjects, we can average over subjects.
+    aryNrnSnSb = np.mean(aryNrnSnSb, axis=0)
+
+    # Across-subjects mean after deconvolution:
+    strTmpTtl = '{} after deconvolution'.format(strRoi.upper())
+    strTmpPth = (strPthPltOt + 'after_')
+    funcPltAcrSubsMean(aryNrnSnSb,
+                       varNumSub,
+                       5,
+                       varNumCon,
+                       varDpi,
+                       varAcrSubsYmin02,
+                       varAcrSubsYmax02,
+                       lstConLbl,
+                       strXlabel,
+                       strYlabel,
+                       strTmpTtl,
+                       strTmpPth,
+                       strFlTp,
+                       strErr='prct95')
 
 
-# Across-subjects mean after deconvolution:
-strTmpTtl = '{} after deconvolution'.format(strRoi.upper())
-strTmpPth = (strPthPltOt + 'after_')
-funcPltAcrSubsMean(aryNrnSnSb,
-                   varNumSub,
-                   5,
-                   varNumCon,
-                   varDpi,
-                   varAcrSubsYmin02,
-                   varAcrSubsYmax02,
-                   lstConLbl,
-                   strXlabel,
-                   strYlabel,
-                   strTmpTtl,
-                   strTmpPth,
-                   strFlTp)
+# ----------------------------------------------------------------------------
 
 print('-Done.')

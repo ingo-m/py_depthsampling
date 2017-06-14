@@ -105,7 +105,7 @@ from ds_findPeak import find_peak
 varMdl = 5
 
 # ROI (V1 or V2):
-strRoi = 'v1'
+strRoi = 'v2'
 
 # Path of depth-profile to correct:
 strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}.npy'  #noqa
@@ -152,7 +152,6 @@ if (varMdl == 4) or (varMdl ==5):
     varNseRndSd = 0.1
     # Extend of systematic noise (only relevant for model 5):
     varNseSys = 0.3
-    # NOTE: Figure labels need to be adjusted manually (see below).
 
 
 # ----------------------------------------------------------------------------
@@ -505,17 +504,23 @@ elif varMdl == 5:
 
     # *** Plot response at half maximum contrast across depth
 
-    strTmpTtl = '{} after deconvolution'.format(strRoi.upper())
+    strTmpTtl = '{}'.format(strRoi.upper())
     strTmpPth = (strPthPltOt + 'after_')
 
     # Labels for model 5:
-    lstLblMdl5 = ['Random error, SD = 10%',
-                  'Systematic error = -30%',
-                  'Systematic error = +30%']
+    lstLblMdl5 = ['Random error',
+                  'Systematic error',
+                  'Systematic error']
 
     # Label for axes:
     strXlabel = 'Cortical depth level (equivolume)'
     strYlabel = 'fMRI signal change [a.u.]'
+
+    # Colour for systematic error plot:
+    aryClr = np.array(([22.0, 41.0, 248.0],
+                       [230.0, 56.0, 60.0],
+                       [230.0, 56.0, 60.0]))
+    aryClr = np.divide(aryClr, 255.0)
 
     funcPltAcrDpth(aryComb,            # aryData[Condition, Depth]
                    0,                  # aryError[Con., Depth]
@@ -534,7 +539,8 @@ elif varMdl == 5:
                    varSizeX=2000.0,
                    varSizeY=1400.0,
                    aryCnfLw=aryErrLw,
-                   aryCnfUp=aryErrUp)
+                   aryCnfUp=aryErrUp,
+                   aryClr=aryClr)
 
 
 # ----------------------------------------------------------------------------

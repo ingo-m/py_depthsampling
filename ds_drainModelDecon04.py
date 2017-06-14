@@ -71,8 +71,6 @@ def depth_deconv_04(varNumCon, aryEmp5, aryNseRnd):
     # Number of random-noise iterations:
     varNumIt = aryNseRnd.shape[0]
 
-    # aryNseRnd = np.ones(aryNseRnd.shape)
-
     # Array for corrected depth profiles:
     aryNrnRnd = np.zeros((varNumIt, aryEmp5.shape[0], aryEmp5.shape[1]))
 

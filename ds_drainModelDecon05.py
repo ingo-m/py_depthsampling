@@ -22,7 +22,7 @@
 import numpy as np
 
 
-def depth_deconv_04(varNumCon, aryEmp5, aryNseRnd, varNseSys=0.2):
+def depth_deconv_05(varNumCon, aryEmp5, aryNseRnd, varNseSys=0.2):
     """
     **Deconvolution of GE fMRI depth profiles (draining effect correction)**.
 
@@ -133,80 +133,80 @@ def depth_deconv_04(varNumCon, aryEmp5, aryNseRnd, varNseSys=0.2):
     # Negative error factor:
 
     # Layer VI:
-    aryNrnSys[0, :, 0] = aryEmp5[None, :, 0]
+    aryNrnSys[0, :, 0] = aryEmp5[:, 0]
 
     # Layer V:
-    aryNrnSys[0, :, 1] = (aryEmp5[None, :, 1]
-                          - ((0.6 / 1.9) * aryNrnSys[:, :, 0]
+    aryNrnSys[0, :, 1] = (aryEmp5[:, 1]
+                          - ((0.6 / 1.9) * aryNrnSys[0, :, 0]
                              * (1.0 - varNseSys))
                           )
     # Layer IV:
-    aryNrnSys[0, :, 2] = (aryEmp5[None, :, 2]
-                          - ((0.3 / 1.5) * aryNrnSys[:, :, 1]
+    aryNrnSys[0, :, 2] = (aryEmp5[:, 2]
+                          - ((0.3 / 1.5) * aryNrnSys[0, :, 1]
                              * (1.0 - varNseSys))
-                          - ((0.6 / 1.9) * aryNrnSys[:, :, 0]
+                          - ((0.6 / 1.9) * aryNrnSys[0, :, 0]
                              * (1.0 - varNseSys))
                           )
 
     # Layer II/III:
-    aryNrnSys[0, :, 3] = (aryEmp5[None, :, 3]
-                          - ((1.3 / 2.2) * aryNrnSys[:, :, 2]
+    aryNrnSys[0, :, 3] = (aryEmp5[:, 3]
+                          - ((1.3 / 2.2) * aryNrnSys[0, :, 2]
                              * (1.0 - varNseSys))
-                          - ((0.3 / 1.5) * aryNrnSys[:, :, 1]
+                          - ((0.3 / 1.5) * aryNrnSys[0, :, 1]
                              * (1.0 - varNseSys))
-                          - ((0.5 / 1.9) * aryNrnSys[:, :, 0]
+                          - ((0.5 / 1.9) * aryNrnSys[0, :, 0]
                              * (1.0 - varNseSys))
                           )
 
     # Layer I:
     aryNrnSys[0, :, 4] = (aryEmp5[:, 4]
-                          - ((0.7 / 1.7) * aryNrnSys[:, :, 3]
+                          - ((0.7 / 1.7) * aryNrnSys[0, :, 3]
                              * (1.0 - varNseSys))
-                          - ((1.3 / 2.2) * aryNrnSys[:, :, 2]
+                          - ((1.3 / 2.2) * aryNrnSys[0, :, 2]
                              * (1.0 - varNseSys))
-                          - ((0.3 / 1.5) * aryNrnSys[:, :, 1]
+                          - ((0.3 / 1.5) * aryNrnSys[0, :, 1]
                              * (1.0 - varNseSys))
-                          - ((0.5 / 1.9) * aryNrnSys[:, :, 0]
+                          - ((0.5 / 1.9) * aryNrnSys[0, :, 0]
                              * (1.0 - varNseSys))
                           )
 
     # Positive error factor:
 
     # Layer VI:
-    aryNrnSys[1, :, 0] = aryEmp5[None, :, 0]
+    aryNrnSys[1, :, 0] = aryEmp5[:, 0]
 
     # Layer V:
-    aryNrnSys[1, :, 1] = (aryEmp5[None, :, 1]
-                          - ((0.6 / 1.9) * aryNrnSys[:, :, 0]
+    aryNrnSys[1, :, 1] = (aryEmp5[:, 1]
+                          - ((0.6 / 1.9) * aryNrnSys[1, :, 0]
                              * (1.0 + varNseSys))
                           )
     # Layer IV:
-    aryNrnSys[1, :, 2] = (aryEmp5[None, :, 2]
-                          - ((0.3 / 1.5) * aryNrnSys[:, :, 1]
+    aryNrnSys[1, :, 2] = (aryEmp5[:, 2]
+                          - ((0.3 / 1.5) * aryNrnSys[1, :, 1]
                              * (1.0 + varNseSys))
-                          - ((0.6 / 1.9) * aryNrnSys[:, :, 0]
+                          - ((0.6 / 1.9) * aryNrnSys[1, :, 0]
                              * (1.0 + varNseSys))
                           )
 
     # Layer II/III:
-    aryNrnSys[1, :, 3] = (aryEmp5[None, :, 3]
-                          - ((1.3 / 2.2) * aryNrnSys[:, :, 2]
+    aryNrnSys[1, :, 3] = (aryEmp5[:, 3]
+                          - ((1.3 / 2.2) * aryNrnSys[1, :, 2]
                              * (1.0 + varNseSys))
-                          - ((0.3 / 1.5) * aryNrnSys[:, :, 1]
+                          - ((0.3 / 1.5) * aryNrnSys[1, :, 1]
                              * (1.0 + varNseSys))
-                          - ((0.5 / 1.9) * aryNrnSys[:, :, 0]
+                          - ((0.5 / 1.9) * aryNrnSys[1, :, 0]
                              * (1.0 + varNseSys))
                           )
 
     # Layer I:
     aryNrnSys[1, :, 4] = (aryEmp5[:, 4]
-                          - ((0.7 / 1.7) * aryNrnSys[:, :, 3]
+                          - ((0.7 / 1.7) * aryNrnSys[1, :, 3]
                              * (1.0 + varNseSys))
-                          - ((1.3 / 2.2) * aryNrnSys[:, :, 2]
+                          - ((1.3 / 2.2) * aryNrnSys[1, :, 2]
                              * (1.0 + varNseSys))
-                          - ((0.3 / 1.5) * aryNrnSys[:, :, 1]
+                          - ((0.3 / 1.5) * aryNrnSys[1, :, 1]
                              * (1.0 + varNseSys))
-                          - ((0.5 / 1.9) * aryNrnSys[:, :, 0]
+                          - ((0.5 / 1.9) * aryNrnSys[1, :, 0]
                              * (1.0 + varNseSys))
                           )
 

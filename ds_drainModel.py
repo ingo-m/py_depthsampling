@@ -88,11 +88,13 @@ macaque. Cerebral Cortex, 18(10), 2318-2330.
 
 import numpy as np
 from scipy.interpolate import griddata
+from ds_pltAcrDpth import funcPltAcrDpth
 from ds_pltAcrSubsMean import funcPltAcrSubsMean
 from ds_drainModelDecon01 import depth_deconv_01
 from ds_drainModelDecon02 import depth_deconv_02
 from ds_drainModelDecon03 import depth_deconv_03
 from ds_drainModelDecon04 import depth_deconv_04
+from ds_drainModelDecon05 import depth_deconv_05
 from ds_findPeak import find_peak
 
 
@@ -149,7 +151,8 @@ if (varMdl == 4) or (varMdl ==5):
     # percent of noise to multiply the signal with):
     varNseRndSd = 0.1
     # Extend of systematic noise (only relevant for model 5):
-    varNseSys = 0.1
+    varNseSys = 0.3
+    # NOTE: Figure labels need to be adjusted manually (see below).
 
 
 # ----------------------------------------------------------------------------
@@ -198,7 +201,7 @@ elif (varMdl == 4) or (varMdl == 5):
 
 if varMdl == 5:
     # Additional array for deconvolution results with systematic error:
-    aryNrnSys = np.zeros((varNumSub, 2, varNumCon, 5))
+    arySys = np.zeros((varNumSub, 2, varNumCon, 5))
 
 for idxSub in range(0, varNumSub):
 
@@ -275,8 +278,8 @@ for idxSub in range(0, varNumSub):
     # (5) Deconvolution based on Markuerkiaga et al. (2016), with random and
     #     systematic error.
     elif varMdl == 5:
-            aryNrnSnSb[idxSub, :, :, :], aryNrnSys[idxSub, :, :, :] = \
-                depth_deconv_04(varNumCon, aryEmp5, aryNseRnd, varNseSys)
+            aryNrnSnSb[idxSub, :, :, :], arySys[idxSub, :, :, :] = \
+                depth_deconv_05(varNumCon, aryEmp5, aryNseRnd, varNseSys)
 
 
     # -------------------------------------------------------------------------
@@ -471,31 +474,68 @@ elif varMdl == 5:
     # the same random noise across subjects, we can average over subjects.
     aryNrnSnSb = np.mean(aryNrnSnSb, axis=0)
 
-    # We only plot one stimulus condition for model 5 (condition 4):
-    aryNrnSnSb = aryNrnSnSb[:, 3, :]
-    aryNrnSnSb = aryNrnSnSb[:, None, :]
+    # Random noise - mean across iteratins:
+    aryRndMne = np.mean(aryNrnSnSb, axis=0)
+    # Random noise -  2.5th percentile:
+    aryRndConfLw = np.percentile(aryNrnSnSb, 2.5, axis=0)
+    # Random noise -  97.5th percentile:
+    aryRndConfUp = np.percentile(aryNrnSnSb, 97.5, axis=0)
 
-    # ...
+    # For model 5, we only plot one stimulus condition (condition 4):
+    aryRndMne = aryRndMne[3, :]
+    aryRndConfLw = aryRndConfLw[3, :]
+    aryRndConfUp = aryRndConfUp[3, :]
 
-    # Across-subjects mean after deconvolution:
+    # Systematic error term - mean across subjects:
+    arySysMne = np.mean(arySys, axis=0)
+
+    # Patching together systematic and random error terms:
+    aryComb = np.array([aryRndMne,
+                        arySysMne[0, 3, :],
+                        arySysMne[1, 3, :]])
+
+    # Patching together array for error shading (no shading for systematic
+    # error term):
+    aryErrLw = np.array([aryRndConfLw,
+                        arySysMne[0, 3, :],
+                        arySysMne[1, 3, :]])
+    aryErrUp = np.array([aryRndConfUp,
+                        arySysMne[0, 3, :],
+                        arySysMne[1, 3, :]])
+
+    # *** Plot response at half maximum contrast across depth
+
     strTmpTtl = '{} after deconvolution'.format(strRoi.upper())
     strTmpPth = (strPthPltOt + 'after_')
-    funcPltAcrSubsMean(aryNrnSnSb,
-                       varNumSub,
-                       5,
-                       1,
-                       varDpi,
-                       varAcrSubsYmin02,
-                       varAcrSubsYmax02,
-                       lstConLbl,
-                       strXlabel,
-                       strYlabel,
-                       strTmpTtl,
-                       strTmpPth,
-                       strFlTp,
-                       strErr='prct95')
+
+    # Labels for model 5:
+    lstLblMdl5 = ['Random error, SD = 10%',
+                  'Systematic error = -30%',
+                  'Systematic error = +30%']
+
+    # Label for axes:
+    strXlabel = 'Cortical depth level (equivolume)'
+    strYlabel = 'fMRI signal change [a.u.]'
+
+    funcPltAcrDpth(aryComb,            # aryData[Condition, Depth]
+                   0,                  # aryError[Con., Depth]
+                   5,                  # Number of depth levels (on the x-axis)
+                   3,                  # Number of conditions (separate lines)
+                   varDpi,             # Resolution of the output figure
+                   0.0,                # Minimum of Y axis
+                   2.0,                # Maximum of Y axis
+                   False,              # Boolean: whether to convert y axis to %
+                   lstLblMdl5,         # Labels for conditions (separate lines)
+                   strXlabel,          # Label on x axis
+                   strYlabel,          # Label on y axis
+                   strTmpTtl,          # Figure title
+                   True,               # Boolean: whether to plot a legend
+                   (strPthPltOt + 'after' + strFlTp),
+                   varSizeX=2000.0,
+                   varSizeY=1400.0,
+                   aryCnfLw=aryErrLw,
+                   aryCnfUp=aryErrUp)
 
 
 # ----------------------------------------------------------------------------
-
 print('-Done.')

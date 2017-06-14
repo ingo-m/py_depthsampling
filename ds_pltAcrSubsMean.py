@@ -43,7 +43,7 @@ def funcPltAcrSubsMean(arySubDpthMns,
                        varSizeY=1600.0,
                        strErr='conf95'):
     """
-    # Calculate & plot across-subjects mean.
+    Calculate & plot across-subjects mean.
 
     Parameters
     ----------

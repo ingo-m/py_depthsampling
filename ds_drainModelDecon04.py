@@ -46,7 +46,7 @@ def depth_deconv_04(varNumCon, aryEmp5, aryNseRnd):
 
     Returns
     -------
-    aryNseNrn : np.array
+    aryNrnRnd : np.array
         Three-dimensional array with corrected depth profiles, of the form
         aryNrn[idxIteration, idxCondition, idxDepth].
 
@@ -66,7 +66,7 @@ def depth_deconv_04(varNumCon, aryEmp5, aryNseRnd):
     """
     # *** Deconvolution (removal of draining effect)
 
-    print('------Deconvolution - Model 1 (only draining effects)')
+    print('------Deconvolution - Model 4 (violation of model assumptions)')
 
     # Number of random-noise iterations:
     varNumIt = aryNseRnd.shape[0]
@@ -74,35 +74,45 @@ def depth_deconv_04(varNumCon, aryEmp5, aryNseRnd):
     # aryNseRnd = np.ones(aryNseRnd.shape)
 
     # Array for corrected depth profiles:
-    aryNrn = np.zeros((varNumIt, aryEmp5.shape[0], aryEmp5.shape[1]))
+    aryNrnRnd = np.zeros((varNumIt, aryEmp5.shape[0], aryEmp5.shape[1]))
 
     # Layer VI:
-    aryNrn[:, :, 0] = aryEmp5[None, :, 0]
+    aryNrnRnd[:, :, 0] = aryEmp5[None, :, 0]
 
     # Layer V:
-    aryNrn[:, :, 1] = (aryEmp5[None, :, 1]
-                       - (0.6 / 1.9) * aryNrn[:, :, 0] * aryNseRnd[:, :, 1]
-                       )
+    aryNrnRnd[:, :, 1] = (aryEmp5[None, :, 1]
+                          - ((0.6 / 1.9) * aryNrnRnd[:, :, 0]
+                             * aryNseRnd[:, :, 1])
+                          )
 
     # Layer IV:
-    aryNrn[:, :, 2] = (aryEmp5[None, :, 2]
-                       - (0.3 / 1.5) * aryNrn[:, :, 1] * aryNseRnd[:, :, 2]
-                       - (0.6 / 1.9) * aryNrn[:, :, 0] * aryNseRnd[:, :, 2]
-                       )
+    aryNrnRnd[:, :, 2] = (aryEmp5[None, :, 2]
+                          - ((0.3 / 1.5) * aryNrnRnd[:, :, 1]
+                             * aryNseRnd[:, :, 2])
+                          - ((0.6 / 1.9) * aryNrnRnd[:, :, 0]
+                             * aryNseRnd[:, :, 2])
+                          )
 
     # Layer II/III:
-    aryNrn[:, :, 3] = (aryEmp5[None, :, 3]
-                       - (1.3 / 2.2) * aryNrn[:, :, 2] * aryNseRnd[:, :, 3]
-                       - (0.3 / 1.5) * aryNrn[:, :, 1] * aryNseRnd[:, :, 3]
-                       - (0.5 / 1.9) * aryNrn[:, :, 0] * aryNseRnd[:, :, 3]
-                       )
+    aryNrnRnd[:, :, 3] = (aryEmp5[None, :, 3]
+                          - ((1.3 / 2.2) * aryNrnRnd[:, :, 2]
+                             * aryNseRnd[:, :, 3])
+                          - ((0.3 / 1.5) * aryNrnRnd[:, :, 1]
+                             * aryNseRnd[:, :, 3])
+                          - ((0.5 / 1.9) * aryNrnRnd[:, :, 0]
+                             * aryNseRnd[:, :, 3])
+                          )
 
     # Layer I:
-    aryNrn[:, :, 4] = (aryEmp5[:, 4]
-                       - (0.7 / 1.7) * aryNrn[:, :, 3] * aryNseRnd[:, :, 4]
-                       - (1.3 / 2.2) * aryNrn[:, :, 2] * aryNseRnd[:, :, 4]
-                       - (0.3 / 1.5) * aryNrn[:, :, 1] * aryNseRnd[:, :, 4]
-                       - (0.5 / 1.9) * aryNrn[:, :, 0] * aryNseRnd[:, :, 4]
-                       )
+    aryNrnRnd[:, :, 4] = (aryEmp5[:, 4]
+                          - ((0.7 / 1.7) * aryNrnRnd[:, :, 3]
+                             * aryNseRnd[:, :, 4])
+                          - ((1.3 / 2.2) * aryNrnRnd[:, :, 2]
+                             * aryNseRnd[:, :, 4])
+                          - ((0.3 / 1.5) * aryNrnRnd[:, :, 1]
+                             * aryNseRnd[:, :, 4])
+                          - ((0.5 / 1.9) * aryNrnRnd[:, :, 0]
+                             * aryNseRnd[:, :, 4])
+                          )
 
-    return aryNrn
+    return aryNrnRnd

@@ -35,6 +35,17 @@ functions for details):
     the plots do not represent the bootstrapped across-subjects variance, but
     the variance across iterations of random-noise iterations.
 
+(5) Similar to (4), but two different types of error are simulated: (1) random
+    error, sampled from a Gaussian distribution, and (2) systematic error. If
+    this solution is selected, only the depth profiles for one condition are
+    plotted. The error shading in the plots does then not represent the
+    bootstrapped across-subjects variance, but the variance across iterations
+    of random-noise iterations. In addition, two separate lines correspond to
+    the systematic error (lower and upper bound). The random noise is different
+    across depth levels, whereas the systematic noise uses one fixed factor
+    across all depth levels, reflecting a hypothetical general bias of the
+    model.
+
 The following data from Markuerkiaga et al. (2016) is used in this script,
 irrespective of which draining effect model is choosen:
 
@@ -89,10 +100,10 @@ from ds_findPeak import find_peak
 # *** Define parameters
 
 # Which draining model to use (1, 2, 3, or 4 - see above for details):
-varMdl = 4
+varMdl = 5
 
 # ROI (V1 or V2):
-strRoi = 'v2'
+strRoi = 'v1'
 
 # Path of depth-profile to correct:
 strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}.npy'  #noqa
@@ -129,13 +140,16 @@ strYlabel = 'fMRI signal change [arbitrary units]'
 # Condition labels:
 lstConLbl = ['2.5%', '6.1%', '16.3%', '72.0%']
 
-# Parameters specific to 'model 4' (i.e. random noise model):
-if varMdl == 4:
+# Parameters specific to 'model 4' (i.e. random noise model) and 'model 5'
+# (random & systematic error model):
+if (varMdl == 4) or (varMdl ==5):
     # How many random noise samples:
     varNumIt = 10000
-    # How much noise (SD of Gaussian distribution to sample noise from, percent
-    # of noise to multiply the signal with):
-    varSd = 0.1
+    # Extend of random noise (SD of Gaussian distribution to sample noise from,
+    # percent of noise to multiply the signal with):
+    varNseRndSd = 0.1
+    # Extend of systematic noise (only relevant for model 5):
+    varNseSys = 0.1
 
 
 # ----------------------------------------------------------------------------
@@ -168,19 +182,23 @@ print('---Subject-by-subject deconvolution')
 aryEmp5SnSb = np.zeros((varNumSub, varNumCon, 5))
 
 # Array for single-subject deconvolution result:
-if varMdl != 4:
+if (varMdl != 4) and (varMdl != 5):
     aryNrnSnSb = np.zeros((varNumSub, varNumCon, 5))
 
-elif varMdl == 4:
+elif (varMdl == 4) or (varMdl == 5):
     # The array for single-subject deconvolution result has an additional
     # dimension in case of model 4 (number of iterations):
     aryNrnSnSb = np.zeros((varNumSub, varNumIt, varNumCon, 5))
     # Generate random noise for model 4:
     aryNseRnd = np.random.randn(varNumIt, varNumCon, varNumDpth)
     # Scale variance:
-    aryNseRnd = np.multiply(aryNseRnd, varSd)
+    aryNseRnd = np.multiply(aryNseRnd, varNseRndSd)
     # Centre at one:
     aryNseRnd = np.add(aryNseRnd, 1.0)
+
+if varMdl == 5:
+    # Additional array for deconvolution results with systematic error:
+    aryNrnSys = np.zeros((varNumSub, 2, varNumCon, 5))
 
 for idxSub in range(0, varNumSub):
 
@@ -254,6 +272,12 @@ for idxSub in range(0, varNumSub):
                                                           aryEmp5,
                                                           aryNseRnd)
 
+    # (5) Deconvolution based on Markuerkiaga et al. (2016), with random and
+    #     systematic error.
+    elif varMdl == 5:
+            aryNrnSnSb[idxSub, :, :, :], aryNrnSys[idxSub, :, :, :] = \
+                depth_deconv_04(varNumCon, aryEmp5, aryNseRnd, varNseSys)
+
 
     # -------------------------------------------------------------------------
     # *** Normalisation
@@ -270,10 +294,11 @@ for idxSub in range(0, varNumSub):
 # ----------------------------------------------------------------------------
 # *** Save corrected depth profiles
 
-# Save array with single-subject corrected depth profiles, of the form
-# aryNrnSnSb[idxSub, idxCondition, idxDpth].
-np.save(strPthPrfOt,
-        aryNrnSnSb)
+if (varMdl != 4) and (varMdl != 5):
+    # Save array with single-subject corrected depth profiles, of the form
+    # aryNrnSnSb[idxSub, idxCondition, idxDpth].
+    np.save(strPthPrfOt,
+            aryNrnSnSb)
 
 
 # ----------------------------------------------------------------------------
@@ -282,7 +307,7 @@ np.save(strPthPrfOt,
 # Bootstrapping in order to obtain an estimate of across-subjects variance is
 # not performed for model 4. (Model 4 is used to test the effect or random
 # error in the model assumptions.)
-if varMdl != 4:
+if (varMdl != 4) and (varMdl != 5):
 
     print('---Peak positions in depth profiles - percentile bootstrap')
 
@@ -374,7 +399,7 @@ if varMdl != 4:
 
 print('---Plot results')
 
-if varMdl != 4:
+if (varMdl != 4) and (varMdl != 5):
 
     # Plot across-subjects mean before deconvolution:
     strTmpTtl = '{} before deconvolution'.format(strRoi.upper())
@@ -427,6 +452,38 @@ elif varMdl == 4:
                        varNumSub,
                        5,
                        varNumCon,
+                       varDpi,
+                       varAcrSubsYmin02,
+                       varAcrSubsYmax02,
+                       lstConLbl,
+                       strXlabel,
+                       strYlabel,
+                       strTmpTtl,
+                       strTmpPth,
+                       strFlTp,
+                       strErr='prct95')
+
+elif varMdl == 5:
+
+    # For 'model 5', i.e. the random & systematic noise model, we are
+    # interested in the variance across random-noise iterations. We are *not*
+    # interested in the variance across subjects in this case. Because we used
+    # the same random noise across subjects, we can average over subjects.
+    aryNrnSnSb = np.mean(aryNrnSnSb, axis=0)
+
+    # We only plot one stimulus condition for model 5 (condition 4):
+    aryNrnSnSb = aryNrnSnSb[:, 3, :]
+    aryNrnSnSb = aryNrnSnSb[:, None, :]
+
+    # ...
+
+    # Across-subjects mean after deconvolution:
+    strTmpTtl = '{} after deconvolution'.format(strRoi.upper())
+    strTmpPth = (strPthPltOt + 'after_')
+    funcPltAcrSubsMean(aryNrnSnSb,
+                       varNumSub,
+                       5,
+                       1,
                        varDpi,
                        varAcrSubsYmin02,
                        varAcrSubsYmax02,

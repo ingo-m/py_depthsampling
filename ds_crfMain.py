@@ -45,7 +45,7 @@ from ds_findPeak import find_peak
 strSwitch = 'create'
 
 # Corrected or  uncorrected depth profiles?
-strCrct = 'uncorrected'
+strCrct = 'corrected'
 
 # Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
 # function).
@@ -53,11 +53,7 @@ strFunc = 'power'
 
 # File to load bootstrap from / save bootstrap to (corrected/uncorrected and
 # power/hyper left open):
-
-# strPthNpz = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/bootstrap_100k_{}_{}.npz'  #noqa
-# strPthNpz = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Higher_Level_Analysis/bootstrap_100k_{}_{}.npz'  #noqa
-strPthNpz = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/bootstrap_100k_th_{}_{}.npz'  #noqa
-
+strPthNpz = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/bootstrap_{}_{}.npz'  #noqa
 strPthNpz = strPthNpz.format(strCrct, strFunc)
 
 # Path of depth-profiles:
@@ -65,8 +61,8 @@ if strCrct == 'uncorrected':
     dicPthDpth = {'V1': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy',  #noqa
                   'V2': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2.npy'}  #noqa
 if strCrct == 'corrected':
-    dicPthDpth = {'V1': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected.npy',  #noqa
-                  'V2': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2_corrected.npy'}  #noqa
+    dicPthDpth = {'V1': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected_model_1.npy',  #noqa
+                  'V2': '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2_corrected_model_1.npy'}  #noqa
 
 # Stimulus luminance contrast levels. NOTE: Should be between zero and one.
 # When using percent (i.e. from zero to 100), the search for the luminance at
@@ -118,8 +114,8 @@ vecLimHypUp = np.array([np.inf, np.inf, np.inf])
 # vecLimHypUp = np.array([10.0, np.inf, np.inf])
 
 # Lower & upper bound of percentile bootstrap (in percent):
-varCnfLw = 2.5
-varCnfUp = 97.5
+varCnfLw = 0.5
+varCnfUp = 99.5
 
 # Number of process to run in parallel:
 varPar = 11
@@ -128,7 +124,7 @@ varPar = 11
 varNumIt = 10000
 
 # Use GPU (currently only implemented for power function)?
-lgcGpu = True
+lgcGpu = False
 
 if strFunc == 'hyper':
     lgcGpu = False

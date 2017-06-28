@@ -53,33 +53,27 @@ from ds_crfParBoot02 import crf_par_02
 # *** Define parameters
 
 # Use existing resampling results or create new one ('load' or 'create')?
-strSwitch = 'load'
+strSwitch = 'create'
 
 # Corrected or  uncorrected depth profiles?
-strCrct = 'corrected'
+strCrct = 'uncorrected'
 
 # Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
 # function).
-strFunc = 'hyper'
+strFunc = 'power'
 
 # File to load resampling from / save resampling to (corrected/uncorrected and
 # power/hyper left open):
 strPthOut = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/crf_permutation_{}_{}.npz'  #noqa
-# strPthOut = '/Users/john/Desktop/tmp/crf_permutation_{}_{}.npz'  #noqa
-
 strPthOut = strPthOut.format(strCrct, strFunc)
 
 # Path of depth-profiles:
 if strCrct == 'uncorrected':
     objDpth01 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy'  #noqa
     objDpth02 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2.npy'  #noqa
-    # objDpth01 = '/Users/john/Dropbox/Sonstiges/Higher_Level_Analysis/v1.npy'  #noqa
-    # objDpth02 = '/Users/john/Dropbox/Sonstiges/Higher_Level_Analysis/v2.npy'  #noqa
 if strCrct == 'corrected':
-    objDpth01 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected.npy'  #noqa
-    objDpth02 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2_corrected.npy'  #noqa
-    # objDpth01 = '/Users/john/Dropbox/Sonstiges/Higher_Level_Analysis/v1_corrected.npy'  #noqa
-    # objDpth02 = '/Users/john/Dropbox/Sonstiges/Higher_Level_Analysis/v2_corrected.npy'  #noqa
+    objDpth01 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected_model_1.npy'  #noqa
+    objDpth02 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2_corrected_model_1.npy'  #noqa
 
 # Stimulus luminance contrast levels. NOTE: Should be between zero and one.
 # When using percent (i.e. from zero to 100), the search for the luminance at
@@ -106,7 +100,7 @@ print(('--Function: ' + strFunc))
 
 if strSwitch == 'load':
 
-    print('---Loading bootstrapping results')
+    print('---Loading resampling results')
 
     # Load previously prepared file:
     # with open(strPthJson, 'r') as objJson:
@@ -136,7 +130,7 @@ elif strSwitch == 'create':
     # ------------------------------------------------------------------------
     # *** Parallelised permutation & CRF fitting
 
-    print('---Parallelised permutation & CRF fitting')
+    print('---Parallelised resampling & CRF fitting')
 
     aryDpth01, aryDpth02, aryMdlY, aryHlfMax, arySemi, aryRes = \
         perm_hlf_max_peak(objDpth01, objDpth02, vecEmpX, strFunc=strFunc,
@@ -145,7 +139,7 @@ elif strSwitch == 'create':
     # ------------------------------------------------------------------------
     # *** Save results
 
-    print('---Saving bootstrapping results as npz object')
+    print('---Saving resampling results as npz object')
 
     # Put results into nested list:
     # lstJson = [aryDpth01.tolist(),  # Original depth profiles V1

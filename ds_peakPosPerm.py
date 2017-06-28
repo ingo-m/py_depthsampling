@@ -58,8 +58,8 @@ if strCrct == 'uncorrected':
     objDpth01 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy'  #noqa
     objDpth02 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2.npy'  #noqa
 if strCrct == 'corrected':
-    objDpth01 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected.npy'  #noqa
-    objDpth02 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2_corrected.npy'  #noqa
+    objDpth01 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected_model_1.npy'  #noqa
+    objDpth02 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2_corrected_model_1.npy'  #noqa
 
 # Stimulus luminance contrast levels (only needed for visualisation):
 # vecEmpX = np.array([0.025, 0.061, 0.163, 0.72])

@@ -58,9 +58,9 @@ strCrct = 'corrected'
 strFunc = 'power'
 
 # File to load resampling from:
-strPthOut = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/crf_permutation_{}_{}.npz'  #noqa
+strPthIn = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/crf_permutation_{}_{}.npz'  #noqa
 
-strPthOut = strPthOut.format(strCrct, strFunc)
+strPthIn = strPthIn.format(strCrct, strFunc)
 
 # Stimulus luminance contrast levels. NOTE: Should be between zero and one.
 # When using percent (i.e. from zero to 100), the search for the luminance at
@@ -79,14 +79,14 @@ elif strSwitch == 'residuals':
 
 
 # ----------------------------------------------------------------------------
-# *** Load / create resampling
+# *** Load resampling
 
 print('-Resampling test on depth profiles')
 
 print('---Loading resampling results')
 
 # Load data from npz file:
-objNpz = np.load(strPthOut)
+objNpz = np.load(strPthIn)
 
 # Retrieve arrays from npz object (dictionary):
 aryDpth01 = objNpz['aryDpth01']
@@ -205,11 +205,12 @@ print(('------Permutation p-value for equality of distributions: '
 # analysis.
 
 # Array to be used in R for bootstrap linear regression, of the form
-# aryEmpSemiR[idxDpt, 3], where the first dimension corresponds to the number
-# of cortical depth levels * number of ROIs, and the second dimension
-# corresponds to three columns for the linear model, representing: the signal
-# (i.e. the semisaturation constant, which is the idenpendent variable), the
-# depth level (dependent variable) and the ROI membership (dependent variable).
+# aryEmpSemiR[(idxDpt * idxRoi), 3], where the first dimension corresponds to
+# the number of cortical depth levels * number of ROIs, and the second
+# dimension corresponds to three columns for the linear model, representing:
+# the signal (i.e. the semisaturation constant, which is the idenpendent
+# variable), the depth level (dependent variable) and the ROI membership
+# (dependent variable).
 aryEmpSemiR = np.zeros(((varNumDpt * 2), 3))
 
 # The first column is to contain the semisaturation constants:

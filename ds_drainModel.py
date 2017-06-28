@@ -11,7 +11,7 @@ depth levels to the signal at each consecutive depth level. In other words,
 at a given depth level, the contribution from lower depth levels is removed
 based on the model proposed by Markuerkiaga et al. (2016).
 
-The correction for the draining effect is done in a function called by this
+The correction for the draining effect is applyed by a function called by this
 script. There are three different option for correction (see respective
 functions for details):
 
@@ -61,12 +61,12 @@ irrespective of which draining effect model is choosen:
 References
 ----------
 Markuerkiaga, I., Barth, M., & Norris, D. G. (2016). A cortical vascular model
-for examining the specificity of the laminar BOLD signal. Neuroimage, 132,
-491-498.
+    for examining the specificity of the laminar BOLD signal. Neuroimage, 132,
+    491-498.
 
 Weber, B., Keller, A. L., Reichold, J., & Logothetis, N. K. (2008). The
-microvascular system of the striate and extrastriate visual cortex of the
-macaque. Cerebral Cortex, 18(10), 2318-2330.
+    microvascular system of the striate and extrastriate visual cortex of the
+    macaque. Cerebral Cortex, 18(10), 2318-2330.
 """
 
 # Part of py_depthsampling library
@@ -102,10 +102,10 @@ from ds_findPeak import find_peak
 # *** Define parameters
 
 # Which draining model to use (1, 2, 3, or 4 - see above for details):
-varMdl = 5
+varMdl = 1
 
 # ROI (V1 or V2):
-strRoi = 'v2'
+strRoi = 'v1'
 
 # Path of depth-profile to correct:
 strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}.npy'  #noqa
@@ -176,21 +176,26 @@ varNumDpth = aryEmpSnSb.shape[2]
 
 
 # ----------------------------------------------------------------------------
-# *** Loop through subjects
+# *** Subject-by-subject deconvolution
 
 print('---Subject-by-subject deconvolution')
 
 # Array for single-subject interpolation result (before deconvolution):
 aryEmp5SnSb = np.zeros((varNumSub, varNumCon, 5))
 
-# Array for single-subject deconvolution result:
 if (varMdl != 4) and (varMdl != 5):
-    aryNrnSnSb = np.zeros((varNumSub, varNumCon, 5))
+    # Array for single-subject deconvolution result (defined at 5 depth
+    # levels):
+    aryDecon5 = np.zeros((varNumSub, varNumCon, 5))
+    # Array for deconvolution results in equi-volume space:
+    aryDecon = np.zeros((varNumSub, varNumCon, varNumDpth))
 
 elif (varMdl == 4) or (varMdl == 5):
     # The array for single-subject deconvolution result has an additional
     # dimension in case of model 4 (number of iterations):
-    aryNrnSnSb = np.zeros((varNumSub, varNumIt, varNumCon, 5))
+    aryDecon5 = np.zeros((varNumSub, varNumIt, varNumCon, 5))
+    # Array for deconvolution results in equi-volume space:
+    aryDecon = np.zeros((varNumSub, varNumIt, varNumCon, varNumDpth))
     # Generate random noise for model 4:
     aryNseRnd = np.random.randn(varNumIt, varNumCon, varNumDpth)
     # Scale variance:
@@ -242,7 +247,7 @@ for idxSub in range(0, varNumSub):
         aryEmp5[idxCon] = griddata(vecPosEmp,
                                    aryEmpSnSb[idxSub, idxCon, :],
                                    vecPosMdl,
-                                   method='linear')
+                                   method='cubic')
 
     # Put interpolation result for this subject into the array:
     aryEmp5SnSb[idxSub, :, :] = np.copy(aryEmp5)
@@ -252,45 +257,79 @@ for idxSub in range(0, varNumSub):
 
     # (1) Deconvolution based on Markuerkiaga et al. (2016).
     if varMdl == 1:
-        aryNrnSnSb[idxSub, :, :] = depth_deconv_01(varNumCon,
-                                                   aryEmp5SnSb[idxSub, :, :])
+        aryDecon5[idxSub, :, :] = depth_deconv_01(varNumCon,
+                                                  aryEmp5SnSb[idxSub, :, :])
 
     # (2) Deconvolution based on Markuerkiaga et al. (2016) & scaling based on
     #     Markuerkiaga et al. (2016).
     elif varMdl == 2:
-        aryNrnSnSb[idxSub, :, :] = depth_deconv_02(varNumCon,
-                                                   aryEmp5SnSb[idxSub, :, :])
+        aryDecon5[idxSub, :, :] = depth_deconv_02(varNumCon,
+                                                  aryEmp5SnSb[idxSub, :, :])
 
     # (3) Deconvolution based on Markuerkiaga et al. (2016) & scaling based on
     #     Weber et al. (2008).
     elif varMdl == 3:
-        aryNrnSnSb[idxSub, :, :] = depth_deconv_03(varNumCon,
-                                                   aryEmp5SnSb[idxSub, :, :],
-                                                   strRoi=strRoi)
+        aryDecon5[idxSub, :, :] = depth_deconv_03(varNumCon,
+                                                  aryEmp5SnSb[idxSub, :, :],
+                                                  strRoi=strRoi)
 
     # (4) Deconvolution based on Markuerkiaga et al. (2016), with random error.
     elif varMdl == 4:
-            aryNrnSnSb[idxSub, :, :, :] = depth_deconv_04(varNumCon,
-                                                          aryEmp5,
-                                                          aryNseRnd)
+            aryDecon5[idxSub, :, :, :] = depth_deconv_04(varNumCon,
+                                                         aryEmp5,
+                                                         aryNseRnd)
 
     # (5) Deconvolution based on Markuerkiaga et al. (2016), with random and
     #     systematic error.
     elif varMdl == 5:
-            aryNrnSnSb[idxSub, :, :, :], arySys[idxSub, :, :, :] = \
+            aryDecon5[idxSub, :, :, :], arySys[idxSub, :, :, :] = \
                 depth_deconv_05(varNumCon, aryEmp5, aryNseRnd, varNseSys)
 
-
     # -------------------------------------------------------------------------
-    # *** Normalisation
+    # *** Interpolation
 
-    # Calculate 'grand mean', i.e. the mean PE across depth levels and
-    # conditions:
-    # varGrndMean = np.mean(aryNrnSnSb[idxSub, :, :])
+    # The original depth profiles were in 'equi-volume' space, and needed to
+    # be downsampled in order to apply the deconvolution (because the
+    # deconvolution model is defined at a lower number of depth levels than the
+    # equivolume space). Here, the results of the deconvolution are brought
+    # back into equivolume space. This is advantageous for the creation of
+    # depth plots (equal spacing of data points on x-axis), and for the
+    # calculation of peak positions (no additional information about relative
+    # position of datapoints needs to be passed on).
 
-    # Divide all values by the grand mean:
-    # aryNrnSnSb[idxSub, :, :] = np.divide(aryNrnSnSb[idxSub, :, :],
-    #                                      varGrndMean)
+    # Sampling points for equi-volume space:
+    vecIntpEqui =  np.linspace(np.min(vecPosMdl),
+                               np.max(vecPosMdl),
+                               num=varNumDpth,
+                               endpoint=True)
+
+    if (varMdl != 4) and (varMdl != 5):
+
+        # Loop through conditions:
+        for idxCon in range(0, varNumCon):
+
+            # Interpolation back into equi-volume space:
+            aryDecon[idxSub, idxCon, :] = griddata(vecPosMdl,
+                                                   aryDecon5[idxSub,
+                                                             idxCon,
+                                                             :],
+                                                   vecIntpEqui,
+                                                   method='cubic')
+
+    elif (varMdl == 4) or (varMdl == 5):
+
+        # Loop through iterations:
+        for idxIt in range(0, varNumIt):
+
+            # Loop through conditions:
+            for idxCon in range(0, varNumCon):
+        
+                # Interpolation back into equi-volume space:
+                aryDecon[idxSub, idxIt, idxCon, :] = \
+                    griddata(vecPosMdl,
+                             aryDecon5[idxSub, idxIt, idxCon, :],
+                             vecIntpEqui,
+                             method='cubic')
 
 
 # ----------------------------------------------------------------------------
@@ -298,16 +337,16 @@ for idxSub in range(0, varNumSub):
 
 if (varMdl != 4) and (varMdl != 5):
     # Save array with single-subject corrected depth profiles, of the form
-    # aryNrnSnSb[idxSub, idxCondition, idxDpth].
+    # aryDecon[idxSub, idxCondition, idxDpth].
     np.save(strPthPrfOt,
-            aryNrnSnSb)
+            aryDecon)
 
 
 # ----------------------------------------------------------------------------
 # *** Peak positions percentile bootstrap
 
 # Bootstrapping in order to obtain an estimate of across-subjects variance is
-# not performed for model 4. (Model 4 is used to test the effect or random
+# not performed for models 4 & 5. (Models 4 & 5 are used to test the effect of
 # error in the model assumptions.)
 if (varMdl != 4) and (varMdl != 5):
 
@@ -343,7 +382,7 @@ if (varMdl != 4) and (varMdl != 5):
         aryPks01 = np.zeros((2, varNumCon, varNumIt))
 
         # Array for actual bootstrap samples:
-        aryBoo = np.zeros((varNumIt, 5))
+        aryBoo = np.zeros((varNumIt, varNumDpth))
 
         # Loop through conditions:
         for idxCon in range(0, varNumCon):
@@ -354,17 +393,17 @@ if (varMdl != 4) and (varMdl != 5):
                 # Before deconvolution:
                 if idxDec == 0:
                     # Take mean across subjects in bootstrap samples:
-                    aryBoo[idxIt, :] = np.mean(aryEmp5SnSb[aryRnd[idxIt, :],
-                                                           idxCon,
-                                                           :],
+                    aryBoo[idxIt, :] = np.mean(aryEmpSnSb[aryRnd[idxIt, :],
+                                                          idxCon,
+                                                          :],
                                                axis=0)
 
                 # After deconvolution:
                 if idxDec == 1:
                     # Take mean across subjects in bootstrap samples:
-                    aryBoo[idxIt, :] = np.mean(aryNrnSnSb[aryRnd[idxIt, :],
-                                                          idxCon,
-                                                          :],
+                    aryBoo[idxIt, :] = np.mean(aryDecon[aryRnd[idxIt, :],
+                                                        idxCon,
+                                                        :],
                                                axis=0)
 
             # Find peaks:
@@ -406,9 +445,9 @@ if (varMdl != 4) and (varMdl != 5):
     # Plot across-subjects mean before deconvolution:
     strTmpTtl = '{} before deconvolution'.format(strRoi.upper())
     strTmpPth = (strPthPltOt + 'before_')
-    funcPltAcrSubsMean(aryEmp5SnSb,
+    funcPltAcrSubsMean(aryEmpSnSb,
                        varNumSub,
-                       5,
+                       varNumDpth,
                        varNumCon,
                        varDpi,
                        varAcrSubsYmin01,
@@ -419,14 +458,14 @@ if (varMdl != 4) and (varMdl != 5):
                        strTmpTtl,
                        strTmpPth,
                        strFlTp,
-                       strErr='conf95')
+                       strErr='sd')
 
     # Across-subjects mean after deconvolution:
     strTmpTtl = '{} after deconvolution'.format(strRoi.upper())
     strTmpPth = (strPthPltOt + 'after_')
-    funcPltAcrSubsMean(aryNrnSnSb,
+    funcPltAcrSubsMean(aryDecon,
                        varNumSub,
-                       5,
+                       varNumDpth,
                        varNumCon,
                        varDpi,
                        varAcrSubsYmin02,
@@ -437,7 +476,7 @@ if (varMdl != 4) and (varMdl != 5):
                        strTmpTtl,
                        strTmpPth,
                        strFlTp,
-                       strErr='conf95')
+                       strErr='sd')
 
 elif varMdl == 4:
 
@@ -445,14 +484,14 @@ elif varMdl == 4:
     # variance across random-noise iterations. We are *not* interested in the
     # variance across subjects in this case. Because we used the same random
     # noise across subjects, we can average over subjects.
-    aryNrnSnSb = np.mean(aryNrnSnSb, axis=0)
+    aryDecon = np.mean(aryDecon, axis=0)
 
     # Across-subjects mean after deconvolution:
     strTmpTtl = '{} after deconvolution'.format(strRoi.upper())
     strTmpPth = (strPthPltOt + 'after_')
-    funcPltAcrSubsMean(aryNrnSnSb,
+    funcPltAcrSubsMean(aryDecon,
                        varNumSub,
-                       5,
+                       varNumDpth,
                        varNumCon,
                        varDpi,
                        varAcrSubsYmin02,
@@ -471,14 +510,14 @@ elif varMdl == 5:
     # interested in the variance across random-noise iterations. We are *not*
     # interested in the variance across subjects in this case. Because we used
     # the same random noise across subjects, we can average over subjects.
-    aryNrnSnSb = np.mean(aryNrnSnSb, axis=0)
+    aryDecon = np.mean(aryDecon, axis=0)
 
     # Random noise - mean across iteratins:
-    aryRndMne = np.mean(aryNrnSnSb, axis=0)
+    aryRndMne = np.mean(aryDecon, axis=0)
     # Random noise -  2.5th percentile:
-    aryRndConfLw = np.percentile(aryNrnSnSb, 2.5, axis=0)
+    aryRndConfLw = np.percentile(aryDecon, 2.5, axis=0)
     # Random noise -  97.5th percentile:
-    aryRndConfUp = np.percentile(aryNrnSnSb, 97.5, axis=0)
+    aryRndConfUp = np.percentile(aryDecon, 97.5, axis=0)
 
     # For model 5, we only plot one stimulus condition (condition 4):
     aryRndMne = aryRndMne[3, :]
@@ -524,7 +563,7 @@ elif varMdl == 5:
 
     funcPltAcrDpth(aryComb,            # aryData[Condition, Depth]
                    0,                  # aryError[Con., Depth]
-                   5,                  # Number of depth levels (on the x-axis)
+                   varNumDpth,         # Number of depth levels (on the x-axis)
                    3,                  # Number of conditions (separate lines)
                    varDpi,             # Resolution of the output figure
                    0.0,                # Minimum of Y axis

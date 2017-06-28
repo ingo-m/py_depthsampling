@@ -28,7 +28,7 @@ import matplotlib.colors as colors
 
 def funcPltAcrDpth(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
                    varYmax, lgcCnvPrct, lstConLbl, strXlabel, strYlabel,
-                   strTitle, lgcLgnd, strPath, varSizeX=1800.0,
+                   strTitle, lgcLgnd, strPath, vecX=None, varSizeX=1800.0,
                    varSizeY=1600.0, varNumLblY=5, varPadY=(0.0, 0.0),
                    aryClr=None, aryCnfLw=None, aryCnfUp=None, lstVrt=None):
     """
@@ -70,6 +70,9 @@ def funcPltAcrDpth(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
         Whether to plot a legend.
     strPath : str
         Output path for the figure
+    vecX : np.array
+        1D array with x-position of data points. If not provided, data points
+        are equally spaced in the range ```range(0, varNumDpth)```.
     varSizeX : float
         Width of output figure.
     varSizeY : float
@@ -117,7 +120,8 @@ def funcPltAcrDpth(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
     axs01 = fgr01.add_subplot(111)
 
     # Vector for x-data:
-    vecX = range(0, varNumDpth)
+    if vecX is None:
+        vecX = range(0, varNumDpth)
 
     if aryClr is None:
         # Prepare colour map:

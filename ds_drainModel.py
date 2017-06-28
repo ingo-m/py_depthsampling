@@ -102,10 +102,10 @@ from ds_findPeak import find_peak
 # *** Define parameters
 
 # Which draining model to use (1, 2, 3, or 4 - see above for details):
-varMdl = 1
+varMdl = 5
 
 # ROI (V1 or V2):
-strRoi = 'v1'
+strRoi = 'v2'
 
 # Path of depth-profile to correct:
 strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}.npy'  #noqa
@@ -127,9 +127,9 @@ varDpi = 80.0
 
 # Limits of y-axis for across subject plot:
 varAcrSubsYmin01 = -0.05
-varAcrSubsYmax01 = 2.0
+varAcrSubsYmax01 = 2.2
 varAcrSubsYmin02 = -0.05
-varAcrSubsYmax02 = 2.0
+varAcrSubsYmax02 = 2.2
 # varAcrSubsYmin01 = -0.05
 # varAcrSubsYmax01 = 800.0
 # varAcrSubsYmin02 = -0.05
@@ -204,8 +204,12 @@ elif (varMdl == 4) or (varMdl == 5):
     aryNseRnd = np.add(aryNseRnd, 1.0)
 
 if varMdl == 5:
-    # Additional array for deconvolution results with systematic error:
-    arySys = np.zeros((varNumSub, 2, varNumCon, 5))
+    # Additional array for deconvolution results with systematic error,
+    # defined at 5 depth levels:
+    arySys5 = np.zeros((varNumSub, 2, varNumCon, 5))
+    # Array for deconvolutino results with systematic error, defined at
+    # empirical depth levels:
+    arySys = np.zeros((varNumSub, 2, varNumCon, varNumDpth))
 
 for idxSub in range(0, varNumSub):
 
@@ -282,7 +286,7 @@ for idxSub in range(0, varNumSub):
     # (5) Deconvolution based on Markuerkiaga et al. (2016), with random and
     #     systematic error.
     elif varMdl == 5:
-            aryDecon5[idxSub, :, :, :], arySys[idxSub, :, :, :] = \
+            aryDecon5[idxSub, :, :, :], arySys5[idxSub, :, :, :] = \
                 depth_deconv_05(varNumCon, aryEmp5, aryNseRnd, varNseSys)
 
     # -------------------------------------------------------------------------
@@ -330,6 +334,26 @@ for idxSub in range(0, varNumSub):
                              aryDecon5[idxSub, idxIt, idxCon, :],
                              vecIntpEqui,
                              method='cubic')
+
+    # For model 5, also resample systematic error term:
+    if varMdl == 5:
+
+        # Loop through conditions:
+        for idxCon in range(0, varNumCon):
+
+            # Interpolation for lower limit of systematic error term:
+            arySys[idxSub, 0, idxCon, :] = \
+                griddata(vecPosMdl,
+                         arySys5[idxSub, 0, idxCon, :],
+                         vecIntpEqui,
+                         method='cubic')
+
+            # Interpolation for upper limit of systematic error term:
+            arySys[idxSub, 1, idxCon, :] = \
+                griddata(vecPosMdl,
+                         arySys5[idxSub, 1, idxCon, :],
+                         vecIntpEqui,
+                         method='cubic')
 
 
 # ----------------------------------------------------------------------------
@@ -520,26 +544,31 @@ elif varMdl == 5:
     aryRndConfUp = np.percentile(aryDecon, 97.5, axis=0)
 
     # For model 5, we only plot one stimulus condition (condition 4):
-    aryRndMne = aryRndMne[3, :]
-    aryRndConfLw = aryRndConfLw[3, :]
-    aryRndConfUp = aryRndConfUp[3, :]
+    varTmpCon = 3
+    aryRndMne = aryRndMne[varTmpCon, :]
+    aryRndConfLw = aryRndConfLw[varTmpCon, :]
+    aryRndConfUp = aryRndConfUp[varTmpCon, :]
 
     # Systematic error term - mean across subjects:
     arySysMne = np.mean(arySys, axis=0)
 
     # Patching together systematic and random error terms:
     aryComb = np.array([aryRndMne,
-                        arySysMne[0, 3, :],
-                        arySysMne[1, 3, :]])
+                        arySysMne[0, varTmpCon, :],
+                        arySysMne[1, varTmpCon, :]])
+
+    #aryRndMne.shape
+    #arySysMne[0, varTmpCon, :].shape
+    #arySysMne[1, varTmpCon, :].shape
 
     # Patching together array for error shading (no shading for systematic
     # error term):
     aryErrLw = np.array([aryRndConfLw,
-                        arySysMne[0, 3, :],
-                        arySysMne[1, 3, :]])
+                         arySysMne[0, varTmpCon, :],
+                         arySysMne[1, varTmpCon, :]])
     aryErrUp = np.array([aryRndConfUp,
-                        arySysMne[0, 3, :],
-                        arySysMne[1, 3, :]])
+                         arySysMne[0, varTmpCon, :],
+                         arySysMne[1, varTmpCon, :]])
 
     # *** Plot response at half maximum contrast across depth
 

@@ -197,13 +197,14 @@ def funcPltAcrSubsMean(arySubDpthMns,
     axs01.set_xticklabels(['WM', 'CSF'])
 
     # Which y values to label with ticks:
-    # vecYlbl = np.linspace(varAcrSubsYmin,
-    #                       varAcrSubsYmax,
-    #                       num=5,
-    #                       endpoint=True)
-    vecYlbl = np.linspace(0, varAcrSubsYmax, num=5, endpoint=True)
+    vecYlbl = np.linspace(np.ceil(varAcrSubsYmin),
+                          np.floor(varAcrSubsYmax),
+                          num=5,
+                          endpoint=True)
+
     # Round:
     # vecYlbl = np.around(vecYlbl, decimals=2)
+
     # Set ticks:
     axs01.set_yticks(vecYlbl)
 

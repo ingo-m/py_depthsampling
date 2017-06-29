@@ -28,9 +28,10 @@ import matplotlib.colors as colors
 
 def funcPltAcrDpth(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
                    varYmax, lgcCnvPrct, lstConLbl, strXlabel, strYlabel,
-                   strTitle, lgcLgnd, strPath, vecX=None, varSizeX=1800.0,
-                   varSizeY=1600.0, varNumLblY=5, varPadY=(0.0, 0.0),
-                   aryClr=None, aryCnfLw=None, aryCnfUp=None, lstVrt=None):
+                   strTitle, lgcLgnd, strPath, vecX=None, varXmin=None,
+                   varXmax=None, varSizeX=1800.0, varSizeY=1600.0,
+                   varNumLblY=5, varPadY=(0.0, 0.0), aryClr=None,
+                   aryCnfLw=None, aryCnfUp=None, lstVrt=None):
     """
     Plot data across depth level for variable number of conditions.
 
@@ -73,6 +74,12 @@ def funcPltAcrDpth(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
     vecX : np.array
         1D array with x-position of data points. If not provided, data points
         are equally spaced in the range ```range(0, varNumDpth)```.
+    varXmin : float
+        Minimum of X axis. If None (default), maximum is determined from vecX
+        or varNumDpth.
+    varXmax : float
+        Maximum of X axis. If None (default), maximum is determined from vecX
+        or varNumDpth.
     varSizeX : float
         Width of output figure.
     varSizeY : float
@@ -121,7 +128,7 @@ def funcPltAcrDpth(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
 
     # Vector for x-data:
     if vecX is None:
-        vecX = range(0, varNumDpth)
+        vecX = np.linspace(0.0, 1.0, num=varNumDpth, endpoint=True)
 
     if aryClr is None:
         # Prepare colour map:
@@ -207,16 +214,25 @@ def funcPltAcrDpth(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
     axs01.spines['bottom'].set_visible(True)
     axs01.spines['left'].set_visible(True)
 
+    # Determine minimum and maximum of x-axis:
+    if varXmin is None:
+        varXmin = np.min(vecX)
+    if varXmax is None:
+        varXmax = np.max(vecX)
+
     # Set x-axis range:
-    axs01.set_xlim([-0.2, (varNumDpth - 0.8)])
+    # axs01.set_xlim([-0.2, (varNumDpth - 0.8)])
+    axs01.set_xlim([(varXmin - 0.07),
+                    (varXmax + 0.07)])
+
     # Set y-axis range:
     axs01.set_ylim([(varYmin - varPadY[0]),
                     (varYmax + varPadY[1])])
 
     # Which x values to label with ticks (WM & CSF boundary):
-    axs01.set_xticks([-0.1, (varNumDpth - 0.9)])
-    # axs01.set_xticks([-0.5, (varNumDpth - 0.5)])
-    # axs01.set_xticks([4.0, (varNumDpth - 4.0)])
+    # axs01.set_xticks([-0.1, (varNumDpth - 0.9)])
+    axs01.set_xticks([(varXmin - 0.04),
+                      (varXmax + 0.04)])
 
     # Set tick labels for x ticks:
     axs01.set_xticklabels(['WM', 'CSF'])

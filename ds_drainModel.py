@@ -102,7 +102,7 @@ from ds_findPeak import find_peak
 # *** Define parameters
 
 # Which draining model to use (1, 2, 3, or 4 - see above for details):
-varMdl = 4
+varMdl = 5
 
 # ROI (V1 or V2):
 strRoi = 'v2'
@@ -142,11 +142,19 @@ strYlabel = 'fMRI signal change [arbitrary units]'
 # Condition labels:
 lstConLbl = ['2.5%', '6.1%', '16.3%', '72.0%']
 
+# Number of resampling iterations for peak finding (for models 1, 2, and 3) or
+# random noise samples (models 4 and 5):
+varNumIt = 10000
+
+# Lower & upper bound of percentile bootstrap (in percent), for bootstrap
+# confidence interval (models 1, 2, and 3) - this value is only printed, not
+# plotted - or plotted confidence intervals in case of model 5:
+varCnfLw = 0.5
+varCnfUp = 99.5
+
 # Parameters specific to 'model 4' (i.e. random noise model) and 'model 5'
 # (random & systematic error model):
 if (varMdl == 4) or (varMdl ==5):
-    # How many random noise samples:
-    varNumIt = 10000
     # Extend of random noise (SD of Gaussian distribution to sample noise from,
     # percent of noise to multiply the signal with):
     varNseRndSd = 0.1
@@ -382,13 +390,6 @@ if (varMdl != 4) and (varMdl != 5):
     # We bootstrap the peak finding. Peak finding needs to be performed both
     # before and after deconvolution, separately for all stimulus conditions.
 
-    # Number of resampling iterations:
-    varNumIt = 10000
-
-    # Lower & upper bound of percentile bootstrap (in percent):
-    varCnfLw = 2.5
-    varCnfUp = 97.5
-
     # Random array with subject indicies for bootstrapping of the form
     # aryRnd[varNumIt, varNumSmp]. Each row includes the indicies of the
     # subjects to the sampled on that iteration.
@@ -545,10 +546,10 @@ elif varMdl == 5:
 
     # Random noise - mean across iteratins:
     aryRndMne = np.mean(aryDecon, axis=0)
-    # Random noise -  2.5th percentile:
-    aryRndConfLw = np.percentile(aryDecon, 2.5, axis=0)
-    # Random noise -  97.5th percentile:
-    aryRndConfUp = np.percentile(aryDecon, 97.5, axis=0)
+    # Random noise -  lower percentile:
+    aryRndConfLw = np.percentile(aryDecon, varCnfLw, axis=0)
+    # Random noise - upper percentile:
+    aryRndConfUp = np.percentile(aryDecon, varCnfUp, axis=0)
 
     # For model 5, we only plot one stimulus condition (condition 4):
     varTmpCon = 3

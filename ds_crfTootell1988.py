@@ -102,6 +102,8 @@ vecLayPos = np.zeros((varNumLayers))
 # Loop through layers & fit function:
 for idxLay in range(varNumLayers):
 
+    print(('---Layer ' + str(idxLay + 1) + ' of ' + str(varNumLayers)))
+
     # Reshape to fit expected function input:
     vecEmpY = lstEmpY[idxLay].reshape((1, varNumConEmp))
 
@@ -117,11 +119,13 @@ for idxLay in range(varNumLayers):
     vecLayPos[idxLay] = lstLayPos[idxLay]
 
 # Rescale laminar position (to fit with plot settings):
-vecLayPos = np.multiply(vecLayPos, 6.0)
-vecLayPos = np.divide(vecLayPos, 1000.0)
+vecLayPos = np.subtract(vecLayPos, 55.0)
+vecLayPos = np.divide(vecLayPos, ((1000.0 - 55.0) / 0.85))
+vecLayPos = np.add(vecLayPos, 0.1)
 
-# Reshape semisaturation contrast array for plot:
+# Reshape arrays for plot:
 vecSemi = vecSemi.reshape((1, varNumLayers))
+vecHlfMax = vecHlfMax.reshape((1, varNumLayers))
 
 # Dummy array for error bars:
 aryError = np.zeros(vecSemi.shape)
@@ -133,4 +137,13 @@ strPath = '/home/john/Desktop/semiTootell.png'
 funcPltAcrDpth(vecSemi, aryError, varNumLayers, 1, 80.0, 0.0, 0.5, True,
                [''], 'Cortical depth', 'Percent luminance contrast',
                'Semisaturation contrast', False, strPath, vecX=vecLayPos,
-               varNumLblY=6)
+               varNumLblY=6, varXmin=0.0, varXmax=1.0)
+
+# Path for figure:
+strPath = '/home/john/Desktop/hlfmaxTootell.png'
+
+# Plot semisaturation contrast:
+funcPltAcrDpth(vecHlfMax, aryError, varNumLayers, 1, 80.0, 0.0, 1.0, False,
+               [''], 'Cortical depth', 'Response [a.u.]',
+               'Response at 50% contrast', False, strPath, vecX=vecLayPos,
+               varNumLblY=6, varXmin=0.0, varXmax=1.0)

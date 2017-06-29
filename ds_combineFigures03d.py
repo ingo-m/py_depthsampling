@@ -3,7 +3,7 @@ Combine SVG figures (depth plots).
 
 Function of the depth sampling pipeline.
 
-The purpose of this script is to combine figures (contrast response functions)
+The purpose of this script is to combine figures (semisaturation contrast)
 in SVG format into a summary figure.
 
 This script is somewhat of a make shift solution to combine figures, tailored
@@ -39,15 +39,16 @@ import numpy as np
 import svgutils.transform as sg
 
 # Paths to figures:
-strFigBase = '/home/john/PhD/Tex/contrast_response_boot/combined_corrected/crf_power_V{}_dpth_{}.svg'  #noqa
-lstPths = [strFigBase.format(str(var01 + 1), str(var02))
-           for var01 in range(2) for var02 in [1, 5, 9]]
+strPthBase = '/home/john/PhD/Tex/contrast_response_boot'
+lstPths = ['/combined_uncorrected/crf_power_semisaturationcontrast.svg',
+           '/combined_corrected/crf_power_semisaturationcontrast.svg']
+lstPths = [(strPthBase + x) for x in lstPths]
 
 # Output path:
-strOt = '/home/john/Dropbox/ParCon_Manuscript/Figures_Source/Figure_05_CRF_corrected.svg'  #noqa
+strOt = '/home/john/Dropbox/ParCon_Manuscript/Figures_Source/Figure_07_semisaturation.svg'  #noqa
 
 # Create parent SVG figure:
-objFigPrnt = sg.SVGFigure(width='1100.0 pix', height='525.0 pix')
+objFigPrnt = sg.SVGFigure(width='1700.0 pix', height='650.0 pix')
 
 # Load figures:
 lstFigs = [None for i in range(len(lstPths))]
@@ -60,19 +61,19 @@ for idxIn in range(len(lstPths)):
     lstPlts[idxIn] = lstFigs[idxIn].getroot()
 
 # X positions for subplots:
-varXstart = 50.0
-varXsize = 340.0
-varXstop = (len(lstPlts) * 0.5 * varXsize + varXstart)
-aryPosX = np.arange(varXstart, varXstop, varXsize)
-aryPosX = np.hstack((aryPosX, aryPosX))
+lstPosX = [10.0, 795.0]
 
 # Y positions for subplots:
-aryPosY = np.hstack((np.repeat([10.0], 3),
-                     np.repeat([240.0], 3)))
+lstPosY = [10.0, 10.0]
+
+# Scaling factors for subplots:
+lstScale = [1.0, 1.0]
 
 # Move plots:
 for idxIn in range(len(lstPths)):
-    lstPlts[idxIn].moveto(aryPosX[idxIn], aryPosY[idxIn], scale=1.0)
+    lstPlts[idxIn].moveto(lstPosX[idxIn],
+                          lstPosY[idxIn],
+                          scale=lstScale[idxIn])
 
 # Append plots to parent figure object:
 objFigPrnt.append(lstPlts)

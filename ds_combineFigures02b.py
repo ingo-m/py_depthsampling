@@ -41,13 +41,13 @@ import svgutils.transform as sg
 # Paths to figures:
 strFigBase = '/home/john/PhD/Tex/contrast_response_boot/combined_uncorrected/crf_power_V{}_dpth_{}.svg'  #noqa
 lstPths = [strFigBase.format(str(var01 + 1), str(var02))
-           for var01 in range(2) for var02 in [0, 5, 10]]
+           for var01 in range(2) for var02 in [1, 5, 9]]
 
 # Output path:
-strOt = '/home/john/PhD/Tex/contrast_response_boot/combined_uncorrected/crf_power_summary.svg'  #noqa
+strOt = '/home/john/Dropbox/ParCon_Manuscript/Figures_Source/Figure_S01_CRF_uncorrected.svg'  #noqa
 
 # Create parent SVG figure:
-objFigPrnt = sg.SVGFigure(width='1115.0 pix', height='600.0 pix')
+objFigPrnt = sg.SVGFigure(width='1100.0 pix', height='525.0 pix')
 
 # Load figures:
 lstFigs = [None for i in range(len(lstPths))]
@@ -60,15 +60,15 @@ for idxIn in range(len(lstPths)):
     lstPlts[idxIn] = lstFigs[idxIn].getroot()
 
 # X positions for subplots:
-varXstart = 10.0
-varXsize = 370.0
+varXstart = 50.0
+varXsize = 340.0
 varXstop = (len(lstPlts) * 0.5 * varXsize + varXstart)
 aryPosX = np.arange(varXstart, varXstop, varXsize)
 aryPosX = np.hstack((aryPosX, aryPosX))
 
 # Y positions for subplots:
 aryPosY = np.hstack((np.repeat([10.0], 3),
-                     np.repeat([300.0], 3)))
+                     np.repeat([240.0], 3)))
 
 # Move plots:
 for idxIn in range(len(lstPths)):

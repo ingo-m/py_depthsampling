@@ -45,7 +45,7 @@ strFig03 = '/home/john/PhD/Tex/deconv/v2_model_1/deconv_v2_m1_before_acrsSubsMea
 strFig04 = '/home/john/PhD/Tex/deconv/v2_model_1/deconv_v2_m1_after_acrsSubsMean.svg'  #noqa
 
 # Output path:
-strOt = '/home/john/PhD/Tex/deconv/summary.svg'
+strOt = '/home/john/Dropbox/ParCon_Manuscript/Figures_Source/Figure_04_Depth_Plots.svg'
 
 # Create parent SVG figure:
 objFigPrnt = sg.SVGFigure(width='1700.0 pix', height='1550.0 pix')
@@ -64,9 +64,9 @@ objPlt04 = objFig04.getroot()
 
 # Move plots:
 objPlt01.moveto(10.0, 1.0, scale=1.0)
-objPlt02.moveto(850.0, 1.0, scale=1.0)
-objPlt03.moveto(10.0, 700.0, scale=1.0)
-objPlt04.moveto(850.0, 700.0, scale=1.0)
+objPlt02.moveto(790.0, 1.0, scale=1.0)
+objPlt03.moveto(10.0, 650.0, scale=1.0)
+objPlt04.moveto(790.0, 650.0, scale=1.0)
 
 # Move redundant axis labels & legends:
 objTmp = objPlt01.find_id('text_3')

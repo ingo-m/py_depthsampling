@@ -42,7 +42,7 @@ from ds_findPeak import find_peak
 # *** Define parameters
 
 # Load existing bootstrap or create new one ('load' or 'create')?
-strSwitch = 'create'
+strSwitch = 'load'
 
 # Corrected or  uncorrected depth profiles?
 strCrct = 'corrected'

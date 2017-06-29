@@ -177,6 +177,12 @@ def funcPltAcrDpth(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
                                         linewidth=0,
                                         antialiased=True)
 
+    # Determine minimum and maximum of x-axis:
+    if varXmin is None:
+        varXmin = np.min(vecX)
+    if varXmax is None:
+        varXmax = np.max(vecX)
+
     # Plot vertical lines (e.g. representing peak position):
     if lstVrt != None:
  
@@ -199,7 +205,7 @@ def funcPltAcrDpth(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
 
             # Apsolute Position of vertical line (input values refer to
             # relative position):
-            varVrtTmp = lstVrt[idxVrt] * (float(varNumDpth) - 1.0)
+            varVrtTmp = lstVrt[idxVrt] / (float(varXmax)) + float(varXmin)
 
             # Plot vertical line:
             axs01.axvline(varVrtTmp,
@@ -207,18 +213,6 @@ def funcPltAcrDpth(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
                           linewidth=8.0,
                           linestyle='--',
                           antialiased=True)
-
-    # Reduce framing box:
-    axs01.spines['top'].set_visible(False)
-    axs01.spines['right'].set_visible(False)
-    axs01.spines['bottom'].set_visible(True)
-    axs01.spines['left'].set_visible(True)
-
-    # Determine minimum and maximum of x-axis:
-    if varXmin is None:
-        varXmin = np.min(vecX)
-    if varXmax is None:
-        varXmax = np.max(vecX)
 
     # Set x-axis range:
     # axs01.set_xlim([-0.2, (varNumDpth - 0.8)])
@@ -244,6 +238,7 @@ def funcPltAcrDpth(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
 
     # Set ticks:
     axs01.set_yticks(vecYlbl)
+
     # Convert labels to percent?
     if lgcCnvPrct:
         # Multiply by 100 to convert to percent:
@@ -259,6 +254,7 @@ def funcPltAcrDpth(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
         lstYlbl = [None] * vecYlbl.shape[0]
         for idxLbl in range(vecYlbl.shape[0]):
             lstYlbl[idxLbl] = '{:0.2f}'.format(vecYlbl[idxLbl])
+
     # Set tick labels for y ticks:
     axs01.set_yticklabels(lstYlbl)
 
@@ -272,6 +268,12 @@ def funcPltAcrDpth(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
                      fontsize=36)
     axs01.set_ylabel(strYlabel,
                      fontsize=36)
+
+    # Reduce framing box:
+    axs01.spines['top'].set_visible(False)
+    axs01.spines['right'].set_visible(False)
+    axs01.spines['bottom'].set_visible(True)
+    axs01.spines['left'].set_visible(True)
 
     # Adjust title:
     axs01.set_title(strTitle, fontsize=36, fontweight="bold")

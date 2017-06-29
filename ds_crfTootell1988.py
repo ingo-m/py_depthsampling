@@ -131,7 +131,7 @@ vecHlfMax = vecHlfMax.reshape((1, varNumLayers))
 aryError = np.zeros(vecSemi.shape)
 
 # Path for figure:
-strPath = '/home/john/Desktop/semiTootell.png'
+strPath = '/home/john/PhD/Tex/Tootell_1988/semiTootell1988.svg'
 
 # Plot semisaturation contrast:
 funcPltAcrDpth(vecSemi, aryError, varNumLayers, 1, 80.0, 0.0, 0.5, True,
@@ -140,7 +140,7 @@ funcPltAcrDpth(vecSemi, aryError, varNumLayers, 1, 80.0, 0.0, 0.5, True,
                varNumLblY=6, varXmin=0.0, varXmax=1.0)
 
 # Path for figure:
-strPath = '/home/john/Desktop/hlfmaxTootell.png'
+strPath = '/home/john/PhD/Tex/Tootell_1988/hlfmaxTootell1988.svg'
 
 # Plot semisaturation contrast:
 funcPltAcrDpth(vecHlfMax, aryError, varNumLayers, 1, 80.0, 0.0, 1.0, False,

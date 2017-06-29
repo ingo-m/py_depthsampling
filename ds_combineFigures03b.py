@@ -3,8 +3,8 @@ Combine SVG figures (depth plots).
 
 Function of the depth sampling pipeline.
 
-The purpose of this script is to combine figures (contrast response functions)
-in SVG format into a summary figure.
+The purpose of this script is to combine figures (response at 50% contrast &
+peak-position boxplots) in SVG format into a summary figure.
 
 This script is somewhat of a make shift solution to combine figures, tailored
 for one particular use case (better than combining them manually and having to

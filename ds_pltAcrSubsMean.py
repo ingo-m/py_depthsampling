@@ -41,7 +41,8 @@ def funcPltAcrSubsMean(arySubDpthMns,
                        strPltOtSuf,
                        varSizeX=1800.0,
                        varSizeY=1600.0,
-                       strErr='conf95'):
+                       strErr='conf95',
+                       vecX=None):
     """
     Calculate & plot across-subjects mean.
 
@@ -93,6 +94,9 @@ def funcPltAcrSubsMean(arySubDpthMns,
                   subject's depth profiles, but, for instance, depth profiles
                   created by iteratively changing model assumtions to test
                   the robustness of the results ('model 4' in ds_drainModel).
+    vecX : np.array
+        1D array with x-position of data points. If not provided, data points
+        are equally spaced in the range ```range(0, varNumDpth)```.
     """
     # Across-subjects mean:
     aryAcrSubDpthMean = np.mean(arySubDpthMns, axis=0)
@@ -146,7 +150,8 @@ def funcPltAcrSubsMean(arySubDpthMns,
     axs01 = fgr01.add_subplot(111)
 
     # Vector for x-data:
-    vecX = range(0, varNumDpth)
+    if vecX is None:
+        vecX = np.linspace(0.0, 1.0, num=varNumDpth, endpoint=True)
 
     # Prepare colour map:
     objClrNorm = colors.Normalize(vmin=0, vmax=(varNumCon - 1))
@@ -186,13 +191,18 @@ def funcPltAcrSubsMean(arySubDpthMns,
     axs01.spines['left'].set_visible(True)
 
     # Set x-axis range:
-    axs01.set_xlim([-0.2, (varNumDpth - 0.8)])
+    axs01.set_xlim([(np.min(vecX) - 0.07),
+                    (np.max(vecX) + 0.07)])
+    #axs01.set_xlim([-0.07, 1.07])
+
     # Set y-axis range:
     axs01.set_ylim([varAcrSubsYmin, varAcrSubsYmax])
 
     # Which x values to label with ticks (WM & CSF boundary):
-    # axs01.set_xticks([-0.5, (varNumDpth - 0.5)])
-    axs01.set_xticks([-0.05, (varNumDpth - 0.95)])
+    axs01.set_xticks([(np.min(vecX) - 0.04),
+                      (np.max(vecX) + 0.04)])
+    #axs01.set_xticks([-0.04, 1.04])
+
     # Labels for x ticks:
     axs01.set_xticklabels(['WM', 'CSF'])
 

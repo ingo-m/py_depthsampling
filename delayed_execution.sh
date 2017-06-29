@@ -8,11 +8,18 @@
 # Define parameters:
 
 # Pause execution until (target epoch):
-str_target_date="20170628 20:05:55"
+str_target_date="20170629 13:10:00"
 
 # Array with paths of python scripts to call after target epoch is reached:
-ary_paths=(/home/john/Desktop/pyecho01.py \
-           /home/john/Desktop/pyecho02.py)
+ary_paths=(/home/john/PhD/GitHub/py_depthsampling/delayed_execution_01_ds_crfMain_pow_uncor.py \
+           /home/john/PhD/GitHub/py_depthsampling/delayed_execution_02_ds_crfMain_pow_cor.py \
+           /home/john/PhD/GitHub/py_depthsampling/delayed_execution_03_ds_permMain_pow_uncor.py \
+           /home/john/PhD/GitHub/py_depthsampling/delayed_execution_04_ds_permMain_pow_cor.py \
+           /home/john/PhD/GitHub/py_depthsampling/delayed_execution_05_ds_crfMain_hyper_uncor.py \
+           /home/john/PhD/GitHub/py_depthsampling/delayed_execution_06_ds_crfMain_hyper_cor.py \
+           /home/john/PhD/GitHub/py_depthsampling/delayed_execution_07_ds_permMain_hyper_uncor.py \
+           /home/john/PhD/GitHub/py_depthsampling/delayed_execution_08_ds_permMain_hyper_cor.py)
+
 #-------------------------------------------------------------------------------
 
 

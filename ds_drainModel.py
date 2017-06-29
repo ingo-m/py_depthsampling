@@ -102,7 +102,7 @@ from ds_findPeak import find_peak
 # *** Define parameters
 
 # Which draining model to use (1, 2, 3, or 4 - see above for details):
-varMdl = 5
+varMdl = 4
 
 # ROI (V1 or V2):
 strRoi = 'v2'
@@ -240,7 +240,10 @@ for idxSub in range(0, varNumSub):
         vecPosMdl = np.divide(vecPosMdl, 1700.0)
 
     # Position of empirical datapoints:
-    vecPosEmp = np.linspace(0.0, 1.0, num=varNumDpth, endpoint=True)
+    vecPosEmp = np.linspace(np.min(vecPosMdl),
+                            np.max(vecPosMdl),
+                            num=varNumDpth,
+                            endpoint=True)
 
     # Vector for downsampled empirical depth profiles:
     aryEmp5 = np.zeros((varNumCon, 5))
@@ -398,6 +401,7 @@ if (varMdl != 4) and (varMdl != 5):
 
         if idxDec == 0:
             print('------UNCORRECTED')
+
         if idxDec == 1:
             print('------CORRECTED')
 
@@ -482,7 +486,8 @@ if (varMdl != 4) and (varMdl != 5):
                        strTmpTtl,
                        strTmpPth,
                        strFlTp,
-                       strErr='sd')
+                       strErr='sd',
+                       vecX=vecPosEmp)
 
     # Across-subjects mean after deconvolution:
     strTmpTtl = '{} after deconvolution'.format(strRoi.upper())
@@ -500,7 +505,8 @@ if (varMdl != 4) and (varMdl != 5):
                        strTmpTtl,
                        strTmpPth,
                        strFlTp,
-                       strErr='sd')
+                       strErr='sd',
+                       vecX=vecIntpEqui)
 
 elif varMdl == 4:
 
@@ -526,7 +532,8 @@ elif varMdl == 4:
                        strTmpTtl,
                        strTmpPth,
                        strFlTp,
-                       strErr='prct95')
+                       strErr='prct95',
+                       vecX=vecIntpEqui)
 
 elif varMdl == 5:
 
@@ -608,7 +615,8 @@ elif varMdl == 5:
                    varSizeY=1400.0,
                    aryCnfLw=aryErrLw,
                    aryCnfUp=aryErrUp,
-                   aryClr=aryClr)
+                   aryClr=aryClr,
+                   vecX=vecIntpEqui)
 
 
 # ----------------------------------------------------------------------------

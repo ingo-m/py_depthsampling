@@ -182,8 +182,8 @@ def crf_fit(vecEmpX, aryEmpY, strFunc='power', varNumX=1000, varXmin=0.0,
     # If the overall stimulus-induced response is very small (close to zero),
     # possibly due to a low or noisy signal, the semisaturation algorithm may
     # converge on an artefactual solution. If the response is very low (i.e.
-    # very close to zero at a reasonable level of precision), the
-    # semisaturation contrast is likewise kept at zero.
+    # very close to zero), the semisaturation contrast is likewise kept at
+    # zero.
     if np.greater(vecMdlPar[0], 0.0001):
 
         # Initial value for the response.

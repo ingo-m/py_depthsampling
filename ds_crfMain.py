@@ -45,7 +45,7 @@ from ds_findPeak import find_peak
 strSwitch = 'load'
 
 # Corrected or  uncorrected depth profiles?
-strCrct = 'corrected'
+strCrct = 'uncorrected'
 
 # Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
 # function).
@@ -113,7 +113,8 @@ vecLimHypLw = np.array([0.0, 0.0, 0.0])
 vecLimHypUp = np.array([np.inf, np.inf, np.inf])
 # vecLimHypUp = np.array([10.0, np.inf, np.inf])
 
-# Lower & upper bound of percentile bootstrap (in percent):
+# Lower & upper bound of percentile bootstrap (in percent). Note:
+# Semisaturation constant depth plots use (2.5, 97.5 percentile) interval.
 varCnfLw = 0.5
 varCnfUp = 99.5
 
@@ -278,10 +279,10 @@ for idxIn in range(0, varNumIn):
     arySemiMne[idxIn, :] = np.median(arySemi[idxIn, :, :], axis=0)
     # Confidence interval:
     arySemiSCnfLw[idxIn, :] = np.percentile(arySemi[idxIn, :, :],
-                                            varCnfLw,
+                                            2.5,
                                             axis=0)
     arySemiSCnfUp[idxIn, :] = np.percentile(arySemi[idxIn, :, :],
-                                            varCnfUp,
+                                            97.5,
                                             axis=0)
 
 
@@ -738,12 +739,6 @@ funcPltAcrDpth(aryHlfMaxMne,       # aryData[Condition, Depth]
 # Label for axes:
 strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'Percent luminance contrast'
-
-# Convert contrast values to percent (otherwise rounding will be a problem for
-# y-axis values):
-# arySemiMne = np.multiply(arySemiMne, 100.0)
-# arySemiSCnfLw = np.multiply(arySemiSCnfLw, 100.0)
-# arySemiSCnfUp = np.multiply(arySemiSCnfUp, 100.0)
 
 # Line colours:
 aryClr = np.array([[15.0, 255.0, 135.0],

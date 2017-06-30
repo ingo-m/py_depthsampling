@@ -31,7 +31,7 @@ aryPthIn <- c('/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/R_aryEmpHl
               '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/R_aryEmpSemi_uncorrected_power.npy')
 
 # Number of iterations:
-varNumIt    <- 100
+varNumIt    <- 100000
 
 print('---Number of resampling iterations:')
 print(varNumIt)
@@ -205,7 +205,7 @@ strResults <- c(strResults,
                 '#######################################################################')
 
 # File to save results to:
-fleResults <- file('/home/john/Desktop/R_test.txt')
+fleResults <- file('/home/john/Dropbox/ParCon_Manuscript/Tables/lin_reg_boot.txt')
 
 # Write results to file:
 writeLines(c(strResults), fleResults)

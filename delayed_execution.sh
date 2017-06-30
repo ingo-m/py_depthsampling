@@ -8,7 +8,7 @@
 # Define parameters:
 
 # Pause execution until (target epoch):
-str_target_date="20170629 13:08:00"
+str_target_date="20170630 17:38:00"
 
 # Array with paths of python scripts to call after target epoch is reached:
 ary_paths=(/home/john/PhD/GitHub/py_depthsampling/delayed_execution_01_ds_crfMain_pow_uncor.py \

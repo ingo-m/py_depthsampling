@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Permutation & bootstrapping tests on depth profiles.
+Permutation test on depth profiles for differences between ROIs.
 
-Can be used to test for differences in depth profiles between ROIs and for
-differences across cortical depth, e.g. on depth profiles of semisaturation
-constant bwetween V1 and V2. (Or, for instance, on residual variance depth
-profiles.)
-
-PART 1 - PERMUTATION TEST FOR DIFFERENCES BETWEEN ROIs
+Can be used to test for differences in depth profiles between ROIs, e.g. on
+depth profiles of semisaturation constant bwetween V1 and V2. (Differences
+across cortical depths are ignored, use ds_bootLinReg.py & ds_bootLinReg.r
+instead).
 
 Takes the mean intensity across cortical depth, and compares the difference
 between this mean between two depth profiles (e.g. the semisaturation constant
@@ -17,11 +15,6 @@ variance or both not being equal).
 
 The permutations need to be provided first (they can be created using
 ds_permMain).
-
-PART 2 - PREPARE BOOTSTRAPPING LINEAR REGRESSION
-
-The bootstrap linear regression is performed in R. Here, we only prepare an npy
-file (containing an np array) that can be read by R.
 
 Function of the depth sampling pipeline.
 """
@@ -69,13 +62,7 @@ vecEmpX = np.array([0.025, 0.061, 0.163, 0.72])
 
 # Test semisaturation constant depth profiles, or residual variance depth
 # profiles ('semi' or 'residuals')?
-strSwitch = 'residuals'
-
-# Output path for array to be analysed in R (bootstrap regerssion):
-if strSwitch == 'semi':
-    strPthSemi = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/aryEmpSemi_{}_{}.npy'.format(strCrct, strFunc)  #noqa
-elif strSwitch == 'residuals':
-    strPthSemi = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/aryEmpResidual_{}_{}.npy'.format(strCrct, strFunc)  #noqa
+strSwitch = 'semi'
 
 
 # ----------------------------------------------------------------------------
@@ -145,9 +132,9 @@ _, aryEmpMdlY, aryEmpHlfMax, aryEmpSemi, aryEmpRes = lstCrf
 
 
 # ----------------------------------------------------------------------------
-# *** PART 1 - PERMUTATION TEST FOR DIFFERENCES BETWEEN ROIs
+# *** Permutation test for differences between ROIs
 
-print('---PART 1 - PERMUTATION TEST FOR DIFFERENCES BETWEEN ROIs')
+print('---Permutation test for differences between ROIs')
 
 # We test for differences in the mean semisaturation constant (mean across
 # cortical depth levels) between the two ROIs (e.g. V1 and V2).
@@ -159,8 +146,8 @@ if strSwitch == 'semi':
                                          np.mean(aryEmpSemi[1, 0, :])))
 
     # Mean difference in permutation samples (null distribution):
-    vecNull = np.subtract(np.mean(arySemi[0, :, :], axis=1),
-                          np.mean(arySemi[1, :, :], axis=1))
+    vecNull = np.subtract(np.mean(arySemi[0, :, :]),  # axis=1),
+                          np.mean(arySemi[1, :, :]))  # axis=1))
 
 
 elif strSwitch == 'residuals':
@@ -170,8 +157,8 @@ elif strSwitch == 'residuals':
                                          np.mean(aryEmpRes[1, 0, :])))
 
     # Mean difference in permutation samples (null distribution):
-    vecNull = np.subtract(np.mean(aryRes[0, :, :], axis=1),
-                          np.mean(aryRes[1, :, :], axis=1))
+    vecNull = np.subtract(np.mean(aryRes[0, :, :]),  # axis=1),
+                          np.mean(aryRes[1, :, :]))  # axis=1))
 
 # Absolute of the mean difference between the two randomised groups:
 vecNullAbs = np.absolute(vecNull)
@@ -195,37 +182,6 @@ varP = np.divide(float(varNumGe), float(varNumIt))
 
 print(('------Permutation p-value for equality of distributions: '
        + str(np.around(varP, decimals=5))))
-
-
-# ----------------------------------------------------------------------------
-# *** PART 2 - PREPARE BOOTSTRAPPING LINEAR REGRESSION
-
-# The bootstrap linear regression is performed in R. Here, we only prepare an
-# npy file (containing a np array) that can be read by R and used for the
-# analysis.
-
-# Array to be used in R for bootstrap linear regression, of the form
-# aryEmpSemiR[(idxDpt * idxRoi), 3], where the first dimension corresponds to
-# the number of cortical depth levels * number of ROIs, and the second
-# dimension corresponds to three columns for the linear model, representing:
-# the signal (i.e. the semisaturation constant, which is the idenpendent
-# variable), the depth level (dependent variable) and the ROI membership
-# (dependent variable).
-aryEmpSemiR = np.zeros(((varNumDpt * 2), 3))
-
-# The first column is to contain the semisaturation constants:
-aryEmpSemiR[:, 0] = aryEmpSemi.flatten()
-
-# The second column is to contain the depth level:
-aryEmpSemiR[0:varNumDpt, 1] = np.arange(0, varNumDpt)
-aryEmpSemiR[varNumDpt:, 1] = np.arange(0, varNumDpt)
-
-# The third column is to contain the ROI labels (1 for V1, 2 for V2):
-aryEmpSemiR[0:varNumDpt, 2] = 0.0
-aryEmpSemiR[varNumDpt:, 2] = 1.0
-
-# Save array to disk:
-np.save(strPthSemi, aryEmpSemiR)
 
 
 # ----------------------------------------------------------------------------

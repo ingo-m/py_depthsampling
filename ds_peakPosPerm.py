@@ -121,6 +121,8 @@ print(('------Absolute difference in peak positions (empirical): '
 # ----------------------------------------------------------------------------
 # *** Create permutation samples
 
+print('---Create permutation samples')
+
 # Random array that is used to permute V1 and V2 labels within subjects, of the
 # form aryRnd[idxIteration, idxSub]. For each iteration and subject, there is
 # either a zero or a one. 'Zero' means that the actual V1 value gets assigned
@@ -168,6 +170,8 @@ aryDpthRnd02 = np.mean(aryDpthRnd02, axis=1)
 # ----------------------------------------------------------------------------
 # *** Find peaks in permutation samples
 
+print('---Find peaks in permutation samples')
+
 # Array for peak positions in permutation samples, of the form
 # aryPermPeaks01[idxCondition, idxIteration]
 aryPermPeaks01 = np.zeros((varNumCon, varNumIt))
@@ -179,6 +183,7 @@ for idxCon in range(0, varNumCon):
                                           lgcStat=False)
     aryPermPeaks02[idxCon, :] = find_peak(aryDpthRnd02[:, idxCon, :],
                                           lgcStat=False)
+
 
 # ----------------------------------------------------------------------------
 # *** Create null distribution

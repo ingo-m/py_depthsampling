@@ -166,7 +166,7 @@ def crf_fit(vecEmpX, aryEmpY, strFunc='power', varNumX=1000, varXmin=0.0,
                               vecMdlPar[1],
                               vecMdlPar[2])
 
-    # Half maximum response:
+    # 50% of response at full contrast:
     varResp50 = np.multiply(varResp50, 0.5)
 
     # Search for the luminance contrast level at half maximum response. A
@@ -179,22 +179,29 @@ def crf_fit(vecEmpX, aryEmpY, strFunc='power', varNumX=1000, varXmin=0.0,
     # the half maximum response is reached).
     varSemi = 0.0
 
-    # Initial value for the resposne.
-    varRespTmp = 0.0
+    # If the overall stimulus-induced response is very small (close to zero),
+    # possibly due to a low or noisy signal, the semisaturation algorithm may
+    # converge on an artefactual solution. If the response is very low (i.e.
+    # very close to zero at a reasonable level of precision), the
+    # semisaturation contrast is likewise kept at zero.
+    if np.greater(vecMdlPar[0], 0.0001):
 
-    # Increment the contrast level until the half maximum response is
-    # reached:
-    while np.less(varRespTmp, varResp50):
-        varSemi += 0.000001
-        if strFunc == 'power':
-            varRespTmp = crf_power(varSemi,
-                                   vecMdlPar[0],
-                                   vecMdlPar[1])
-        elif strFunc == 'hyper':
-            varRespTmp = crf_hyper(varSemi,
-                                   vecMdlPar[0],
-                                   vecMdlPar[1],
-                                   vecMdlPar[2])
+        # Initial value for the response.
+        varRespTmp = 0.0
+
+        # Increment the contrast level until the half maximum response is
+        # reached:
+        while np.less(varRespTmp, varResp50):
+            varSemi += 0.000001
+            if strFunc == 'power':
+                varRespTmp = crf_power(varSemi,
+                                       vecMdlPar[0],
+                                       vecMdlPar[1])
+            elif strFunc == 'hyper':
+                varRespTmp = crf_hyper(varSemi,
+                                       vecMdlPar[0],
+                                       vecMdlPar[1],
+                                       vecMdlPar[2])
 
     # *** Calculate residual variance
 

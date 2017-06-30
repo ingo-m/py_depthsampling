@@ -18,14 +18,13 @@ print('-Parametric bootstraping of linear regerssion on depth profiles.')
 
 # Load empirical semisaturation constant from disk (i.e. semisaturation constant
 # fitted on the full dataset; needs to be created with ds_crfMain.py):
-#aryEmpSemi  <- npyLoad('/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/aryEmpSemi_uncorrected_hyper.npy')
-aryEmpSemi  <- npyLoad('/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/aryEmpResidual_corrected_power.npy')
+aryEmpSemi  <- npyLoad('/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/R_aryEmpSemi_corrected_power.npy')
 
 # Put data into data frame object:
 datEmpSemi  <- data.frame(aryEmpSemi)
 
 # Adjust column names:
-colnames(datEmpSemi) <- c('Signal', 'Depth', 'ROI')
+colnames(datEmpSemi) <- c('Signal', 'Depth', 'ROI', 'Subject')
 
 # Number of iterations:
 varNumIt    <- 100000
@@ -34,7 +33,7 @@ print('---Number of iterations:')
 print(varNumIt)
 
 # Linear model:
-mdlLin      <- lm(Signal ~ Depth + ROI, datEmpSemi)
+mdlLin      <- lm(Signal ~ Depth + ROI + Subject, datEmpSemi)
 
 # Parameter estimates (coefficients):
 vecPe       <- coefficients(mdlLin)
@@ -50,12 +49,12 @@ aryBoot     <- matrix(rep(0, varNumPe * varNumIt), ncol=varNumPe)
 for (idxIt in 1:varNumIt) {
   # The parametric bootstrap. The 'simulate()' function simulates new
   # parameter estimates based on the full model. The model fitting is repeated
-  # on the simulated, data, and the original data is put into this new model.
+  # on the simulated data, and the original data is put into this new model.
   # The resulting parameter estimates are saved into aryBoot.
-  aryBoot[idxIt,] <-coefficients(lm(unlist(simulate(mdlLin)) ~ Depth + ROI, datEmpSemi))
+  aryBoot[idxIt,] <-coefficients(lm(unlist(simulate(mdlLin)) ~ Depth + ROI + Subject, datEmpSemi))
 }
 
-# There are three coefficient: (1) intercept, (2) depth, (3) ROI.
+# There are four coefficients: (1) intercept, (2) depth, (3) ROI, (4) Subject.
 
 # (1) Intercept
 
@@ -76,6 +75,7 @@ varPe01P <- format(round(varPe01P, 5), nsmall = 5)
 # Confidence interval for PE:
 vecPe01Conf <- quantile(aryBoot[,1], c(.025, 0.975))
 
+print('----------------------------------------------------------------------')
 print('---Intercept:')
 print('------p-value:')
 print(varPe01P)
@@ -101,6 +101,7 @@ varPe02P <- format(round(varPe02P, 5), nsmall = 5)
 # Confidence interval for PE:
 vecPe02Conf <- quantile(aryBoot[,2], c(.025, 0.975))
 
+print('----------------------------------------------------------------------')
 print('---Cortical depth level:')
 print('------p-value:')
 print(varPe02P)
@@ -126,8 +127,35 @@ varPe03P <- format(round(varPe03P, 5), nsmall = 5)
 # Confidence interval for PE:
 vecPe03Conf <- quantile(aryBoot[,3], c(.025, 0.975))
 
+print('----------------------------------------------------------------------')
 print('---ROI:')
 print('------p-value:')
 print(varPe03P)
 print('------Confidence interval:')
 print(vecPe03Conf)
+
+# (4) Subject
+
+# Mean parameter estimate across bootstrap iterations:
+varPe04Mne <- mean(aryBoot[,4])
+# Absolute difference between the PE of each iteration and the mean PE across
+# iterations (null distribution, i.e. distribution of the PE assuming that the
+# mean value of the PE is zero):
+vecPe04Abs <-  abs(aryBoot[,4] - mean(varPe04Mne))
+# Logical test: For each iteration, is the PE from the null distribution greater
+# than the PE found on the full model?
+vecPe04Lgc <- vecPe04Abs > abs(vecPe[4])
+# Ratio of iterations with bootstrapped PE under H0 greater than empirical PE
+# (p-value):
+varPe04P <- mean(vecPe04Lgc)
+# Fix decimal places:
+varPe04P <- format(round(varPe04P, 5), nsmall = 5)
+# Confidence interval for PE:
+vecPe04Conf <- quantile(aryBoot[,4], c(.025, 0.975))
+
+print('----------------------------------------------------------------------')
+print('---Subject:')
+print('------p-value:')
+print(varPe04P)
+print('------Confidence interval:')
+print(vecPe04Conf)

@@ -632,7 +632,7 @@ for idxIn in range(0, varNumIn):
     # Across-subjects mean of empirical contrast responses:
     vecEmpYMne = np.mean(aryDpth[idxIn, :, :, :], axis=0)
     # SEM:
-    vecEmpYSem = np.divide(np.std(aryDpth[idxIn, :, :, :], axis=0),
+    vecEmpYSd = np.divide(np.std(aryDpth[idxIn, :, :, :], axis=0),
                            np.sqrt(varNumSubs)
                            )
 
@@ -693,7 +693,7 @@ for idxIn in range(0, varNumIn):
                 vecMdlYCnfUp=aryMdlYCnfUp[idxIn, idxDpt, :],
                 vecEmpX=vecEmpX,
                 vecEmpYMne=vecEmpYMne[:, idxDpt],
-                vecEmpYSem=vecEmpYSem[:, idxDpt],
+                vecEmpYSd=vecEmpYSd[:, idxDpt],
                 varXmin=varXmin,
                 varXmax=varXmax,
                 varYmin=varYmin,

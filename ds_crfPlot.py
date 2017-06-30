@@ -28,7 +28,7 @@ def plt_crf(vecMdlX,
             vecMdlYCnfUp=None,
             vecEmpX=None,
             vecEmpYMne=None,
-            vecEmpYSem=None,
+            vecEmpYSd=None,
             varXmin=0.0,
             varXmax=1.0,
             varYmin=0.0,
@@ -62,9 +62,9 @@ def plt_crf(vecMdlX,
     vecEmpYMne : np.array
         Mean empirical (i.e. measured) contrast response (of the form
         vecEmpYMne[idxCon]).
-    vecEmpYSem : np.array
-        Standard error of the mean empirical (i.e. measured) contrast response
-        (same shape as vecEmpYMne, i.e. vecEmpYSem[idxCon]).
+    vecEmpYSd : np.array
+        Standard deviation of the mean empirical (i.e. measured) contrast
+        response (same shape as vecEmpYMne, i.e. vecEmpYSd[idxCon]).
     varXmin : float
         Lower limit of x axis.
     varXmax : float
@@ -134,7 +134,7 @@ def plt_crf(vecMdlX,
         # Plot the average dependent data with error bars:
         plt03 = axs01.errorbar(vecEmpX,  #noqa
                                vecEmpYMne,
-                               yerr=vecEmpYSem,
+                               yerr=vecEmpYSd,
                                color=[0.1, 0.1, 0.9],
                                label='Empirical mean (SEM)',
                                linewidth=4.0,

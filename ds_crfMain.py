@@ -45,7 +45,7 @@ from ds_findPeak import find_peak
 strSwitch = 'load'
 
 # Corrected or  uncorrected depth profiles?
-strCrct = 'uncorrected'
+strCrct = 'corrected'
 
 # Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
 # function).
@@ -632,9 +632,7 @@ for idxIn in range(0, varNumIn):
     # Across-subjects mean of empirical contrast responses:
     vecEmpYMne = np.mean(aryDpth[idxIn, :, :, :], axis=0)
     # SEM:
-    vecEmpYSem = np.divide(np.std(aryDpth[idxIn, :, :, :], axis=0),
-                           np.sqrt(varNumSubs)
-                           )
+    vecEmpYSd = np.std(aryDpth[idxIn, :, :, :], axis=0)
 
     # Loop through depth levels:
     for idxDpt in range(0, varNumDpt):
@@ -693,7 +691,7 @@ for idxIn in range(0, varNumIn):
                 vecMdlYCnfUp=aryMdlYCnfUp[idxIn, idxDpt, :],
                 vecEmpX=vecEmpX,
                 vecEmpYMne=vecEmpYMne[:, idxDpt],
-                vecEmpYSem=vecEmpYSem[:, idxDpt],
+                vecEmpYSd=vecEmpYSd[:, idxDpt],
                 varXmin=varXmin,
                 varXmax=varXmax,
                 varYmin=varYmin,

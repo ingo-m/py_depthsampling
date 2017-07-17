@@ -45,7 +45,7 @@ lstPths = ['/hlfmaxTootell1988.svg',
 lstPths = [(strPthBase + x) for x in lstPths]
 
 # Output path:
-strOt = '/home/john/Dropbox/ParCon_Manuscript/Figures_Source/Figure_09_Tootell_1988.svg'  #noqa
+strOt = '/home/john/Dropbox/ParCon_Manuscript/Figures_Source/Figure_08_Tootell_1988.svg'  #noqa
 
 # Create parent SVG figure:
 objFigPrnt = sg.SVGFigure(width='1680.0 pix', height='750.0 pix')

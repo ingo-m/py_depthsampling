@@ -154,10 +154,10 @@ varCnfUp = 99.5
 
 # Parameters specific to 'model 4' (i.e. random noise model) and 'model 5'
 # (random & systematic error model):
-if (varMdl == 4) or (varMdl ==5):
+if (varMdl == 4) or (varMdl == 5):
     # Extend of random noise (SD of Gaussian distribution to sample noise from,
     # percent of noise to multiply the signal with):
-    varNseRndSd = 0.1
+    varNseRndSd = 0.15
     # Extend of systematic noise (only relevant for model 5):
     varNseSys = 0.3
 
@@ -313,10 +313,10 @@ for idxSub in range(0, varNumSub):
     # position of datapoints needs to be passed on).
 
     # Sampling points for equi-volume space:
-    vecIntpEqui =  np.linspace(np.min(vecPosMdl),
-                               np.max(vecPosMdl),
-                               num=varNumDpth,
-                               endpoint=True)
+    vecIntpEqui = np.linspace(np.min(vecPosMdl),
+                              np.max(vecPosMdl),
+                              num=varNumDpth,
+                              endpoint=True)
 
     if (varMdl != 4) and (varMdl != 5):
 
@@ -338,7 +338,7 @@ for idxSub in range(0, varNumSub):
 
             # Loop through conditions:
             for idxCon in range(0, varNumCon):
-        
+
                 # Interpolation back into equi-volume space:
                 aryDecon[idxSub, idxIt, idxCon, :] = \
                     griddata(vecPosMdl,
@@ -565,9 +565,9 @@ elif varMdl == 5:
                         arySysMne[0, varTmpCon, :],
                         arySysMne[1, varTmpCon, :]])
 
-    #aryRndMne.shape
-    #arySysMne[0, varTmpCon, :].shape
-    #arySysMne[1, varTmpCon, :].shape
+    # aryRndMne.shape
+    # arySysMne[0, varTmpCon, :].shape
+    # arySysMne[1, varTmpCon, :].shape
 
     # Patching together array for error shading (no shading for systematic
     # error term):
@@ -605,7 +605,7 @@ elif varMdl == 5:
                    varDpi,             # Resolution of the output figure
                    0.0,                # Minimum of Y axis
                    2.0,                # Maximum of Y axis
-                   False,              # Boolean: whether to convert y axis to %
+                   False,              # Bool.: whether to convert y axis to %
                    lstLblMdl5,         # Labels for conditions (separate lines)
                    strXlabel,          # Label on x axis
                    strYlabel,          # Label on y axis

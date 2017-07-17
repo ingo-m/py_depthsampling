@@ -40,12 +40,12 @@ import svgutils.transform as sg
 
 # Paths to figures:
 strPthBase = '/home/john/PhD/Tex/deconv'
-lstPths = ['/v1_model_5/Figure_08A_deconv_v1_m5_after.svg',
-           '/v2_model_5/Figure_08B_deconv_v2_m5_after.svg']
+lstPths = ['/v1_model_5/deconv_v1_m5_after.svg',
+           '/v2_model_5/deconv_v2_m5_after.svg']
 lstPths = [(strPthBase + x) for x in lstPths]
 
 # Output path:
-strOt = '/home/john/Dropbox/ParCon_Manuscript/Figures_Source/Figure_08_combined_V1_V2.svg'  #noqa
+strOt = '/home/john/Dropbox/ParCon_Manuscript/Figures_Source/Figure_09_combined_V1_V2.svg'  #noqa
 
 # Create parent SVG figure:
 objFigPrnt = sg.SVGFigure(width='1700.0 pix', height='650.0 pix')

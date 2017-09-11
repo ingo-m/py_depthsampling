@@ -62,7 +62,11 @@ print('-CRF fitting on data from Tootell et al. (1988)')
 # effect on depth profiles (for comparison with fMRI profiles). If zero, no
 # smoothing is performed. Unit is the ratio of cortical depth, i.e. if 0.1,
 # FWHM is 10% of cortical depth.
-varSd = 0.1
+varSd = 0.2
+
+# Numher of points at which to interpolate before smoothing is applied (only
+# relevant if smoothing is applied):
+varNumIntp = 50
 
 # Number of x-values for which to solve the function when calculating model
 # fit:
@@ -100,7 +104,7 @@ lstLayPos = [670.0,  # Layer 3
 if np.greater(float(varSd), 0.0):
     # If smoothing is applied, the depth-profiles are upsampled before
     # smoothing. The plots are then created at the upsampled resolution.
-    varNumLayers = int(max(lstLayPos))
+    varNumLayers = int(varNumIntp)  # int(max(lstLayPos))
 else:
     varNumLayers = len(lstLayPos)
 
@@ -128,13 +132,16 @@ if np.greater(float(varSd), 0.0):
 
     # Cortical depth is set to 1000, based on the reference frame of the
     # empirical values from the literature:
-    varNumIntp = 1000.0
+    varDpth = 1000.0
 
     # Position of original datapoints (before interpolation):
     vecPosOrig = np.asarray(lstLayPos)
 
     # Positions at which to sample (interpolate) depth profiles:
-    vecPosIntp = np.linspace(0.0, varNumIntp, num=1000, endpoint=True)
+    vecPosIntp = np.linspace(float(min(lstLayPos)),
+                             float(max(lstLayPos)),
+                             num=varNumIntp,
+                             endpoint=True)
 
     # Empirical data (from literature) from list to array:
     aryEmpY = np.asarray(lstEmpY)
@@ -145,14 +152,6 @@ if np.greater(float(varSd), 0.0):
                            kind='linear',
                            axis=0,
                            fill_value='extrapolate')
-
-# interp1d - Possibly use other parameters?
-# kind : str or int, optional
-# Specifies the kind of interpolation as a string (‘linear’, ‘nearest’, ‘zero’,
-# ‘slinear’, ‘quadratic’, ‘cubic’ where ‘zero’, ‘slinear’, ‘quadratic’ and
-# ‘cubic’ refer to a spline interpolation of zeroth, first, second or third
-# order) or as an integer specifying the order of the spline interpolator to
-# use. Default is ‘linear’.
 
     # Apply interpolation function:
     aryEmpIntY = func_interp(vecPosIntp)
@@ -169,9 +168,9 @@ if np.greater(float(varSd), 0.0):
 
     # After interpolation, spacing of laminar positions is linear, with the
     # maximum value equal to the position of the outermost original datapoint:
-    vecLayPos = np.linspace(0.0,
+    vecLayPos = np.linspace(float(min(lstLayPos)),
                             float(max(lstLayPos)),
-                            num=int(max(lstLayPos)))
+                            num=int(varNumIntp))
 
 
 # ----------------------------------------------------------------------------
@@ -225,7 +224,7 @@ aryError = np.zeros(vecSemi.shape)
 # *** Plot results
 
 # Path for figure:
-strPath = '/Users/john/Desktop/Tootell_Smooth/semiTootell1988_smth_0p1.png'
+strPath = '/home/john/PhD/Tex/Tootell_1988/semiTootell1988_smth_0p2.png'
 
 # Plot semisaturation contrast:
 funcPltAcrDpth(vecSemi, aryError, varNumLayers, 1, 80.0, 0.0, 0.5, True,
@@ -234,7 +233,7 @@ funcPltAcrDpth(vecSemi, aryError, varNumLayers, 1, 80.0, 0.0, 0.5, True,
                varNumLblY=6, varXmin=0.0, varXmax=1.0)
 
 # Path for figure:
-strPath = '/Users/john/Desktop/Tootell_Smooth/hlfmaxTootell1988_smth_0p1.png'
+strPath = '/home/john/PhD/Tex/Tootell_1988/hlfmaxTootell1988_smth_0p2.png'
 
 # Plot response at 50% contrast:
 funcPltAcrDpth(vecHlfMax, aryError, varNumLayers, 1, 80.0, 0.0, 1.0, False,

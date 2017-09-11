@@ -156,8 +156,16 @@ if np.greater(float(varSd), 0.0):
     # Apply interpolation function:
     aryEmpIntY = func_interp(vecPosIntp)
 
-    # Scale the standard deviation of the Gaussian kernel:
-    varSdSc = np.float64(varNumIntp) * varSd
+    # Scale the standard deviation of the Gaussian kernel to percent cortical
+    # thickness:
+    varSdSc = (
+               float(varNumIntp)
+               * float(varSd)
+               * np.divide(
+                           (float(max(lstLayPos)) - float(min(lstLayPos))),
+                           float(varDpth)
+                           )
+               )
 
     # Smooth interpolated depth profiles:
     aryEmpSmthY = gaussian_filter1d(aryEmpIntY,
@@ -224,7 +232,7 @@ aryError = np.zeros(vecSemi.shape)
 # *** Plot results
 
 # Path for figure:
-strPath = '/home/john/PhD/Tex/Tootell_1988/semiTootell1988_smth_0p2.png'
+strPath = '/home/john/PhD/Tex/Tootell_1988/semiTootell1988_smth_0p2.svg'
 
 # Plot semisaturation contrast:
 funcPltAcrDpth(vecSemi, aryError, varNumLayers, 1, 80.0, 0.0, 0.5, True,
@@ -233,7 +241,7 @@ funcPltAcrDpth(vecSemi, aryError, varNumLayers, 1, 80.0, 0.0, 0.5, True,
                varNumLblY=6, varXmin=0.0, varXmax=1.0)
 
 # Path for figure:
-strPath = '/home/john/PhD/Tex/Tootell_1988/hlfmaxTootell1988_smth_0p2.png'
+strPath = '/home/john/PhD/Tex/Tootell_1988/hlfmaxTootell1988_smth_0p2.svg'
 
 # Plot response at 50% contrast:
 funcPltAcrDpth(vecHlfMax, aryError, varNumLayers, 1, 80.0, 0.0, 1.0, False,

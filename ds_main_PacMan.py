@@ -65,18 +65,18 @@ print('-Visualisation of depth sampling results')
 # *** Define parameters
 
 # Region of interest ('v1' or 'v2'):
-strRoi = 'mt'
+strRoi = 'v1'
 
 # Hemisphere ('lh' or 'rh'):
-strHmsph = 'lh'
+strHmsph = 'rh'
 
 # List of subject identifiers:
 lstSubIds = ['20161221']
 
 # Condition levels (used to complete file names):
-lstCon = ['Static', 'Dynamic', 'DmS']
+lstCon = ['Dynamic']  # ['Static', 'Dynamic', 'DmS']
 # Condition labels:
-lstConLbl = ['Static', 'Dynamic', 'DmS']
+lstConLbl = ['Dynamic']  # ['Static', 'Dynamic', 'DmS']
 
 # Base path of first set of vtk files with depth-sampled data, e.g. parameter
 # estimates (with subject ID, hemisphere, and stimulus level left open):
@@ -101,7 +101,7 @@ varThrSlct02 = 100.0
 # (3)
 # Use third selection criterion (vertices that are BELOW threshold at any depth
 # level are excluded):
-lgcSlct03 = False
+lgcSlct03 = True
 # Path of vtk files with 3rd vertex selection criterion. This vtk file is
 # supposed to contain one set of data values for each depth level. (With
 # subject ID and hemisphere left open.)
@@ -129,8 +129,8 @@ lgcVtk02 = True
 lstNumVrtx = [1000] * len(lstSubIds)
 # Base name of second set of vtk files with depth-sampled data, e.g. z-values
 # (with subject ID and hemisphere left open):
-# strVtkDpth02 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}_extrasession_retinotopy/R2_multi_smoothdata.vtk'  #noqa
-strVtkDpth02 = '/home/john/PhD/PacMan_Depth_Data/20161221/cbs_distcor/lh_extrasession_retinotopy/zstats_Dynamic.vtk'  #noqa
+strVtkDpth02 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}_extrasession_retinotopy/R2_multi_smoothdata.vtk'  #noqa
+# strVtkDpth02 = '/home/john/PhD/PacMan_Depth_Data/20161221/cbs_distcor/lh_extrasession_retinotopy/zstats_Dynamic.vtk'  #noqa
 
 # (6)
 # Use PE range?
@@ -161,11 +161,9 @@ varNumLne = 2
 strTitle = strRoi.upper()
 
 # Limits of y-axis for single subject plots (list of tuples, [(Ymin, Ymax)]):
-# lstLimY = [(-2.0, 5.0)] * len(lstSubIds)
-# lstLimY = [(-1.0, 3.0)] * len(lstSubIds)
-# lstLimY = [(-200.0, 100.0)] * len(lstSubIds)
-# lstLimY = [(-300.0, 100.0)] * len(lstSubIds)
-lstLimY = [(0.0, 500.0)] * len(lstSubIds)
+# lstLimY = [(-250.0, 100.0)] * len(lstSubIds)  # v2
+lstLimY = [(-150.0, 0.0)] * len(lstSubIds)  # v1
+# lstLimY = [(0.0, 600.0)] * len(lstSubIds)  # mt
 
 # Limits of y-axis for across subject plot:
 varAcrSubsYmin = -3.0

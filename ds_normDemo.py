@@ -45,7 +45,7 @@ varBumpWidth = 8.0
 varDpi = 80.0
 
 # Output folder:
-strPthOt = '/home/john/PhD/Tex/dpth_norm_demo/plots/'
+strPthOt = '/home/john/Dropbox/Thesis/Chapters/Comment_Depth_Sampling_Normalisation/figures_source/'  #noqa
 # -----------------------------------------------------------------------------
 
 

@@ -49,7 +49,7 @@ from ds_ertPlt import funcPltErt
 lgcPic = True
 
 # ROI ('v1' or 'v2'):
-strRoi = 'v1'
+strRoi = 'v2'
 
 # Name of pickle file from which to load time course data or save time course
 # data to (ROI name left open):
@@ -70,7 +70,8 @@ lstSubId = ['20150930',
 # Condition levels (used to complete file names):
 lstCon = ['01', '02', '03', '04']
 
-# Base name of vertex inclusion masks (subject ID, subject ID, & ROI left open):
+# Base name of vertex inclusion masks (subject ID, subject ID, & ROI left
+# open):
 strVtkMsk = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/{}_vertex_inclusion_mask_{}.vtk'  #noqa
 
 # Base name of single-volume vtk meshes that together make up the timecourse
@@ -124,7 +125,7 @@ lgcLgnd02 = False
 # Output path for plots - prfix (ROI left open):
 strPltOtPre = '/home/john/PhD/Tex/tex_era/plots_{}/'
 # Output path for plots - suffix:
-strPltOtSuf = '_ert.svg'
+strPltOtSuf = '_ert.png'
 
 # Figure scaling factor:
 varDpi = 70.0

@@ -69,7 +69,7 @@ print('-Visualisation of depth sampling results')
 # *** Define parameters
 
 # Region of interest ('v1' or 'v2'):
-strRoi = 'v2'
+strRoi = 'mt'
 
 # Hemisphere ('lh' or 'rh'):
 strHmsph = 'lh'
@@ -139,7 +139,10 @@ lgcVtk02 = True
 lstNumVrtx = [1000] * len(lstSubIds)
 # Base name of second set of vtk files with depth-sampled data, e.g. z-values
 # (with subject ID and hemisphere left open):
-strVtkDpth02 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}_reduced/R2_multi_smoothdata.vtk'  #noqa
+if (strRoi == 'v1') or (strRoi == 'v2'):
+    strVtkDpth02 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}_reduced/R2_multi_smoothdata.vtk'  #noqa
+elif strRoi == 'mt':
+    strVtkDpth02 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}_extrasession_retinotopy/zstats_Dynamic.vtk'  #noqa
 
 # (6)
 # Use PE range?

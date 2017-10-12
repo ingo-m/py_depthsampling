@@ -184,14 +184,14 @@ def funcPltAcrDpth(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
         varXmax = np.max(vecX)
 
     # Plot vertical lines (e.g. representing peak position):
-    if lstVrt != None:
- 
+    if lstVrt is not None:
+
         # Use same colours as for lines:
         if aryClr is None:
             # Prepare colour map:
             objClrNorm = colors.Normalize(vmin=0, vmax=(varNumCon - 1))
             objCmap = plt.cm.winter
-        
+
         # Loop through list with line positions:
         varNumVrt = len(lstVrt)
         for idxVrt in range(0, varNumVrt):

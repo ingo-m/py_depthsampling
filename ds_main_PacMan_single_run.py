@@ -4,8 +4,8 @@
 VTK depth samling across subjects.
 
 THIS VERSION:
-Reduced number of runs in 2nd level feat in order to test effect of smaller
-amount of data on depth-profiles.
+Single-run depth-samping in order to test effect of smaller amount of data on
+depth-profiles.
 
 The purpose of this script is to visualise cortical depth sampling results from
 vtk files. The script can visualise statistical maps from vtk files. Vertices
@@ -78,25 +78,29 @@ strHmsph = 'lh'
 lstSubIds = ['20161221']
 
 # Condition levels (used to complete file names):
-lstCon = ['02',
-          '03',
-          '04',
-          '05']  # ['Static', 'Dynamic', 'DmS']
+lstCon = ['func_01',
+          'func_02',
+          'func_03',
+          'func_04',
+          'func_05',
+          'func_06']
 # Condition labels:
-lstConLbl = ['2 runs',
-             '3 runs',
-             '4 runs',
-             '5 runs']  # ['Static', 'Dynamic', 'DmS']
+lstConLbl = ['func_01',
+             'func_02',
+             'func_03',
+             'func_04',
+             'func_05',
+             'func_06']
 
 # Base path of first set of vtk files with depth-sampled data, e.g. parameter
-# estimates (with subject ID, 2 * hemisphere, and stimulus level left open):
-strVtkDpth01 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}_reduced/{}_surf_inf_pe_Dyn_{}.vtk'  #noqa
+# estimates (with subject ID, hemisphere, and stimulus level left open):
+strVtkDpth01 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}_single_run/{}_pe.vtk'  #noqa
 
 # (1)
 # Base path of csv files with ROI definition (i.e. patch of cortex selected on
 # the surface, e.g. V1 or V2) - i.e. the first vertex selection criterion (with
 # subject ID, hemisphere, and ROI left open):
-strCsvRoi = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}_reduced/{}.csv'  #noqa
+strCsvRoi = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}_single_run/{}.csv'  #noqa
 
 # (2)
 # Use second selection criterion defined at one depth level (legacy function):
@@ -116,9 +120,9 @@ lgcSlct03 = True
 # supposed to contain one set of data values for each depth level. (With
 # subject ID and hemisphere left open.)
 if strHmsph == 'lh':
-    strVtkSlct03 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}_reduced/pRF_ovrlp_centre_right_visual_field_smoothdata.vtk'  #noqa
+    strVtkSlct03 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}_single_run/pRF_ovrlp_centre_right_visual_field_smoothdata.vtk'  #noqa
 elif strHmsph == 'rh':
-    strVtkSlct03 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}_reduced/pRF_ovrlp_centre_left_visual_field_smoothdata.vtk'  #noqa
+    strVtkSlct03 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}_single_run/pRF_ovrlp_centre_left_visual_field_smoothdata.vtk'  #noqa
 # Threshold for vertex selection:
 varThrSlct03 = 0.9
 
@@ -127,7 +131,7 @@ varThrSlct03 = 0.9
 # depth level are excluded):
 lgcSlct04 = True
 # Path of exclusion mask (with subject ID and hemisphere left open):
-strVtkSlct04 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}_reduced/combined_mean.vtk'  #noqa
+strVtkSlct04 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}_single_run/combined_mean.vtk'  #noqa
 # Threshold for vertex selection:
 varThrSlct04 = 7000.0
 
@@ -139,10 +143,7 @@ lgcVtk02 = True
 lstNumVrtx = [1000] * len(lstSubIds)
 # Base name of second set of vtk files with depth-sampled data, e.g. z-values
 # (with subject ID and hemisphere left open):
-if (strRoi == 'v1') or (strRoi == 'v2'):
-    strVtkDpth02 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}_reduced/R2_multi_smoothdata.vtk'  #noqa
-elif strRoi == 'mt':
-    strVtkDpth02 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}_extrasession_retinotopy/zstats_Dynamic.vtk'  #noqa
+strVtkDpth02 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}_single_run/R2_multi_smoothdata.vtk'  #noqa
 
 # (6)
 # Use PE range?
@@ -174,13 +175,9 @@ strTitle = strRoi.upper()
 
 # Limits of y-axis for single subject plots (list of tuples, [(Ymin, Ymax)]):
 if strRoi == 'v1':
-    # lstLimY = [(-150.0, 0.0)] * len(lstSubIds)  # v1 reduced
-    lstLimY = [(-200.0, 50.0)] * len(lstSubIds)  # v1 single run
+    lstLimY = [(-200.0, 50.0)] * len(lstSubIds)  # v1
 elif strRoi == 'v2':
-    # lstLimY = [(-250.0, 100.0)] * len(lstSubIds)  # v2 reduced
-    lstLimY = [(-290.0, 140.0)] * len(lstSubIds)  # v2 single run
-elif strRoi == 'mt':
-    lstLimY = [(0.0, 600.0)] * len(lstSubIds)  # mt
+    lstLimY = [(-290.0, 140.0)] * len(lstSubIds)  # v2
 
 # Limits of y-axis for across subject plot:
 varAcrSubsYmin = -3.0
@@ -191,7 +188,7 @@ strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'fMRI signal [a.u.]'
 
 # Output path for plots - prefix:
-strPltOtPre = '/home/john/PhD/PacMan_Plots_reduced/plots_{}/'.format(strRoi)
+strPltOtPre = '/home/john/PhD/PacMan_Plots_single_run/plots_{}/'.format(strRoi)
 
 # Output path for plots - suffix:
 strPltOtSuf = '_{}_{}.png'.format(strHmsph, strRoi)
@@ -210,7 +207,7 @@ varNormIdx = 0
 lgcNormDiv = False
 
 # Output path for depth samling results (within subject means):
-strDpthMeans = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}_{}_reduced.npy'.format(strRoi, strHmsph)  #noqa
+strDpthMeans = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}_{}_single_run.npy'.format(strRoi, strHmsph)  #noqa
 
 # Maximum number of processes to run in parallel: *** NOT IMPLEMENTED
 # varPar = 10
@@ -245,7 +242,6 @@ for idxSub in range(0, varNumSubs):
 
     # Create list with complete file names for the data to be depth-sampled:
     lstVtkDpth01 = [strVtkDpth01.format(lstSubIds[idxSub],
-                                        strHmsph,
                                         strHmsph,
                                         strTmp) for strTmp in lstCon]
 

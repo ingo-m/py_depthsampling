@@ -71,22 +71,30 @@ strRoi = 'v1'
 strHmsph = 'rh'
 
 # List of subject identifiers:
-lstSubIds = ['20161221']
+lstSubIds = ['20171023']
 
 # Condition levels (used to complete file names):
-lstCon = ['Dynamic']  # ['Static', 'Dynamic', 'DmS']
+lstCon = ['Pd',
+          'Cd',
+          'Ps',
+          'Pd_min_Cd',
+          'Pd_min_Ps']  # ['Static', 'Dynamic', 'DmS']
 # Condition labels:
-lstConLbl = ['Dynamic']  # ['Static', 'Dynamic', 'DmS']
+lstConLbl = ['PacMan Dynamic',
+             'Control Dynamic',
+             'PacMan Static',
+             'PacMan D - Control D',
+             'PacMan Dynamic - Statis']  # ['Static', 'Dynamic', 'DmS']
 
 # Base path of first set of vtk files with depth-sampled data, e.g. parameter
 # estimates (with subject ID, hemisphere, and stimulus level left open):
-strVtkDpth01 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}_extrasession_retinotopy/pe_{}.vtk'  # noqa
+strVtkDpth01 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}/{}_pe1.vtk'  # noqa
 
 # (1)
 # Base path of csv files with ROI definition (i.e. patch of cortex selected on
 # the surface, e.g. V1 or V2) - i.e. the first vertex selection criterion (with
 # subject ID, hemisphere, and ROI left open):
-strCsvRoi = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}_extrasession_retinotopy/{}.csv'  #noqa
+strCsvRoi = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}/{}.csv'  #noqa
 
 # (2)
 # Use second selection criterion defined at one depth level (legacy function):
@@ -101,14 +109,14 @@ varThrSlct02 = 100.0
 # (3)
 # Use third selection criterion (vertices that are BELOW threshold at any depth
 # level are excluded):
-lgcSlct03 = True
+lgcSlct03 = False
 # Path of vtk files with 3rd vertex selection criterion. This vtk file is
 # supposed to contain one set of data values for each depth level. (With
 # subject ID and hemisphere left open.)
 if strHmsph == 'lh':
-    strVtkSlct03 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}_extrasession_retinotopy/pRF_ovrlp_centre_right_visual_field_smoothdata.vtk'  #noqa
+    strVtkSlct03 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}/pRF_ovrlp_centre_right_visual_field_smoothdata.vtk'  #noqa
 elif strHmsph == 'rh':
-    strVtkSlct03 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}_extrasession_retinotopy/pRF_ovrlp_centre_left_visual_field_smoothdata.vtk'  #noqa
+    strVtkSlct03 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}/pRF_ovrlp_centre_left_visual_field_smoothdata.vtk'  #noqa
 # Threshold for vertex selection:
 varThrSlct03 = 0.9
 
@@ -117,7 +125,7 @@ varThrSlct03 = 0.9
 # depth level are excluded):
 lgcSlct04 = True
 # Path of exclusion mask (with subject ID and hemisphere left open):
-strVtkSlct04 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}_extrasession_retinotopy/combined_mean.vtk'  #noqa
+strVtkSlct04 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}/combined_mean.vtk'  #noqa
 # Threshold for vertex selection:
 varThrSlct04 = 7000.0
 
@@ -129,10 +137,7 @@ lgcVtk02 = True
 lstNumVrtx = [1000] * len(lstSubIds)
 # Base name of second set of vtk files with depth-sampled data, e.g. z-values
 # (with subject ID and hemisphere left open):
-if (strRoi == 'v1') or (strRoi == 'v2'):
-    strVtkDpth02 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}_extrasession_retinotopy/R2_multi_smoothdata.vtk'  #noqa
-elif strRoi == 'mt':
-    strVtkDpth02 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}_extrasession_retinotopy/zstats_Dynamic.vtk'  #noqa
+strVtkDpth02 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}/R2_multi_smoothdata.vtk'  #noqa
 
 # (6)
 # Use PE range?
@@ -164,11 +169,9 @@ strTitle = strRoi.upper()
 
 # Limits of y-axis for single subject plots (list of tuples, [(Ymin, Ymax)]):
 if strRoi == 'v1':
-    lstLimY = [(-150.0, 0.0)] * len(lstSubIds)  # v1
+    lstLimY = [(-400.0, 100.0)] * len(lstSubIds)  # v1
 elif strRoi == 'v2':
     lstLimY = [(-250.0, 100.0)] * len(lstSubIds)  # v2
-elif strRoi == 'mt':
-    lstLimY = [(0.0, 600.0)] * len(lstSubIds)  # mt
 
 # Limits of y-axis for across subject plot:
 varAcrSubsYmin = -3.0

@@ -69,7 +69,7 @@ print('-Visualisation of depth sampling results')
 # *** Define parameters
 
 # Region of interest ('v1' or 'v2'):
-strRoi = 'v2'
+strRoi = 'v1'
 
 # Hemisphere ('lh' or 'rh'):
 strHmsph = 'lh'

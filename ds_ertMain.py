@@ -49,40 +49,34 @@ from ds_ertPlt import funcPltErt
 lgcPic = True
 
 # ROI ('v1' or 'v2'):
-strRoi = 'v2'
+strRoi = 'v1'
+
+# Hemisphere ('rh' or 'lh'):
+strHmsph = 'rh'
 
 # Name of pickle file from which to load time course data or save time course
-# data to (ROI name left open):
-strPthPic = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/era_{}.pickle'  #noqa
+# data to (ROI name and hemisphere left open):
+strPthPic = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/era_{}_{}.pickle'  #noqa
 
 # List of subject IDs:
-lstSubId = ['20150930',
-            '20151118',
-            '20151127_01',
-            '20151130_02',
-            '20161205',
-            '20161207',
-            '20161212_02',
-            '20161214',
-            '20161219_01',
-            '20161219_02']
+lstSubId = ['20171023']
 
 # Condition levels (used to complete file names):
-lstCon = ['01', '02', '03', '04']
+lstCon = ['control_dynamic', 'pacman_dynamic', 'pacman_static']
 
-# Base name of vertex inclusion masks (subject ID, subject ID, & ROI left
-# open):
-strVtkMsk = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/{}_vertex_inclusion_mask_{}.vtk'  #noqa
+# Base name of vertex inclusion masks (subject ID, , hemisphere, subject ID,
+# & ROI left open):
+strVtkMsk = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}/{}_vertex_inclusion_mask_{}.vtk'  #noqa
 
 # Base name of single-volume vtk meshes that together make up the timecourse
-# (subject ID, stimulus level, and volume index left open):
-strVtkPth = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh_era/stim_lvl_{}/vol_{}.vtk'  #noqa
+# (subject ID, hemisphere, stimulus level, and volume index left open):
+strVtkPth = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}_era/{}/vol_{}.vtk'  #noqa
 
 # Number of cortical depths:
 varNumDpth = 11
 
 # Number of timepoints:
-varNumVol = 14
+varNumVol = 19
 
 # Beginning of string which precedes vertex data in data vtk files (i.e. in the
 # statistical maps):
@@ -91,12 +85,9 @@ strPrcdData = 'SCALARS'
 # Number of lines between vertex-identification-string and first data point:
 varNumLne = 2
 
-# Limits of axis for single subject plots (list of tuples, [(Ymin, Ymax)]):
-lstLimY = [(0.0, 2.5)] * len(lstSubId)
-
-# Limits of axis for across subject plot:
-varAcrSubsYmin = -0.02
-varAcrSubsYmax = 0.08
+# Limits of y-axis:
+varAcrSubsYmin = -0.06
+varAcrSubsYmax = 0.04
 
 # Convert y-axis values to percent (i.e. divide label values by 100)?
 lgcCnvPrct = True
@@ -107,23 +98,24 @@ strYlabel = 'Percent signal change'
 
 # Volume index of start of stimulus period (i.e. index of first volume during
 # which stimulus was on - for the plot):
-varStimStrt = 3
+varStimStrt = 5
 # Volume index of end of stimulus period (i.e. index of last volume during
 # which stimulus was on - for the plot):
-varStimEnd = 6
+varStimEnd = 9
 # Volume TR (in seconds, for the plot):
-varTr = 2.94
+varTr = 2.079
 
 # Condition labels:
-# lstConLbl = ['2.5%', '6.1%', '16.3%', '72.0%']
-lstConLbl = ['72.0%', '16.3%', '6.1%', '2.5%']
-# Plot legend - single subject plots:
-lgcLgnd01 = False
-# Plot legend - across subject plots:
-lgcLgnd02 = False
+# lstConLbl = ['72.0%', '16.3%', '6.1%', '2.5%']
+lstConLbl = ['Control dynamic', 'Pacman dynamic', 'Pacman static']
 
-# Output path for plots - prfix (ROI left open):
-strPltOtPre = '/home/john/PhD/Tex/tex_era/plots_{}/'
+# Plot legend - single subject plots:
+lgcLgnd01 = True
+# Plot legend - across subject plots:
+lgcLgnd02 = True
+
+# Output path for plots - prfix (ROI and hemisphere left open):
+strPltOtPre = '/home/john/PhD/PacMan_ERA/{}_{}/'
 # Output path for plots - suffix:
 strPltOtSuf = '_ert.png'
 
@@ -138,8 +130,8 @@ varDpi = 70.0
 print('-Event-related timecourses depth sampling')
 
 # Complete strings:
-strPthPic = strPthPic.format(strRoi)
-strPltOtPre = strPltOtPre.format(strRoi)
+strPthPic = strPthPic.format(strRoi, strHmsph)
+strPltOtPre = strPltOtPre.format(strRoi, strHmsph)
 
 # Number of subjects:
 varNumSub = len(lstSubId)
@@ -173,11 +165,12 @@ else:
         print(('------Subject: ' + strSubID))
 
         # Complete file path of vertex inclusion mask for current subject:
-        strVtkMskTmp = strVtkMsk.format(strSubID, strSubID, strRoi)
+        strVtkMskTmp = strVtkMsk.format(strSubID, strHmsph, strSubID, strRoi)
 
         # Load data for current subject (returns array of the form:
         # aryRoiErt[varNumCon, varNumDpth, varNumVol]):
         dicAllSubsRoiErt[strSubID] = funcGetSubData(strSubID,
+                                                    strHmsph,
                                                     strVtkMskTmp,
                                                     strVtkPth,
                                                     lstCon,
@@ -209,7 +202,7 @@ for strSubID, aryRoiErt in dicAllSubsRoiErt.items():
 # *****************************************************************************
 # *** Plot single subjet results
 
-if False:
+if True:
 
     print('---Ploting single-subjects event-related averages')
 

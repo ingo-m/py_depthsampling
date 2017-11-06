@@ -51,13 +51,12 @@ def funcPltErt(aryRoiErtMeanDpth,  #noqa
     # Create axis:
     axs01 = fgr01.add_subplot(111)
 
-    # Plot horizontal bar for stimulus interval (plot this one first so that it
-    # is first in the legend):
+    # Plot horizontal bar for stimulus interval:
     plot03 = plt.plot(((varStimStrt - 0.35), (varStimEnd + 0.35)),  #noqa
-                      ((varYmin + 0.006), (varYmin + 0.006)),
+                      ((varYmin + 0.002), (varYmin + 0.002)),
                       color=(0.3, 0.3, 0.3),
                       linewidth=8.0,
-                      label='Stimulus')
+                      label='_nolegend_')
 
     # Vector for x-data:
     vecX = range(0, varNumVol)
@@ -67,8 +66,8 @@ def funcPltErt(aryRoiErtMeanDpth,  #noqa
     objCmap = plt.cm.winter
 
     # Loop through conditions:
-    # for idxCon in range(0, varNumCon):
-    for idxCon in [3, 2, 1, 0]:
+    # for idxCon in [3, 2, 1, 0]:
+    for idxCon in range(0, varNumCon):
 
         # Adjust the colour of current line:
         # vecClrTmp = objCmap(objClrNorm(varNumCon - 1 - idxCon))
@@ -95,13 +94,6 @@ def funcPltErt(aryRoiErtMeanDpth,  #noqa
                                     linewidth=0,
                                     # linestyle='dashdot',
                                     antialiased=True)
-
-    # Plot horizontal bar for stimulus interval:
-    # plot04 = plt.plot((0, 2),  #noqa
-    #                  (0, 0),
-    #                  color=(0.9, 0.1, 0.1),
-    #                  linewidth=10.0,
-    #                  label='Baseline')
 
     # Reduce framing box:
     axs01.spines['top'].set_visible(False)
@@ -154,9 +146,9 @@ def funcPltErt(aryRoiErtMeanDpth,  #noqa
     axs01.set_xticklabels(lstXlbl)
 
     # Which y values to label with ticks:
-    # vecYlbl = np.linspace(varYmin, varYmax, num=4, endpoint=True)
+    vecYlbl = np.linspace(varYmin, varYmax, num=5, endpoint=True)
     # vecYlbl = np.arange(varYmin, varYmax, 0.02)
-    vecYlbl = np.linspace(0.0, varYmax, num=5, endpoint=True)
+    # vecYlbl = np.linspace(0.0, varYmax, num=5, endpoint=True)
     # Round:
     # vecYlbl = np.around(vecYlbl, decimals=2)
     # Set ticks:
@@ -199,7 +191,7 @@ def funcPltErt(aryRoiErtMeanDpth,  #noqa
     if lgcLgnd:
         axs01.legend(loc=0,
                      frameon=False,
-                     prop={'size': 36})
+                     prop={'size': 32})
 
     # Save figure:
     fgr01.savefig(strPthOut,

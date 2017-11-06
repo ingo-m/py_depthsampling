@@ -27,6 +27,7 @@ from ds_loadVtkMulti import funcLoadVtkMulti
 
 
 def funcGetSubData(strSubId,
+                   strHmsph,
                    strVtkMsk,
                    strVtkPth,
                    lstCon,
@@ -71,6 +72,7 @@ def funcGetSubData(strSubId,
 
             # Complete file path of current volume:
             strVtkPthTmp = strVtkPth.format(strSubId,
+                                            strHmsph,
                                             lstCon[idxCon],
                                             str(idxVol).zfill(3))
 
@@ -90,7 +92,7 @@ def funcGetSubData(strSubId,
     # is supposed to contain ones for vertices that are included, and zeros
     # elsewhere).
     vecInc = np.greater_equal(vecVtkMsk, 0.5)
-    
+
     print('---------Subject: ' + strSubId + ' --- Number of vertices in ROI: '
           + str(np.sum(vecInc)))
     print('------------Based on vtk mask: ' + strVtkMsk)

@@ -62,7 +62,8 @@ def funcGetSubData(strSubId,
     varNumVrtc = vecVtkMsk.shape[0]
 
     # Array to be filled with data:
-    aryErt = np.zeros((varNumCon, varNumDpth, varNumVol, varNumVrtc))
+    aryErt = np.zeros((varNumCon, varNumDpth, varNumVol, varNumVrtc),
+                      dtype=np.float32)
 
     # Loop through conditions:
     for idxCon in range(0, varNumCon):
@@ -80,7 +81,7 @@ def funcGetSubData(strSubId,
             aryTmp = funcLoadVtkMulti(strVtkPthTmp,
                                       strPrcdData,
                                       varNumLne,
-                                      varNumDpth)
+                                      varNumDpth).astype(np.float32)
 
             aryErt[idxCon, :, idxVol, :] = aryTmp.T
     # *************************************************************************

@@ -74,18 +74,20 @@ strHmsph = 'rh'
 lstSubIds = ['20171023']
 
 # Condition levels (used to complete file names):
-# lstCon = ['Pd',
-#           'Cd',
-#           'Ps']
-lstCon = ['Pd_min_Cd',
-          'Pd_min_Ps']
+lstCon = ['Pd',
+          'Cd',
+          'Ps']
+#lstCon = ['Pd_min_Ps']
+#lstCon = ['Pd_min_Cd']
+
 
 # Condition labels:
-# lstConLbl = ['PacMan Dynamic',
-#              'Control Dynamic',
-#              'PacMan Static']
-lstConLbl = ['PacMan D - Control D',
-             'PacMan D - PacMan S']
+lstConLbl = ['PacMan Dynamic',
+             'Control Dynamic',
+             'PacMan Static']
+#lstConLbl = ['PacMan D - PacMan S']
+#lstConLbl = ['PacMan D - Control D']
+
 
 # Base path of first set of vtk files with depth-sampled data, e.g. parameter
 # estimates (with subject ID, hemisphere, and stimulus level left open):
@@ -170,11 +172,13 @@ strTitle = strRoi.upper()
 
 # Limits of y-axis for single subject plots (list of tuples, [(Ymin, Ymax)]):
 if strRoi == 'v1':
-    # lstLimY = [(-300.0, 25.0)] * len(lstSubIds)  # v1 simple contrasts
-    # lstLimY = [(-30.0, 0.0)] * len(lstSubIds)  # v1 Pd_min_Ps
-    lstLimY = [(0.0, 75.0)] * len(lstSubIds)  # v1 Pd_min_Cd
+    lstLimY = [(-300.0, 25.0)] * len(lstSubIds)  # v1 simple contrasts
+    #lstLimY = [(-30.0, 0.0)] * len(lstSubIds)  # v1 Pd_min_Ps
+    #lstLimY = [(0.0, 75.0)] * len(lstSubIds)  # v1 Pd_min_Cd
 elif strRoi == 'v2':
-    lstLimY = [(-250.0, 100.0)] * len(lstSubIds)  # v2
+    lstLimY = [(-500.0, 20.0)] * len(lstSubIds)  # v2 simple contrasts
+    #lstLimY = [(-50.0, 10.0)] * len(lstSubIds)  # v2 Pd_min_Ps
+    #lstLimY = [(0.0, 100.0)] * len(lstSubIds)  # v2 Pd_min_Cd
 
 # Limits of y-axis for across subject plot:
 varAcrSubsYmin = -3.0
@@ -188,7 +192,7 @@ strYlabel = 'fMRI signal [a.u.]'
 strPltOtPre = '/home/john/PhD/PacMan_Plots/plots_{}/'.format(strRoi)
 
 # Output path for plots - suffix:
-strPltOtSuf = '_{}_{}.png'.format(strHmsph, strRoi)
+strPltOtSuf = '_{}_{}_{}.png'.format(strHmsph, strRoi, lstCon[0])
 
 # Figure scaling factor:
 varDpi = 80.0

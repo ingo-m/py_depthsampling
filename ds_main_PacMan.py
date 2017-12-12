@@ -71,22 +71,23 @@ strRoi = 'v1'
 strHmsph = 'rh'
 
 # List of subject identifiers:
-lstSubIds = ['20171023']
+lstSubIds = ['20171023',
+             '20171109']
 
 # Condition levels (used to complete file names):
 lstCon = ['Pd',
           'Cd',
           'Ps']
-#lstCon = ['Pd_min_Ps']
-#lstCon = ['Pd_min_Cd']
+# lstCon = ['Pd_min_Ps']
+# lstCon = ['Pd_min_Cd']
 
 
 # Condition labels:
 lstConLbl = ['PacMan Dynamic',
              'Control Dynamic',
              'PacMan Static']
-#lstConLbl = ['PacMan D - PacMan S']
-#lstConLbl = ['PacMan D - Control D']
+# lstConLbl = ['PacMan D - PacMan S']
+# lstConLbl = ['PacMan D - Control D']
 
 
 # Base path of first set of vtk files with depth-sampled data, e.g. parameter
@@ -112,16 +113,13 @@ varThrSlct02 = 100.0
 # (3)
 # Use third selection criterion (vertices that are BELOW threshold at any depth
 # level are excluded):
-lgcSlct03 = False
+lgcSlct03 = True
 # Path of vtk files with 3rd vertex selection criterion. This vtk file is
 # supposed to contain one set of data values for each depth level. (With
 # subject ID and hemisphere left open.)
-if strHmsph == 'lh':
-    strVtkSlct03 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}/pRF_ovrlp_centre_right_visual_field_smoothdata.vtk'  #noqa
-elif strHmsph == 'rh':
-    strVtkSlct03 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}/pRF_ovrlp_centre_left_visual_field_smoothdata.vtk'  #noqa
+strVtkSlct03 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}/R2_multi_smoothdata.vtk'  #noqa
 # Threshold for vertex selection:
-varThrSlct03 = 0.9
+varThrSlct03 = 0.1
 
 # (4)
 # Use fourth selection criterion (vertices that are BELOW threshold at any
@@ -140,7 +138,10 @@ lgcVtk02 = True
 lstNumVrtx = [1000] * len(lstSubIds)
 # Base name of second set of vtk files with depth-sampled data, e.g. z-values
 # (with subject ID and hemisphere left open):
-strVtkDpth02 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}/R2_multi_smoothdata.vtk'  #noqa
+if strHmsph == 'lh':
+    strVtkDpth02 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}/pRF_ovrlp_ratio_right_visual_field_smoothdata.vtk'  #noqa
+elif strHmsph == 'rh':
+    strVtkDpth02 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}/pRF_ovrlp_ratio_left_visual_field_smoothdata.vtk'  #noqa
 
 # (6)
 # Use PE range?
@@ -173,23 +174,23 @@ strTitle = strRoi.upper()
 # Limits of y-axis for single subject plots (list of tuples, [(Ymin, Ymax)]):
 if strRoi == 'v1':
     lstLimY = [(-300.0, 25.0)] * len(lstSubIds)  # v1 simple contrasts
-    #lstLimY = [(-30.0, 0.0)] * len(lstSubIds)  # v1 Pd_min_Ps
-    #lstLimY = [(0.0, 75.0)] * len(lstSubIds)  # v1 Pd_min_Cd
+    # lstLimY = [(-30.0, 0.0)] * len(lstSubIds)  # v1 Pd_min_Ps
+    # lstLimY = [(0.0, 75.0)] * len(lstSubIds)  # v1 Pd_min_Cd
 elif strRoi == 'v2':
     lstLimY = [(-500.0, 20.0)] * len(lstSubIds)  # v2 simple contrasts
-    #lstLimY = [(-50.0, 10.0)] * len(lstSubIds)  # v2 Pd_min_Ps
-    #lstLimY = [(0.0, 100.0)] * len(lstSubIds)  # v2 Pd_min_Cd
+    # lstLimY = [(-50.0, 10.0)] * len(lstSubIds)  # v2 Pd_min_Ps
+    # lstLimY = [(0.0, 100.0)] * len(lstSubIds)  # v2 Pd_min_Cd
 
 # Limits of y-axis for across subject plot:
-varAcrSubsYmin = -3.0
-varAcrSubsYmax = 3.0
+varAcrSubsYmin = -500.0
+varAcrSubsYmax = 500.0
 
 # Label for axes:
 strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'fMRI signal [a.u.]'
 
 # Output path for plots - prefix:
-strPltOtPre = '/home/john/PhD/PacMan_Plots/plots_{}/'.format(strRoi)
+strPltOtPre = '/home/john/PhD/PacMan_Depth_Plots/plots_{}/'.format(strRoi)
 
 # Output path for plots - suffix:
 strPltOtSuf = '_{}_{}_{}.png'.format(strHmsph, strRoi, lstCon[0])

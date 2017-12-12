@@ -46,6 +46,14 @@ functions for details):
     across all depth levels, reflecting a hypothetical general bias of the
     model.
 
+(6) Similar to (5), but in this version the effect of a systematic
+    underestimation of local activity at the deepest depth level (close to WM)
+    is tested. The rational for this is that due to partial volume effects
+    and/or segmentation errors, the local signal at the deepest depth level
+    may have been underestimated. Thus, here we simulate the profile shape
+    after deconvolution with substantially higher signal at the deepest GM
+    level.
+
 The following data from Markuerkiaga et al. (2016) is used in this script,
 irrespective of which draining effect model is choosen:
 
@@ -95,17 +103,18 @@ from ds_drainModelDecon02 import depth_deconv_02
 from ds_drainModelDecon03 import depth_deconv_03
 from ds_drainModelDecon04 import depth_deconv_04
 from ds_drainModelDecon05 import depth_deconv_05
+from ds_drainModelDecon06 import depth_deconv_06
 from ds_findPeak import find_peak
 
 
 # ----------------------------------------------------------------------------
 # *** Define parameters
 
-# Which draining model to use (1, 2, 3, or 4 - see above for details):
-varMdl = 5
+# Which draining model to use (1, 2, 3, 4, 5, or 6 - see above for details):
+varMdl = 6
 
 # ROI (V1 or V2):
-strRoi = 'v2'
+strRoi = 'v1'
 
 # Path of depth-profile to correct:
 strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}.npy'  #noqa
@@ -161,6 +170,15 @@ if (varMdl == 4) or (varMdl == 5):
     # Extend of systematic noise (only relevant for model 5):
     varNseSys = 0.3
 
+# Parameters specific to 'model 6' (simulating underestimation of deep GM
+# signal):
+if varMdl == 6:
+    # List of fraction of underestimation of empirical deep GM signal. For
+    # instance, a value of 0.1 simulates that the deep GM signal was
+    # understimated by 10%, and the deepest signal level will be multiplied by
+    # 1.1. (Each factor will be represented by a sepearate line in the plot.)
+    lstFctr = [0.0, 0.25, 0.5, 0.75]
+
 
 # ----------------------------------------------------------------------------
 # *** Load depth profile from disk
@@ -191,7 +209,7 @@ print('---Subject-by-subject deconvolution')
 # Array for single-subject interpolation result (before deconvolution):
 aryEmp5SnSb = np.zeros((varNumSub, varNumCon, 5))
 
-if (varMdl != 4) and (varMdl != 5):
+if (varMdl != 4) and (varMdl != 5) and (varMdl != 6):
     # Array for single-subject deconvolution result (defined at 5 depth
     # levels):
     aryDecon5 = np.zeros((varNumSub, varNumCon, 5))
@@ -218,6 +236,13 @@ if varMdl == 5:
     # Array for deconvolutino results with systematic error, defined at
     # empirical depth levels:
     arySys = np.zeros((varNumSub, 2, varNumCon, varNumDpth))
+
+if varMdl == 6:
+    # Array for single-subject deconvolution result (defined at 5 depth
+    # levels):
+    aryDecon5 = np.zeros((varNumSub, len(lstFctr), varNumCon, 5))
+    # Array for deconvolution results in equi-volume space:
+    aryDecon = np.zeros((varNumSub, len(lstFctr), varNumCon, varNumDpth))
 
 for idxSub in range(0, varNumSub):
 
@@ -300,6 +325,12 @@ for idxSub in range(0, varNumSub):
             aryDecon5[idxSub, :, :, :], arySys5[idxSub, :, :, :] = \
                 depth_deconv_05(varNumCon, aryEmp5, aryNseRnd, varNseSys)
 
+    # (6) Deconvolution based on Markuerkiaga et al. (2016), with deep GM
+    #     signal scaling factor.
+    elif varMdl == 6:
+            aryDecon5[idxSub, :, :, :] = \
+                depth_deconv_06(varNumCon, aryEmp5, lstFctr)
+
     # -------------------------------------------------------------------------
     # *** Interpolation
 
@@ -318,7 +349,7 @@ for idxSub in range(0, varNumSub):
                               num=varNumDpth,
                               endpoint=True)
 
-    if (varMdl != 4) and (varMdl != 5):
+    if (varMdl != 4) and (varMdl != 5) and (varMdl != 6):
 
         # Loop through conditions:
         for idxCon in range(0, varNumCon):
@@ -366,11 +397,30 @@ for idxSub in range(0, varNumSub):
                          vecIntpEqui,
                          method='cubic')
 
+    # For model 6, loop through deep-GM-signal-intensity-scaling-factors:
+    if varMdl == 6:
+
+        # The array now has the form: aryDecon[idxSub, idxFctr, idxCon,
+        # idxDepth], where idxFctr corresponds to the
+        # deep-GM-signal-intensity-scaling-factors.
+
+        # Loop through factors:
+        for idxFctr in range(len(lstFctr)):
+
+            # Loop through conditions:
+            for idxCon in range(varNumCon):
+
+                # Interpolation back into equi-volume space:
+                aryDecon[idxSub, idxFctr, idxCon, :] = \
+                    griddata(vecPosMdl,
+                             aryDecon5[idxSub, idxFctr, idxCon, :],
+                             vecIntpEqui,
+                             method='cubic')
 
 # ----------------------------------------------------------------------------
 # *** Save corrected depth profiles
 
-if (varMdl != 4) and (varMdl != 5):
+if (varMdl != 4) and (varMdl != 5) and (varMdl != 6):
     # Save array with single-subject corrected depth profiles, of the form
     # aryDecon[idxSub, idxCondition, idxDpth].
     np.save(strPthPrfOt,
@@ -383,7 +433,7 @@ if (varMdl != 4) and (varMdl != 5):
 # Bootstrapping in order to obtain an estimate of across-subjects variance is
 # not performed for models 4 & 5. (Models 4 & 5 are used to test the effect of
 # error in the model assumptions.)
-if (varMdl != 4) and (varMdl != 5):
+if (varMdl != 4) and (varMdl != 5) and (varMdl != 6):
 
     print('---Peak positions in depth profiles - percentile bootstrap')
 
@@ -469,7 +519,7 @@ if (varMdl != 4) and (varMdl != 5):
 
 print('---Plot results')
 
-if (varMdl != 4) and (varMdl != 5):
+if (varMdl != 4) and (varMdl != 5) and (varMdl != 6):
 
     # Plot across-subjects mean before deconvolution:
     strTmpTtl = '{} before deconvolution'.format(strRoi.upper())
@@ -619,6 +669,59 @@ elif varMdl == 5:
                    aryClr=aryClr,
                    vecX=vecIntpEqui)
 
+elif varMdl == 6:
+
+    # The array now has the form: aryDecon[idxSub, idxFctr, idxCon, idxDepth],
+    # where idxFctr corresponds to the
+    # deep-GM-signal-intensity-scaling-factors.
+
+    # For 'model 6', i.e. the deep-GM signal underestimation model, we are
+    # *not* interested in the variance across subjects, but in the effect of
+    # the deep-GM signal scaling factor. Because we used the same deep-GM
+    # scaling factor across subjects, we can average over subjects.
+    aryDecon = np.mean(aryDecon, axis=0)
+
+    # The array now has the form: aryDecon[idxFctr, idxCon, idxDepth], where
+    # idxFctr corresponds to the deep-GM-signal-intensity-scaling-factors.
+
+    # Reduce further; only one stimulus condition is plotted. The
+    # deep-GM-signal-intensity-scaling-factors are treated as conditions for
+    # the plot.
+    aryDecon = aryDecon[:, 3, :]
+
+    # The array now has the form: aryDecon[idxFctr, idxDepth], where idxFctr
+    # corresponds to the deep-GM-signal-intensity-scaling-factors.
+
+    # Dummy error array (no error will be plotted):
+    aryErr = np.zeros(aryDecon.shape)
+
+    strTmpTtl = '{}'.format(strRoi.upper())
+    strTmpPth = (strPthPltOt + 'after_')
+
+    # Labels for model 6 (deep-GM-signal-intensity-scaling-factors):
+    lstLblMdl5 = [(str(int(np.around(x * 100.0))) + ' %') for x in lstFctr]
+
+    # Label for axes:
+    strXlabel = 'Cortical depth level (equivolume)'
+    strYlabel = 'fMRI signal change [a.u.]'
+
+    funcPltAcrDpth(aryDecon,           # aryData[Condition, Depth]
+                   aryErr,             # aryError[Con., Depth]
+                   varNumDpth,         # Number of depth levels (on the x-axis)
+                   aryDecon.shape[0],  # Number of conditions (separate lines)
+                   varDpi,             # Resolution of the output figure
+                   0.0,                # Minimum of Y axis
+                   2.0,                # Maximum of Y axis
+                   False,              # Bool.: whether to convert y axis to %
+                   lstLblMdl5,         # Labels for conditions (separate lines)
+                   strXlabel,          # Label on x axis
+                   strYlabel,          # Label on y axis
+                   strTmpTtl,          # Figure title
+                   True,               # Boolean: whether to plot a legend
+                   (strPthPltOt + 'after' + strFlTp),
+                   varSizeX=2000.0,
+                   varSizeY=1400.0,
+                   vecX=vecIntpEqui)
 
 # ----------------------------------------------------------------------------
 print('-Done.')

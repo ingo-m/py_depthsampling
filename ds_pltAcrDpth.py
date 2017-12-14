@@ -31,7 +31,7 @@ def funcPltAcrDpth(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
                    strTitle, lgcLgnd, strPath, vecX=None, varXmin=None,
                    varXmax=None, varSizeX=1800.0, varSizeY=1600.0,
                    varNumLblY=5, varPadY=(0.0, 0.0), aryClr=None,
-                   aryCnfLw=None, aryCnfUp=None, lstVrt=None):
+                   aryCnfLw=None, aryCnfUp=None, lstVrt=None, varRound=2):
     """
     Plot data across depth level for variable number of conditions.
 
@@ -107,6 +107,9 @@ def funcPltAcrDpth(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
         cortical depth. If lstVrt and aryClr are provided, they need to contain
         the same number of conditions (i.e. lstVrt needs to contain the same
         number of values as the size of the first dimension of aryClr).
+    varRound : int
+        Number of digits after decimal point for labels on y-axis (e.g. if
+        `varRound=1`, labels may be '0.0, 1.0, ...').
 
     Returns
     -------
@@ -247,13 +250,17 @@ def funcPltAcrDpth(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
         # number of decimals (including trailing zeros):
         lstYlbl = [None] * vecYlbl.shape[0]
         for idxLbl in range(vecYlbl.shape[0]):
-            lstYlbl[idxLbl] = '{:0.1f}'.format(vecYlbl[idxLbl])
+            lstYlbl[idxLbl] = ('{:0.'
+                               + str(varRound)
+                               + 'f}').format(vecYlbl[idxLbl])
     else:
         # Convert labels from float to a list of strings, with well-defined
         # number of decimals (including trailing zeros):
         lstYlbl = [None] * vecYlbl.shape[0]
         for idxLbl in range(vecYlbl.shape[0]):
-            lstYlbl[idxLbl] = '{:0.2f}'.format(vecYlbl[idxLbl])
+            lstYlbl[idxLbl] = ('{:0.'
+                               + str(varRound)
+                               + 'f}').format(vecYlbl[idxLbl])
 
     # Set tick labels for y ticks:
     axs01.set_yticklabels(lstYlbl)

@@ -306,6 +306,12 @@ def funcSlctVrtcs(varNumCon,      # Number of conditions  #noqa
                 aryLgcZcon = np.multiply(lstLgcZcon[idxIn],
                                          aryLgcZcon)
 
+            # In order to base the selection on the mean (instead of minimum)
+            # across the column, comment out the previous lines and un-comment
+            # the following:
+            # aryLgcZcon = np.greater_equal(np.mean(aryDpthData02, axis=0),
+            #                               varThrZcon)
+
             # At this point, aryLgcZcon holds the information whether each
             # vertex exceeds the z-threshold in all conditions, separately for
             # each depth level. Next, we test for each 'column' whether this

@@ -3,6 +3,10 @@
 """
 VTK depth samling across subjects.
 
+THIS VERSION:
+Different output directories (for reproduction of results with different
+settings for review).
+
 The purpose of this script is to visualise cortical depth sampling results from
 vtk files. The script can visualise statistical maps from vtk files. Vertices
 are selected according to several criteria. Two vertex selection criteria are

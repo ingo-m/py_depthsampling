@@ -73,7 +73,7 @@ print('-Visualisation of depth sampling results')
 strRoi = 'v1'
 
 # List of subject identifiers:
-lstSubIds = ['20150930']
+lstSubIds = ['20161214', '20150930']
 
 # Condition levels (used to complete file names):
 lstCon = ['01', '02', '03', '04']

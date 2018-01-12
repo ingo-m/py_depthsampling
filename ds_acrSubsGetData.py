@@ -240,14 +240,20 @@ def funcAcrSubGetSubsData(idxPrc,        # Process ID  #noqa
             varTmp = np.multiply(np.divide(np.std(aryTmp),
                                            np.sqrt(aryTmp.size * 0.125)),
                                  1.96)
-            # Place standard deviation in array:
+            # Place confidence interval in array:
             aryDpthConf[idxIn, idxDpth] = varTmp
 
             # Calculate standard error of the mean.
-            varTmp = np.divide(np.std(aryTmp),
-                               np.sqrt(aryTmp.size * 0.125))
+            # varTmp = np.divide(np.std(aryTmp),
+            #                    np.sqrt(aryTmp.size * 0.125))
+            # Place SEM in array:
+            # aryDpthConf[idxIn, idxDpth] = varTmp
+
+            # Calculate standard deviation over vertices:
+            # varTmp = np.std(aryTmp)
+
             # Place standard deviation in array:
-            aryDpthConf[idxIn, idxDpth] = varTmp
+            # aryDpthConf[idxIn, idxDpth] = varTmp
 
     # Normalise by division:
     if lgcNormDiv:

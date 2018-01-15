@@ -73,7 +73,7 @@ print('-Visualisation of depth sampling results')
 strRoi = 'v1'
 
 # List of subject identifiers:
-lstSubIds = ['20161214', '20150930']
+lstSubIds = ['20151127_01', '20161212_02', '20151130_02']
 
 # Condition levels (used to complete file names):
 lstCon = ['01', '02', '03', '04']
@@ -176,7 +176,7 @@ strPltOtPre = '/home/john/PhD/Tex/tex_pe_review/plots_{}/'.format(strRoi)
 # strPltOtPre = '/home/john/PhD/Tex/tex_pe_not_norm/plots_{}/'.format(strRoi)
 
 # Output path for plots - suffix:
-strPltOtSuf = '_RH_R2multi_0p12_combinedmean_7000_z_1000_review_z_mean.png'
+strPltOtSuf = '_RH_R2multi_0p12_combinedmean_7000_z_1000_review_z.png'
 
 # Figure scaling factor:
 varDpi = 80.0
@@ -210,7 +210,7 @@ varLinRegYmax = 0.18
 strLinRegYlabel = 'Regression coefficient'
 
 # Output path for depth samling results (within subject means):
-strDpthMeans = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/Higher_Level_Analysis/{}_RH_review.npy'.format(strRoi)  #noqa
+strDpthMeans = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/Higher_Level_Analysis/{}_RH.npy'.format(strRoi)  #noqa
 
 # Maximum number of processes to run in parallel: *** NOT IMPLEMENTED
 # varPar = 10

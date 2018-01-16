@@ -73,16 +73,7 @@ print('-Visualisation of depth sampling results')
 strRoi = 'v1'
 
 # List of subject identifiers:
-lstSubIds = ['20150930',
-             '20151118',
-             '20151127_01',
-             '20151130_02',
-             '20161205',
-             '20161207',
-             '20161212_02',
-             '20161214',
-             '20161219_01',
-             '20161219_02']
+lstSubIds = ['20150930']
 
 # Condition levels (used to complete file names):
 lstCon = ['01', '02', '03', '04']
@@ -91,13 +82,13 @@ lstConLbl = ['2.5%', '6.1%', '16.3%', '72.0%']
 
 # Base path of first set of vtk files with depth-sampled data, e.g. parameter
 # estimates (with subject ID and stimulus level left open):
-strVtkDpth01 = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/{}/cbs_distcor/lh/pe_stim_lvl_{}.vtk'  # noqa
+strVtkDpth01 = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/{}/cbs_distcor_triln/lh/pe_stim_lvl_{}.vtk'  # noqa
 
 # (1)
 # Base path of csv files with ROI definition (i.e. patch of cortex selected on
 # the surface, e.g. V1 or V2) - i.e. the first vertex selection criterion (with
 # subject ID & ROI left open):
-strCsvRoi = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/{}/cbs_distcor/lh/{}.csv'  #noqa
+strCsvRoi = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/{}/cbs_distcor_triln/lh/{}.csv'  #noqa
 
 # (2)
 # Use second selection criterion defined at one depth level (legacy function):
@@ -115,7 +106,7 @@ varThrSlct02 = 100.0
 lgcSlct03 = True
 # Path of vtk files with 3rd vertex selection criterion. This vtk file is
 # supposed to contain one set of data values for each depth level.
-strVtkSlct03 = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/{}/cbs_distcor/lh/R2_multi.vtk'  #noqa
+strVtkSlct03 = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/{}/cbs_distcor_triln/lh/R2_multi.vtk'  #noqa
 # Threshold for vertex selection:
 varThrSlct03 = 0.12
 
@@ -124,7 +115,7 @@ varThrSlct03 = 0.12
 # depth level are excluded):
 lgcSlct04 = True
 # Path of exclusion mask:
-strVtkSlct04 = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/{}/cbs_distcor/lh/combined_mean.vtk'  #noqa
+strVtkSlct04 = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/{}/cbs_distcor_triln/lh/combined_mean.vtk'  #noqa
 # Threshold for vertex selection:
 varThrSlct04 = 7000.0
 
@@ -137,7 +128,7 @@ lstNumVrtx = [1000] * len(lstSubIds)
 
 # Base name of second set of vtk files with depth-sampled data, e.g. z-values
 # (with subject ID and stimulus level left open):
-strVtkDpth02 = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/{}/cbs_distcor/lh/zstat_lvl_{}.vtk'  #noqa
+strVtkDpth02 = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/{}/cbs_distcor_triln/lh/zstat_lvl_{}.vtk'  #noqa
 
 # (6)
 # Use PE range?
@@ -181,11 +172,10 @@ strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'fMRI signal change [arbitrary units]'
 
 # Output path for plots - prfix:
-strPltOtPre = '/home/john/PhD/Tex/tex_pe/plots_{}/'.format(strRoi)
-# strPltOtPre = '/home/john/PhD/Tex/tex_pe_not_norm/plots_{}/'.format(strRoi)
+strPltOtPre = '/home/john/PhD/Tex/tex_pe_review/plots_{}_triln/'.format(strRoi)
 
 # Output path for plots - suffix:
-strPltOtSuf = '_R2multi_0p12_combinedmean_7000_z_1000_review_z_mean.png'
+strPltOtSuf = '_R2multi_0p12_combinedmean_7000_z_1000_review_z.svg'
 
 # Figure scaling factor:
 varDpi = 80.0
@@ -219,7 +209,7 @@ varLinRegYmax = 0.18
 strLinRegYlabel = 'Regression coefficient'
 
 # Output path for depth samling results (within subject means):
-strDpthMeans = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/Higher_Level_Analysis/{}_review.npy'.format(strRoi)  #noqa
+strDpthMeans = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/Higher_Level_Analysis/{}_review_triln.npy'.format(strRoi)  #noqa
 
 # Maximum number of processes to run in parallel: *** NOT IMPLEMENTED
 # varPar = 10

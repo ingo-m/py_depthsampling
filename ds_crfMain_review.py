@@ -228,16 +228,16 @@ strYlabel = 'fMRI signal change [a.u.]'
 
 
 # Median and percentile:
-#aryHlfMaxMne = np.median(aryEmpHlfMax, axis=1)
-#aryHlfMaxCnfLw = np.percentile(aryEmpHlfMax, 2.5, axis=1)
-#aryHlfMaxCnfUp = np.percentile(aryEmpHlfMax, 97.5, axis=1)
+# aryHlfMaxMne = np.median(aryEmpHlfMax, axis=1)
+# aryHlfMaxCnfLw = np.percentile(aryEmpHlfMax, 0.5, axis=1)
+# aryHlfMaxCnfUp = np.percentile(aryEmpHlfMax, 99.5, axis=1)
 
 # Mean and standar error:
 aryHlfMaxMne = np.mean(aryEmpHlfMax, axis=1)
 aryError = np.std(aryEmpHlfMax, axis=1)
 
 funcPltAcrDpth(aryHlfMaxMne,       # aryData[Condition, Depth]
-               aryError,                  # aryError[Con., Depth]
+               aryError,           # aryError[Con., Depth]
                varNumDpt,          # Number of depth levels (on the x-axis)
                varNumIn,           # Number of conditions (separate lines)
                varDpi,             # Resolution of the output figure
@@ -252,8 +252,8 @@ funcPltAcrDpth(aryHlfMaxMne,       # aryData[Condition, Depth]
                (strPthOt + '_' + strFunc + '_half_max_response' + strFleTyp),
                varSizeX=2000.0,
                varSizeY=1400.0,
-               #aryCnfLw=aryHlfMaxCnfLw,
-               #aryCnfUp=aryHlfMaxCnfUp,
+               # aryCnfLw=aryHlfMaxCnfLw,
+               # aryCnfUp=aryHlfMaxCnfUp,
                lstVrt=list(vecPeakHlfMaxMed))
 # ----------------------------------------------------------------------------
 

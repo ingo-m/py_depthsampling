@@ -120,15 +120,15 @@ varMdl = 1
 strRoi = 'v1'
 
 # Path of depth-profile to correct:
-strPthPrf = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/Higher_Level_Analysis/{}_RH.npy'  #noqa
+strPthPrf = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/Higher_Level_Analysis/{}_review_triln_nii.npy'  #noqa
 strPthPrf = strPthPrf.format(strRoi)
 
 # Output path for corrected depth-profiles:
-strPthPrfOt = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/Higher_Level_Analysis/{}_RH_corrected_model_{}.npy'  #noqa
+strPthPrfOt = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/Higher_Level_Analysis/{}_corrected_model_triln_nii_{}.npy'  #noqa
 strPthPrfOt = strPthPrfOt.format(strRoi, str(varMdl))
 
 # Output path & prefix for plots:
-strPthPltOt = '/home/john/PhD/Tex/deconv_review/rh/{}_model_{}/deconv_{}_m{}_'  #noqa
+strPthPltOt = '/home/john/PhD/Tex/deconv_review/lh/{}_model_{}/deconv_{}_m{}_triln_nii'  #noqa
 strPthPltOt = strPthPltOt.format(strRoi, str(varMdl), strRoi, str(varMdl))
 
 # File type suffix for plot:

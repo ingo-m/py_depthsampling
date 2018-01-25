@@ -40,14 +40,14 @@ from os import rename
 # %% Define parameters
 
 # Subject IDs & number of prefixes to remove for that subject:
-dicSubId = {'20151130_02': 7}  # {'20150930': 6}
+dicSubId = {'20161214': 6}  # {'20150930': 6}
 
 # Paths with files to be renamed (subject ID left open):
-lstPths = ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/{}/cbs_distcor/rh/',
-           '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/{}/cbs_distcor/rh_era/stim_lvl_01/',  #noqa
-           '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/{}/cbs_distcor/rh_era/stim_lvl_02/',  #noqa
-           '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/{}/cbs_distcor/rh_era/stim_lvl_03/',  #noqa
-           '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/{}/cbs_distcor/rh_era/stim_lvl_04/']  #noqa
+lstPths = ['/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/{}/cbs_distcor_triln/lh/',
+           '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/{}/cbs_distcor_triln/lh_era/stim_lvl_01/',  #noqa
+           '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/{}/cbs_distcor_triln/lh_era/stim_lvl_02/',  #noqa
+           '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/{}/cbs_distcor_triln/lh_era/stim_lvl_03/',  #noqa
+           '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/Depth_Data_Review/{}/cbs_distcor_triln/lh_era/stim_lvl_04/']  #noqa
 
 # File type (suffix):
 strFleTpe = '.vtk'

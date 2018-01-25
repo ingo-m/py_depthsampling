@@ -56,13 +56,13 @@ strHmsph = 'rh'
 
 # Name of pickle file from which to load time course data or save time course
 # data to (ROI name and hemisphere left open):
-strPthPic = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/era_{}_{}.pickle'  #noqa
+strPthPic = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/era_long_{}_{}.pickle'  #noqa
 
 # List of subject IDs:
 lstSubId = ['20171109']
 
 # Condition levels (used to complete file names):
-lstCon = ['control_dynamic', 'pacman_dynamic', 'pacman_static']
+lstCon = ['pacman_dynamic_long']
 
 # Base name of vertex inclusion masks (subject ID, hemisphere, subject ID,
 # & ROI left open):
@@ -76,7 +76,7 @@ strVtkPth = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}_era/{}/v
 varNumDpth = 11
 
 # Number of timepoints:
-varNumVol = 19
+varNumVol = 400
 
 # Beginning of string which precedes vertex data in data vtk files (i.e. in the
 # statistical maps):
@@ -98,10 +98,13 @@ strYlabel = 'Percent signal change'
 
 # Volume index of start of stimulus period (i.e. index of first volume during
 # which stimulus was on - for the plot):
-varStimStrt = 5
+varStimStrt = 5 * 10
 # Volume index of end of stimulus period (i.e. index of last volume during
 # which stimulus was on - for the plot):
-varStimEnd = 9
+varStimEnd = int(np.around(
+                           ((25.0 / 2.079) + 5) * 10.0
+                           )
+                 )
 # Volume TR (in seconds, for the plot):
 varTr = 2.079
 
@@ -114,10 +117,10 @@ lgcLgnd01 = True
 # Plot legend - across subject plots:
 lgcLgnd02 = True
 
-# Output path for plots - prfix (ROI and hemisphere left open):
-strPltOtPre = '/home/john/PhD/PacMan_Plots/era/{}_{}/'
+# Output path for plots - prefix (ROI and hemisphere left open):
+strPltOtPre = '/home/john/PhD/PacMan_Plots/era_long/{}_{}/'
 # Output path for plots - suffix:
-strPltOtSuf = '_ert.png'
+strPltOtSuf = '_ert_long.png'
 
 # Figure scaling factor:
 varDpi = 70.0

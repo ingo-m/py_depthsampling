@@ -71,8 +71,7 @@ strRoi = 'v1'
 strHmsph = 'rh'
 
 # List of subject identifiers:
-lstSubIds = ['20171023',
-             '20171109']
+lstSubIds = ['20171109']
 
 # Condition levels (used to complete file names):
 lstCon = ['Pd',
@@ -92,13 +91,13 @@ lstConLbl = ['PacMan Dynamic',
 
 # Base path of first set of vtk files with depth-sampled data, e.g. parameter
 # estimates (with subject ID, hemisphere, and stimulus level left open):
-strVtkDpth01 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}/{}_pe1.vtk'  # noqa
+strVtkDpth01 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/{}_pe1.vtk'  # noqa
 
 # (1)
 # Base path of csv files with ROI definition (i.e. patch of cortex selected on
 # the surface, e.g. V1 or V2) - i.e. the first vertex selection criterion (with
 # subject ID, hemisphere, and ROI left open):
-strCsvRoi = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}/{}.csv'  #noqa
+strCsvRoi = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/{}.csv'  #noqa
 
 # (2)
 # Use second selection criterion defined at one depth level (legacy function):
@@ -117,7 +116,7 @@ lgcSlct03 = True
 # Path of vtk files with 3rd vertex selection criterion. This vtk file is
 # supposed to contain one set of data values for each depth level. (With
 # subject ID and hemisphere left open.)
-strVtkSlct03 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}/R2_multi_smoothdata.vtk'  #noqa
+strVtkSlct03 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/R2_multi_smoothdata.vtk'  #noqa
 # Threshold for vertex selection:
 varThrSlct03 = 0.1
 
@@ -126,7 +125,7 @@ varThrSlct03 = 0.1
 # depth level are excluded):
 lgcSlct04 = True
 # Path of exclusion mask (with subject ID and hemisphere left open):
-strVtkSlct04 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}/combined_mean.vtk'  #noqa
+strVtkSlct04 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/combined_mean.vtk'  #noqa
 # Threshold for vertex selection:
 varThrSlct04 = 7000.0
 
@@ -139,9 +138,9 @@ lstNumVrtx = [1000] * len(lstSubIds)
 # Base name of second set of vtk files with depth-sampled data, e.g. z-values
 # (with subject ID and hemisphere left open):
 if strHmsph == 'lh':
-    strVtkDpth02 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}/pRF_ovrlp_ratio_right_visual_field_smoothdata.vtk'  #noqa
+    strVtkDpth02 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/pRF_ovrlp_ratio_right_visual_field_smoothdata.vtk'  #noqa
 elif strHmsph == 'rh':
-    strVtkDpth02 = '/home/john/PhD/PacMan_Depth_Data/{}/cbs_distcor/{}/pRF_ovrlp_ratio_left_visual_field_smoothdata.vtk'  #noqa
+    strVtkDpth02 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/pRF_ovrlp_ratio_left_visual_field_smoothdata.vtk'  #noqa
 
 # (6)
 # Use PE range?
@@ -190,7 +189,7 @@ strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'fMRI signal [a.u.]'
 
 # Output path for plots - prefix:
-strPltOtPre = '/home/john/PhD/PacMan_Depth_Plots/plots_{}/'.format(strRoi)
+strPltOtPre = '/home/john/PhD/PacMan_Plots/pe/plots_{}/'.format(strRoi)
 
 # Output path for plots - suffix:
 strPltOtSuf = '_{}_{}_{}.png'.format(strHmsph, strRoi, lstCon[0])

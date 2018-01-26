@@ -46,7 +46,7 @@ from ds_ertPlt import funcPltErt
 
 # Load data from previously prepared pickle? If 'False', data is loaded from
 # vtk meshes and saved as pickle.
-lgcPic = False
+lgcPic = True
 
 # ROI ('v1' or 'v2'):
 strRoi = 'v1'
@@ -99,13 +99,17 @@ strYlabel = 'Percent signal change'
 # Volume TR (in seconds, for the plot):
 varTr = 2.079
 
+# Time scaling factor (factor by which timecourse was temporally upsampled; if
+# it was not upsampled, varTmeScl = 1.0):
+varTmeScl = 10.0
+
 # Volume index of start of stimulus period (i.e. index of first volume during
 # which stimulus was on - for the plot):
-varStimStrt = 5 * 10
+varStimStrt = 5 * int(varTmeScl)
 # Volume index of end of stimulus period (i.e. index of last volume during
 # which stimulus was on - for the plot):
 varStimEnd = int(np.around(
-                           ((25.0 / varTr) + 5.0) * 10.0
+                           ((25.0 / varTr) + 5.0) * int(varTmeScl)
                            )
                  )
 
@@ -249,7 +253,8 @@ if True:
                        lgcCnvPrct,
                        strTmpTtl,
                        strTmpPth,
-                       varXlbl=10)
+                       varXlbl=5,
+                       varTmeScl=varTmeScl)
 # *****************************************************************************
 
 
@@ -306,5 +311,6 @@ for idxDpth in [0, 5, 10]:
                lgcCnvPrct,
                strTmpTtl,
                strTmpPth,
-               varXlbl=10)
+               varXlbl=5,
+               varTmeScl=varTmeScl)
 # *****************************************************************************

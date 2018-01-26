@@ -96,17 +96,18 @@ lgcCnvPrct = True
 strXlabel = 'Time [s]'
 strYlabel = 'Percent signal change'
 
+# Volume TR (in seconds, for the plot):
+varTr = 2.079
+
 # Volume index of start of stimulus period (i.e. index of first volume during
 # which stimulus was on - for the plot):
 varStimStrt = 5 * 10
 # Volume index of end of stimulus period (i.e. index of last volume during
 # which stimulus was on - for the plot):
 varStimEnd = int(np.around(
-                           ((25.0 / 2.079) + 5) * 10.0
+                           ((25.0 / varTr) + 5.0) * 10.0
                            )
                  )
-# Volume TR (in seconds, for the plot):
-varTr = 2.079
 
 # Condition labels:
 # lstConLbl = ['72.0%', '16.3%', '6.1%', '2.5%']

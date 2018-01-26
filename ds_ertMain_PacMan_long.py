@@ -248,7 +248,8 @@ if True:
                        strYlabel,
                        lgcCnvPrct,
                        strTmpTtl,
-                       strTmpPth)
+                       strTmpPth,
+                       varXlbl=10)
 # *****************************************************************************
 
 
@@ -304,5 +305,6 @@ for idxDpth in [0, 5, 10]:
                strYlabel,
                lgcCnvPrct,
                strTmpTtl,
-               strTmpPth)
+               strTmpPth,
+               varXlbl=10)
 # *****************************************************************************

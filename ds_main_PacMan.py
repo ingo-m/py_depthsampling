@@ -23,8 +23,7 @@ Other optional vertex selection criteria are:
         certain threshold at any depth level are excluded.
 
     (5) Multi-level data distribution criterion I
-        Selection based on combination of z-conjunction-mask mask and
-        distribution of z-values.
+        Selection based on distribution of parameter values (e.g. z-values).
     (6) Multi-level data distribution criterion II
         Calculates maximum data value across depth levels, and excludes
         vertices whose across-depth-maximum-value is at the lower and/or upper
@@ -134,13 +133,15 @@ varThrSlct04 = 7000.0
 # distribution?
 lgcVtk02 = True
 # How many vertices to select for each subject?
-lstNumVrtx = [1000] * len(lstSubIds)
+lstNumVrtx = [2000] * len(lstSubIds)
 # Base name of second set of vtk files with depth-sampled data, e.g. z-values
 # (with subject ID and hemisphere left open):
 if strHmsph == 'lh':
-    strVtkDpth02 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/pRF_ovrlp_ratio_right_visual_field_smoothdata.vtk'  #noqa
+    # strVtkDpth02 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/pRF_ovrlp_ratio_right_visual_field_smoothdata.vtk'  #noqa
+    strVtkDpth02 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/Pd_zstat1.vtk'  #noqa
 elif strHmsph == 'rh':
-    strVtkDpth02 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/pRF_ovrlp_ratio_left_visual_field_smoothdata.vtk'  #noqa
+    # strVtkDpth02 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/pRF_ovrlp_ratio_left_visual_field_smoothdata.vtk'  #noqa
+    strVtkDpth02 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/Pd_zstat1.vtk'  #noqa
 
 # (6)
 # Use PE range?

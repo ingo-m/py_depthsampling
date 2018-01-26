@@ -43,7 +43,8 @@ def funcPltErt(aryRoiErtMeanDpth,  #noqa
                strYlabel,
                lgcCnvPrct,
                strTitle,
-               strPthOut):
+               strPthOut,
+               varXlbl=2):
     """Plot event-related timecourses."""
     # Create figure:
     fgr01 = plt.figure(figsize=(1200.0/varDpi, 800.0/varDpi),
@@ -121,8 +122,12 @@ def funcPltErt(aryRoiErtMeanDpth,  #noqa
     # Convert labels from float to list of strings:
     lstXlbl = map(str, vecXlbl)
 
+    # In case only every n-th volume is labelled, make sure the label variable
+    # is integer:
+    varXlbl = int(np.around(varXlbl))
+
     # Label every second volume:
-    if False:
+    if varXlbl == 2:
         # For better readibility, we would like to only label every second
         # volume, starting from the second volume. The label for every other
         # volume will be an empty string. Indicies of volumes to label with
@@ -132,9 +137,9 @@ def funcPltErt(aryRoiErtMeanDpth,  #noqa
         for idxLbl in vecXlblIdx02:
             lstXlbl[idxLbl] = ''
     # Label every third volume:
-    if True:
+    if varXlbl > 2:
         # Indicies of volumes NOT to label with emtpy string:
-        vecXlblIdx02 = np.arange(0, varNumVol, 3, dtype=np.int16)
+        vecXlblIdx02 = np.arange(0, varNumVol, varXlbl, dtype=np.int16)
         # Replace respective entries with empty strings:
         for idxLbl in range(0, varNumVol):
             # Is the current volume index NOT in the vector of indicies NOT to

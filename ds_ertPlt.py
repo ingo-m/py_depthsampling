@@ -44,7 +44,8 @@ def funcPltErt(aryRoiErtMeanDpth,  #noqa
                lgcCnvPrct,
                strTitle,
                strPthOut,
-               varXlbl=2):
+               varXlbl=2,
+               varTmeScl=1.0):
     """Plot event-related timecourses."""
     # Create figure:
     fgr01 = plt.figure(figsize=(1200.0/varDpi, 800.0/varDpi),
@@ -107,6 +108,10 @@ def funcPltErt(aryRoiErtMeanDpth,  #noqa
     # Set y-axis range:
     axs01.set_ylim([varYmin, varYmax])
 
+    # If time series was temporally upsampled, adjust number of x-labels:
+    if not(float(varTmeScl) == 1.0):
+        vecX = vecX[0::int(np.around(varTmeScl))]
+
     # Which x values to label with ticks:
     axs01.set_xticks(vecX)
     # We convert the volume indicies ('0, 1, 2 ...') into seconds, with time
@@ -116,6 +121,11 @@ def funcPltErt(aryRoiErtMeanDpth,  #noqa
                           varStimStrt)
     # Convert to seconds (multiply by volume TR):
     vecXlbl = np.multiply(vecXlbl, varTr)
+
+    # If time series was temporally upsampled, adjust x-labels:
+    if not(float(varTmeScl) == 1.0):
+        vecXlbl = np.divide(vecXlbl, float(varTmeScl))
+
     # Round:
     vecXlbl = np.around(vecXlbl, decimals=1)
 
@@ -132,7 +142,7 @@ def funcPltErt(aryRoiErtMeanDpth,  #noqa
         # volume, starting from the second volume. The label for every other
         # volume will be an empty string. Indicies of volumes to label with
         # empty sting:
-        vecXlblIdx02 = np.arange(0, varNumVol, 2, dtype=np.int16)
+        vecXlblIdx02 = np.arange(0, len(vecX), 2, dtype=np.int16)
         # Replace respective entries with empty strings:
         for idxLbl in vecXlblIdx02:
             lstXlbl[idxLbl] = ''
@@ -141,7 +151,7 @@ def funcPltErt(aryRoiErtMeanDpth,  #noqa
         # Indicies of volumes NOT to label with emtpy string:
         vecXlblIdx02 = np.arange(0, varNumVol, varXlbl, dtype=np.int16)
         # Replace respective entries with empty strings:
-        for idxLbl in range(0, varNumVol):
+        for idxLbl in range(0, len(vecX)):
             # Is the current volume index NOT in the vector of indicies NOT to
             # label with an empty string?
             if not (idxLbl in vecXlblIdx02):

@@ -133,7 +133,7 @@ varThrSlct04 = 7000.0
 # distribution?
 lgcVtk02 = True
 # How many vertices to select for each subject?
-lstNumVrtx = [2000] * len(lstSubIds)
+lstNumVrtx = [1000] * len(lstSubIds)
 # Base name of second set of vtk files with depth-sampled data, e.g. z-values
 # (with subject ID and hemisphere left open):
 if strHmsph == 'lh':

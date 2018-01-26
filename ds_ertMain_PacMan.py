@@ -46,7 +46,7 @@ from ds_ertPlt import funcPltErt
 
 # Load data from previously prepared pickle? If 'False', data is loaded from
 # vtk meshes and saved as pickle.
-lgcPic = True
+lgcPic = False
 
 # ROI ('v1' or 'v2'):
 strRoi = 'v1'

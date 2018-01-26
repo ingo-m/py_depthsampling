@@ -27,8 +27,7 @@ Other optional vertex selection criteria are:
         certain threshold at any depth level are excluded.
 
     (5) Multi-level data distribution criterion I
-        Selection based on combination of z-conjunction-mask mask and
-        distribution of z-values.
+        Selection based on distribution of parameter values (e.g. z-values).
     (6) Multi-level data distribution criterion II
         Calculates maximum data value across depth levels, and excludes
         vertices whose across-depth-maximum-value is at the lower and/or upper

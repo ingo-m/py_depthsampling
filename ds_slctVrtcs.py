@@ -214,22 +214,15 @@ def funcSlctVrtcs(varNumCon,      # Number of conditions  #noqa
     # **************************************************************************
     # *** (5) Multi-level data distribution criterion I
     #         Selection based on combination of z-conjunction-mask mask and
-    #         distribution of z-values.
+    #         distribution of parameter values (e.g. z-values, R2, ...).
 
     if lgcVtk02:
 
         if idxPrc == 0:
-            print('---------Vertex selection based on combintation of '
-                  + 'z-conjunction mask and distribution of z-values.')
+            print('---------Vertex selection based on distribution of '
+                  + 'parameter values.')
 
-        # Calculate z-conjunction mask. First, we check for each vertex whether
-        # its data value (e.g. z-score) exceeds a certain value in ALL input
-        # files (i.e. in all conditions). For instance, one could exclude
-        # vertices that do not have a z-score of at least 1.5 in all stimulus
-        # conditions. If this condition is fulfilled at least at one depth
-        # level, the entire 'column' is included.
-
-        # The second set of depth-data (i.e. the z-scores) need to be put into
+        # The second set of depth-data (e.g. the z-scores) need to be put into
         # the same shape as the first set of depth-data (i.e. the parameter
         # estimates). In other words, the same exclusion criteria have to be
         # applied to both data sets:
@@ -266,6 +259,11 @@ def funcSlctVrtcs(varNumCon,      # Number of conditions  #noqa
 
         # Initial value for number of included vertices:
         varNumIncTmp = varNumInc
+
+        # Selection based on absolute values (in order to include negative
+        # signal changes):
+        aryDpthData02 = np.absolute(aryDpthData02)
+        print('*** WARNING: Selection based on ABSOLUTE values. ***')
 
         # Initial value for z-conjunction threshold:
         varThrZcon = 0.0

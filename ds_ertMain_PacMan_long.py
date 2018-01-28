@@ -208,7 +208,7 @@ for strSubID, aryRoiErt in dicAllSubsRoiErt.items():
 
 
 # *****************************************************************************
-# *** Plot single subjet results
+# *** Plot single subjet results (at individual depth levels)
 
 if True:
 
@@ -255,6 +255,54 @@ if True:
                        strTmpPth,
                        varXlbl=5,
                        varTmeScl=varTmeScl)
+# *****************************************************************************
+
+
+# *****************************************************************************
+# *** Plot single subjet results (mean across depth levels)
+
+if True:
+
+    print('---Ploting single-subjects event-related averages - mean across '
+          + 'depth levels')
+
+    # Loop through subjects:
+    for strSubID, aryRoiErt in dicAllSubsRoiErt.items():
+
+        # Title for plot:
+        strTmpTtl = (strSubID + ' ERA, mean across depth levels ')
+
+        # Output filename:
+        strTmpPth = (strPltOtPre + strSubID + '_mean_' + str(idxDpth)
+                     + strPltOtSuf)
+
+        # Mean ERA across depth levels:
+        aryMneTmp = np.mean(aryRoiErt, axis=1)
+
+        # SD across depth levels:
+        arySdTmp = np.std(aryRoiErt, axis=1)
+
+        # We create one plot per depth-level.
+        funcPltErt(aryMneTmp,
+                   arySdTmp,
+                   varNumDpth,
+                   varNumCon,
+                   varNumVol,
+                   varDpi,
+                   varAcrSubsYmin,
+                   varAcrSubsYmax,
+                   varStimStrt,
+                   varStimEnd,
+                   varTr,
+                   lstConLbl,
+                   lgcLgnd01,
+                   strXlabel,
+                   strYlabel,
+                   lgcCnvPrct,
+                   strTmpTtl,
+                   strTmpPth,
+                   varXlbl=5,
+                   varTmeScl=varTmeScl)
 # *****************************************************************************
 
 

@@ -38,9 +38,9 @@ def funcGetSubData(strSubId,
     """
     Load data for event-related timecourse analysis.
 
-    The purpose of this function is to load vtk meshes for the event-related
-    average timecourses analysis, for one subject. Each vtk mesh is one 3D
-    volume. This script loads all meshes for all conditions for one subject.
+    Load vtk meshes for the event-related average timecourses analysis, for one
+    subject. Each vtk mesh is one 3D volume. This script loads all meshes for
+    all conditions for one subject.
     """
     # *************************************************************************
     # *** Load vtk mask (ROI)

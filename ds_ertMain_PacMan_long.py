@@ -273,8 +273,7 @@ if True:
         strTmpTtl = (strSubID + ' ERA, mean across depth levels ')
 
         # Output filename:
-        strTmpPth = (strPltOtPre + strSubID + '_mean_' + str(idxDpth)
-                     + strPltOtSuf)
+        strTmpPth = (strPltOtPre + strSubID + '_mean_' + strPltOtSuf)
 
         # Mean ERA across depth levels:
         aryMneTmp = np.mean(aryRoiErt, axis=1)

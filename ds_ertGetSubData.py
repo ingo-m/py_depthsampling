@@ -21,6 +21,7 @@ Function of the event-related timecourses depth sampling sub-pipeline.
 # You should have received a copy of the GNU General Public License along with
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 import numpy as np
 from ds_loadVtkSingle import funcLoadVtkSingle
 from ds_loadVtkMulti import funcLoadVtkMulti
@@ -65,29 +66,80 @@ def funcGetSubData(strSubId,
     aryErt = np.zeros((varNumCon, varNumDpth, varNumVol, varNumVrtc),
                       dtype=np.float32)
 
-    # Loop through conditions:
-    for idxCon in range(0, varNumCon):
+    # Loading time courses from single vtk files is very slow. The first time
+    # the time courses are accessed, we therefore save the data to disk in form
+    # of a *.npy file, and delete the vtk files. Here, we first check whether
+    # the vtk files are available. If yes, we load them and create a new *.npy
+    # file. In this way, we do not risk loading an outdated *.npy file (because
+    # we only load an *.npy file if no vtk (new) files are available).
 
-        # Loop through volumes:
-        for idxVol in range(0, varNumVol):
+    # Path of vtk file of first volume:
+    strVtkPthTmp = strVtkPth.format(strSubId,
+                                    strHmsph,
+                                    lstCon[0],
+                                    str(0).zfill(3))
 
-            # Complete file path of current volume:
+    # Check whether first vtk file exists:
+    if os.path.isfile(strVtkPthTmp):
+
+        # Loop through conditions:
+        for idxCon in range(0, varNumCon):
+
+            # Loop through volumes:
+            for idxVol in range(0, varNumVol):
+
+                # Complete file path of current volume:
+                strVtkPthTmp = strVtkPth.format(strSubId,
+                                                strHmsph,
+                                                lstCon[idxCon],
+                                                str(idxVol).zfill(3))
+
+                # Load vtk mesh for current timepoint:
+                aryTmp = funcLoadVtkMulti(strVtkPthTmp,
+                                          strPrcdData,
+                                          varNumLne,
+                                          varNumDpth).astype(np.float32)
+
+                aryErt[idxCon, :, idxVol, :] = aryTmp.T
+
+                # Delete vtk file:
+                os.remove(strVtkPthTmp)
+
+            # Save array of current condition to disk (in case data need to be
+            # accessed again (conditions are saved separately because
+            # composition of conditions can change for plot):
+            strPthNpy = os.path.join(os.path.split(strVtkPthTmp)[0],
+                                     ('aryErt_' + lstCon[idxCon] + '.npy'))
+            np.save(strPthNpy, aryErt[idxCon, :, :, :])
+
+    # Vtk file does not exist, attempt loading (previously created) *.npy file:
+    else:
+
+        # Loop through conditions:
+        for idxCon in range(0, varNumCon):
+
+            # Vtk file path of current condition:
             strVtkPthTmp = strVtkPth.format(strSubId,
                                             strHmsph,
                                             lstCon[idxCon],
-                                            str(idxVol).zfill(3))
+                                            str(0).zfill(3))
 
-            # Load vtk mesh for current timepoint:
-            aryTmp = funcLoadVtkMulti(strVtkPthTmp,
-                                      strPrcdData,
-                                      varNumLne,
-                                      varNumDpth).astype(np.float32)
+            # Path of *.npy file to load (file name is hard-coded, not optimal
+            # but still serves the purpose):
+            strPthNpy = os.path.join(os.path.split(strVtkPthTmp)[0],
+                                     ('aryErt_' + lstCon[idxCon] + '.npy'))
 
-            aryErt[idxCon, :, idxVol, :] = aryTmp.T
+            aryErt[idxCon, :, :, :] = np.load(strPthNpy).astype(np.float32)
     # *************************************************************************
 
     # *************************************************************************
     # Extract ROI timecourses
+
+    # Note that the ROI time courses extraction is done after saving the data
+    # to disk in *.npy format. This is on purpose; the file size would be much
+    # smaller otherwise, but changing the ROI would require to load vtk data
+    # again, which is slower than loading *.npy and would defeat the purpose of
+    # creating the *.npy file in the first place.
 
     # Get indicies of vertices with value greater than threshold. (The vtk mask
     # is supposed to contain ones for vertices that are included, and zeros

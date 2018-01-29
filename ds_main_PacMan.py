@@ -67,7 +67,7 @@ print('-Visualisation of depth sampling results')
 strRoi = 'v1'
 
 # Hemisphere ('lh' or 'rh'):
-strHmsph = 'rh'
+strHmsph = 'lh'
 
 # List of subject identifiers:
 lstSubIds = ['20171109']

@@ -52,7 +52,7 @@ lgcPic = False
 strRoi = 'v1'
 
 # Hemisphere ('rh' or 'lh'):
-strHmsph = 'rh'
+strHmsph = 'lh'
 
 # Name of pickle file from which to load time course data or save time course
 # data to (ROI name and hemisphere left open):

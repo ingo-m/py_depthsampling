@@ -286,7 +286,7 @@ def funcAcrSubGetSubsData(idxPrc,        # Process ID  #noqa
     strTitleTmp = (strTitle
                    + ', '
                    + str(varNumInc)
-                   + ' vertices, R2>'
+                   + ' vertices, z>'
                    + str(np.around(varThrZcon, decimals=2)))
 
     funcPltAcrDpth(aryDpthMean,  # Data: aryData[Condition, Depth]

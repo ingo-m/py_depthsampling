@@ -52,14 +52,15 @@ lgcPic = False
 strRoi = 'v1'
 
 # Hemisphere ('rh' or 'lh'):
-strHmsph = 'lh'
+strHmsph = 'rh'
 
 # Name of pickle file from which to load time course data or save time course
 # data to (ROI name and hemisphere left open):
 strPthPic = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/era_{}_{}.pickle'  #noqa
 
 # List of subject IDs:
-lstSubId = ['20171109']
+lstSubId = ['20171109',
+            '20171211']
 
 # Condition levels (used to complete file names):
 lstCon = ['control_dynamic', 'pacman_dynamic', 'pacman_static']

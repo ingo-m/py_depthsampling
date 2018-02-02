@@ -67,10 +67,11 @@ print('-Visualisation of depth sampling results')
 strRoi = 'v1'
 
 # Hemisphere ('lh' or 'rh'):
-strHmsph = 'lh'
+strHmsph = 'rh'
 
 # List of subject identifiers:
-lstSubIds = ['20171109']
+lstSubIds = ['20171109',
+             '20171211']
 
 # Condition levels (used to complete file names):
 lstCon = ['Pd',
@@ -173,7 +174,7 @@ strTitle = strRoi.upper()
 
 # Limits of y-axis for single subject plots (list of tuples, [(Ymin, Ymax)]):
 if strRoi == 'v1':
-    lstLimY = [(-300.0, 25.0)] * len(lstSubIds)  # v1 simple contrasts
+    lstLimY = [(-750.0, 25.0)] * len(lstSubIds)  # v1 simple contrasts
     # lstLimY = [(-30.0, 0.0)] * len(lstSubIds)  # v1 Pd_min_Ps
     # lstLimY = [(0.0, 75.0)] * len(lstSubIds)  # v1 Pd_min_Cd
 elif strRoi == 'v2':
@@ -182,8 +183,8 @@ elif strRoi == 'v2':
     # lstLimY = [(0.0, 100.0)] * len(lstSubIds)  # v2 Pd_min_Cd
 
 # Limits of y-axis for across subject plot:
-varAcrSubsYmin = -500.0
-varAcrSubsYmax = 500.0
+varAcrSubsYmin = -750.0
+varAcrSubsYmax = 250.0
 
 # Label for axes:
 strXlabel = 'Cortical depth level (equivolume)'

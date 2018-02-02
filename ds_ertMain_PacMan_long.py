@@ -52,14 +52,15 @@ lgcPic = False
 strRoi = 'v1'
 
 # Hemisphere ('rh' or 'lh'):
-strHmsph = 'lh'
+strHmsph = 'rh'
 
 # Name of pickle file from which to load time course data or save time course
 # data to (ROI name and hemisphere left open):
 strPthPic = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/era_long_{}_{}.pickle'  #noqa
 
 # List of subject IDs:
-lstSubId = ['20171109']
+lstSubId = ['20171109',
+            '20171211']
 
 # Condition levels (used to complete file names):
 lstCon = ['pacman_dynamic_long']
@@ -360,4 +361,58 @@ for idxDpth in [0, 5, 10]:
                strTmpPth,
                varXlbl=5,
                varTmeScl=varTmeScl)
+# *****************************************************************************
+
+
+# *****************************************************************************
+# *** Plot across-subjects average (mean across depth levels)
+
+print('---Ploting across-subjects average - mean across depth levels')
+
+# Event-related time courses have the form:
+# aryAllSubsRoiErt[varNumSub, varNumCon, varNumDpth, varNumVol]
+
+# Calculate mean across depth:
+aryMneDpth = np.mean(aryAllSubsRoiErt, axis=2)
+
+# Now of the form:
+# aryMneTmp[varNumSub, varNumCon, varNumVol]
+
+# Calculate mean across subjects:
+aryMneDpthSub = np.mean(aryMneDpth, axis=0)
+
+# Calculate SD across subjects:
+arySdDpthSub = np.std(aryMneDpth, axis=0)
+
+# Now of the form:
+# aryMneDpthSub[varNumCon, varNumVol]
+# arySdDpthSub[varNumCon, varNumVol]
+
+# Title for plot:
+strTmpTtl = ''
+
+# Output filename:
+strTmpPth = (strPltOtPre + 'acr_dpth_acr_subs' + strPltOtSuf)
+
+# We create one plot per depth-level.
+funcPltErt(aryMneDpthSub,
+           arySdDpthSub,
+           varNumDpth,
+           varNumCon,
+           varNumVol,
+           varDpi,
+           varAcrSubsYmin,
+           varAcrSubsYmax,
+           varStimStrt,
+           varStimEnd,
+           varTr,
+           lstConLbl,
+           lgcLgnd02,
+           strXlabel,
+           strYlabel,
+           lgcCnvPrct,
+           strTmpTtl,
+           strTmpPth,
+           varXlbl=5,
+           varTmeScl=varTmeScl)
 # *****************************************************************************

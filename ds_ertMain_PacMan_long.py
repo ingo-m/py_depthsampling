@@ -45,7 +45,7 @@ from ds_ertPlt import funcPltErt
 # *** Define parameters
 
 # Load data from previously prepared pickle? If 'False', data is loaded from
-# vtk meshes and saved as pickle.
+# vtk meshes (or npy files) and saved as pickle.
 lgcPic = False
 
 # ROI ('v1' or 'v2'):
@@ -60,7 +60,8 @@ strPthPic = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/era_long_{}_
 
 # List of subject IDs:
 lstSubId = ['20171109',
-            '20171211']
+            '20171211',
+            '20171213']
 
 # Condition levels (used to complete file names):
 lstCon = ['pacman_dynamic_long']

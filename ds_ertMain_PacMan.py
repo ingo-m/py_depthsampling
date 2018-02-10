@@ -126,6 +126,15 @@ varDpi = 70.0
 
 
 # *****************************************************************************
+# *** Preparations
+
+# Convert stimulus onset & offset times from volume indicies to seconds:
+varStimStrt = float(varStimStrt) * varTr
+varStimEnd = float(varStimEnd) * varTr
+# *****************************************************************************
+
+
+# *****************************************************************************
 # *** Load data
 
 print('-Event-related timecourses depth sampling')

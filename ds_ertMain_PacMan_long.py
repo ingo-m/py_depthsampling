@@ -56,7 +56,8 @@ strHmsph = 'rh'
 
 # Name of pickle file from which to load time course data or save time course
 # data to (ROI name and hemisphere left open):
-strPthPic = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/era_long_{}_{}.pickle'  #noqa
+# strPthPic = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/era_long_{}_{}.pickle'  #noqa
+strPthPic = '/media/PacMan_Depth_Data/Higher_Level_Analysis/era_long_{}_{}.pickle'  #noqa
 
 # List of subject IDs:
 lstSubId = ['20171109',
@@ -105,15 +106,11 @@ varTr = 2.079
 # it was not upsampled, varTmeScl = 1.0):
 varTmeScl = 10.0
 
-# Volume index of start of stimulus period (i.e. index of first volume during
-# which stimulus was on - for the plot):
-varStimStrt = 5 * int(varTmeScl)
-# Volume index of end of stimulus period (i.e. index of last volume during
-# which stimulus was on - for the plot):
-varStimEnd = int(np.around(
-                           ((25.0 / varTr) + 5.0) * int(varTmeScl)
-                           )
-                 )
+# Stimulus onset in seconds (for the plot):
+varStimStrt = 5.0 * varTr  # 5 volumes prestimulus interval in ERT
+
+# Stimulus offset in seconds (for the plot):
+varStimEnd = varStimStrt + 25.0  # 25 s stimulus plus prestimulus interval
 
 # Condition labels:
 # lstConLbl = ['72.0%', '16.3%', '6.1%', '2.5%']
@@ -125,7 +122,8 @@ lgcLgnd01 = True
 lgcLgnd02 = True
 
 # Output path for plots - prefix (ROI and hemisphere left open):
-strPltOtPre = '/home/john/PhD/PacMan_Plots/era_long/{}_{}/'
+# strPltOtPre = '/home/john/PhD/PacMan_Plots/era_long/{}_{}/'
+strPltOtPre = '/media/PacMan_Plots/era_long/{}_{}/'
 # Output path for plots - suffix:
 strPltOtSuf = '_ert_long.png'
 
@@ -255,7 +253,7 @@ if True:
                        lgcCnvPrct,
                        strTmpTtl,
                        strTmpPth,
-                       varXlbl=5,
+                       varXlbl=10,
                        varTmeScl=varTmeScl)
 # *****************************************************************************
 
@@ -302,7 +300,7 @@ if True:
                    lgcCnvPrct,
                    strTmpTtl,
                    strTmpPth,
-                   varXlbl=5,
+                   varXlbl=10,
                    varTmeScl=varTmeScl)
 # *****************************************************************************
 
@@ -360,7 +358,7 @@ for idxDpth in [0, 5, 10]:
                lgcCnvPrct,
                strTmpTtl,
                strTmpPth,
-               varXlbl=5,
+               varXlbl=10,
                varTmeScl=varTmeScl)
 # *****************************************************************************
 
@@ -414,6 +412,6 @@ funcPltErt(aryMneDpthSub,
            lgcCnvPrct,
            strTmpTtl,
            strTmpPth,
-           varXlbl=5,
+           varXlbl=10,
            varTmeScl=varTmeScl)
 # *****************************************************************************

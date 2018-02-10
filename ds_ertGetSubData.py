@@ -64,7 +64,7 @@ def funcGetSubData(strSubId,
 
     # Array to be filled with data:
     aryErt = np.zeros((varNumCon, varNumDpth, varNumVol, varNumVrtc),
-                      dtype=np.float32)
+                      dtype=np.float16)
 
     # Loading time courses from single vtk files is very slow. The first time
     # the time courses are accessed, we therefore save the data to disk in form
@@ -98,7 +98,7 @@ def funcGetSubData(strSubId,
                 aryTmp = funcLoadVtkMulti(strVtkPthTmp,
                                           strPrcdData,
                                           varNumLne,
-                                          varNumDpth).astype(np.float32)
+                                          varNumDpth).astype(np.float16)
 
                 aryErt[idxCon, :, idxVol, :] = aryTmp.T
 
@@ -129,7 +129,7 @@ def funcGetSubData(strSubId,
             strPthNpy = os.path.join(os.path.split(strVtkPthTmp)[0],
                                      ('aryErt_' + lstCon[idxCon] + '.npy'))
 
-            aryErt[idxCon, :, :, :] = np.load(strPthNpy).astype(np.float32)
+            aryErt[idxCon, :, :, :] = np.load(strPthNpy).astype(np.float16)
     # *************************************************************************
 
     # *************************************************************************

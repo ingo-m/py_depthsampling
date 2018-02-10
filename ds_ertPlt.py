@@ -53,15 +53,44 @@ def funcPltErt(aryRoiErtMeanDpth,  #noqa
     # Create axis:
     axs01 = fgr01.add_subplot(111)
 
-    # Plot horizontal bar for stimulus interval:
-    plot03 = plt.plot(((varStimStrt - 0.35), (varStimEnd + 0.35)),  #noqa
-                      ((varYmin + 0.002), (varYmin + 0.002)),
-                      color=(0.3, 0.3, 0.3),
-                      linewidth=8.0,
-                      label='_nolegend_')
-
     # Vector for x-data:
     vecX = range(0, varNumVol)
+
+    # Convert the volume indicies ('0, 1, 2 ...') into seconds. First divide by
+    # the temporal scaling factor (in case ERTs were temporally upsampled for
+    # the averaging), then multiply with the TR in order to convert from
+    # from indicies to seconds:
+    vecX = np.multiply(
+                       np.divide(np.array((vecX), dtype=np.float64),
+                                 varTmeScl),
+                       varTr
+                       )
+
+    # Subtract pre-stimulus interval:
+    vecX = np.subtract(vecX, varStimStrt)
+
+
+    # Time points to label in the negative range:
+    vecXlblNeg = np.arange(
+                           np.multiply(-1.0,
+                                      np.floor(varStimStrt)
+                                      ),
+                           0.0,
+                           int(varXlbl)
+                           )
+
+    # Time points to label in the positive range:
+    vecXlblPos = np.arange(
+                           0.0,
+                           np.floor(np.max(vecX)),
+                           int(varXlbl)
+                           )
+
+    # Put together negative and positive range:
+    vecXlbl = np.concatenate((vecXlblNeg, vecXlblPos), axis=0)
+
+    # Get index of time point zero (i.e. of stimulus onset):
+    # varIdxZero = np.where((np.around(vecX, decimals=5) == 0.0))[0]
 
     # Prepare colour map:
     objClrNorm = colors.Normalize(vmin=0, vmax=(varNumCon - 1))
@@ -104,64 +133,21 @@ def funcPltErt(aryRoiErtMeanDpth,  #noqa
     axs01.spines['left'].set_visible(True)
 
     # Set x-axis range:
-    axs01.set_xlim([-0.5, (varNumVol - 0.5)])
+    axs01.set_xlim([varStimStrt, varStimEnd])
     # Set y-axis range:
     axs01.set_ylim([varYmin, varYmax])
 
-    # If time series was temporally upsampled, adjust number of x-labels:
-    if not(float(varTmeScl) == 1.0):
-        vecX = vecX[0::int(np.around(varTmeScl))]
-
     # Which x values to label with ticks:
-    axs01.set_xticks(vecX)
-    # We convert the volume indicies ('0, 1, 2 ...') into seconds, with time
-    # point zeros at stimulus onset (e.g. '-9.0, -6.0, -3.0, 0.0, 3.0, ...').
-    # First, set the index of the volume of stimulus onset to zero:
-    vecXlbl = np.subtract(np.array((vecX), dtype=np.float64),
-                          varStimStrt)
-    # Convert to seconds (multiply by volume TR):
-    vecXlbl = np.multiply(vecXlbl, varTr)
-
-    # If time series was temporally upsampled, adjust x-labels:
-    if not(float(varTmeScl) == 1.0):
-        vecXlbl = np.divide(vecXlbl, float(varTmeScl))
-
-    # Round:
-    vecXlbl = np.around(vecXlbl, decimals=1)
+    axs01.set_xticks(vecXlbl)
 
     # Convert labels from float to list of strings:
-    lstXlbl = map(str, vecXlbl)
-
-    # In case only every n-th volume is labelled, make sure the label variable
-    # is integer:
-    varXlbl = int(np.around(varXlbl))
-
-    # Label every second volume:
-    if varXlbl == 2:
-        # For better readibility, we would like to only label every second
-        # volume, starting from the second volume. The label for every other
-        # volume will be an empty string. Indicies of volumes to label with
-        # empty sting:
-        vecXlblIdx02 = np.arange(0, len(vecX), 2, dtype=np.int16)
-        # Replace respective entries with empty strings:
-        for idxLbl in vecXlblIdx02:
-            lstXlbl[idxLbl] = ''
-    # Label every third volume:
-    if varXlbl > 2:
-        # Indicies of volumes NOT to label with emtpy string:
-        vecXlblIdx02 = np.arange(0, varNumVol, varXlbl, dtype=np.int16)
-        # Replace respective entries with empty strings:
-        for idxLbl in range(0, len(vecX)):
-            # Is the current volume index NOT in the vector of indicies NOT to
-            # label with an empty string?
-            if not (idxLbl in vecXlblIdx02):
-                lstXlbl[idxLbl] = ''
+    # lstXlbl = map(str, vecXlbl)
 
     # Labels for x ticks:
-    axs01.set_xticklabels(lstXlbl)
+    # axs01.set_xticklabels(lstXlbl)
 
     # Which y values to label with ticks:
-    vecYlbl = np.linspace(varYmin, varYmax, num=5, endpoint=True)
+    vecYlbl = np.linspace(varYmin, varYmax, num=6, endpoint=True)
     # vecYlbl = np.arange(varYmin, varYmax, 0.02)
     # vecYlbl = np.linspace(0.0, varYmax, num=5, endpoint=True)
     # Round:
@@ -207,6 +193,13 @@ def funcPltErt(aryRoiErtMeanDpth,  #noqa
         axs01.legend(loc=0,
                      frameon=False,
                      prop={'size': 32})
+
+    # Plot horizontal bar for stimulus interval:
+    plot03 = plt.plot(((0.0), (varStimEnd - varStimStrt)),  #noqa
+                      ((varYmin + 0.002), (varYmin + 0.002)),
+                      color=(0.3, 0.3, 0.3),
+                      linewidth=8.0,
+                      label='_nolegend_')
 
     # Save figure:
     fgr01.savefig(strPthOut,

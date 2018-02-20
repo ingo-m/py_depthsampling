@@ -59,7 +59,8 @@ strHmsph = 'rh'
 strPthPic = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/era_{}_{}.pickle'  #noqa
 
 # List of subject IDs:
-lstSubId = ['20171109']
+lstSubId = ['20171109',
+            '20171211']
 
 # Condition levels (used to complete file names):
 lstCon = ['control_dynamic', 'pacman_dynamic', 'pacman_static']
@@ -121,6 +122,15 @@ strPltOtSuf = '_ert.png'
 
 # Figure scaling factor:
 varDpi = 70.0
+# *****************************************************************************
+
+
+# *****************************************************************************
+# *** Preparations
+
+# Convert stimulus onset & offset times from volume indicies to seconds:
+varStimStrt = float(varStimStrt) * varTr
+varStimEnd = float(varStimEnd) * varTr
 # *****************************************************************************
 
 

@@ -46,7 +46,7 @@ from ds_ertPlt import funcPltErt
 
 # Load data from previously prepared pickle? If 'False', data is loaded from
 # vtk meshes and saved as pickle.
-lgcPic = True
+lgcPic = False
 
 # ROI ('v1' or 'v2'):
 strRoi = 'v2'
@@ -129,6 +129,15 @@ strPltOtSuf = '_ert.png'
 
 # Figure scaling factor:
 varDpi = 70.0
+# *****************************************************************************
+
+
+# *****************************************************************************
+# *** Preparations
+
+# Convert stimulus onset & offset times from volume indicies to seconds:
+varStimStrt = float(varStimStrt) * varTr
+varStimEnd = float(varStimEnd) * varTr
 # *****************************************************************************
 
 

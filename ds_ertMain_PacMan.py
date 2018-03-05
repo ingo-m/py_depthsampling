@@ -60,7 +60,9 @@ strPthPic = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/era_{}_{}.pi
 
 # List of subject IDs:
 lstSubId = ['20171109',
-            '20171211']
+            '20171213',
+            '20180111',
+            '20180118']
 
 # Condition levels (used to complete file names):
 lstCon = ['control_dynamic', 'pacman_dynamic', 'pacman_static']

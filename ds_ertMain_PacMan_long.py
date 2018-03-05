@@ -61,8 +61,9 @@ strPthPic = '/media/PacMan_Depth_Data/Higher_Level_Analysis/era_long_{}_{}.pickl
 
 # List of subject IDs:
 lstSubId = ['20171109',
-            '20171211',
-            '20171213']
+            '20171213',
+            '20180111',
+            '20180118']
 
 # Condition levels (used to complete file names):
 lstCon = ['pacman_dynamic_long']

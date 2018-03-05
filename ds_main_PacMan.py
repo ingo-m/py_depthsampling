@@ -71,8 +71,9 @@ strHmsph = 'rh'
 
 # List of subject identifiers:
 lstSubIds = ['20171109',
-             '20171211',
-             '20171213']
+             '20171213',
+             '20180111',
+             '20180118']
 
 # Condition levels (used to complete file names):
 lstCon = ['Pd',

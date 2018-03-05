@@ -64,13 +64,14 @@ print('-Visualisation of depth sampling results')
 # *** Define parameters
 
 # Region of interest ('v1' or 'v2'):
-strRoi = 'v1'
+strRoi = 'v2'
 
 # Hemisphere ('lh' or 'rh'):
 strHmsph = 'rh'
 
 # List of subject identifiers:
 lstSubIds = ['20171109',
+             '20171211',
              '20171213',
              '20180111',
              '20180118']
@@ -118,7 +119,7 @@ lgcSlct03 = True
 # Path of vtk files with 3rd vertex selection criterion. This vtk file is
 # supposed to contain one set of data values for each depth level. (With
 # subject ID and hemisphere left open.)
-strVtkSlct03 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/R2_multi_smoothdata.vtk'  #noqa
+strVtkSlct03 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/R2_multi.vtk'  #noqa
 # Threshold for vertex selection:
 varThrSlct03 = 0.1
 

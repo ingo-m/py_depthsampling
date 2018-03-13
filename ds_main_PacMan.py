@@ -64,7 +64,7 @@ print('-Visualisation of depth sampling results')
 # *** Define parameters
 
 # Region of interest ('v1' or 'v2'):
-strRoi = 'v1'
+strRoi = 'v2'
 
 # Hemisphere ('lh' or 'rh'):
 strHmsph = 'rh'
@@ -72,7 +72,9 @@ strHmsph = 'rh'
 # List of subject identifiers:
 lstSubIds = ['20171109',
              '20171211',
-             '20171213']
+             '20171213',
+             '20180111',
+             '20180118']
 
 # Condition levels (used to complete file names):
 lstCon = ['Pd',
@@ -117,7 +119,7 @@ lgcSlct03 = True
 # Path of vtk files with 3rd vertex selection criterion. This vtk file is
 # supposed to contain one set of data values for each depth level. (With
 # subject ID and hemisphere left open.)
-strVtkSlct03 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/R2_multi_smoothdata.vtk'  #noqa
+strVtkSlct03 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/R2_multi.vtk'  #noqa
 # Threshold for vertex selection:
 varThrSlct03 = 0.1
 
@@ -139,10 +141,10 @@ lstNumVrtx = [1000] * len(lstSubIds)
 # Base name of second set of vtk files with depth-sampled data, e.g. z-values
 # (with subject ID and hemisphere left open):
 if strHmsph == 'lh':
-    # strVtkDpth02 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/pRF_ovrlp_ratio_right_visual_field_smoothdata.vtk'  #noqa
+    # strVtkDpth02 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/pRF_ovrlp_ratio_right_visual_field.vtk'  #noqa
     strVtkDpth02 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/Pd_zstat1.vtk'  #noqa
 elif strHmsph == 'rh':
-    # strVtkDpth02 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/pRF_ovrlp_ratio_left_visual_field_smoothdata.vtk'  #noqa
+    # strVtkDpth02 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/pRF_ovrlp_ratio_left_visual_field.vtk'  #noqa
     strVtkDpth02 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/Pd_zstat1.vtk'  #noqa
 
 # (6)

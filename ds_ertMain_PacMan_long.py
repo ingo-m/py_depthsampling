@@ -49,20 +49,22 @@ from ds_ertPlt import funcPltErt
 lgcPic = False
 
 # ROI ('v1' or 'v2'):
-strRoi = 'v1'
+strRoi = 'v2'
 
 # Hemisphere ('rh' or 'lh'):
 strHmsph = 'rh'
 
 # Name of pickle file from which to load time course data or save time course
 # data to (ROI name and hemisphere left open):
-# strPthPic = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/era_long_{}_{}.pickle'  #noqa
-strPthPic = '/media/PacMan_Depth_Data/Higher_Level_Analysis/era_long_{}_{}.pickle'  #noqa
+strPthPic = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/era_long_{}_{}.pickle'  #noqa
+# strPthPic = '/media/PacMan_Depth_Data/Higher_Level_Analysis/era_long_{}_{}.pickle'  #noqa
 
 # List of subject IDs:
 lstSubId = ['20171109',
             '20171211',
-            '20171213']
+            '20171213',
+            '20180111',
+            '20180118']
 
 # Condition levels (used to complete file names):
 lstCon = ['pacman_dynamic_long']
@@ -122,8 +124,8 @@ lgcLgnd01 = True
 lgcLgnd02 = True
 
 # Output path for plots - prefix (ROI and hemisphere left open):
-# strPltOtPre = '/home/john/PhD/PacMan_Plots/era_long/{}_{}/'
-strPltOtPre = '/media/PacMan_Plots/era_long/{}_{}/'
+strPltOtPre = '/home/john/PhD/PacMan_Plots/era_long/{}_{}/'
+# strPltOtPre = '/media/PacMan_Plots/era_long/{}_{}/'
 # Output path for plots - suffix:
 strPltOtSuf = '_ert_long.png'
 

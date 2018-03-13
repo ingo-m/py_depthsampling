@@ -168,8 +168,7 @@ def funcPltAcrSubsMean(arySubDpthMns,
                            aryAcrSubDpthMean[idxIn, :],
                            color=vecClrTmp,
                            alpha=0.9,
-                           label=('Luminance contrast '
-                                  + lstConLbl[idxIn]),
+                           label=(lstConLbl[idxIn]),
                            linewidth=8.0,
                            antialiased=True)
 

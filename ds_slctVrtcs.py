@@ -2,7 +2,7 @@
 """
 Function of the depth sampling pipeline.
 
-@author: Ingo Marquardt, 04.11.2016
+(C) Ingo Marquardt, 2018
 """
 
 # Part of py_depthsampling library
@@ -23,100 +23,87 @@ Function of the depth sampling pipeline.
 
 import numpy as np
 
-def funcSlctVrtcs(varNumCon,      # Number of conditions  #noqa
-                  lstDpthData01,  # List with depth-sampled data I
-                  aryRoiVrtx,     # Array with ROI definition (1st crit.)
-                  lgcSlct02,      # Criterion 2 - Yes or no?
-                  vecSlct02,      # Criterion 2 - Data
-                  varThrSlct02,   # Criterion 2 - Threshold
-                  lgcSlct03,      # Criterion 3 - Yes or no?
-                  arySlct03,      # Criterion 3 - Data
-                  varThrSlct03,   # Criterion 3 - Threshold
-                  lgcSlct04,      # Criterion 4 - Yes or no?
-                  arySlct04,      # Criterion 4 - Data
-                  varThrSlct04,     # Criterion 4 - Threshold
-                  lgcVtk02,       # Criterion 5 - Yes or no?
-                  lstDpthData02,  # Criterion 5 - VTK path
-                  varNumVrtx,     # Criterion 5 - Num vrtx to include
-                  lgcPeRng,       # Criterion 6 - Yes or no?
-                  varPeRngLw,     # Criterion 6 - Lower bound
-                  varPeRngUp,     # Criterion 6 - Upper bound
-                  idxPrc,         # Process ID (to manage status messages)
-                  ):
+
+def funcSlctVrtcs(varNumCon,           # Number of conditions
+                  lstDpthData01,       # List with depth-sampled data I
+                  lgcSlct01,           # Criterion 1 - Yes or no?
+                  aryRoiVrtx,          # Criterion 1 - Data (ROI)
+                  lgcSlct02,           # Criterion 2 - Yes or no?
+                  arySlct02,           # Criterion 2 - Data
+                  varThrSlct02,        # Criterion 2 - Threshold
+                  lgcSlct03,           # Criterion 3 - Yes or no?
+                  arySlct03,           # Criterion 3 - Data
+                  varThrSlct03,        # Criterion 3 - Threshold
+                  lgcSlct04,           # Criterion 4 - Yes or no?
+                  arySlct04,           # Criterion 4 - Data
+                  varThrSlct04,        # Criterion 4 - Threshold
+                  idxPrc):             # Process ID
     """Function for selecting vertices. See ds_main.py for more information."""
     # **************************************************************************
     # *** (1) Select vertices contained within the ROI
 
-    # Only print status messages if this is the first of several parallel
-    # processes:
-    if idxPrc == 0:
-        print('---------Select vertices contained within the ROI')
+    # Apply first selection criterion (ROI)?
+    if lgcSlct01:
 
-    # The second column of the array "aryRoiVrtx" contains the indicies of the
-    # vertices contained in the ROI. We extract that information:
-    vecRoiIdx = aryRoiVrtx[:, 1].astype(np.int64)
+        # Only print status messages if this is the first of several parallel
+        # processes:
+        if idxPrc == 0:
+            print('---------Select vertices contained within the ROI')
 
-    # Loop through conditions (corresponding to input files):
-    for idxIn in range(0, varNumCon):
+        # The second column of the array "aryRoiVrtx" contains the indicies of
+        # the vertices contained in the ROI. We extract that information:
+        vecRoiIdx = aryRoiVrtx[:, 1].astype(np.int64)
 
-        # Get array for current condition:
-        aryTmp = lstDpthData01[idxIn]
+        # Loop through conditions (corresponding to input files):
+        for idxIn in range(0, varNumCon):
 
-        # Get original number of vertices in vtk mesh:
-        varOrigNumVtkVrtc = aryTmp.shape[0]
+            # Get array for current condition:
+            aryTmp = lstDpthData01[idxIn]
 
-        # Selcet vertices that are included in the patch of interest:
-        aryTmp = aryTmp[vecRoiIdx, :]
+            # Get original number of vertices in vtk mesh:
+            varOrigNumVtkVrtc = aryTmp.shape[0]
 
-        # Put array back into list:
-        lstDpthData01[idxIn] = aryTmp
+            # Selcet vertices that are included in the patch of interest:
+            aryTmp = aryTmp[vecRoiIdx, :]
 
-    # Apply ROI selection to second set of vtk data:
-    if lgcVtk02:
+            # Put array back into list:
+            lstDpthData01[idxIn] = aryTmp
 
-            # Loop through conditions (corresponding to input files):
-            for idxIn in range(0, varNumCon):
+        # Initialise inclusion vector:
+        vecInc = np.ones((vecRoiIdx.shape[0]), dtype=bool)
 
-                # Get array for current condition:
-                aryTmp = lstDpthData02[idxIn]
+        # Initialise number of included vertices:
+        varNumInc = np.sum(vecInc)
 
-                # Selcet vertices that are included in the patch of interest:
-                aryTmp = aryTmp[vecRoiIdx, :]
-
-                # Put array back into list:
-                lstDpthData02[idxIn] = aryTmp
-
-    # Initialise dummy inclusion vector:
-    vecInc = np.ones((vecRoiIdx.shape[0]), dtype=bool)
-
-    # Initialise number of included vertices:
-    varNumInc = np.sum(vecInc)
-
-    # Only print status messages if this is the first of several parallel
-    # processes:
-    if idxPrc == 0:
-        print('------------Remaining vertices: ' + str(varNumInc))
+        # Only print status messages if this is the first of several parallel
+        # processes:
+        if idxPrc == 0:
+            print('------------Remaining vertices: ' + str(varNumInc))
     # **************************************************************************
 
     # **************************************************************************
-    # *** (2) Select vertices based on intensity criterion
+    # *** (2) Selection criterion 2
+    #         Vertices that are BELOW a certain threshold at any depth level
+    #         are excluded.
 
     if lgcSlct02:
 
         if idxPrc == 0:
-            print('---------Select vertices based on intensity criteria')
+            print('---------Select vertices based criterion 2 (vertices below '
+                  + 'threshold at any depth level will be excluded)')
 
-        # Previously, we selected those vertices in the data array that are
-        # contained within the ROI. In order to apply the intensity-criterion,
-        # we have to extract the data corresponding to the ROI from the
-        # intensity array (e.g. extract pRF-overlap-ratio data for the ROI).
+        # Get minimum value across cortical depths:
+        vecMinSlct02 = np.min(arySlct02, axis=1)
 
-        # Selcet vertices from patch-selection arrays:
+        # Check whether vertex values are above the exclusion threshold:
+        vecSlct02 = np.greater(vecMinSlct02, varThrSlct02)
+
+        # Extract values for ROI:
         vecSlct02 = vecSlct02[vecRoiIdx]
 
-        # Get indicies of vertices with value greater than the intensity
-        # criterion:
-        vecInc = np.greater_equal(vecSlct02, varThrSlct02)
+        # Apply second vertex selection criterion to inclusion-vector:
+        vecInc = np.logical_and(vecInc,
+                                vecSlct02)
 
         # Update number of included vertices:
         varNumInc = np.sum(vecInc)
@@ -128,15 +115,15 @@ def funcSlctVrtcs(varNumCon,      # Number of conditions  #noqa
     # **************************************************************************
 
     # **************************************************************************
-    # *** (3) Multi-depth level criterion I
+    # *** (3) Selection criterion 3
     #         Vertices that are BELOW a certain threshold at any depth level
     #         are excluded.
 
     if lgcSlct03:
 
         if idxPrc == 0:
-            print('---------Select vertices based on multi-depth level ' +
-                  'criterion I')
+            print('---------Select vertices based criterion 3 (vertices below '
+                  + 'threshold at any depth level will be excluded)')
 
         # Get minimum value across cortical depths:
         vecMinSlct03 = np.min(arySlct03, axis=1)
@@ -161,14 +148,15 @@ def funcSlctVrtcs(varNumCon,      # Number of conditions  #noqa
     # **************************************************************************
 
     # **************************************************************************
-    # *** (4) Multi-depth level criterion II
-    #         vertices BELOW threshold at any depth level are excluded.
+    # *** (2) Selection criterion 4
+    #         Vertices that are BELOW a certain threshold at any depth level
+    #         are excluded.
 
     if lgcSlct04:
 
         if idxPrc == 0:
-            print('---------Select vertices based on multi-depth level ' +
-                  'criterion II')
+            print('---------Select vertices based criterion 4 (vertices below '
+                  + 'threshold at any depth level will be excluded)')
 
         # Get minimum value across cortical depths:
         vecMinSlct04 = np.min(arySlct04, axis=1)
@@ -211,209 +199,7 @@ def funcSlctVrtcs(varNumCon,      # Number of conditions  #noqa
         lstDpthData01[idxIn] = aryTmp
     # **************************************************************************
 
-    # **************************************************************************
-    # *** (5) Multi-level data distribution criterion I
-    #         Selection based on combination of z-conjunction-mask mask and
-    #         distribution of parameter values (e.g. z-values, R2, ...).
-
-    if lgcVtk02:
-
-        if idxPrc == 0:
-            print('---------Vertex selection based on distribution of '
-                  + 'parameter values.')
-
-        # The second set of depth-data (e.g. the z-scores) need to be put into
-        # the same shape as the first set of depth-data (i.e. the parameter
-        # estimates). In other words, the same exclusion criteria have to be
-        # applied to both data sets:
-
-        # Loop through conditions (corresponding to input files):
-        for idxIn in range(0, varNumCon):
-
-            # Get array for current condition:
-            aryTmp = lstDpthData02[idxIn]
-
-            # Selcet vertices that survived all previous inclusion criteria:
-            aryTmp = aryTmp[vecInc, :]
-
-            # Put array back into list:
-            lstDpthData02[idxIn] = aryTmp
-
-        # Get minimum data value (e.g. z score) across conditions
-
-        # Array for entire depth data, of the form
-        # aryDpthData02[condition, vertex, depthlevel]
-        aryDpthData02 = np.zeros((varNumCon,
-                                  lstDpthData02[0].shape[0],
-                                  lstDpthData02[0].shape[1]))
-
-        # Loop through conditions (corresponding to input files):
-        for idxIn in range(0, varNumCon):
-
-            # Get array for current condition:
-            aryDpthData02[idxIn, :, :] = lstDpthData02[idxIn]
-
-        if idxPrc == 0:
-            print('------------Attempting to select ' + str(varNumVrtx)
-                  + ' vertices')
-
-        # Initial value for number of included vertices:
-        varNumIncTmp = varNumInc
-
-        # Selection based on absolute values (in order to include negative
-        # signal changes):
-        aryDpthData02 = np.absolute(aryDpthData02)
-        print('*** WARNING: Selection based on ABSOLUTE values. ***')
-
-        # Initial value for z-conjunction threshold:
-        varThrZcon = 0.0
-
-        # If we attempt to select more vertices than have survived all
-        # inclusion criteria until now, the following while-loop will be
-        # skipped. We create a dummy-version of the vector that would have
-        # been created in the while-loop (all 'columns' that have survived
-        # until now are also included after this criterion has been applied).
-        if not(np.greater(varNumIncTmp, varNumVrtx)):
-            vecLgcZconAny = np.ones(np.sum(vecInc), dtype=bool)
-
-        # We increase the z conjunction threshold until we have reached the
-        # number of vertices we would like to inlcude:
-        while np.greater(varNumIncTmp, varNumVrtx):
-
-            # Increase z-conjunction-threshold for next interation of the
-            # while-loop:
-            varThrZcon = varThrZcon + 0.0001
-
-            # Create boolean array for z-conjunction criterion:
-            aryLgcZcon = np.ones((lstDpthData02[0].shape[0],
-                                  lstDpthData02[0].shape[1]),
-                                 dtype=bool)
-
-            # List for logical arrays (for testing whether the vertex exceeds
-            # the threshold in all conditions):
-            lstLgcZcon = [None] * varNumCon
-
-            # Test whether vertex exceeds threshold (separately for each
-            # condition):
-            for idxIn in range(0, varNumCon):
-                lstLgcZcon[idxIn] = np.greater_equal(aryDpthData02[idxIn],
-                                                     varThrZcon)
-
-            # Create conjunction by multipying all logical test results:
-            for idxIn in range(0, varNumCon):
-                aryLgcZcon = np.multiply(lstLgcZcon[idxIn],
-                                         aryLgcZcon)
-
-            # In order to base the selection on the mean (instead of minimum)
-            # across the column, comment out the previous lines and un-comment
-            # the following:
-            # aryLgcZcon = np.greater_equal(np.mean(aryDpthData02, axis=0),
-            #                               varThrZcon)
-
-            # At this point, aryLgcZcon holds the information whether each
-            # vertex exceeds the z-threshold in all conditions, separately for
-            # each depth level. Next, we test for each 'column' whether this
-            # z-conjunction condition is fulfilled at least at one depth level
-            # (we take the maximum across depth level):
-            vecLgcZconAny = np.max(aryLgcZcon, axis=1)
-
-            # Update number of included vertices:
-            varNumIncTmp = np.sum(vecLgcZconAny)
-
-        if idxPrc == 0:
-            print('------------Selected ' + str(varNumIncTmp) + ' vertices, '
-                  + 'based on a z-conjunction-threshold of ' + str(varThrZcon))
-
-        # Apply z-conjunction criterion on first set of depth-data (i.e.
-        # parameter estimates):
-
-        # Loop through conditions (corresponding to input files):
-        for idxIn in range(0, varNumCon):
-
-            # Get array for current condition:
-            aryTmp = lstDpthData01[idxIn]
-
-            # Put array back into list:
-            lstDpthData01[idxIn] = aryTmp[vecLgcZconAny, :]
-    # **************************************************************************
-
-    # **************************************************************************
-    # *** (6) Multi-level data distribution criterion II
-    #         Excludes vertices whose across-depth-maximum-value is at the
-    #         lower and/or upper end of the distribution across vertices.
-    #         (E.g. percentile of parameter estimates.)
-
-    if lgcPeRng:
-
-        if idxPrc == 0:
-            print('---------Select vertices based on multi-depth data ' +
-                  'distribution criterion (e.g. percentile of parameter ' +
-                  'estimates)')
-
-        # Get maximum PE value across depth levels
-
-        # Loop through conditions (corresponding to input files):
-        for idxIn in range(0, varNumCon):
-
-            # Get array for current condition:
-            aryTmp = lstDpthData01[idxIn]
-
-            # On first iteration of the loop, create array for maxium PE values
-            # across depth:
-            if idxIn == 0:
-                vecPeMax = np.zeros(aryTmp.shape[0])
-
-            # Maximum PE across depths:
-            vecPeMaxTmp = np.max(aryTmp, axis=1)
-
-            # Check whether values in current PE file are greater than maximum
-            # so far:
-            vecLgcTmp = np.greater(vecPeMaxTmp, vecPeMax)
-
-            # Update maximum PE vector:
-            vecPeMax[vecLgcTmp] = vecPeMaxTmp[vecLgcTmp]
-
-        # Lower percentile & indicies of vertices above:
-        varPrctlLw = np.percentile(vecPeMax, varPeRngLw)
-        vecLgcLw = np.greater_equal(vecPeMax, varPrctlLw)
-
-        # Upper percentile:
-        varPrctlUp = np.percentile(vecPeMax, varPeRngUp)
-        vecLgcUp = np.less_equal(vecPeMax, varPrctlUp)
-
-        # Conjunction of the two criteria:
-        vecLgcPrctl = np.logical_and(vecLgcLw, vecLgcUp)
-
-        # Select vertices that fulfill the PE range criterion
-
-        # Number of vertices before exclusion:
-        varTmp01 = aryTmp.shape[0]
-
-        # Loop through conditions (corresponding to input files):
-        for idxIn in range(0, varNumCon):
-
-            # Get array for current condition:
-            aryTmp = lstDpthData01[idxIn]
-
-            # Put array back into list:
-            lstDpthData01[idxIn] = aryTmp[vecLgcPrctl, :]
-
-        # Number of vertices after exclusion:
-        varTmp02 = lstDpthData01[0].shape[0]
-
-        # Number of excluded varticies:
-        varTmp03 = np.subtract(varTmp01, varTmp02)
-
-        # Ratio of vertices excluded:
-        varTmp04 = np.around(np.multiply(np.divide(float(varTmp03),
-                                                   float(varTmp01)),
-                                         100.0),
-                             decimals=1)
-
-        if idxPrc == 0:
-            print(('------------Excluded ' + str(varTmp03) + ' vertices out '
-                   + 'of ' + str(varTmp01) + ', i.e. ' + str(varTmp04) + '%'))
-    # **************************************************************************
+# TODO
 
     # **************************************************************************
     # *** Update inclusion vector

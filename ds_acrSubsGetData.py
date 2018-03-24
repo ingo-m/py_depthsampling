@@ -23,53 +23,47 @@ Function of the depth sampling pipeline.
 
 import numpy as np  # noqa
 from ds_loadCsvRoi import funcLoadCsvRoi
-from ds_loadVtkSingle import funcLoadVtkSingle
+# from ds_loadVtkSingle import funcLoadVtkSingle
 from ds_loadVtkMulti import funcLoadVtkMulti
 from ds_slctVrtcs import funcSlctVrtcs
 from ds_crtVtkMsk import funcCrtVtkMsk
 from ds_pltAcrDpth import funcPltAcrDpth
 
 
-def funcAcrSubGetSubsData(idxPrc,        # Process ID  #noqa
-                          strSubId,      # Data struc - Subject ID
-                          lstVtkDpth01,  # Data struc - Pth vtk I
-                          strCsvRoi,     # Data struc - ROI CSV fle
-                          varNumDpth,    # Data struc - Num. depth levels
-                          varNumHdrRoi,  # Data struc - Header lines CSV
-                          strPrcdData,   # Data struc - Str. prcd. VTK data
-                          varNumLne,     # Data struc - Lns. prcd. data VTK
-                          lgcSlct02,     # Criterion 2 - Yes or no?
-                          strVtkSlct02,  # Criterion 2 - VTK path
-                          varThrSlct02,  # Criterion 2 - Threshold
-                          lgcSlct03,     # Criterion 3 - Yes or no?
-                          strVtkSlct03,  # Criterion 3 - VTK path
-                          varThrSlct03,  # Criterion 3 - Threshold
-                          lgcSlct04,     # Criterion 4 - Yes or no?
-                          strVtkSlct04,  # Criterion 4 - VTK path
-                          varThrSlct04,  # Criterion 4 - Threshold
-                          lgcVtk02,      # Criterion 5 - Yes or no?
-                          lstVtkDpth02,  # Criterion 5 - VTK path
-                          varNumVrtx,    # Criterion 5 - Num vrtx to include
-                          lgcPeRng,      # Criterion 6 - Yes or no?
-                          varPeRngLw,    # Criterion 6 - Lower limit
-                          varPeRngUp,    # Criterion 6 - Upper limit
-                          lgcNormDiv,    # Normalisation - Yes or no?
-                          varNormIdx,    # Normalisation - Which reference
-                          varDpi,        # Plot - dots per inch
-                          varYmin,       # Plot - Minimum of Y axis
-                          varYmax,       # Plot - Maximum of Y axis
-                          lstConLbl,     # Plot - Condition labels
-                          strXlabel,     # Plot - X axis label
-                          strYlabel,     # Plot - Y axis label
-                          strTitle,      # Plot - Title
-                          strPltOtPre,   # Plot - Output file path prefix
-                          strPltOtSuf,   # Plot - Output file path suffix
-                          queOut,        # Queue for output list
-                          ):
+def funcAcrSubGetSubsData(idxPrc,              # Process ID
+                          strSubId,            # Data struc - Subject ID
+                          lstVtkDpth01,        # Data struc - Pth vtk I
+                          varNumDpth,          # Data struc - Num. depth levels
+                          strPrcdData,         # Data struc - Str prcd VTK data
+                          varNumLne,           # Data struc - Lns prcd data VTK
+                          lgcSlct01,           # Criterion 1 - Yes or no?
+                          strCsvRoi,           # Criterion 1 - CSV path
+                          varNumHdrRoi,        # Criterion 1 - Header lines
+                          lgcSlct02,           # Criterion 2 - Yes or no?
+                          strVtkSlct02,        # Criterion 2 - VTK path
+                          varThrSlct02,        # Criterion 2 - Threshold
+                          lgcSlct03,           # Criterion 3 - Yes or no?
+                          strVtkSlct03,        # Criterion 3 - VTK path
+                          varThrSlct03,        # Criterion 3 - Threshold
+                          lgcSlct04,           # Criterion 4 - Yes or no?
+                          strVtkSlct04,        # Criterion 4 - VTK path
+                          varThrSlct04,        # Criterion 4 - Threshold
+                          lgcNormDiv,          # Normalisation - Yes or no?
+                          varNormIdx,          # Normalisation - Reference
+                          varDpi,              # Plot - Dots per inch
+                          varYmin,             # Plot - Minimum of Y axis
+                          varYmax,             # Plot - Maximum of Y axis
+                          lstConLbl,           # Plot - Condition labels
+                          strXlabel,           # Plot - X axis label
+                          strYlabel,           # Plot - Y axis label
+                          strTitle,            # Plot - Title
+                          strPltOtPre,         # Plot - Output file path prefix
+                          strPltOtSuf,         # Plot - Output file path suffix
+                          queOut):             # Queue for output list
     """
     Obtaining & plotting single subject data for across subject analysis.
 
-    This function loads the data for each subject in an across subject analysis
+    This function loads the data for each subject for a multi-subject analysis
     and passes the data to the parent function for visualisation.
     """
     # Only print status messages if this is the first of several parallel
@@ -81,20 +75,27 @@ def funcAcrSubGetSubsData(idxPrc,        # Process ID  #noqa
     # *** Import data
 
     # Import CSV file with ROI definition
-    if idxPrc == 0:
-        print('---------Importing CSV file with ROI definition (first '
-              + 'criterion)')
-    aryRoiVrtx = funcLoadCsvRoi(strCsvRoi, varNumHdrRoi)
-
-    # Import second criterion vtk file (one depth level)
-    if lgcSlct02:
+    if lgcSlct01:
         if idxPrc == 0:
-            print('---------Importing second criterion vtk file (one depth '
-                  + 'level).')
-        vecSlct02 = funcLoadVtkSingle(strVtkSlct02, strPrcdData, varNumLne)
+            print('---------Importing CSV file with ROI definition (first '
+                  + 'criterion)')
+        aryRoiVrtx = funcLoadCsvRoi(strCsvRoi, varNumHdrRoi)
     # Otherwise, create dummy vector (for function I/O)
     else:
-        vecSlct02 = 0
+        aryRoiVrtx = 0
+
+    # Import second criterion vtk file (all depth levels)
+    if lgcSlct02:
+        if idxPrc == 0:
+            print('---------Importing second criterion vtk file (all depth '
+                  + 'levels).')
+        arySlct02 = funcLoadVtkMulti(strVtkSlct02,
+                                     strPrcdData,
+                                     varNumLne,
+                                     varNumDpth)
+    # Otherwise, create dummy vector (for function I/O)
+    else:
+        arySlct02 = 0
 
     # Import third criterion vtk file (all depth levels)
     if lgcSlct03:
@@ -122,9 +123,9 @@ def funcAcrSubGetSubsData(idxPrc,        # Process ID  #noqa
     else:
         arySlct04 = 0
 
-    # Import first set of data vtk files
+    # Import depth data vtk files
     if idxPrc == 0:
-        print('---------Importing first set of data vtk files.')
+        print('---------Importing depth data vtk files.')
     # Number of input files (i.e. number of conditions):
     varNumCon = len(lstVtkDpth01)
     # List for input data:
@@ -139,54 +140,28 @@ def funcAcrSubGetSubsData(idxPrc,        # Process ID  #noqa
         if idxPrc == 0:
             print('------------File ' + str(idxIn + 1) + ' out of '
                   + str(varNumCon))
-
-    # Import second set of data vtk files
-    if lgcVtk02:
-        if idxPrc == 0:
-            print('---------Importing second set of data vtk files.')
-        # Number of input files (i.e. number of conditions):
-        varNumCon = len(lstVtkDpth02)
-        # List for input data:
-        lstDpthData02 = [None] * varNumCon
-        # Loop through input data files:
-        for idxIn in range(0, varNumCon):
-            # Import data from file:
-            lstDpthData02[idxIn] = funcLoadVtkMulti(lstVtkDpth02[idxIn],
-                                                    strPrcdData,
-                                                    varNumLne,
-                                                    varNumDpth)
-            if idxPrc == 0:
-                print('------------File ' + str(idxIn + 1) + ' out of '
-                      + str(varNumCon))
-    # Otherwise, create dummy array (for function I/O):
-    else:
-        lstDpthData02 = 0
     # **************************************************************************
 
     # **************************************************************************
     # *** Select vertices
 
     lstDpthData01, varNumInc, varThrZcon, vecInc = \
-        funcSlctVrtcs(varNumCon,      # Number of conditions
-                      lstDpthData01,  # List with depth-sampled data I
-                      aryRoiVrtx,     # Array with ROI definition (1st crit.)
-                      lgcSlct02,      # Criterion 2 - Yes or no?
-                      vecSlct02,      # Criterion 2 - Data
-                      varThrSlct02,   # Criterion 2 - Threshold
-                      lgcSlct03,      # Criterion 3 - Yes or no?
-                      arySlct03,      # Criterion 3 - Data
-                      varThrSlct03,   # Criterion 3 - Threshold
-                      lgcSlct04,      # Criterion 4 - Yes or no?
-                      arySlct04,      # Criterion 4 - Data
-                      varThrSlct04,   # Criterion 4 - Threshold
-                      lgcVtk02,       # Criterion 5 - Yes or no?
-                      lstDpthData02,  # Criterion 5 - Depth-sampled data II
-                      varNumVrtx,     # Criterion 5 - Num vrtx to include
-                      lgcPeRng,       # Criterion 6 - Yes or no?
-                      varPeRngLw,     # Criterion 6 - Lower bound
-                      varPeRngUp,     # Criterion 6 - Upper bound
-                      idxPrc,         # Process ID (to manage status messages)
-                      )
+        funcSlctVrtcs(varNumCon,           # Number of conditions
+                      lstDpthData01,       # List with depth-sampled data I
+                      lgcSlct01,           # Criterion 1 - Yes or no?
+                      strCsvRoi,           # Criterion 1 - CSV path
+                      aryRoiVrtx,          # Criterion 1 - Data (ROI)
+                      varNumHdrRoi,        # Criterion 1 - Header lines
+                      lgcSlct02,           # Criterion 2 - Yes or no?
+                      arySlct02,           # Criterion 2 - Data
+                      varThrSlct02,        # Criterion 2 - Threshold
+                      lgcSlct03,           # Criterion 3 - Yes or no?
+                      arySlct03,           # Criterion 3 - Data
+                      varThrSlct03,        # Criterion 3 - Threshold
+                      lgcSlct04,           # Criterion 4 - Yes or no?
+                      arySlct04,           # Criterion 4 - Data
+                      varThrSlct04,        # Criterion 4 - Threshold
+                      idxPrc)              # Process ID
     # **************************************************************************
 
     # **************************************************************************

@@ -109,17 +109,22 @@ def funcCrtVtkMsk(strSubId,      # Data struc - Subject ID
     # Change default lookup table:
     lstVtkData[(varIdxPreData + 1)] = 'LOOKUP_TABLE viridis'
 
-    # Replace vertex data points with inclusion vector:
+    # TODO: Make this section more elegant.
 
-    # The vertex selection procedure (the result of which is vecInc) is only
-    # carried out within the ROI as specified by the CSV file supplied for the
-    # depth sampling. Therefore, we need the indicies of the vertices that are
-    # within the ROI. All verticies that are not in the ROI are not considered
-    # for depth sampling, and are therefore set to zero here. The indicies of
-    # the vertices that are included in the ROI are in the second (i.e.
-    # index=1) column of aryRoiVrtx (i.e. the indicies relative to the full
-    # vtk mesh).
-    vecRoiVrtx = aryRoiVrtx[:, 1].astype(np.uint32)
+    # If no ROI mask is provided, 'aryRoiVrtx' is set to zero, and we cannot
+    # use its values.
+    try:
+        # If a ROI mask is provided (in form of a CSV file), the vertex
+        # selection procedure (the result of which is vecInc) is only carried
+        # out within the ROI. Therefore, we need the indicies of the vertices
+        # that are within the ROI. All verticies that are not in the ROI are not
+        # considered for depth sampling, and are therefore set to zero here. The
+        # indicies of the vertices that are included in the ROI are in the
+        # second (i.e. index=1) column of aryRoiVrtx (i.e. the indicies relative
+        # to the full vtk mesh).
+        vecRoiVrtx = aryRoiVrtx[:, 1].astype(np.uint32)
+    except:
+        vecRoiVrtx = np.arange(varNumDataVrtx, dtype=np.uint32)
 
     # Since the output is supposed to be float, we have to change vecInc from
     # boolean to float:

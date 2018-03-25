@@ -82,7 +82,7 @@ strVtkDpth01 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/{}_pe
 
 # (1)
 # Restrict vertex selection to region of interest (ROI)?
-lgcSlct01 = True
+lgcSlct01 = False
 # Base path of csv files with ROI definition (i.e. patch of cortex selected on
 # the surface, e.g. V1 or V2) - i.e. the first vertex selection criterion (with
 # subject ID, hemisphere, and ROI left open):

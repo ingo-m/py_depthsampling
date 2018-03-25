@@ -219,8 +219,8 @@ def funcPltAcrSubsMean(arySubDpthMns,
 
     # Set x & y tick font size:
     axs01.tick_params(labelsize=36,
-                      top='off',
-                      right='off')
+                      top=False,
+                      right=False)
 
     # Adjust labels:
     axs01.set_xlabel(strXlabel,

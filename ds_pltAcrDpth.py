@@ -22,6 +22,8 @@ Function of the depth sampling pipeline.
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np  # noqa
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 
@@ -267,8 +269,8 @@ def funcPltAcrDpth(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
 
     # Set x & y tick font size:
     axs01.tick_params(labelsize=36,
-                      top='off',
-                      right='off')
+                      top=False,
+                      right=False)
 
     # Adjust labels:
     axs01.set_xlabel(strXlabel,

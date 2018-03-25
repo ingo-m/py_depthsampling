@@ -82,7 +82,7 @@ strVtkDpth01 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/{}_pe
 
 # (1)
 # Restrict vertex selection to region of interest (ROI)?
-lgcSlct01 = True  # TODO not implemented yet (will not work if `False`)
+lgcSlct01 = True
 # Base path of csv files with ROI definition (i.e. patch of cortex selected on
 # the surface, e.g. V1 or V2) - i.e. the first vertex selection criterion (with
 # subject ID, hemisphere, and ROI left open):
@@ -231,7 +231,7 @@ for idxSub in range(0, varNumSubs):
                          strPrcdData,         # Data struc - Str prcd VTK data
                          varNumLne,           # Data struc - Lns prcd data VTK
                          lgcSlct01,           # Criterion 1 - Yes or no?
-                         strCsvRoi,           # Criterion 1 - CSV path
+                         strCsvRoiTmp,        # Criterion 1 - CSV path
                          varNumHdrRoi,        # Criterion 1 - Header lines
                          lgcSlct02,           # Criterion 2 - Yes or no?
                          strVtkSlct02Tmp,     # Criterion 2 - VTK path

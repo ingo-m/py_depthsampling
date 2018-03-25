@@ -145,13 +145,11 @@ def funcAcrSubGetSubsData(idxPrc,              # Process ID
     # **************************************************************************
     # *** Select vertices
 
-    lstDpthData01, varNumInc, varThrZcon, vecInc = \
+    lstDpthData01, varNumInc, vecInc = \
         funcSlctVrtcs(varNumCon,           # Number of conditions
                       lstDpthData01,       # List with depth-sampled data I
                       lgcSlct01,           # Criterion 1 - Yes or no?
-                      strCsvRoi,           # Criterion 1 - CSV path
                       aryRoiVrtx,          # Criterion 1 - Data (ROI)
-                      varNumHdrRoi,        # Criterion 1 - Header lines
                       lgcSlct02,           # Criterion 2 - Yes or no?
                       arySlct02,           # Criterion 2 - Data
                       varThrSlct02,        # Criterion 2 - Threshold
@@ -261,8 +259,7 @@ def funcAcrSubGetSubsData(idxPrc,              # Process ID
     strTitleTmp = (strTitle
                    + ', '
                    + str(varNumInc)
-                   + ' vertices, z>'
-                   + str(np.around(varThrZcon, decimals=2)))
+                   + ' vertices')
 
     funcPltAcrDpth(aryDpthMean,  # Data: aryData[Condition, Depth]
                    aryDpthConf,  # Error shading: aryError[Condition, Depth]

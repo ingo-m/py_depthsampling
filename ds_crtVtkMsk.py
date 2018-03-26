@@ -25,26 +25,13 @@ import csv
 import os
 import numpy as np  #noqa
 
-#strSubId = '20150930'
-#strVtkDpth01 = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/lh/20150930_mp2rage_seg_v24_lh__surf_05_inf_pe_stim_lvl_01.vtk'
-#strPrcdData = 'SCALARS'
-#varNumLne = 2
-#varNumHdrRoi = 1
-#strCsvRoi = '/media/sf_D_DRIVE/MRI_Data_PhD/04_ParCon/20150930/cbs_distcor/lh/v1.csv'
-#vecInc = np.ones(9049)
-
-#from ds_loadCsvRoi import funcLoadCsvRoi
-#aryRoiVrtx = funcLoadCsvRoi(strCsvRoi, varNumHdrRoi)
-
 
 def funcCrtVtkMsk(strSubId,      # Data struc - Subject ID
                   strVtkDpth01,  # Data struc - Path first data vtk file
                   strPrcdData,   # Data struc - Str. prcd. VTK data
                   varNumLne,     # Data struc - Lns. prcd. data VTK
                   strCsvRoi,     # Data struc - ROI CSV fle (for output naming)
-                  aryRoiVrtx,    # Array with ROI definition (1st crit.)
-                  vecInc,        # Vertex inclusion vector
-                  ):
+                  vecInc):       # Vertex inclusion vector
     """
     Create surface mask for selected vertices.
 
@@ -104,47 +91,24 @@ def funcCrtVtkMsk(strSubId,      # Data struc - Subject ID
     # datatype as float (integer type would be sufficient, but we keep it as
     # float for consistency), followed by the number of data points per vertex
     # (which is one data point per vertex).
-    lstVtkData[varIdxPreData] = (strPrcdData + ' SurfaceMask ' + 'float 1')
+    lstVtkData[varIdxPreData] = (strPrcdData + ' ROI_MASK ' + 'float 1')
 
     # Change default lookup table:
     lstVtkData[(varIdxPreData + 1)] = 'LOOKUP_TABLE viridis'
-
-    # Replace vertex data points with inclusion vector:
-
-    # The vertex selection procedure (the result of which is vecInc) is only
-    # carried out within the ROI as specified by the CSV file supplied for the
-    # depth sampling. Therefore, we need the indicies of the vertices that are
-    # within the ROI. All verticies that are not in the ROI are not considered
-    # for depth sampling, and are therefore set to zero here. The indicies of
-    # the vertices that are included in the ROI are in the second (i.e.
-    # index=1) column of aryRoiVrtx (i.e. the indicies relative to the full
-    # vtk mesh).
-    vecRoiVrtx = aryRoiVrtx[:, 1].astype(np.uint32)
-
-    # Since the output is supposed to be float, we have to change vecInc from
-    # boolean to float:
-    vecInc = vecInc.astype(np.float32)
-
-    # Index for accessing the verticies included in the CSV ROI:
-    varCount = 0
 
     # Loop through vertices and replace values:
     # for idxVrtx in range(varIdxFrst, (varIdxFrst + varNumDataVrtx)):
     for idxVrtx in range(0, varNumDataVrtx):
 
-        # If the vertex with the current index is within the ROI (as defined
-        # by the CSV file), we replace its data value with the value in the
-        # inclusion vector vecInc (i.e. one or zero):
-        if idxVrtx in vecRoiVrtx:
+        # If the vertex with the current index is supposed to be included, we
+        # set its value to one:
+        if vecInc[idxVrtx]:
             # Since the header and the section with the vertex coordinates
             # precedes the numeric vertex data, we have to add the row number
             # of the first numeric data point to the index:
-            lstVtkData[(idxVrtx + varIdxFrst)] = \
-                str(np.around(vecInc[varCount], decimals=1))
-            varCount = varCount + 1
-        # If the current vertex is not in the ROI (as defined by the CSV
-        # file), it can by definition also not considered for depth sampling,
-        # so we set its value to zero:
+            lstVtkData[(idxVrtx + varIdxFrst)] = '1.0'
+        # If the current vertex is not to be included, we set its value to
+        # zero:
         else:
             lstVtkData[(idxVrtx + varIdxFrst)] = '0.0'
     # *************************************************************************

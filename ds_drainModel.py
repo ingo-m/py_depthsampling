@@ -111,22 +111,25 @@ from ds_findPeak import find_peak
 # *** Define parameters
 
 # Which draining model to use (1, 2, 3, 4, 5, or 6 - see above for details):
-varMdl = 6
+varMdl = 1
 
-# ROI (V1 or V2):
+# ROI ('v1' or 'v2'):
 strRoi = 'v1'
 
+# Hemisphere ('rh' or 'lh'):
+strHmsph = 'rh'
+
 # Path of depth-profile to correct:
-strPthPrf = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}.npy'  #noqa
-strPthPrf = strPthPrf.format(strRoi)
+strPthPrf = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}_{}.npy'  #noqa
+strPthPrf = strPthPrf.format(strRoi, strHmsph)
 
 # Output path for corrected depth-profiles:
-strPthPrfOt = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/{}_corrected_model_{}.npy'  #noqa
-strPthPrfOt = strPthPrfOt.format(strRoi, str(varMdl))
+strPthPrfOt = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}_{}_corrected_model_{}.npy'  #noqa
+strPthPrfOt = strPthPrfOt.format(strRoi, strHmsph, str(varMdl))
 
 # Output path & prefix for plots:
-strPthPltOt = '/home/john/PhD/Tex/deconv/{}_model_{}/deconv_{}_m{}_'  #noqa
-strPthPltOt = strPthPltOt.format(strRoi, str(varMdl), strRoi, str(varMdl))
+strPthPltOt = '/home/john/PhD/PacMan_Plots/deconv/deconv_{}_{}_model_{}_'  #noqa
+strPthPltOt = strPthPltOt.format(strRoi, strHmsph, str(varMdl))
 
 # File type suffix for plot:
 strFlTp = '.svg'
@@ -135,21 +138,23 @@ strFlTp = '.svg'
 varDpi = 80.0
 
 # Limits of y-axis for across subject plot:
-varAcrSubsYmin01 = -0.05
-varAcrSubsYmax01 = 2.2
-varAcrSubsYmin02 = -0.05
-varAcrSubsYmax02 = 2.2
 # varAcrSubsYmin01 = -0.05
-# varAcrSubsYmax01 = 800.0
+# varAcrSubsYmax01 = 2.2
 # varAcrSubsYmin02 = -0.05
-# varAcrSubsYmax02 = 800.0
+# varAcrSubsYmax02 = 2.2
+varAcrSubsYmin01 = -500.0
+varAcrSubsYmax01 = 0.0
+varAcrSubsYmin02 = -300.0
+varAcrSubsYmax02 = 0.0
 
 # Label for axes:
 strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'fMRI signal change [arbitrary units]'
 
 # Condition labels:
-lstConLbl = ['2.5%', '6.1%', '16.3%', '72.0%']
+lstConLbl = ['PacMan Dynamic',
+             'Control Dynamic',
+             'PacMan Static']
 
 # Number of resampling iterations for peak finding (for models 1, 2, and 3) or
 # random noise samples (models 4 and 5):
@@ -537,7 +542,7 @@ if (varMdl != 4) and (varMdl != 5) and (varMdl != 6):
                        strTmpTtl,
                        strTmpPth,
                        strFlTp,
-                       strErr='sd',
+                       strErr='sem',
                        vecX=vecPosEmp)
 
     # Across-subjects mean after deconvolution:
@@ -556,7 +561,7 @@ if (varMdl != 4) and (varMdl != 5) and (varMdl != 6):
                        strTmpTtl,
                        strTmpPth,
                        strFlTp,
-                       strErr='sd',
+                       strErr='sem',
                        vecX=vecIntpEqui)
 
 elif varMdl == 4:

@@ -52,13 +52,16 @@ print('-Visualisation of depth sampling results')
 # *** Define parameters
 
 # Region of interest ('v1' or 'v2'):
-strRoi = 'v1'
+strRoi = 'v2'
 
 # Hemisphere ('lh' or 'rh'):
 strHmsph = 'rh'
 
 # List of subject identifiers:
-lstSubIds = ['20180111',
+lstSubIds = ['20171109',
+             '20171211',
+             '20171213',
+             '20180111',
              '20180118']
 
 # Condition levels (used to complete file names):
@@ -82,7 +85,7 @@ strVtkDpth01 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/{}_pe
 
 # (1)
 # Restrict vertex selection to region of interest (ROI)?
-lgcSlct01 = False
+lgcSlct01 = True
 # Base path of csv files with ROI definition (i.e. patch of cortex selected on
 # the surface, e.g. V1 or V2) - i.e. the first vertex selection criterion (with
 # subject ID, hemisphere, and ROI left open):
@@ -158,7 +161,7 @@ strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'fMRI signal [a.u.]'
 
 # Output path for plots - prefix:
-strPltOtPre = '/media/john/PhD/PacMan_Plots/pe/plots_{}/'.format(strRoi)
+strPltOtPre = '/home/john/PhD/PacMan_Plots/pe/plots_{}/'.format(strRoi)
 
 # Output path for plots - suffix:
 strPltOtSuf = '_{}_{}_{}.png'.format(strHmsph, strRoi, lstCon[0])
@@ -177,7 +180,7 @@ varNormIdx = 0
 lgcNormDiv = False
 
 # Output path for depth samling results (within subject means):
-strDpthMeans = '/media/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}_{}.npy'.format(strRoi, strHmsph)  #noqa
+strDpthMeans = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}_{}.npy'.format(strRoi, strHmsph)  #noqa
 
 # Maximum number of processes to run in parallel: *** NOT IMPLEMENTED
 # varPar = 10

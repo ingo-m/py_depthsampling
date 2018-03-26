@@ -45,30 +45,6 @@ def funcSlctVrtcs(varNumCon,           # Number of conditions
     # Original number of vertices in mesh:
     varOrigNumVtkVrtc = lstDpthData01[0].shape[0]
 
-    #print('print(varOrigNumVtkVrtc)')
-    #print(varOrigNumVtkVrtc)
-
-    #print('print(lstDpthData01[0].shape)')
-    #print(lstDpthData01[0].shape)
-
-    #print('print(arySlct02.shape)')
-    #print(arySlct02.shape)
-
-    #print('print(aryRoiVrtx.shape)')
-    #print(aryRoiVrtx.shape)
-
-    #print(varOrigNumVtkVrtc)
-    #294242
-
-    #print(lstDpthData01[0].shape)
-    #(294242, 11)
-
-    #print(arySlct02.shape)
-    #(294242, 11)
-
-    #print(aryRoiVrtx.shape)
-    #(9527, 5)
-
     # Only print status message if this is the first of several parallel
     # processes:
     if idxPrc == 0:

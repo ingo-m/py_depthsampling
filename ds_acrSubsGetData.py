@@ -175,7 +175,6 @@ def funcAcrSubGetSubsData(idxPrc,              # Process ID
                   strPrcdData,      # Data struc - Str. prcd. VTK data
                   varNumLne,        # Data struc - Lns. prcd. data VTK
                   strCsvRoi,        # Data struc - ROI CSV fle (outpt. naming)
-                  aryRoiVrtx,       # Array with ROI definition (1st crit.)
                   vecInc)           # Vector with included vertices
     # **************************************************************************
 

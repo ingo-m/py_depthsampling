@@ -117,7 +117,7 @@ varMdl = 1
 strRoi = 'v1'
 
 # Hemisphere ('rh' or 'lh'):
-strHmsph = 'rh'
+strHmsph = 'lh'
 
 # Path of depth-profile to correct:
 strPthPrf = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}_{}.npy'  #noqa
@@ -132,7 +132,7 @@ strPthPltOt = '/home/john/PhD/PacMan_Plots/deconv/deconv_{}_{}_model_{}_'  #noqa
 strPthPltOt = strPthPltOt.format(strRoi, strHmsph, str(varMdl))
 
 # File type suffix for plot:
-strFlTp = '.svg'
+strFlTp = '.png'
 
 # Figure scaling factor:
 varDpi = 80.0

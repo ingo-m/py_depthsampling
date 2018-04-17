@@ -90,14 +90,13 @@ def funcSlctVrtcs(varNumCon,           # Number of conditions
 
     # **************************************************************************
     # *** (2) Selection criterion 2
-    #         Vertices that are BELOW a certain threshold at any depth level
-    #         are excluded.
+    #         Vertices that are BELOW a certain threshold are excluded - mean
+    #         across depth levels.
 
     if lgcSlct02:
 
         if idxPrc == 0:
-            print('---------Select vertices based on criterion 2 (vertices '
-                  + 'below threshold at any depth level will be excluded)')
+            print('---------Select vertices based on criterion 2')
 
         # Get mean value across cortical depths:
         vecMneSlct02 = np.mean(arySlct02, axis=1)
@@ -120,17 +119,16 @@ def funcSlctVrtcs(varNumCon,           # Number of conditions
 
     # **************************************************************************
     # *** (3) Selection criterion 3
-    #         Vertices that are BELOW a certain threshold at any depth level
-    #         are excluded.
+    #         Vertices that are BELOW a certain threshold are excluded -
+    #         minimum across depth levels.
 
     if lgcSlct03:
 
         if idxPrc == 0:
-            print('---------Select vertices based on criterion 3 (vertices '
-                  + 'below threshold at any depth level will be excluded)')
+            print('---------Select vertices based on criterion 3')
 
         # Get minimum value across cortical depths:
-        vecMneSlct03 = np.mean(arySlct03, axis=1)
+        vecMneSlct03 = np.min(arySlct03, axis=1)
 
         # Check whether vertex values are above the exclusion threshold:
         vecSlct03 = np.greater(vecMneSlct03, varThrSlct03)
@@ -150,17 +148,16 @@ def funcSlctVrtcs(varNumCon,           # Number of conditions
 
     # **************************************************************************
     # *** (2) Selection criterion 4
-    #         Vertices that are BELOW a certain threshold at any depth level
-    #         are excluded.
+    #         Vertices that are BELOW a certain threshold are excluded - mean
+    #         of absolute value across depth levels.
 
     if lgcSlct04:
 
         if idxPrc == 0:
-            print('---------Select vertices based on criterion 4 (vertices '
-                  + 'below threshold at any depth level will be excluded)')
+            print('---------Select vertices based on criterion 4')
 
         # Get minimum value across cortical depths:
-        vecMneSlct04 = np.mean(arySlct04, axis=1)
+        vecMneSlct04 = np.mean(np.absolute(arySlct04), axis=1)
 
         # Check whether vertex values are above the exclusion threshold:
         vecSlct04 = np.greater(vecMneSlct04, varThrSlct04)

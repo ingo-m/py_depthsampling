@@ -149,7 +149,7 @@ def ds_main(strRoi, strHmsph, lstSubIds, lstCon, lstConLbl, strVtkDpth01,
     # *************************************************************************
     # *** Save results
 
-    # We save the mean parameter estimates of each subject to disk. This file
+    # We save the mean parameter estimates of all subjects to disk. This file
     # can be used to plot results from different ROIs in one plot.
 
     np.save(strDpthMeans, arySubDpthMns)

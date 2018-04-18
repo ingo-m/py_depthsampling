@@ -44,18 +44,17 @@ from ds_paramEccDpthHist import funcParamEccDpthHist
 # *** Define parameters
 
 # List of subject IDs:
-lstSubId = ['20150930',
-            '20151118',
-            '20151127_01',
-            '20151130_02',
-            '20161207',
-            '20161212_02',
-            '20161214',
-            '20161219_01',
-            '20161219_02']
+lstSubId = ['20171023',
+            '20171109',
+            '20171204_01',
+            '20171204_02',
+            '20171211',
+            '20171213',
+            '20180111',
+            '20180118']
 
 # Path of vtk files with eccentricity information (subject ID left open):
-strVtkEcc = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/eccentricity.vtk'  #noqa
+strVtkEcc = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/rh/eccentricity.vtk'  #noqa
 
 # Eccentricity bins:
 vecEccBin = np.array([0.1,
@@ -69,7 +68,7 @@ vecEccBin = np.array([0.1,
 
 # Path of vtk file with statistical parameters (at several depth levels;
 # subject ID left open):
-strVtkParam = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/pe_stim_lvl_04.vtk'  #noqa
+strVtkParam = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/rh/Pd_pe1.vtk'  #noqa
 # Number of depth levels in the parameter vtk files:
 varNumDpth = 11
 
@@ -82,24 +81,23 @@ varNumLne = 2
 
 # Paths of csv files with ROI information (created with paraview on a vtk mesh
 # in the same space as the above vtk files; subject ID left open):
-strCsvRoi = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/v1.csv'  #noqa
+strCsvRoi = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/rh/v1.csv'  #noqa
 
 # Number of header lines in ROI CSV file:
 varNumHdrRoi = 1
 
 # Paths of vtk files with intensity information for thresholding (at all depth
 # levels, e.g. R2 from pRF analysis; subject ID left open):
-# strVtkThr = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/R2_multi.vtk'  #noqa
-strVtkThr = '/home/john/PhD/ParCon_Depth_Data/{}/cbs_distcor/lh/R2_multi.vtk'  #noqa
+strVtkThr = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/rh/R2_multi.vtk'  #noqa
 # Threshold (e.g. minimum R2 value - if vertex is below this value at any
 # depth level, vertex is excluded):
-varThr = 0.25
+varThr = 0.1
 
 # Use separate lookup tables for negative values?
 lgcNegLkp = True
 
 # Output basename:
-strPathOut = '/home/john/Desktop/paramEccV1/pe_stim_lvl_04_R2_0p25_GMS'
+strPathOut = '/home/john/Desktop/param_ecc_pd_V1'
 # *****************************************************************************
 
 

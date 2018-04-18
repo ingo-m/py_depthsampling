@@ -157,10 +157,12 @@ def funcSlctVrtcs(varNumCon,           # Number of conditions
             print('---------Select vertices based on criterion 4')
 
         # Get minimum value across cortical depths:
-        vecMneSlct04 = np.mean(np.absolute(arySlct04), axis=1)
+        # vecMneSlct04 = np.mean(np.absolute(arySlct04), axis=1)
+        vecMneSlct04 = np.mean(arySlct04, axis=1)
 
         # Check whether vertex values are above the exclusion threshold:
-        vecSlct04 = np.greater(vecMneSlct04, varThrSlct04)
+        # vecSlct04 = np.greater(vecMneSlct04, varThrSlct04)
+        vecSlct04 = np.less(vecMneSlct04, varThrSlct04)
 
         # Apply second vertex selection criterion to inclusion-vector:
         vecInc = np.logical_and(vecInc,

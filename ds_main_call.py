@@ -133,7 +133,7 @@ varNormIdx = 0
 lgcNormDiv = False
 
 # Output path for depth samling results (within subject means):
-strDpthMeans = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}_{}.npy'  #noqa
+strDpthMeans = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}_{}_{}.npy'  #noqa
 
 # Maximum number of processes to run in parallel: *** NOT IMPLEMENTED
 # varPar = 10
@@ -214,5 +214,6 @@ for idxRoi in range(len(lstRoi)):
                     strPltOtPre.format(lstRoi[idxRoi]), strPltOtSuf.format(
                     lstHmsph[idxHmsph], lstRoi[idxRoi], lstNstCon[idxCon][0]),
                     varDpi, varNormIdx, lgcNormDiv, strDpthMeans.format(
-                    lstRoi[idxRoi], lstHmsph[idxHmsph]))
+                    lstRoi[idxRoi], lstHmsph[idxHmsph], lstNstCon[idxCon][0]),
+                    varAcrSubsYmin, varAcrSubsYmax)
 # *****************************************************************************

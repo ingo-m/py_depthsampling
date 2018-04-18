@@ -214,6 +214,5 @@ for idxRoi in range(len(lstRoi)):
                     strPltOtPre.format(lstRoi[idxRoi]), strPltOtSuf.format(
                     lstHmsph[idxHmsph], lstRoi[idxRoi], lstNstCon[idxCon][0]),
                     varDpi, varNormIdx, lgcNormDiv, strDpthMeans.format(
-                    lstRoi[idxRoi], lstHmsph[idxHmsph], lstNstCon[idxCon][0]),
-                    varAcrSubsYmin, varAcrSubsYmax)
+                    lstRoi[idxRoi], lstHmsph[idxHmsph], lstNstCon[idxCon][0]))
 # *****************************************************************************

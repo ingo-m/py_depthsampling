@@ -181,7 +181,7 @@ funcParamEccDpthHist(vecEccAcrSubs,
 # *****************************************************************************
 # *** Grand mean scaling
 
-if True:
+if False:
 
     # Before averaging across subjects, we apply grand mean scaling; i.e. we
     # divide all PE values for a subject (i.e. all depth levels, all

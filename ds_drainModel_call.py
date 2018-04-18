@@ -228,4 +228,5 @@ for idxMdl in range(len(lstMdl)):
                 str(lstMdl[idxMdl])), strPthPltOt.format(lstRoi[idxRoi],
                 lstHmsph[idxHmsph], str(lstMdl[idxMdl])), strFlTp, varDpi,
                 strXlabel, strYlabel, lstNstCon[idxCon], lstNstConLbl[idxCon],
-                varNumIt, varCnfLw, varCnfUp, varNseRndSd, varNseSys, lstFctr)
+                varNumIt, varCnfLw, varCnfUp, varNseRndSd, varNseSys, lstFctr,
+                varAcrSubsYmin, varAcrSubsYmax)

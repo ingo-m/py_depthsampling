@@ -246,7 +246,7 @@ def funcPltAcrSubsMean(arySubDpthMns,
     strPltOt = strPltOtPre + 'acrsSubsMean' + strPltOtSuf
 
     # Make plot & axis labels fit into figure:
-    # plt.tight_layout(pad=0.5)
+    plt.tight_layout(pad=0.5)
 
     # Save figure:
     fgr01.savefig(strPltOt,

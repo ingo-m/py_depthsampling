@@ -61,9 +61,13 @@ vecEccBin = np.array([0.1,
                       1.0,
                       1.5,
                       2.0,
+                      2.5,
                       3.0,
+                      3.5,
+                      4.0,
                       4.5,
                       5.0,
+                      5.5,
                       6.0])
 
 # Path of vtk file with statistical parameters (at several depth levels;
@@ -212,7 +216,7 @@ if False:
 # *****************************************************************************
 # *** Plot single subject results
 
-if False:
+if True:
 
     print('---Ploting single subject results')
 

@@ -25,9 +25,7 @@ import csv
 import numpy as np
 
 
-def funcLoadVtkSingle(strVtkIn,
-                      strPrcdData,
-                      varNumLne):
+def load_vtk_single(strVtkIn, strPrcdData, varNumLne):
     """
     Function for loading vtk file with one data point per vertex.
 

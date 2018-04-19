@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
-"""
-Function of the depth sampling pipeline.
-
-@author: Ingo Marquardt, 05.12.2016
-"""
+"""Function of the depth sampling pipeline."""
 
 # Part of py_depthsampling library
-# Copyright (C) 2017  Ingo Marquardt
+# Copyright (C) 2018  Ingo Marquardt
 #
-# This program is free software: you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the Free
-# Software Foundation, either version 3 of the License, or (at your option) any
-# later version.
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -21,22 +17,15 @@ Function of the depth sampling pipeline.
 # You should have received a copy of the GNU General Public License along with
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
 import numpy as np
-from ds_loadVtkSingle import funcLoadVtkSingle
-from ds_loadVtkMulti import funcLoadVtkMulti
-from ds_loadCsvRoi import funcLoadCsvRoi
+from py_depthsampling.get_data.load_vtk_single import load_vtk_single
+from py_depthsampling.get_data.load_vtk_multi import load_vtk_multi
+from py_depthsampling.get_data.load_csv_roi import load_csv_roi
 
 
-def funcParamEccDpthGet(strVtkEcc,
-                        strPrcdData,
-                        varNumLne,
-                        strVtkParam,
-                        varNumDpth,
-                        strCsvRoi,
-                        varNumHdrRoi,
-                        vecEccBin,
-                        strVtkThr,
-                        varThr):
+def ecc_get_data(strVtkEcc, strPrcdData, varNumLne, strVtkParam, varNumDpth,
+                 strCsvRoi, varNumHdrRoi, vecEccBin, strVtkThr, varThr):
     """
     Load data for eccentricity & cortical depth analysis.
 
@@ -54,26 +43,26 @@ def funcParamEccDpthGet(strVtkEcc,
     # *** Import data
 
     # Import the eccentricity information (one value per vertex):
-    vecEcc = funcLoadVtkSingle(strVtkEcc,
-                               strPrcdData,
-                               varNumLne)
+    vecEcc = load_vtk_single(strVtkEcc,
+                             strPrcdData,
+                             varNumLne)
 
     # Import the parameter estimates (several values per vertex - one per
     # cortical depth level):
-    aryParam = funcLoadVtkMulti(strVtkParam,
-                                strPrcdData,
-                                varNumLne,
-                                varNumDpth)
+    aryParam = load_vtk_multi(strVtkParam,
+                              strPrcdData,
+                              varNumLne,
+                              varNumDpth)
 
     # Import ROI definition (csv file, list of vertices):
-    aryRoiVrtx = funcLoadCsvRoi(strCsvRoi,
-                                varNumHdrRoi)
+    aryRoiVrtx = load_csv_roi(strCsvRoi,
+                              varNumHdrRoi)
 
     # Import intensity data for vertex selection (e.g. R2 values):
-    aryVtkThr = funcLoadVtkMulti(strVtkThr,
-                                 strPrcdData,
-                                 varNumLne,
-                                 varNumDpth)
+    aryVtkThr = load_vtk_multi(strVtkThr,
+                               strPrcdData,
+                               varNumLne,
+                               varNumDpth)
     # *************************************************************************
 
     # *************************************************************************

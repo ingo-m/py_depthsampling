@@ -6,12 +6,12 @@ Function of the depth sampling pipeline.
 """
 
 # Part of py_depthsampling library
-# Copyright (C) 2017  Ingo Marquardt
+# Copyright (C) 2018  Ingo Marquardt
 #
-# This program is free software: you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the Free
-# Software Foundation, either version 3 of the License, or (at your option) any
-# later version.
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -27,21 +27,17 @@ import matplotlib.colors as colors
 # from matplotlib.colors import BoundaryNorm
 
 
-def funcParamEccDpthPlt(aryMean,
-                        vecEccBin,
-                        strPathOut):
+def ecc_plot(aryMean, vecEccBin, strPathOut):
     """
     Plot results for eccentricity & cortical depth analysis.
-
-    This function plots statistical parameters (e.g. parameter estimates) by
-    cortical depth (x-axis) and pRF eccentricity (y-axis).
 
     This version plots the values using two separate colourmaps for negative
     and positive values.
 
-    This function is part of a tool for analysis of cortical-depth-dependent
-    fMRI responses at different retinotopic eccentricities. (Which is a part
-    of the depth sampling pipeline.)
+    Plots statistical parameters (e.g. parameter estimates) by cortical depth
+    (x-axis) and pRF eccentricity (y-axis). This function is part of a tool for
+    analysis of cortical-depth-dependent fMRI responses at different
+    retinotopic eccentricities.
     """
     # Number of eccentricity bins:
     varEccNum = vecEccBin.shape[0]
@@ -79,10 +75,10 @@ def funcParamEccDpthPlt(aryMean,
     axsCmn.spines['left'].set_color('none')
     axsCmn.spines['right'].set_color('none')
     axsCmn.tick_params(labelcolor='w',
-                       top='off',
-                       bottom='off',
-                       left='off',
-                       right='off')
+                       top=False,
+                       bottom=False,
+                       left=False,
+                       right=False)
 
     # Set and adjust common axes labels:
     axsCmn.set_xlabel('V1 relative cortical depth',
@@ -185,10 +181,10 @@ def funcParamEccDpthPlt(aryMean,
 
     # Turn of ticks:
     axsTmp.tick_params(labelcolor=([0.0, 0.0, 0.0]),
-                       top='off',
-                       bottom='off',
-                       left='off',
-                       right='off')
+                       top=False,
+                       bottom=False,
+                       left=False,
+                       right=False)
 
     # We create invisible axes for the colour bar slightly to the right of the
     # position of the last data-axes. First, retrieve position of last

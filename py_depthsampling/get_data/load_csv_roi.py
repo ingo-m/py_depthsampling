@@ -25,8 +25,7 @@ import csv
 import numpy as np
 
 
-def funcLoadCsvRoi(strCsvRoi,
-                   varNumHdrRoi):
+def load_csv_roi(strCsvRoi, varNumHdrRoi):
     """
     Function for loading ROI definition from csv file.
 

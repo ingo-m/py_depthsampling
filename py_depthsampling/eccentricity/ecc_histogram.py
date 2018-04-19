@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
-"""
-Function of the depth sampling pipeline.
-
-@author: Ingo Marquardt, 08.12.2016
-"""
+"""Function of the depth sampling pipeline."""
 
 # Part of py_depthsampling library
-# Copyright (C) 2017  Ingo Marquardt
+# Copyright (C) 2018  Ingo Marquardt
 #
-# This program is free software: you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the Free
-# Software Foundation, either version 3 of the License, or (at your option) any
-# later version.
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -26,18 +22,13 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 
-def funcParamEccDpthHist(vecEcc,
-                         vecEccBin,
-                         strPathOut):
+def ecc_histogram(vecEcc, vecEccBin, strPathOut):
     """
     Plot histogram for eccentricity & cortical depth analysis.
 
-    This function plots a histogram of the distribution of eccentricity values
-    within an ROI.
-
+    Plots a histogram of the distribution of eccentricity values within an ROI.
     This function is part of a tool for analysis of cortical-depth-dependent
-    fMRI responses at different retinotopic eccentricities. (Which is a part
-    of the depth sampling pipeline.)
+    fMRI responses at different retinotopic eccentricities.
     """
     # Lower and upper eccentricity bound of the visual stimulus:
     varStimEccLw = 1.5

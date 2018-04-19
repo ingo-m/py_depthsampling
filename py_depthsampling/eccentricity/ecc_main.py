@@ -4,23 +4,20 @@ Function of the depth sampling pipeline.
 
 Plot statistical parameter by eccentricity & cortical depth.
 
-The purpose of this script is to plot a statistical parameter, such as
-parameter estimates, by pRF eccentricity and cortical depth from information
-contained in vtk files. To this end, information on the pRF eccentricity of
-each vertex is loaded from a vtk file. This vtk file is defined at a single
-cortical depth (e.g. mid-GM). Second, a vtk file with statistical information
-at different depth levels in needed.
-
-@author: Ingo Marquardt, 05.12.2016
+Plot a statistical parameter, such as parameter estimates, by pRF eccentricity
+and cortical depth from information contained in vtk files. To this end,
+information on the pRF eccentricity of each vertex is loaded from a vtk file.
+This vtk file is defined at a single cortical depth (e.g. mid-GM). Second, a
+vtk file with statistical information at different depth levels in needed.
 """
 
 # Part of py_depthsampling library
-# Copyright (C) 2017  Ingo Marquardt
+# Copyright (C) 2018  Ingo Marquardt
 #
-# This program is free software: you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the Free
-# Software Foundation, either version 3 of the License, or (at your option) any
-# later version.
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -30,13 +27,14 @@ at different depth levels in needed.
 # You should have received a copy of the GNU General Public License along with
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
 # *****************************************************************************
 # *** Import modules
 import numpy as np
-from ds_paramEccDpthGet import funcParamEccDpthGet
-from ds_paramEccDpthPlt import funcParamEccDpthPlt
-from ds_paramEccDpthPltSmpl import funcParamEccDpthPltSmpl
-from ds_paramEccDpthHist import funcParamEccDpthHist
+from py_depthsampling.eccentricity.ecc_get_data import ecc_get_data
+from py_depthsampling.eccentricity.ecc_plot import ecc_plot
+from py_depthsampling.eccentricity.ecc_plot_simple import ecc_plot_simple
+from py_depthsampling.eccentricity.ecc_histogram import ecc_histogram
 # *****************************************************************************
 
 
@@ -101,7 +99,7 @@ varThr = 0.1
 lgcNegLkp = True
 
 # Output basename:
-strPathOut = '/home/john/Desktop/param_ecc_pd_V1'
+strPathOut = '/home/john/Desktop/tmp/e/param_ecc_pd_V1'
 # *****************************************************************************
 
 
@@ -131,16 +129,16 @@ for idxSub in range(0, varNumSub):
     print(('------Dataset: ' + lstSubId[idxSub]))
 
     lstSubMean[idxSub], lstSubEcc[idxSub], lstSubCnt[idxSub] = \
-        funcParamEccDpthGet(strVtkEcc.format(lstSubId[idxSub]),
-                            strPrcdData,
-                            varNumLne,
-                            strVtkParam.format(lstSubId[idxSub]),
-                            varNumDpth,
-                            strCsvRoi.format(lstSubId[idxSub]),
-                            varNumHdrRoi,
-                            vecEccBin,
-                            strVtkThr.format(lstSubId[idxSub]),
-                            varThr)
+        ecc_get_data(strVtkEcc.format(lstSubId[idxSub]),
+                     strPrcdData,
+                     varNumLne,
+                     strVtkParam.format(lstSubId[idxSub]),
+                     varNumDpth,
+                     strCsvRoi.format(lstSubId[idxSub]),
+                     varNumHdrRoi,
+                     vecEccBin,
+                     strVtkThr.format(lstSubId[idxSub]),
+                     varThr)
 # *****************************************************************************
 
 
@@ -158,9 +156,9 @@ if False:
 
         strTmp = (strPathOut + '_sngl_sub_' + lstSubId[idxSub] + '_ecc.png')
 
-        funcParamEccDpthHist(lstSubEcc[idxSub],
-                             vecEccBin,
-                             strTmp)
+        ecc_histogram(lstSubEcc[idxSub],
+                      vecEccBin,
+                      strTmp)
 # *****************************************************************************
 
 
@@ -176,9 +174,9 @@ for idxSub in lstSubEcc:
 
 strTmp = (strPathOut + '_acrsSubsEcc.png')
 
-funcParamEccDpthHist(vecEccAcrSubs,
-                     vecEccBin,
-                     strTmp)
+ecc_histogram(vecEccAcrSubs,
+              vecEccBin,
+              strTmp)
 # *****************************************************************************
 
 
@@ -227,9 +225,9 @@ if True:
 
         strTmp = (strPathOut + '_sngl_sub_' + lstSubId[idxSub] + '.png')
 
-        funcParamEccDpthPlt(lstSubMean[idxSub],
-                            vecEccBin,
-                            strTmp)
+        ecc_plot(lstSubMean[idxSub],
+                 vecEccBin,
+                 strTmp)
 # *****************************************************************************
 
 
@@ -267,11 +265,11 @@ arySubData = np.divide(arySubData, vecCntTtl[:, None])
 strTmp = (strPathOut + '_acrsSubsMean.png')
 
 if lgcNegLkp:
-    funcParamEccDpthPlt(arySubData,
-                        vecEccBin,
-                        strTmp)
+    ecc_plot(arySubData,
+             vecEccBin,
+             strTmp)
 else:
-    funcParamEccDpthPltSmpl(arySubData,
-                            vecEccBin,
-                            strTmp)
+    ecc_plot_simple(arySubData,
+                    vecEccBin,
+                    strTmp)
 # *****************************************************************************

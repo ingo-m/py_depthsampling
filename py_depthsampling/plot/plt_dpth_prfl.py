@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Function of the depth sampling pipeline.
-
-@author: Ingo Marquardt, 06.11.2016
-"""
+"""Function of the depth sampling pipeline."""
 
 # Part of py_depthsampling library
 # Copyright (C) 2017  Ingo Marquardt
@@ -28,7 +24,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 
 
-def funcPltAcrDpth(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
+def plt_dpth_prfl(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
                    varYmax, lgcCnvPrct, lstConLbl, strXlabel, strYlabel,
                    strTitle, lgcLgnd, strPath, vecX=None, varXmin=None,
                    varXmax=None, varSizeX=1800.0, varSizeY=1600.0,

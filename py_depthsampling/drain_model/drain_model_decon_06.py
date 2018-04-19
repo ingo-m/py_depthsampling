@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
-
 """Deconvolution of GE fMRI depth profiles (draining effect correction)."""
 
 # Part of py_depthsampling library
-# Copyright (C) 2017  Ingo Marquardt
+# Copyright (C) 2018  Ingo Marquardt
 #
-# This program is free software: you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the Free
-# Software Foundation, either version 3 of the License, or (at your option) any
-# later version.
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -24,7 +23,7 @@ import numpy as np
 
 def depth_deconv_06(varNumCon, aryEmp5, lstFctr):
     """
-    **Deconvolution of GE fMRI depth profiles (draining effect correction)**.
+    Deconvolution of GE fMRI depth profiles (draining effect correction).
 
     Function of the model-based correction of draining effect pipeline.
 

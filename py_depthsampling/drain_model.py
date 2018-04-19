@@ -94,7 +94,7 @@ Weber, B., Keller, A. L., Reichold, J., & Logothetis, N. K. (2008). The
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from ds_drainModel import drain_model
+from py_depthsampling.drain_model.drain_model_main import drain_model
 
 # -----------------------------------------------------------------------------
 # *** Define parameters
@@ -171,7 +171,7 @@ lstFctr = [0.0, 0.25, 0.5, 0.75]
 # *** Loop through ROIs / conditions
 
 # Loop through models, ROIs, hemispheres, and conditions to create plots:
-for idxMdl in range(len(lstMdl)):
+for idxMdl in range(len(lstMdl)):  #noqa
     for idxRoi in range(len(lstRoi)):
         for idxHmsph in range(len(lstHmsph)):
             for idxCon in range(len(lstNstCon)):
@@ -229,4 +229,5 @@ for idxMdl in range(len(lstMdl)):
                 lstHmsph[idxHmsph], str(lstMdl[idxMdl])), strFlTp, varDpi,
                 strXlabel, strYlabel, lstNstCon[idxCon], lstNstConLbl[idxCon],
                 varNumIt, varCnfLw, varCnfUp, varNseRndSd, varNseSys, lstFctr,
-                varAcrSubsYmin, varAcrSubsYmax)
+                varAcrSubsYmin01, varAcrSubsYmax01, varAcrSubsYmin02,
+                varAcrSubsYmax02)

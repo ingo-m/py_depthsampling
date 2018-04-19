@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Function of the depth sampling pipeline.
-
-@author: Ingo Marquardt, 06.11.2016
-"""
+"""Function of the depth sampling pipeline."""
 
 # Part of py_depthsampling library
 # Copyright (C) 2017  Ingo Marquardt
@@ -26,7 +22,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 
 
-def funcPltAcrSubsMean(arySubDpthMns,
+def plt_dpth_prfl_acr_subs(arySubDpthMns,
                        varNumSubs,
                        varNumDpth,
                        varNumCon,
@@ -44,7 +40,7 @@ def funcPltAcrSubsMean(arySubDpthMns,
                        strErr='conf95',
                        vecX=None):
     """
-    Calculate & plot across-subjects mean.
+    Calculate & plot across-subjects mean depth profiles.
 
     Parameters
     ----------

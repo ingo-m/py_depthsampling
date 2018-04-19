@@ -1,5 +1,6 @@
-u"""
-**Model-based correction of draining effect**.
+# -*- coding: utf-8 -*-
+"""
+Model-based correction of draining effect.
 
 Function of the depth sampling pipeline.
 
@@ -72,10 +73,10 @@ irrespective of which draining effect model is choosen:
 
 References
 ----------
-Huber L, Handwerker DA, Jangraw DC, Chen G, Hall A, Stueber C, Gonzalez-Castillo
-    J, Ivanov D, Marrett S, Guidi M, Goense J, Poser BA, Bandettini PA (2017):
-    High-resolution CBV-fMRI allows mapping of laminar activity and
-    connectivity of cortical input and output in human M1. Neuron.
+Huber L, Handwerker DA, Jangraw DC, Chen G, Hall A, Stueber C,
+    Gonzalez-Castillo J, Ivanov D, Marrett S, Guidi M, Goense J, Poser BA,
+    Bandettini PA (2017): High-resolution CBV-fMRI allows mapping of laminar
+    activity and connectivity of cortical input and output in human M1. Neuron.
 
 Markuerkiaga, I., Barth, M., & Norris, D. G. (2016). A cortical vascular model
     for examining the specificity of the laminar BOLD signal. Neuroimage, 132,
@@ -87,12 +88,12 @@ Weber, B., Keller, A. L., Reichold, J., & Logothetis, N. K. (2008). The
 """
 
 # Part of py_depthsampling library
-# Copyright (C) 2017  Ingo Marquardt
+# Copyright (C) 2018  Ingo Marquardt
 #
-# This program is free software: you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the Free
-# Software Foundation, either version 3 of the License, or (at your option) any
-# later version.
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS

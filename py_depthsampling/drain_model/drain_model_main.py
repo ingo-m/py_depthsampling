@@ -1,7 +1,7 @@
 """Function of the depth sampling pipeline."""
 
 # Part of py_depthsampling library
-# Copyright (C) 2017  Ingo Marquardt
+# Copyright (C) 2018  Ingo Marquardt
 #
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -19,21 +19,22 @@
 
 import numpy as np
 from scipy.interpolate import griddata
-from ds_pltAcrDpth import funcPltAcrDpth
-from ds_pltAcrSubsMean import funcPltAcrSubsMean
-from ds_drainModelDecon01 import depth_deconv_01
-from ds_drainModelDecon02 import depth_deconv_02
-from ds_drainModelDecon03 import depth_deconv_03
-from ds_drainModelDecon04 import depth_deconv_04
-from ds_drainModelDecon05 import depth_deconv_05
-from ds_drainModelDecon06 import depth_deconv_06
-from ds_findPeak import find_peak
+from py_depthsampling.plot.plt_acr_dpth import plt_acr_dpth
+from py_depthsampling.plot.plt_dpth_prfl_acr_subs import plt_dpth_prfl_acr_subs
+from py_depthsampling.drain_model.drain_model_decon_01 import deconv_01
+from py_depthsampling.drain_model.drain_model_decon_02 import deconv_02
+from py_depthsampling.drain_model.drain_model_decon_03 import deconv_03
+from py_depthsampling.drain_model.drain_model_decon_04 import deconv_04
+from py_depthsampling.drain_model.drain_model_decon_05 import deconv_05
+from py_depthsampling.drain_model.drain_model_decon_06 import deconv_06
+from py_depthsampling.drain_model.find_peak import find_peak
 
 
-def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,
+def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  #noqa
                 strFlTp, varDpi, strXlabel, strYlabel, lstCon, lstConLbl,
                 varNumIt, varCnfLw, varCnfUp, varNseRndSd, varNseSys, lstFctr,
-                varAcrSubsYmin, varAcrSubsYmax):
+                varAcrSubsYmin01, varAcrSubsYmax01, varAcrSubsYmin02,
+                varAcrSubsYmax02):
     """Model-based correction of draining effect."""
     # ----------------------------------------------------------------------------
     # *** Load depth profile from disk
@@ -55,7 +56,7 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,
     # Number of equi-volume depth levels in the input data:
     varNumDpth = aryEmpSnSb.shape[2]
 
-    # ----------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # *** Subject-by-subject deconvolution
 
     print('---Subject-by-subject deconvolution')
@@ -100,7 +101,7 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,
 
     for idxSub in range(0, varNumSub):
 
-        # -------------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # *** Interpolation (downsampling)
 
         # The empirical depth profiles are defined at more depth levels than
@@ -146,47 +147,47 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,
         # Put interpolation result for this subject into the array:
         aryEmp5SnSb[idxSub, :, :] = np.copy(aryEmp5)
 
-        # -------------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # *** Subtraction of draining effect
 
         # (1) Deconvolution based on Markuerkiaga et al. (2016).
         if varMdl == 1:
-            aryDecon5[idxSub, :, :] = depth_deconv_01(varNumCon,
-                                                      aryEmp5SnSb[idxSub, :, :])
+            aryDecon5[idxSub, :, :] = deconv_01(varNumCon,
+                                                aryEmp5SnSb[idxSub, :, :])
 
         # (2) Deconvolution based on Markuerkiaga et al. (2016) & scaling based
         #     on Markuerkiaga et al. (2016).
         elif varMdl == 2:
-            aryDecon5[idxSub, :, :] = depth_deconv_02(varNumCon,
-                                                      aryEmp5SnSb[idxSub, :, :])
+            aryDecon5[idxSub, :, :] = deconv_02(varNumCon,
+                                                aryEmp5SnSb[idxSub, :, :])
 
         # (3) Deconvolution based on Markuerkiaga et al. (2016) & scaling based
         #     on Weber et al. (2008).
         elif varMdl == 3:
-            aryDecon5[idxSub, :, :] = depth_deconv_03(varNumCon,
-                                                      aryEmp5SnSb[idxSub, :, :],
-                                                      strRoi=strRoi)
+            aryDecon5[idxSub, :, :] = deconv_03(varNumCon,
+                                                aryEmp5SnSb[idxSub, :, :],
+                                                strRoi=strRoi)
 
         # (4) Deconvolution based on Markuerkiaga et al. (2016), with random
         #     error.
         elif varMdl == 4:
-                aryDecon5[idxSub, :, :, :] = depth_deconv_04(varNumCon,
-                                                             aryEmp5,
-                                                             aryNseRnd)
+                aryDecon5[idxSub, :, :, :] = deconv_04(varNumCon,
+                                                       aryEmp5,
+                                                       aryNseRnd)
 
         # (5) Deconvolution based on Markuerkiaga et al. (2016), with random
         #     and systematic error.
         elif varMdl == 5:
                 aryDecon5[idxSub, :, :, :], arySys5[idxSub, :, :, :] = \
-                    depth_deconv_05(varNumCon, aryEmp5, aryNseRnd, varNseSys)
+                    deconv_05(varNumCon, aryEmp5, aryNseRnd, varNseSys)
 
         # (6) Deconvolution based on Markuerkiaga et al. (2016), with deep GM
         #     signal scaling factor.
         elif varMdl == 6:
                 aryDecon5[idxSub, :, :, :] = \
-                    depth_deconv_06(varNumCon, aryEmp5, lstFctr)
+                    deconv_06(varNumCon, aryEmp5, lstFctr)
 
-        # -------------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # *** Interpolation
 
         # The original depth profiles were in 'equi-volume' space, and needed
@@ -281,7 +282,6 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,
         np.save(strPthPrfOt,
                 aryDecon)
 
-
     # -------------------------------------------------------------------------
     # *** Peak positions percentile bootstrap
 
@@ -292,8 +292,8 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,
 
         print('---Peak positions in depth profiles - percentile bootstrap')
 
-        # We bootstrap the peak finding. Peak finding needs to be performed both
-        # before and after deconvolution, separately for all stimulus
+        # We bootstrap the peak finding. Peak finding needs to be performed
+        # both before and after deconvolution, separately for all stimulus
         # conditions.
 
         # Random array with subject indicies for bootstrapping of the form
@@ -371,7 +371,6 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,
                           + str(np.around(varTmpCnfUp, decimals=2)))
                 print(strTmp)
 
-
     # -------------------------------------------------------------------------
     # *** Plot results
 
@@ -382,40 +381,40 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,
         # Plot across-subjects mean before deconvolution:
         strTmpTtl = '{} before deconvolution'.format(strRoi.upper())
         strTmpPth = (strPthPltOt + 'before_')
-        funcPltAcrSubsMean(aryEmpSnSb,
-                           varNumSub,
-                           varNumDpth,
-                           varNumCon,
-                           varDpi,
-                           varAcrSubsYmin01,
-                           varAcrSubsYmax01,
-                           lstConLbl,
-                           strXlabel,
-                           strYlabel,
-                           strTmpTtl,
-                           strTmpPth,
-                           strFlTp,
-                           strErr='sem',
-                           vecX=vecPosEmp)
+        plt_dpth_prfl_acr_subs(aryEmpSnSb,
+                               varNumSub,
+                               varNumDpth,
+                               varNumCon,
+                               varDpi,
+                               varAcrSubsYmin01,
+                               varAcrSubsYmax01,
+                               lstConLbl,
+                               strXlabel,
+                               strYlabel,
+                               strTmpTtl,
+                               strTmpPth,
+                               strFlTp,
+                               strErr='sem',
+                               vecX=vecPosEmp)
 
         # Across-subjects mean after deconvolution:
         strTmpTtl = '{} after deconvolution'.format(strRoi.upper())
         strTmpPth = (strPthPltOt + 'after_')
-        funcPltAcrSubsMean(aryDecon,
-                           varNumSub,
-                           varNumDpth,
-                           varNumCon,
-                           varDpi,
-                           varAcrSubsYmin02,
-                           varAcrSubsYmax02,
-                           lstConLbl,
-                           strXlabel,
-                           strYlabel,
-                           strTmpTtl,
-                           strTmpPth,
-                           strFlTp,
-                           strErr='sem',
-                           vecX=vecIntpEqui)
+        plt_dpth_prfl_acr_subs(aryDecon,
+                               varNumSub,
+                               varNumDpth,
+                               varNumCon,
+                               varDpi,
+                               varAcrSubsYmin02,
+                               varAcrSubsYmax02,
+                               lstConLbl,
+                               strXlabel,
+                               strYlabel,
+                               strTmpTtl,
+                               strTmpPth,
+                               strFlTp,
+                               strErr='sem',
+                               vecX=vecIntpEqui)
 
     elif varMdl == 4:
 
@@ -428,29 +427,29 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,
         # Across-subjects mean after deconvolution:
         strTmpTtl = '{} after deconvolution'.format(strRoi.upper())
         strTmpPth = (strPthPltOt + 'after_')
-        funcPltAcrSubsMean(aryDecon,
-                           varNumSub,
-                           varNumDpth,
-                           varNumCon,
-                           varDpi,
-                           varAcrSubsYmin02,
-                           varAcrSubsYmax02,
-                           lstConLbl,
-                           strXlabel,
-                           strYlabel,
-                           strTmpTtl,
-                           strTmpPth,
-                           strFlTp,
-                           strErr='prct95',
-                           vecX=vecIntpEqui)
+        plt_dpth_prfl_acr_subs(aryDecon,
+                               varNumSub,
+                               varNumDpth,
+                               varNumCon,
+                               varDpi,
+                               varAcrSubsYmin02,
+                               varAcrSubsYmax02,
+                               lstConLbl,
+                               strXlabel,
+                               strYlabel,
+                               strTmpTtl,
+                               strTmpPth,
+                               strFlTp,
+                               strErr='prct95',
+                               vecX=vecIntpEqui)
 
     elif varMdl == 5:
 
         # For 'model 5', i.e. the random & systematic noise model, we are
         # interested in the variance across random-noise iterations. We are
-        # *not* interested in the variance across subjects in this case. Because
-        # we used the same random noise across subjects, we can average over
-        # subjects.
+        # *not* interested in the variance across subjects in this case.
+        # Because we used the same random noise across subjects, we can average
+        # over subjects.
         aryDecon = np.mean(aryDecon, axis=0)
 
         # Random noise - mean across iteratins:
@@ -507,26 +506,26 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,
                            [230.0, 56.0, 60.0]))
         aryClr = np.divide(aryClr, 255.0)
 
-        funcPltAcrDpth(aryComb,        # aryData[Condition, Depth]
-                       0,              # aryError[Con., Depth]
-                       varNumDpth,     # Number of depth levels (on the x-axis)
-                       3,              # Number of conditions (separate lines)
-                       varDpi,         # Resolution of the output figure
-                       0.0,            # Minimum of Y axis
-                       2.0,            # Maximum of Y axis
-                       False,          # Bool.: whether to convert y axis to %
-                       lstLblMdl5,     # Labels for conditions (separate lines)
-                       strXlabel,      # Label on x axis
-                       strYlabel,      # Label on y axis
-                       strTmpTtl,      # Figure title
-                       True,           # Boolean: whether to plot a legend
-                       (strPthPltOt + 'after' + strFlTp),
-                       varSizeX=2000.0,
-                       varSizeY=1400.0,
-                       aryCnfLw=aryErrLw,
-                       aryCnfUp=aryErrUp,
-                       aryClr=aryClr,
-                       vecX=vecIntpEqui)
+        plt_acr_dpth(aryComb,        # aryData[Condition, Depth]
+                     0,              # aryError[Con., Depth]
+                     varNumDpth,     # Number of depth levels (on the x-axis)
+                     3,              # Number of conditions (separate lines)
+                     varDpi,         # Resolution of the output figure
+                     0.0,            # Minimum of Y axis
+                     2.0,            # Maximum of Y axis
+                     False,          # Bool.: whether to convert y axis to %
+                     lstLblMdl5,     # Labels for conditions (separate lines)
+                     strXlabel,      # Label on x axis
+                     strYlabel,      # Label on y axis
+                     strTmpTtl,      # Figure title
+                     True,           # Boolean: whether to plot a legend
+                     (strPthPltOt + 'after' + strFlTp),
+                     varSizeX=2000.0,
+                     varSizeY=1400.0,
+                     aryCnfLw=aryErrLw,
+                     aryCnfUp=aryErrUp,
+                     aryClr=aryClr,
+                     vecX=vecIntpEqui)
 
     elif varMdl == 6:
 
@@ -535,21 +534,22 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,
         # deep-GM-signal-intensity-scaling-factors.
 
         # For 'model 6', i.e. the deep-GM signal underestimation model, we are
-        # *not* interested in the variance across subjects, but in the effect of
-        # the deep-GM signal scaling factor. Because we used the same deep-GM
-        # scaling factor across subjects, we can average over subjects.
+        # *not* interested in the variance across subjects, but in the effect
+        # of the deep-GM signal scaling factor. Because we used the same
+        # deep-GM scaling factor across subjects, we can average over subjects.
         aryDecon = np.mean(aryDecon, axis=0)
 
-        # The array now has the form: aryDecon[idxFctr, idxCon, idxDepth], where
-        # idxFctr corresponds to the deep-GM-signal-intensity-scaling-factors.
+        # The array now has the form: aryDecon[idxFctr, idxCon, idxDepth],
+        # where idxFctr corresponds to the
+        # deep-GM-signal-intensity-scaling-factors.
 
         # Reduce further; only one stimulus condition is plotted. The
-        # deep-GM-signal-intensity-scaling-factors are treated as conditions for
-        # the plot.
+        # deep-GM-signal-intensity-scaling-factors are treated as conditions
+        # for the plot.
         aryDecon = aryDecon[:, 3, :]
 
-        # The array now has the form: aryDecon[idxFctr, idxDepth], where idxFctr
-        # corresponds to the deep-GM-signal-intensity-scaling-factors.
+        # The array now has the form: aryDecon[idxFctr, idxDepth], where
+        # idxFctr corresponds to the deep-GM-signal-intensity-scaling-factors.
 
         # Dummy error array (no error will be plotted):
         aryErr = np.zeros(aryDecon.shape)
@@ -564,23 +564,23 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,
         strXlabel = 'Cortical depth level (equivolume)'
         strYlabel = 'fMRI signal change [a.u.]'
 
-        funcPltAcrDpth(aryDecon,           # aryData[Condition, Depth]
-                       aryErr,             # aryError[Con., Depth]
-                       varNumDpth,         # Number of depth levels (on the x-axis)
-                       aryDecon.shape[0],  # Number of conditions (separate lines)
-                       varDpi,             # Resolution of the output figure
-                       0.0,                # Minimum of Y axis
-                       2.0,                # Maximum of Y axis
-                       False,              # Bool.: whether to convert y axis to %
-                       lstLblMdl5,         # Labels for conditions (separate lines)
-                       strXlabel,          # Label on x axis
-                       strYlabel,          # Label on y axis
-                       strTmpTtl,          # Figure title
-                       True,               # Boolean: whether to plot a legend
-                       (strPthPltOt + 'after' + strFlTp),
-                       varSizeX=2000.0,
-                       varSizeY=1400.0,
-                       vecX=vecIntpEqui)
+        plt_acr_dpth(aryDecon,           # aryData[Condition, Depth]
+                     aryErr,             # aryError[Con., Depth]
+                     varNumDpth,         # Number of depth levels (on x-axis)
+                     aryDecon.shape[0],  # Number conditions (separate lines)
+                     varDpi,             # Resolution of the output figure
+                     0.0,                # Minimum of Y axis
+                     2.0,                # Maximum of Y axis
+                     False,              # Bool: convert y axis to % ?
+                     lstLblMdl5,         # Condition labels (separate lines)
+                     strXlabel,          # Label on x axis
+                     strYlabel,          # Label on y axis
+                     strTmpTtl,          # Figure title
+                     True,               # Boolean: whether to plot a legend
+                     (strPthPltOt + 'after' + strFlTp),
+                     varSizeX=2000.0,
+                     varSizeY=1400.0,
+                     vecX=vecIntpEqui)
 
-    # ----------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     print('-Done.')

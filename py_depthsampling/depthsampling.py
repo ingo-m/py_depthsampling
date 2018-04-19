@@ -20,7 +20,7 @@ are selected according to several criteria:
 """
 
 
-from ds_main import ds_main
+from py_depthsampling.main.main import ds_main
 
 
 # *****************************************************************************

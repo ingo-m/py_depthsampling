@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Function of the depth sampling pipeline.
-
-@author: Ingo Marquardt, 04.11.2016
-"""
+"""Function of the depth sampling pipeline."""
 
 # Part of py_depthsampling library
 # Copyright (C) 2017  Ingo Marquardt
@@ -22,44 +18,43 @@ Function of the depth sampling pipeline.
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np  # noqa
-from ds_loadCsvRoi import funcLoadCsvRoi
-# from ds_loadVtkSingle import funcLoadVtkSingle
-from ds_loadVtkMulti import funcLoadVtkMulti
-from ds_slctVrtcs import funcSlctVrtcs
-from ds_crtVtkMsk import funcCrtVtkMsk
-from ds_pltAcrDpth import funcPltAcrDpth
+from py_depthsampling.get_data.load_csv_roi import load_csv_roi
+from py_depthsampling.get_data.load_vtk_multi import load_vtk_multi
+from py_depthsampling.main.slct_vrtcs import slct_vrtcs
+from py_depthsampling.get_data.vtk_msk import vtk_msk
+from py_depthsampling.plot.plt_dpth_prfl import plt_dpth_prfl
 
 
-def funcAcrSubGetSubsData(idxPrc,              # Process ID
-                          strSubId,            # Data struc - Subject ID
-                          lstVtkDpth01,        # Data struc - Pth vtk I
-                          varNumDpth,          # Data struc - Num. depth levels
-                          strPrcdData,         # Data struc - Str prcd VTK data
-                          varNumLne,           # Data struc - Lns prcd data VTK
-                          lgcSlct01,           # Criterion 1 - Yes or no?
-                          strCsvRoi,           # Criterion 1 - CSV path
-                          varNumHdrRoi,        # Criterion 1 - Header lines
-                          lgcSlct02,           # Criterion 2 - Yes or no?
-                          strVtkSlct02,        # Criterion 2 - VTK path
-                          varThrSlct02,        # Criterion 2 - Threshold
-                          lgcSlct03,           # Criterion 3 - Yes or no?
-                          strVtkSlct03,        # Criterion 3 - VTK path
-                          varThrSlct03,        # Criterion 3 - Threshold
-                          lgcSlct04,           # Criterion 4 - Yes or no?
-                          strVtkSlct04,        # Criterion 4 - VTK path
-                          varThrSlct04,        # Criterion 4 - Threshold
-                          lgcNormDiv,          # Normalisation - Yes or no?
-                          varNormIdx,          # Normalisation - Reference
-                          varDpi,              # Plot - Dots per inch
-                          varYmin,             # Plot - Minimum of Y axis
-                          varYmax,             # Plot - Maximum of Y axis
-                          lstConLbl,           # Plot - Condition labels
-                          strXlabel,           # Plot - X axis label
-                          strYlabel,           # Plot - Y axis label
-                          strTitle,            # Plot - Title
-                          strPltOtPre,         # Plot - Output file path prefix
-                          strPltOtSuf,         # Plot - Output file path suffix
-                          queOut):             # Queue for output list
+def acr_subs_get_data(idxPrc,              # Process ID  #noqa
+                      strSubId,            # Data struc - Subject ID
+                      lstVtkDpth01,        # Data struc - Pth vtk I
+                      varNumDpth,          # Data struc - Num. depth levels
+                      strPrcdData,         # Data struc - Str prcd VTK data
+                      varNumLne,           # Data struc - Lns prcd data VTK
+                      lgcSlct01,           # Criterion 1 - Yes or no?
+                      strCsvRoi,           # Criterion 1 - CSV path
+                      varNumHdrRoi,        # Criterion 1 - Header lines
+                      lgcSlct02,           # Criterion 2 - Yes or no?
+                      strVtkSlct02,        # Criterion 2 - VTK path
+                      varThrSlct02,        # Criterion 2 - Threshold
+                      lgcSlct03,           # Criterion 3 - Yes or no?
+                      strVtkSlct03,        # Criterion 3 - VTK path
+                      varThrSlct03,        # Criterion 3 - Threshold
+                      lgcSlct04,           # Criterion 4 - Yes or no?
+                      strVtkSlct04,        # Criterion 4 - VTK path
+                      varThrSlct04,        # Criterion 4 - Threshold
+                      lgcNormDiv,          # Normalisation - Yes or no?
+                      varNormIdx,          # Normalisation - Reference
+                      varDpi,              # Plot - Dots per inch
+                      varYmin,             # Plot - Minimum of Y axis
+                      varYmax,             # Plot - Maximum of Y axis
+                      lstConLbl,           # Plot - Condition labels
+                      strXlabel,           # Plot - X axis label
+                      strYlabel,           # Plot - Y axis label
+                      strTitle,            # Plot - Title
+                      strPltOtPre,         # Plot - Output file path prefix
+                      strPltOtSuf,         # Plot - Output file path suffix
+                      queOut):             # Queue for output list
     """
     Obtaining & plotting single subject data for across subject analysis.
 
@@ -79,7 +74,7 @@ def funcAcrSubGetSubsData(idxPrc,              # Process ID
         if idxPrc == 0:
             print('---------Importing CSV file with ROI definition (first '
                   + 'criterion)')
-        aryRoiVrtx = funcLoadCsvRoi(strCsvRoi, varNumHdrRoi)
+        aryRoiVrtx = load_csv_roi(strCsvRoi, varNumHdrRoi)
     # Otherwise, create dummy vector (for function I/O)
     else:
         aryRoiVrtx = 0
@@ -89,10 +84,10 @@ def funcAcrSubGetSubsData(idxPrc,              # Process ID
         if idxPrc == 0:
             print('---------Importing second criterion vtk file (all depth '
                   + 'levels).')
-        arySlct02 = funcLoadVtkMulti(strVtkSlct02,
-                                     strPrcdData,
-                                     varNumLne,
-                                     varNumDpth)
+        arySlct02 = load_vtk_multi(strVtkSlct02,
+                                   strPrcdData,
+                                   varNumLne,
+                                   varNumDpth)
     # Otherwise, create dummy vector (for function I/O)
     else:
         arySlct02 = 0
@@ -102,10 +97,10 @@ def funcAcrSubGetSubsData(idxPrc,              # Process ID
         if idxPrc == 0:
             print('---------Importing third criterion vtk file (all depth '
                   + 'levels).')
-        arySlct03 = funcLoadVtkMulti(strVtkSlct03,
-                                     strPrcdData,
-                                     varNumLne,
-                                     varNumDpth)
+        arySlct03 = load_vtk_multi(strVtkSlct03,
+                                   strPrcdData,
+                                   varNumLne,
+                                   varNumDpth)
     # Otherwise, create dummy array (for function I/O)
     else:
         arySlct03 = 0
@@ -115,10 +110,10 @@ def funcAcrSubGetSubsData(idxPrc,              # Process ID
         if idxPrc == 0:
             print('---------Importing fourth criterion vtk file (all depth '
                   + 'levels).')
-        arySlct04 = funcLoadVtkMulti(strVtkSlct04,
-                                     strPrcdData,
-                                     varNumLne,
-                                     varNumDpth)
+        arySlct04 = load_vtk_multi(strVtkSlct04,
+                                   strPrcdData,
+                                   varNumLne,
+                                   varNumDpth)
     # Otherwise, create dummy array (for function I/O):
     else:
         arySlct04 = 0
@@ -133,10 +128,10 @@ def funcAcrSubGetSubsData(idxPrc,              # Process ID
     # Loop through input data files:
     for idxIn in range(0, varNumCon):
         # Import data from file:
-        lstDpthData01[idxIn] = funcLoadVtkMulti(lstVtkDpth01[idxIn],
-                                                strPrcdData,
-                                                varNumLne,
-                                                varNumDpth)
+        lstDpthData01[idxIn] = load_vtk_multi(lstVtkDpth01[idxIn],
+                                              strPrcdData,
+                                              varNumLne,
+                                              varNumDpth)
         if idxPrc == 0:
             print('------------File ' + str(idxIn + 1) + ' out of '
                   + str(varNumCon))
@@ -146,20 +141,20 @@ def funcAcrSubGetSubsData(idxPrc,              # Process ID
     # *** Select vertices
 
     lstDpthData01, varNumInc, vecInc = \
-        funcSlctVrtcs(varNumCon,           # Number of conditions
-                      lstDpthData01,       # List with depth-sampled data I
-                      lgcSlct01,           # Criterion 1 - Yes or no?
-                      aryRoiVrtx,          # Criterion 1 - Data (ROI)
-                      lgcSlct02,           # Criterion 2 - Yes or no?
-                      arySlct02,           # Criterion 2 - Data
-                      varThrSlct02,        # Criterion 2 - Threshold
-                      lgcSlct03,           # Criterion 3 - Yes or no?
-                      arySlct03,           # Criterion 3 - Data
-                      varThrSlct03,        # Criterion 3 - Threshold
-                      lgcSlct04,           # Criterion 4 - Yes or no?
-                      arySlct04,           # Criterion 4 - Data
-                      varThrSlct04,        # Criterion 4 - Threshold
-                      idxPrc)              # Process ID
+        slct_vrtcs(varNumCon,           # Number of conditions
+                   lstDpthData01,       # List with depth-sampled data I
+                   lgcSlct01,           # Criterion 1 - Yes or no?
+                   aryRoiVrtx,          # Criterion 1 - Data (ROI)
+                   lgcSlct02,           # Criterion 2 - Yes or no?
+                   arySlct02,           # Criterion 2 - Data
+                   varThrSlct02,        # Criterion 2 - Threshold
+                   lgcSlct03,           # Criterion 3 - Yes or no?
+                   arySlct03,           # Criterion 3 - Data
+                   varThrSlct03,        # Criterion 3 - Threshold
+                   lgcSlct04,           # Criterion 4 - Yes or no?
+                   arySlct04,           # Criterion 4 - Data
+                   varThrSlct04,        # Criterion 4 - Threshold
+                   idxPrc)              # Process ID
     # **************************************************************************
 
     # **************************************************************************
@@ -170,12 +165,12 @@ def funcAcrSubGetSubsData(idxPrc,              # Process ID
 
     # We would like to be able to visualise the selected vertices on the
     # cortical surface, i.e. on a vtk mesh.
-    funcCrtVtkMsk(strSubId,         # Data struc - Subject ID
-                  lstVtkDpth01[0],  # Data struc - Path first data vtk file
-                  strPrcdData,      # Data struc - Str. prcd. VTK data
-                  varNumLne,        # Data struc - Lns. prcd. data VTK
-                  strCsvRoi,        # Data struc - ROI CSV fle (outpt. naming)
-                  vecInc)           # Vector with included vertices
+    vtk_msk(strSubId,         # Data struc - Subject ID
+            lstVtkDpth01[0],  # Data struc - Path first data vtk file
+            strPrcdData,      # Data struc - Str. prcd. VTK data
+            varNumLne,        # Data struc - Lns. prcd. data VTK
+            strCsvRoi,        # Data struc - ROI CSV fle (outpt. naming)
+            vecInc)           # Vector with included vertices
     # **************************************************************************
 
     # **************************************************************************
@@ -260,20 +255,20 @@ def funcAcrSubGetSubsData(idxPrc,              # Process ID
                    + str(varNumInc)
                    + ' vertices')
 
-    funcPltAcrDpth(aryDpthMean,  # Data: aryData[Condition, Depth]
-                   aryDpthConf,  # Error shading: aryError[Condition, Depth]
-                   varNumDpth,   # Number of depth levels (on the x-axis)
-                   varNumCon,    # Number of conditions (separate lines)
-                   varDpi,       # Resolution of the output figure
-                   varYmin,      # Minimum of Y axis
-                   varYmax,      # Maximum of Y axis
-                   False,        # Boolean: whether to convert y axis to %
-                   lstConLbl,    # Labels for conditions (separate lines)
-                   strXlabel,    # Label on x axis
-                   strYlabel,    # Label on y axis
-                   strTitleTmp,  # Figure title
-                   True,         # Boolean: whether to plot a legend
-                   strPltOt)
+    plt_dpth_prfl(aryDpthMean,  # Data: aryData[Condition, Depth]
+                  aryDpthConf,  # Error shading: aryError[Condition, Depth]
+                  varNumDpth,   # Number of depth levels (on the x-axis)
+                  varNumCon,    # Number of conditions (separate lines)
+                  varDpi,       # Resolution of the output figure
+                  varYmin,      # Minimum of Y axis
+                  varYmax,      # Maximum of Y axis
+                  False,        # Boolean: whether to convert y axis to %
+                  lstConLbl,    # Labels for conditions (separate lines)
+                  strXlabel,    # Label on x axis
+                  strYlabel,    # Label on y axis
+                  strTitleTmp,  # Figure title
+                  True,         # Boolean: whether to plot a legend
+                  strPltOt)
     # **************************************************************************
 
     # **************************************************************************

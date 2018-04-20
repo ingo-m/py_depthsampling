@@ -24,7 +24,7 @@ Function of the depth sampling pipeline.
 import numpy as np
 
 
-def funcSlctVrtcs(varNumCon,           # Number of conditions
+def slct_vrtcs(varNumCon,           # Number of conditions
                   lstDpthData01,       # List with depth-sampled data I
                   lgcSlct01,           # Criterion 1 - Yes or no?
                   aryRoiVrtx,          # Criterion 1 - Data (ROI)

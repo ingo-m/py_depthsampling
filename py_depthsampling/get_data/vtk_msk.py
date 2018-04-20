@@ -26,7 +26,7 @@ import os
 import numpy as np  #noqa
 
 
-def funcCrtVtkMsk(strSubId,      # Data struc - Subject ID
+def vtk_msk(strSubId,      # Data struc - Subject ID
                   strVtkDpth01,  # Data struc - Path first data vtk file
                   strPrcdData,   # Data struc - Str. prcd. VTK data
                   varNumLne,     # Data struc - Lns. prcd. data VTK

@@ -23,22 +23,22 @@ import matplotlib.colors as colors
 
 
 def plt_dpth_prfl_acr_subs(arySubDpthMns,
-                       varNumSubs,
-                       varNumDpth,
-                       varNumCon,
-                       varDpi,
-                       varAcrSubsYmin,
-                       varAcrSubsYmax,
-                       lstConLbl,
-                       strXlabel,
-                       strYlabel,
-                       strTitle,
-                       strPltOtPre,
-                       strPltOtSuf,
-                       varSizeX=1800.0,
-                       varSizeY=1600.0,
-                       strErr='conf95',
-                       vecX=None):
+                           varNumSubs,
+                           varNumDpth,
+                           varNumCon,
+                           varDpi,
+                           varAcrSubsYmin,
+                           varAcrSubsYmax,
+                           lstConLbl,
+                           strXlabel,
+                           strYlabel,
+                           strTitle,
+                           strPltOtPre,
+                           strPltOtSuf,
+                           varSizeX=1800.0,
+                           varSizeY=1600.0,
+                           strErr='conf95',
+                           vecX=None):
     """
     Calculate & plot across-subjects mean depth profiles.
 

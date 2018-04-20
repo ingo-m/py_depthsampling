@@ -20,8 +20,8 @@
 
 import numpy as np
 import multiprocessing as mp
-from ds_acrSubsGetData import funcAcrSubGetSubsData
-from ds_pltAcrSubsMean import funcPltAcrSubsMean
+from py_depthsampling.get_data.acr_subs_get_data import acr_subs_get_data
+from py_depthsampling.plot.plt_dpth_prfl_acr_subs import plt_dpth_prfl_acr_subs
 
 
 def ds_main(strRoi, strHmsph, lstSubIds, lstCon, lstConLbl, strVtkDpth01,
@@ -77,7 +77,7 @@ def ds_main(strRoi, strHmsph, lstSubIds, lstCon, lstConLbl, strVtkDpth01,
 
         # Prepare processes that plot & return single subject data:
         lstPrcs[idxSub] = \
-            mp.Process(target=funcAcrSubGetSubsData,
+            mp.Process(target=acr_subs_get_data,
                        args=(idxSub,             # Process ID
                              lstSubIds[idxSub],  # Data struc - Subject ID
                              lstVtkDpth01,       # Data struc - Pth vtk I
@@ -160,17 +160,17 @@ def ds_main(strRoi, strHmsph, lstSubIds, lstCon, lstConLbl, strVtkDpth01,
 
     print('---Plot results - mean over subjects.')
 
-    funcPltAcrSubsMean(arySubDpthMns,
-                       varNumSubs,
-                       varNumDpth,
-                       varNumCon,
-                       varDpi,
-                       varAcrSubsYmin,
-                       varAcrSubsYmax,
-                       lstConLbl,
-                       strXlabel,
-                       strYlabel,
-                       strTitle,
-                       strPltOtPre,
-                       strPltOtSuf)
+    plt_dpth_prfl_acr_subs(arySubDpthMns,
+                           varNumSubs,
+                           varNumDpth,
+                           varNumCon,
+                           varDpi,
+                           varAcrSubsYmin,
+                           varAcrSubsYmax,
+                           lstConLbl,
+                           strXlabel,
+                           strYlabel,
+                           strTitle,
+                           strPltOtPre,
+                           strPltOtSuf)
     # *************************************************************************

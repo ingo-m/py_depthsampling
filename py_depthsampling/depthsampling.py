@@ -89,15 +89,16 @@ strVtkSlct03 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/combined_mean
 varThrSlct03 = 7000.0
 
 # (4)
-# Use vertex selection criterion 2 (vertices that are BELOW threshold are
-# excluded - mean of absolute across depth levels):
+# Use vertex selection criterion 4 (vertices that are WITHIN INTERVAL are
+# included - mean across depth levels):
 lgcSlct04 = True
 # Path of vtk files with for vertex selection criterion. This vtk file is
 # supposed to contain one set of data values for each depth level. (With
 # subject ID and hemisphere left open.)
-strVtkSlct04 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/Pd_zstat1.vtk'  #noqa
+# strVtkSlct04 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/Pd_zstat1.vtk'  #noqa
+strVtkSlct04 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/eccentricity.vtk'  #noqa
 # Threshold for vertex selection:
-varThrSlct04 = 2.0
+tplThrSlct04 = (0.0, 3.0)
 
 # Number of cortical depths:
 varNumDpth = 11
@@ -208,7 +209,7 @@ for idxRoi in range(len(lstRoi)):
                     lstNstCon[idxCon], lstNstConLbl[idxCon], strVtkDpth01,
                     lgcSlct01, strCsvRoi, varNumHdrRoi, lgcSlct02,
                     strVtkSlct02, varThrSlct02, lgcSlct03, strVtkSlct03,
-                    varThrSlct03, lgcSlct04, strVtkSlct04, varThrSlct04,
+                    varThrSlct03, lgcSlct04, strVtkSlct04, tplThrSlct04,
                     varNumDpth, strPrcdData, varNumLne, strTitle, lstLimY,
                     varAcrSubsYmin, varAcrSubsYmax, strXlabel, strYlabel,
                     strPltOtPre.format(lstRoi[idxRoi]), strPltOtSuf.format(

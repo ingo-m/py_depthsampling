@@ -36,7 +36,7 @@ def funcSlctVrtcs(varNumCon,           # Number of conditions
                   varThrSlct03,        # Criterion 3 - Threshold
                   lgcSlct04,           # Criterion 4 - Yes or no?
                   arySlct04,           # Criterion 4 - Data
-                  varThrSlct04,        # Criterion 4 - Threshold
+                  tplThrSlct04,        # Criterion 4 - Threshold
                   idxPrc):             # Process ID
     """Function for selecting vertices. See ds_main.py for more information."""
     # **************************************************************************
@@ -148,8 +148,8 @@ def funcSlctVrtcs(varNumCon,           # Number of conditions
 
     # **************************************************************************
     # *** (2) Selection criterion 4
-    #         Vertices that are BELOW a certain threshold are excluded - mean
-    #         of absolute value across depth levels.
+    #         Vertices that are WITHIN INTERVAL are included - mean across
+    #         depth levels).
 
     if lgcSlct04:
 
@@ -157,12 +157,14 @@ def funcSlctVrtcs(varNumCon,           # Number of conditions
             print('---------Select vertices based on criterion 4')
 
         # Get mean value across cortical depths:
-        vecMneSlct04 = np.mean(np.absolute(arySlct04), axis=1)
-        # vecMneSlct04 = np.mean(arySlct04, axis=1)
+        # vecMneSlct04 = np.mean(np.absolute(arySlct04), axis=1)
+        vecMneSlct04 = np.mean(arySlct04, axis=1)
 
-        # Check whether vertex values are above the exclusion threshold:
-        vecSlct04 = np.greater(vecMneSlct04, varThrSlct04)
-        # vecSlct04 = np.less(vecMneSlct04, varThrSlct04)
+        # Check whether vertex values are within the interval (lower and upper
+        # bound):
+        vecSlct04lowbound = np.greater(vecMneSlct04, tplThrSlct04[0])
+        vecSlct04upbound = np.less(vecMneSlct04, tplThrSlct04[1])
+        vecSlct04 = np.logical_and(vecSlct04lowbound, vecSlct04upbound)
 
         # Apply second vertex selection criterion to inclusion-vector:
         vecInc = np.logical_and(vecInc,

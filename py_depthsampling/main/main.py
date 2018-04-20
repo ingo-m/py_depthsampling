@@ -27,7 +27,7 @@ from ds_pltAcrSubsMean import funcPltAcrSubsMean
 def ds_main(strRoi, strHmsph, lstSubIds, lstCon, lstConLbl, strVtkDpth01,
             lgcSlct01, strCsvRoi, varNumHdrRoi, lgcSlct02, strVtkSlct02,
             varThrSlct02, lgcSlct03, strVtkSlct03, varThrSlct03, lgcSlct04,
-            strVtkSlct04, varThrSlct04, varNumDpth, strPrcdData, varNumLne,
+            strVtkSlct04, tplThrSlct04, varNumDpth, strPrcdData, varNumLne,
             strTitle, lstLimY, varAcrSubsYmin, varAcrSubsYmax, strXlabel,
             strYlabel, strPltOtPre, strPltOtSuf, varDpi, varNormIdx,
             lgcNormDiv, strDpthMeans):
@@ -95,7 +95,7 @@ def ds_main(strRoi, strHmsph, lstSubIds, lstCon, lstConLbl, strVtkDpth01,
                              varThrSlct03,       # Criterion 3 - Threshold
                              lgcSlct04,          # Criterion 4 - Yes or no?
                              strVtkSlct04Tmp,    # Criterion 4 - VTK path
-                             varThrSlct04,       # Criterion 4 - Threshold
+                             tplThrSlct04,       # Criterion 4 - Threshold
                              lgcNormDiv,         # Normalisation - Yes or no?
                              varNormIdx,         # Normalisation - Reference
                              varDpi,             # Plot - dots per inch

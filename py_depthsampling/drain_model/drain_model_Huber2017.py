@@ -106,16 +106,15 @@ Weber, B., Keller, A. L., Reichold, J., & Logothetis, N. K. (2008). The
 
 import numpy as np
 from scipy.interpolate import griddata
-from ds_pltAcrDpth import funcPltAcrDpth
-from ds_pltAcrSubsMean import funcPltAcrSubsMean
-from ds_drainModelDecon01 import depth_deconv_01
-from ds_drainModelDecon02 import depth_deconv_02
-from ds_drainModelDecon03 import depth_deconv_03
-from ds_drainModelDecon04 import depth_deconv_04
-from ds_drainModelDecon05 import depth_deconv_05
-from ds_drainModelDecon06 import depth_deconv_06
-from ds_findPeak import find_peak
-
+from py_depthsampling.plot.plt_acr_dpth import plt_acr_dpth
+from py_depthsampling.plot.plt_dpth_prfl_acr_subs import plt_dpth_prfl_acr_subs
+from py_depthsampling.drain_model.drain_model_decon_01 import deconv_01
+from py_depthsampling.drain_model.drain_model_decon_02 import deconv_02
+from py_depthsampling.drain_model.drain_model_decon_03 import deconv_03
+from py_depthsampling.drain_model.drain_model_decon_04 import deconv_04
+from py_depthsampling.drain_model.drain_model_decon_05 import deconv_05
+from py_depthsampling.drain_model.drain_model_decon_06 import deconv_06
+from py_depthsampling.drain_model.find_peak import find_peak
 
 # ----------------------------------------------------------------------------
 # *** Define parameters
@@ -322,39 +321,39 @@ for idxSub in range(0, varNumSub):
 
     # (1) Deconvolution based on Markuerkiaga et al. (2016).
     if varMdl == 1:
-        aryDecon5[idxSub, :, :] = depth_deconv_01(varNumCon,
-                                                  aryEmp5SnSb[idxSub, :, :])
+        aryDecon5[idxSub, :, :] = deconv_01(varNumCon,
+                                            aryEmp5SnSb[idxSub, :, :])
 
     # (2) Deconvolution based on Markuerkiaga et al. (2016) & scaling based on
     #     Markuerkiaga et al. (2016).
     elif varMdl == 2:
-        aryDecon5[idxSub, :, :] = depth_deconv_02(varNumCon,
-                                                  aryEmp5SnSb[idxSub, :, :])
+        aryDecon5[idxSub, :, :] = deconv_02(varNumCon,
+                                            aryEmp5SnSb[idxSub, :, :])
 
     # (3) Deconvolution based on Markuerkiaga et al. (2016) & scaling based on
     #     Weber et al. (2008).
     elif varMdl == 3:
-        aryDecon5[idxSub, :, :] = depth_deconv_03(varNumCon,
-                                                  aryEmp5SnSb[idxSub, :, :],
-                                                  strRoi=strRoi)
+        aryDecon5[idxSub, :, :] = deconv_03(varNumCon,
+                                            aryEmp5SnSb[idxSub, :, :],
+                                            strRoi=strRoi)
 
     # (4) Deconvolution based on Markuerkiaga et al. (2016), with random error.
     elif varMdl == 4:
-            aryDecon5[idxSub, :, :, :] = depth_deconv_04(varNumCon,
-                                                         aryEmp5,
-                                                         aryNseRnd)
+            aryDecon5[idxSub, :, :, :] = deconv_04(varNumCon,
+                                                   aryEmp5,
+                                                   aryNseRnd)
 
     # (5) Deconvolution based on Markuerkiaga et al. (2016), with random and
     #     systematic error.
     elif varMdl == 5:
             aryDecon5[idxSub, :, :, :], arySys5[idxSub, :, :, :] = \
-                depth_deconv_05(varNumCon, aryEmp5, aryNseRnd, varNseSys)
+                deconv_05(varNumCon, aryEmp5, aryNseRnd, varNseSys)
 
     # (6) Deconvolution based on Markuerkiaga et al. (2016), with deep GM
     #     signal scaling factor.
     elif varMdl == 6:
             aryDecon5[idxSub, :, :, :] = \
-                depth_deconv_06(varNumCon, aryEmp5, lstFctr)
+                deconv_06(varNumCon, aryEmp5, lstFctr)
 
     # -------------------------------------------------------------------------
     # *** Interpolation
@@ -554,26 +553,26 @@ if (varMdl != 4) and (varMdl != 5) and (varMdl != 6):
     lstLbl = ['BOLD before deconvolution', 'BOLD after deconvolution', 'CBV']
 
     # Plot BOLD profiles before and after deconvolution, and CBV profile:
-    funcPltAcrDpth(aryComb,            # aryData[Condition, Depth]
-                   aryErr,                  # aryError[Con., Depth]
-                   varNumDpth,         # Number of depth levels (on the x-axis)
-                   3,                  # Number of conditions (separate lines)
-                   varDpi,             # Resolution of the output figure
-                   varAcrSubsYmin01,   # Minimum of Y axis
-                   varAcrSubsYmax01,   # Maximum of Y axis
-                   False,              # Bool.: whether to convert y axis to %
-                   lstLbl,         # Labels for conditions (separate lines)
-                   strXlabel,          # Label on x axis
-                   strYlabel,          # Label on y axis
-                   strTmpTtl,          # Figure title
-                   True,               # Boolean: whether to plot a legend
-                   (strPthPltOt + strFlTp),
-                   varSizeX=2000.0,
-                   varSizeY=1400.0,
-                   vecX=vecIntpEqui,
-                   varNumLblY=5,
-                   varPadY=(1, 2),
-                   varRound=1)
+    plt_acr_dpth(aryComb,            # aryData[Condition, Depth]
+                 aryErr,                  # aryError[Con., Depth]
+                 varNumDpth,         # Number of depth levels (on the x-axis)
+                 3,                  # Number of conditions (separate lines)
+                 varDpi,             # Resolution of the output figure
+                 varAcrSubsYmin01,   # Minimum of Y axis
+                 varAcrSubsYmax01,   # Maximum of Y axis
+                 False,              # Bool.: whether to convert y axis to %
+                 lstLbl,         # Labels for conditions (separate lines)
+                 strXlabel,          # Label on x axis
+                 strYlabel,          # Label on y axis
+                 strTmpTtl,          # Figure title
+                 True,               # Boolean: whether to plot a legend
+                 (strPthPltOt + strFlTp),
+                 varSizeX=2000.0,
+                 varSizeY=1400.0,
+                 vecX=vecIntpEqui,
+                 varNumLblY=5,
+                 varPadY=(1, 2),
+                 varRound=1)
 
 
 elif varMdl == 4:
@@ -587,21 +586,21 @@ elif varMdl == 4:
     # Across-subjects mean after deconvolution:
     strTmpTtl = '{} after deconvolution'.format(strRoi.upper())
     strTmpPth = (strPthPltOt + 'after_')
-    funcPltAcrSubsMean(aryDecon,
-                       varNumSub,
-                       varNumDpth,
-                       varNumCon,
-                       varDpi,
-                       varAcrSubsYmin02,
-                       varAcrSubsYmax02,
-                       lstConLbl,
-                       strXlabel,
-                       strYlabel,
-                       strTmpTtl,
-                       strTmpPth,
-                       strFlTp,
-                       strErr='prct95',
-                       vecX=vecIntpEqui)
+    plt_dpth_prfl_acr_subs(aryDecon,
+                           varNumSub,
+                           varNumDpth,
+                           varNumCon,
+                           varDpi,
+                           varAcrSubsYmin02,
+                           varAcrSubsYmax02,
+                           lstConLbl,
+                           strXlabel,
+                           strYlabel,
+                           strTmpTtl,
+                           strTmpPth,
+                           strFlTp,
+                           strErr='prct95',
+                           vecX=vecIntpEqui)
 
 elif varMdl == 5:
 
@@ -665,26 +664,26 @@ elif varMdl == 5:
                        [230.0, 56.0, 60.0]))
     aryClr = np.divide(aryClr, 255.0)
 
-    funcPltAcrDpth(aryComb,            # aryData[Condition, Depth]
-                   0,                  # aryError[Con., Depth]
-                   varNumDpth,         # Number of depth levels (on the x-axis)
-                   3,                  # Number of conditions (separate lines)
-                   varDpi,             # Resolution of the output figure
-                   0.0,                # Minimum of Y axis
-                   2.0,                # Maximum of Y axis
-                   False,              # Bool.: whether to convert y axis to %
-                   lstLblMdl5,         # Labels for conditions (separate lines)
-                   strXlabel,          # Label on x axis
-                   strYlabel,          # Label on y axis
-                   strTmpTtl,          # Figure title
-                   True,               # Boolean: whether to plot a legend
-                   (strPthPltOt + 'after' + strFlTp),
-                   varSizeX=2000.0,
-                   varSizeY=1400.0,
-                   aryCnfLw=aryErrLw,
-                   aryCnfUp=aryErrUp,
-                   aryClr=aryClr,
-                   vecX=vecIntpEqui)
+    plt_acr_dpth(aryComb,            # aryData[Condition, Depth]
+                 0,                  # aryError[Con., Depth]
+                 varNumDpth,         # Number of depth levels (on the x-axis)
+                 3,                  # Number of conditions (separate lines)
+                 varDpi,             # Resolution of the output figure
+                 0.0,                # Minimum of Y axis
+                 2.0,                # Maximum of Y axis
+                 False,              # Bool.: whether to convert y axis to %
+                 lstLblMdl5,         # Labels for conditions (separate lines)
+                 strXlabel,          # Label on x axis
+                 strYlabel,          # Label on y axis
+                 strTmpTtl,          # Figure title
+                 True,               # Boolean: whether to plot a legend
+                 (strPthPltOt + 'after' + strFlTp),
+                 varSizeX=2000.0,
+                 varSizeY=1400.0,
+                 aryCnfLw=aryErrLw,
+                 aryCnfUp=aryErrUp,
+                 aryClr=aryClr,
+                 vecX=vecIntpEqui)
 
 elif varMdl == 6:
 
@@ -722,23 +721,23 @@ elif varMdl == 6:
     strXlabel = 'Cortical depth level (equivolume)'
     strYlabel = 'fMRI signal change [a.u.]'
 
-    funcPltAcrDpth(aryDecon,           # aryData[Condition, Depth]
-                   aryErr,             # aryError[Con., Depth]
-                   varNumDpth,         # Number of depth levels (on the x-axis)
-                   aryDecon.shape[0],  # Number of conditions (separate lines)
-                   varDpi,             # Resolution of the output figure
-                   0.0,                # Minimum of Y axis
-                   2.0,                # Maximum of Y axis
-                   False,              # Bool.: whether to convert y axis to %
-                   lstLblMdl5,         # Labels for conditions (separate lines)
-                   strXlabel,          # Label on x axis
-                   strYlabel,          # Label on y axis
-                   strTmpTtl,          # Figure title
-                   True,               # Boolean: whether to plot a legend
-                   (strPthPltOt + 'after' + strFlTp),
-                   varSizeX=2000.0,
-                   varSizeY=1400.0,
-                   vecX=vecIntpEqui)
+    plt_acr_dpth(aryDecon,           # aryData[Condition, Depth]
+                 aryErr,             # aryError[Con., Depth]
+                 varNumDpth,         # Number of depth levels (on the x-axis)
+                 aryDecon.shape[0],  # Number of conditions (separate lines)
+                 varDpi,             # Resolution of the output figure
+                 0.0,                # Minimum of Y axis
+                 2.0,                # Maximum of Y axis
+                 False,              # Bool.: whether to convert y axis to %
+                 lstLblMdl5,         # Labels for conditions (separate lines)
+                 strXlabel,          # Label on x axis
+                 strYlabel,          # Label on y axis
+                 strTmpTtl,          # Figure title
+                 True,               # Boolean: whether to plot a legend
+                 (strPthPltOt + 'after' + strFlTp),
+                 varSizeX=2000.0,
+                 varSizeY=1400.0,
+                 vecX=vecIntpEqui)
 
 # ----------------------------------------------------------------------------
 print('-Done.')

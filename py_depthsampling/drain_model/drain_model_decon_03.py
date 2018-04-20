@@ -21,7 +21,7 @@
 import numpy as np
 
 
-def depth_deconv_03(varNumCon, aryEmp5, strRoi='v1'):
+def deconv_03(varNumCon, aryEmp5, strRoi='v1'):
     """
     Deconvolution of GE fMRI depth profiles (draining effect correction).
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Function of the depth sampling pipeline."""
 
 # Part of py_depthsampling library

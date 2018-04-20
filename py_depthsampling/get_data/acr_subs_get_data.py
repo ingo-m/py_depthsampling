@@ -19,6 +19,7 @@
 
 import numpy as np  # noqa
 from py_depthsampling.get_data.load_csv_roi import load_csv_roi
+from py_depthsampling.get_data.load_vtk_single import load_vtk_single
 from py_depthsampling.get_data.load_vtk_multi import load_vtk_multi
 from py_depthsampling.main.slct_vrtcs import slct_vrtcs
 from py_depthsampling.get_data.vtk_msk import vtk_msk
@@ -105,15 +106,14 @@ def acr_subs_get_data(idxPrc,              # Process ID  #noqa
     else:
         arySlct03 = 0
 
-    # Import fourth criterion vtk file (all depth levels)
+    # Import fourth criterion vtk file (one depth level)
     if lgcSlct04:
         if idxPrc == 0:
-            print('---------Importing fourth criterion vtk file (all depth '
-                  + 'levels).')
-        arySlct04 = load_vtk_multi(strVtkSlct04,
-                                   strPrcdData,
-                                   varNumLne,
-                                   varNumDpth)
+            print('---------Importing fourth criterion vtk file (one depth '
+                  + 'level).')
+        arySlct04 = load_vtk_single(strVtkSlct04,
+                                    strPrcdData,
+                                    varNumLne)
     # Otherwise, create dummy array (for function I/O):
     else:
         arySlct04 = 0

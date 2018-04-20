@@ -15,8 +15,8 @@ are selected according to several criteria:
         level can be used.)
     (3) Selection criterion 3 - same as (2). Vertices that are BELOW threshold
         at any depth level are excluded.
-    (4) Selection criterion 4 - same as (2). Vertices that are BELOW threshold
-        at any depth level are excluded.
+    (4) Selection criterion 4 - Vertices that are WITHIN INTERVAL are included
+        (one depth level, e.g. mid-GM eccentricity).
 """
 
 
@@ -25,6 +25,9 @@ from py_depthsampling.main.main import ds_main
 
 # *****************************************************************************
 # *** Define parameters
+
+# Meta-condition (within or outside of stimulus area):
+lstMetaCon = ['within', 'outside']
 
 # Region of interest ('v1' or 'v2'):
 lstRoi = ['v1', 'v2']
@@ -90,15 +93,16 @@ varThrSlct03 = 7000.0
 
 # (4)
 # Use vertex selection criterion 4 (vertices that are WITHIN INTERVAL are
-# included - mean across depth levels):
+# included - one depth level):
 lgcSlct04 = True
 # Path of vtk files with for vertex selection criterion. This vtk file is
 # supposed to contain one set of data values for each depth level. (With
 # subject ID and hemisphere left open.)
 # strVtkSlct04 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/Pd_zstat1.vtk'  #noqa
 strVtkSlct04 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/eccentricity.vtk'  #noqa
-# Threshold for vertex selection:
-tplThrSlct04 = (0.0, 3.0)
+# Threshold for vertex selection - list of tuples (interval per meta-condition,
+# e.g. within & outside stimulus area):
+lstThrSlct04 = [(0.0, 3.0), (3.5, 4.0)]
 
 # Number of cortical depths:
 varNumDpth = 11
@@ -115,7 +119,7 @@ strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'fMRI signal [a.u.]'
 
 # Output path for plots - prefix:
-strPltOtPre = '/home/john/PhD/PacMan_Plots/pe/plots_{}/'
+strPltOtPre = '/home/john/PhD/PacMan_Plots/pe/{}/plots_{}/'
 
 # Output path for plots - suffix:
 strPltOtSuf = '_{}_{}_{}.png'
@@ -134,7 +138,7 @@ varNormIdx = 0
 lgcNormDiv = False
 
 # Output path for depth samling results (within subject means):
-strDpthMeans = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}_{}_{}.npy'  #noqa
+strDpthMeans = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}.npy'  #noqa
 
 # Maximum number of processes to run in parallel: *** NOT IMPLEMENTED
 # varPar = 10
@@ -145,75 +149,80 @@ strDpthMeans = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}_{}_{}.
 # *** Loop through ROIs / conditions
 
 # Loop through ROIs, hemispheres, and conditions to create plots:
-for idxRoi in range(len(lstRoi)):
-    for idxHmsph in range(len(lstHmsph)):
-        for idxCon in range(len(lstNstCon)):
+for idxMtaCn in range(len(lstMetaCon)):  #noqa
+    for idxRoi in range(len(lstRoi)):
+        for idxHmsph in range(len(lstHmsph)):
+            for idxCon in range(len(lstNstCon)):
 
-            # Limits of axes need to be adjusted based on ROI, condition,
-            # hemisphere.
+                # Limits of axes need to be adjusted based on ROI, condition,
+                # hemisphere.
 
-            # Limits of y-axis for SINGLE SUBJECT PLOTS (list of tuples,
-            # [(Ymin, Ymax)]):
+                # Limits of y-axis for SINGLE SUBJECT PLOTS (list of tuples,
+                # [(Ymin, Ymax)]):
 
-            if idxRoi == 0:  # v1
-                if idxCon == 0:  # v1 simple contrasts
-                    lstLimY = [(-750.0, 25.0)] * len(lstSubIds)
-                elif idxCon == 1:  # v1 Pd_min_Ps
-                    lstLimY = [(-50.0, 50.0)] * len(lstSubIds)
-                elif idxCon == 2:  # v1 Pd_min_Cd
-                    lstLimY = [(-50.0, 50.0)] * len(lstSubIds)
+                if idxRoi == 0:  # v1
+                    if idxCon == 0:  # v1 simple contrasts
+                        lstLimY = [(-325.0, 25.0)] * len(lstSubIds)
+                    elif idxCon == 1:  # v1 Pd_min_Ps
+                        lstLimY = [(-50.0, 50.0)] * len(lstSubIds)
+                    elif idxCon == 2:  # v1 Pd_min_Cd
+                        lstLimY = [(-50.0, 50.0)] * len(lstSubIds)
 
-            elif idxRoi == 1:  # v2
-                if idxCon == 0:  # v2 simple contrasts
-                    lstLimY = [(-500.0, 20.0)] * len(lstSubIds)
-                elif idxCon == 1:  # v2 Pd_min_Ps
-                    lstLimY = [(-50.0, 50.0)] * len(lstSubIds)
-                elif idxCon == 2:  # v2 Pd_min_Cd
-                    lstLimY = [(-50.0, 50.0)] * len(lstSubIds)
+                elif idxRoi == 1:  # v2
+                    if idxCon == 0:  # v2 simple contrasts
+                        lstLimY = [(-500.0, 20.0)] * len(lstSubIds)
+                    elif idxCon == 1:  # v2 Pd_min_Ps
+                        lstLimY = [(-50.0, 50.0)] * len(lstSubIds)
+                    elif idxCon == 2:  # v2 Pd_min_Cd
+                        lstLimY = [(-50.0, 50.0)] * len(lstSubIds)
 
-            # Limits of y-axis for ACROSS SUBJECT PLOTS:
+                # Limits of y-axis for ACROSS SUBJECT PLOTS:
 
-            if idxRoi == 0:  # v1
-                if idxCon == 0:  # v1 simple contrasts
-                    # Limits of y-axis for across subject plot:
-                    varAcrSubsYmin = -500.0
-                    varAcrSubsYmax = 200.0
-                elif idxCon == 1:  # v1 Pd_min_Ps
-                    # Limits of y-axis for across subject plot:
-                    varAcrSubsYmin = -70.0
-                    varAcrSubsYmax = 70.0
-                elif idxCon == 2:  # v1 Pd_min_Cd
-                    # Limits of y-axis for across subject plot:
-                    varAcrSubsYmin = -70.0
-                    varAcrSubsYmax = 70.0
+                if idxRoi == 0:  # v1
+                    if idxCon == 0:  # v1 simple contrasts
+                        # Limits of y-axis for across subject plot:
+                        varAcrSubsYmin = -500.0
+                        varAcrSubsYmax = 200.0
+                    elif idxCon == 1:  # v1 Pd_min_Ps
+                        # Limits of y-axis for across subject plot:
+                        varAcrSubsYmin = -70.0
+                        varAcrSubsYmax = 70.0
+                    elif idxCon == 2:  # v1 Pd_min_Cd
+                        # Limits of y-axis for across subject plot:
+                        varAcrSubsYmin = -70.0
+                        varAcrSubsYmax = 70.0
 
-            elif idxRoi == 1:  # v2
-                if idxCon == 0:  # v2 simple contrasts
-                    # Limits of y-axis for across subject plot:
-                    varAcrSubsYmin = -500.0
-                    varAcrSubsYmax = 200.0
-                elif idxCon == 1:  # v2 Pd_min_Ps
-                    # Limits of y-axis for across subject plot:
-                    varAcrSubsYmin = -70.0
-                    varAcrSubsYmax = 70.0
-                elif idxCon == 2:  # v2 Pd_min_Cd
-                    # Limits of y-axis for across subject plot:
-                    varAcrSubsYmin = -70.0
-                    varAcrSubsYmax = 70.0
+                elif idxRoi == 1:  # v2
+                    if idxCon == 0:  # v2 simple contrasts
+                        # Limits of y-axis for across subject plot:
+                        varAcrSubsYmin = -500.0
+                        varAcrSubsYmax = 200.0
+                    elif idxCon == 1:  # v2 Pd_min_Ps
+                        # Limits of y-axis for across subject plot:
+                        varAcrSubsYmin = -70.0
+                        varAcrSubsYmax = 70.0
+                    elif idxCon == 2:  # v2 Pd_min_Cd
+                        # Limits of y-axis for across subject plot:
+                        varAcrSubsYmin = -70.0
+                        varAcrSubsYmax = 70.0
 
-            # Title for mean plot:
-            strTitle = lstRoi[idxRoi].upper()
+                # Title for mean plot:
+                strTitle = lstRoi[idxRoi].upper()
 
-            # Call main function:
-            ds_main(lstRoi[idxRoi], lstHmsph[idxHmsph], lstSubIds,
-                    lstNstCon[idxCon], lstNstConLbl[idxCon], strVtkDpth01,
-                    lgcSlct01, strCsvRoi, varNumHdrRoi, lgcSlct02,
-                    strVtkSlct02, varThrSlct02, lgcSlct03, strVtkSlct03,
-                    varThrSlct03, lgcSlct04, strVtkSlct04, tplThrSlct04,
-                    varNumDpth, strPrcdData, varNumLne, strTitle, lstLimY,
-                    varAcrSubsYmin, varAcrSubsYmax, strXlabel, strYlabel,
-                    strPltOtPre.format(lstRoi[idxRoi]), strPltOtSuf.format(
-                    lstHmsph[idxHmsph], lstRoi[idxRoi], lstNstCon[idxCon][0]),
-                    varDpi, varNormIdx, lgcNormDiv, strDpthMeans.format(
-                    lstRoi[idxRoi], lstHmsph[idxHmsph], lstNstCon[idxCon][0]))
+                # Call main function:
+                ds_main(lstRoi[idxRoi], lstHmsph[idxHmsph], lstSubIds,
+                        lstNstCon[idxCon], lstNstConLbl[idxCon], strVtkDpth01,
+                        lgcSlct01, strCsvRoi, varNumHdrRoi, lgcSlct02,
+                        strVtkSlct02, varThrSlct02, lgcSlct03, strVtkSlct03,
+                        varThrSlct03, lgcSlct04, strVtkSlct04,
+                        lstThrSlct04[idxMtaCn], varNumDpth, strPrcdData,
+                        varNumLne, strTitle, lstLimY, varAcrSubsYmin,
+                        varAcrSubsYmax, strXlabel, strYlabel,
+                        strPltOtPre.format(lstMetaCon[idxMtaCn],
+                        lstRoi[idxRoi]), strPltOtSuf.format(
+                        lstHmsph[idxHmsph], lstRoi[idxRoi],
+                        lstNstCon[idxCon][0]), varDpi, varNormIdx, lgcNormDiv,
+                        strDpthMeans.format(lstMetaCon[idxMtaCn],
+                        lstRoi[idxRoi], lstHmsph[idxHmsph],
+                        lstNstCon[idxCon][0]))
 # *****************************************************************************

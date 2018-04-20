@@ -25,19 +25,19 @@ import numpy as np
 
 
 def slct_vrtcs(varNumCon,           # Number of conditions
-                  lstDpthData01,       # List with depth-sampled data I
-                  lgcSlct01,           # Criterion 1 - Yes or no?
-                  aryRoiVrtx,          # Criterion 1 - Data (ROI)
-                  lgcSlct02,           # Criterion 2 - Yes or no?
-                  arySlct02,           # Criterion 2 - Data
-                  varThrSlct02,        # Criterion 2 - Threshold
-                  lgcSlct03,           # Criterion 3 - Yes or no?
-                  arySlct03,           # Criterion 3 - Data
-                  varThrSlct03,        # Criterion 3 - Threshold
-                  lgcSlct04,           # Criterion 4 - Yes or no?
-                  arySlct04,           # Criterion 4 - Data
-                  tplThrSlct04,        # Criterion 4 - Threshold
-                  idxPrc):             # Process ID
+               lstDpthData01,       # List with depth-sampled data I
+               lgcSlct01,           # Criterion 1 - Yes or no?
+               aryRoiVrtx,          # Criterion 1 - Data (ROI)
+               lgcSlct02,           # Criterion 2 - Yes or no?
+               arySlct02,           # Criterion 2 - Data
+               varThrSlct02,        # Criterion 2 - Threshold
+               lgcSlct03,           # Criterion 3 - Yes or no?
+               arySlct03,           # Criterion 3 - Data
+               varThrSlct03,        # Criterion 3 - Threshold
+               lgcSlct04,           # Criterion 4 - Yes or no?
+               arySlct04,           # Criterion 4 - Data
+               tplThrSlct04,        # Criterion 4 - Threshold
+               idxPrc):             # Process ID
     """Function for selecting vertices. See ds_main.py for more information."""
     # **************************************************************************
     # Preparations
@@ -158,12 +158,12 @@ def slct_vrtcs(varNumCon,           # Number of conditions
 
         # Get mean value across cortical depths:
         # vecMneSlct04 = np.mean(np.absolute(arySlct04), axis=1)
-        vecMneSlct04 = np.mean(arySlct04, axis=1)
+        # vecMneSlct04 = np.mean(arySlct04, axis=1)
 
         # Check whether vertex values are within the interval (lower and upper
         # bound):
-        vecSlct04lowbound = np.greater(vecMneSlct04, tplThrSlct04[0])
-        vecSlct04upbound = np.less(vecMneSlct04, tplThrSlct04[1])
+        vecSlct04lowbound = np.greater(arySlct04, tplThrSlct04[0])
+        vecSlct04upbound = np.less(arySlct04, tplThrSlct04[1])
         vecSlct04 = np.logical_and(vecSlct04lowbound, vecSlct04upbound)
 
         # Apply second vertex selection criterion to inclusion-vector:

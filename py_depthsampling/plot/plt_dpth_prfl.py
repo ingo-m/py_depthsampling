@@ -290,7 +290,7 @@ def plt_dpth_prfl(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
                      prop={'size': 26})
 
     # Make plot & axis labels fit into figure:
-    plt.tight_layout(pad=0.5)
+    # plt.tight_layout(pad=0.5)
 
     # Save figure:
     fgr01.savefig(strPath,

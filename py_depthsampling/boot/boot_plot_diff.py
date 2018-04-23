@@ -21,11 +21,11 @@ import numpy as np
 from py_depthsampling.plot.plt_dpth_prfl import plt_dpth_prfl
 
 
-def bootPlot(objDpth, strPath, lstConLbl, varNumIt=10000, varConLw=2.5,
-             varConUp=97.5, strTtl='', varYmin=0.0, varYmax=2.0,
-             strXlabel='Cortical depth level (equivolume)',
-             strYlabel='fMRI signal change [arbitrary units]',
-             lgcLgnd=False, tplDiff=None):
+def boot_plot(objDpth, strPath, lstConLbl, varNumIt=10000, varConLw=2.5,
+              varConUp=97.5, strTtl='', varYmin=0.0, varYmax=2.0,
+              strXlabel='Cortical depth level (equivolume)',
+              strYlabel='fMRI signal change [arbitrary units]',
+              lgcLgnd=False, tplDiff=None):
     """
     Plot across-subject cortical depth profiles with confidence intervals.
 
@@ -188,4 +188,3 @@ def bootPlot(objDpth, strPath, lstConLbl, varNumIt=10000, varConLw=2.5,
                   varNumLblY=5, varPadY=(0.1, 0.1), aryCnfLw=aryPrct[0, :, :],
                   aryCnfUp=aryPrct[1, :, :])
     # ------------------------------------------------------------------------
-

@@ -241,8 +241,11 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
     # File name for figure:
     strPltOt = strPltOtPre + 'acrsSubsMean' + strPltOtSuf
 
-    # Make plot & axis labels fit into figure:
+    # Make plot & axis labels fit into figure (this may not always work):
+    # try:
     plt.tight_layout(pad=0.5)
+    # except ...:
+    #     pass
 
     # Save figure:
     fgr01.savefig(strPltOt,

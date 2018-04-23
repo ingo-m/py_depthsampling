@@ -26,8 +26,8 @@ from py_depthsampling.main.main import ds_main
 # *****************************************************************************
 # *** Define parameters
 
-# Meta-condition (within or outside of stimulus area):
-lstMetaCon = ['within', 'outside']
+# Meta-condition (within or outside of retinotopic stimulus area):
+lstMetaCon = ['stimulus', 'periphery']
 
 # Region of interest ('v1' or 'v2'):
 lstRoi = ['v1', 'v2']

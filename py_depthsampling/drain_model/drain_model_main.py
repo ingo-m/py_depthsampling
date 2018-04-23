@@ -20,7 +20,6 @@
 
 import numpy as np
 from scipy.interpolate import griddata
-from py_depthsampling.plot.plt_acr_dpth import plt_acr_dpth
 from py_depthsampling.plot.plt_dpth_prfl_acr_subs import plt_dpth_prfl_acr_subs
 from py_depthsampling.drain_model.drain_model_decon_01 import deconv_01
 from py_depthsampling.drain_model.drain_model_decon_02 import deconv_02
@@ -28,7 +27,7 @@ from py_depthsampling.drain_model.drain_model_decon_03 import deconv_03
 from py_depthsampling.drain_model.drain_model_decon_04 import deconv_04
 from py_depthsampling.drain_model.drain_model_decon_05 import deconv_05
 from py_depthsampling.drain_model.drain_model_decon_06 import deconv_06
-from py_depthsampling.drain_model.find_peak import find_peak
+from py_depthsampling.main.find_peak import find_peak
 
 
 def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  #noqa

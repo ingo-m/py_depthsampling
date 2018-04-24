@@ -30,7 +30,7 @@ def ds_main(strRoi, strHmsph, lstSubIds, lstCon, lstConLbl, strVtkDpth01,
             strVtkSlct04, tplThrSlct04, varNumDpth, strPrcdData, varNumLne,
             strTitle, lstLimY, varAcrSubsYmin, varAcrSubsYmax, strXlabel,
             strYlabel, strPltOtPre, strPltOtSuf, varDpi, varNormIdx,
-            lgcNormDiv, strDpthMeans):
+            lgcNormDiv, strDpthMeans, strMetaCon=''):
     """Main routine for analysis & visualisation of depth sampling results."""
     # *************************************************************************
     # *** Plot and retrieve single subject data
@@ -107,6 +107,7 @@ def ds_main(strRoi, strHmsph, lstSubIds, lstCon, lstConLbl, strVtkDpth01,
                              strTitle,            # Plot - Title
                              strPltOtPre,   # Plot - Output file path prefix
                              strPltOtSuf,   # Plot - Output file path suffix
+                             strMetaCon,    # Metacondition (stim/periphery)
                              queOut))       # Queue for output list
 
         # Daemon (kills processes when exiting):

@@ -103,20 +103,26 @@ from py_depthsampling.drain_model.drain_model_main import drain_model
 # Which draining model to use (1, 2, 3, 4, 5, or 6 - see above for details):
 lstMdl = [1]
 
+# Meta-condition (within or outside of retinotopic stimulus area):
+lstMetaCon = ['stimulus', 'periphery']
+
 # ROI ('v1' or 'v2'):
 lstRoi = ['v1', 'v2']
 
 # Hemisphere ('rh' or 'lh'):
 lstHmsph = ['lh', 'rh']
 
-# Path of depth-profile to correct:
-strPthPrf = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}_{}.npy'  #noqa
+# Path of depth-profile to correct (meta-condition, ROI, hemisphere, and
+# condition left open):
+strPthPrf = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}.npy'  #noqa
 
-# Output path for corrected depth-profiles:
-strPthPrfOt = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}_{}_corrected_model_{}.npy'  #noqa
+# Output path for corrected depth-profiles (meta-condition, ROI, hemisphere,
+# condition, and model index left open):
+strPthPrfOt = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}_deconv_model_{}.npy'  #noqa
 
-# Output path & prefix for plots:
-strPthPltOt = '/home/john/PhD/PacMan_Plots/deconv/deconv_{}_{}_model_{}_'  #noqa
+# Output path & prefix for plots (meta-condition, ROI, ROI, hemisphere,
+# condition, and model index left open):
+strPthPltOt = '/home/john/PhD/PacMan_Plots/deconv/{}/{}/{}_{}_{}_deconv_model_{}_'  #noqa
 
 # File type suffix for plot:
 strFlTp = '.png'
@@ -129,14 +135,17 @@ strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'fMRI signal change [arbitrary units]'
 
 # Condition levels (used to complete file names) - nested list:
-lstNstCon = [['Pd', 'Cd', 'Ps'],
-             ['Pd_min_Ps'],
-             ['Pd_min_Cd']]
+# lstNstCon = [['Pd', 'Cd', 'Ps'],
+#              ['Pd_min_Ps'],
+#              ['Pd_min_Cd']]
+# NOTE: Higher level contrast should be calculated again after deconvolution.
+lstNstCon = [['Pd', 'Cd', 'Ps']]
 
 # Condition labels:
-lstNstConLbl = [['PacMan Dynamic', 'Control Dynamic', 'PacMan Static'],
-                ['PacMan D - PacMan S'],
-                ['PacMan D - Control D']]
+# lstNstConLbl = [['PacMan Dynamic', 'Control Dynamic', 'PacMan Static'],
+#                 ['PacMan D - PacMan S'],
+#                 ['PacMan D - Control D']]
+lstNstConLbl = [['PacMan Dynamic', 'Control Dynamic', 'PacMan Static']]
 
 # Number of resampling iterations for peak finding (for models 1, 2, and 3) or
 # random noise samples (models 4 and 5):
@@ -172,63 +181,87 @@ lstFctr = [0.0, 0.25, 0.5, 0.75]
 # *** Loop through ROIs / conditions
 
 # Loop through models, ROIs, hemispheres, and conditions to create plots:
-for idxMdl in range(len(lstMdl)):  #noqa
-    for idxRoi in range(len(lstRoi)):
-        for idxHmsph in range(len(lstHmsph)):
-            for idxCon in range(len(lstNstCon)):
+for idxMtaCn in range(len(lstMetaCon)):  #noqa
+    for idxMdl in range(len(lstMdl)):  #noqa
+        for idxRoi in range(len(lstRoi)):
+            for idxHmsph in range(len(lstHmsph)):
+                for idxCon in range(len(lstNstCon)):
 
-                # Limits of axes need to be adjusted based on ROI, condition,
-                # hemisphere.
+                    # Limits of axes need to be adjusted based on ROI,
+                    # condition, hemisphere.
 
-                # Limits of y-axis for ACROSS SUBJECT PLOTS:
+                    # Limits of y-axis for ACROSS SUBJECT PLOTS:
 
-                if idxRoi == 0:  # v1
-                    if idxCon == 0:  # v1 simple contrasts
-                        # Limits of y-axis for across subject plot:
-                        varAcrSubsYmin01 = -500.0
-                        varAcrSubsYmax01 = 0.0
-                        varAcrSubsYmin02 = -300.0
-                        varAcrSubsYmax02 = 0.0
-                    elif idxCon == 1:  # v1 Pd_min_Ps
-                        # Limits of y-axis for across subject plot:
-                        varAcrSubsYmin01 = -500.0
-                        varAcrSubsYmax01 = 0.0
-                        varAcrSubsYmin02 = -300.0
-                        varAcrSubsYmax02 = 0.0
-                    elif idxCon == 2:  # v1 Pd_min_Cd
-                        # Limits of y-axis for across subject plot:
-                        varAcrSubsYmin01 = -500.0
-                        varAcrSubsYmax01 = 0.0
-                        varAcrSubsYmin02 = -300.0
-                        varAcrSubsYmax02 = 0.0
+                    if idxRoi == 0:  # v1
+                        if idxCon == 0:  # v1 simple contrasts
+                            if lstMetaCon[idxMtaCn] == 'stimulus':
+                                # Limits of y-axis for across subject plot:
+                                varAcrSubsYmin01 = -400.0
+                                varAcrSubsYmax01 = 0.0
+                                varAcrSubsYmin02 = -400.0
+                                varAcrSubsYmax02 = 0.0
+                            if lstMetaCon[idxMtaCn] == 'periphery':
+                                # Limits of y-axis for across subject plot:
+                                varAcrSubsYmin01 = -100.0
+                                varAcrSubsYmax01 = 300.0
+                                varAcrSubsYmin02 = -100.0
+                                varAcrSubsYmax02 = 300.0
+                        # elif idxCon == 1:  # v1 Pd_min_Ps
+                        #    # Limits of y-axis for across subject plot:
+                        #    varAcrSubsYmin01 = -400.0
+                        #    varAcrSubsYmax01 = 0.0
+                        #    varAcrSubsYmin02 = -400.0
+                        #    varAcrSubsYmax02 = 0.0
+                        # elif idxCon == 2:  # v1 Pd_min_Cd
+                        #    # Limits of y-axis for across subject plot:
+                        #    varAcrSubsYmin01 = -500.0
+                        #    varAcrSubsYmax01 = 0.0
+                        #    varAcrSubsYmin02 = -300.0
+                        #    varAcrSubsYmax02 = 0.0
 
-                elif idxRoi == 1:  # v2
-                    if idxCon == 0:  # v2 simple contrasts
-                        # Limits of y-axis for across subject plot:
-                        varAcrSubsYmin01 = -500.0
-                        varAcrSubsYmax01 = 0.0
-                        varAcrSubsYmin02 = -300.0
-                        varAcrSubsYmax02 = 0.0
-                    elif idxCon == 1:  # v2 Pd_min_Ps
-                        # Limits of y-axis for across subject plot:
-                        varAcrSubsYmin01 = -500.0
-                        varAcrSubsYmax01 = 0.0
-                        varAcrSubsYmin02 = -300.0
-                        varAcrSubsYmax02 = 0.0
-                    elif idxCon == 2:  # v2 Pd_min_Cd
-                        # Limits of y-axis for across subject plot:
-                        varAcrSubsYmin01 = -500.0
-                        varAcrSubsYmax01 = 0.0
-                        varAcrSubsYmin02 = -300.0
-                        varAcrSubsYmax02 = 0.0
+                    elif idxRoi == 1:  # v2
+                        if idxCon == 0:  # v2 simple contrasts
+                            if lstMetaCon[idxMtaCn] == 'stimulus':
+                                # Limits of y-axis for across subject plot:
+                                varAcrSubsYmin01 = -400.0
+                                varAcrSubsYmax01 = 100.0
+                                varAcrSubsYmin02 = -400.0
+                                varAcrSubsYmax02 = 100.0
+                            if lstMetaCon[idxMtaCn] == 'periphery':
+                                # Limits of y-axis for across subject plot:
+                                varAcrSubsYmin01 = -100.0
+                                varAcrSubsYmax01 = 300.0
+                                varAcrSubsYmin02 = -100.0
+                                varAcrSubsYmax02 = 300.0
+                        # elif idxCon == 1:  # v2 Pd_min_Ps
+                        #    # Limits of y-axis for across subject plot:
+                        #    varAcrSubsYmin01 = -500.0
+                        #    varAcrSubsYmax01 = 0.0
+                        #    varAcrSubsYmin02 = -300.0
+                        #    varAcrSubsYmax02 = 0.0
+                        # elif idxCon == 2:  # v2 Pd_min_Cd
+                        #    # Limits of y-axis for across subject plot:
+                        #    varAcrSubsYmin01 = -500.0
+                        #    varAcrSubsYmax01 = 0.0
+                        #    varAcrSubsYmin02 = -300.0
+                        #    varAcrSubsYmax02 = 0.0
 
-    # Call drain model function:
-    drain_model(lstMdl[idxMdl], lstRoi[idxRoi], lstHmsph[idxHmsph],
-                strPthPrf.format(lstRoi[idxRoi], lstHmsph[idxHmsph]),
-                strPthPrfOt.format(lstRoi[idxRoi], lstHmsph[idxHmsph],
-                str(lstMdl[idxMdl])), strPthPltOt.format(lstRoi[idxRoi],
-                lstHmsph[idxHmsph], str(lstMdl[idxMdl])), strFlTp, varDpi,
-                strXlabel, strYlabel, lstNstCon[idxCon], lstNstConLbl[idxCon],
-                varNumIt, varCnfLw, varCnfUp, varNseRndSd, varNseSys, lstFctr,
-                varAcrSubsYmin01, varAcrSubsYmax01, varAcrSubsYmin02,
-                varAcrSubsYmax02)
+                    # Call drain model function:
+                    drain_model(lstMdl[idxMdl], lstRoi[idxRoi],
+                                lstHmsph[idxHmsph],
+                                strPthPrf.format(lstMetaCon[idxMtaCn],
+                                lstRoi[idxRoi], lstHmsph[idxHmsph],
+                                lstNstCon[idxCon][0]),
+                                strPthPrfOt.format(lstMetaCon[idxMtaCn],
+                                lstRoi[idxRoi], lstHmsph[idxHmsph],
+                                lstNstCon[idxCon][0], lstMdl[idxMdl]),
+                                strPthPltOt.format(lstMetaCon[idxMtaCn],
+                                lstRoi[idxRoi], lstRoi[idxRoi],
+                                lstHmsph[idxHmsph], lstNstCon[idxCon][0],
+                                str(lstMdl[idxMdl])), strFlTp, varDpi,
+                                strXlabel, strYlabel, lstNstCon[idxCon],
+                                lstNstConLbl[idxCon], varNumIt, varCnfLw,
+                                varCnfUp, varNseRndSd, varNseSys, lstFctr,
+                                varAcrSubsYmin01, varAcrSubsYmax01,
+                                varAcrSubsYmin02, varAcrSubsYmax02)
+# -----------------------------------------------------------------------------

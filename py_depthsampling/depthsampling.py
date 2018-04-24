@@ -26,8 +26,8 @@ from py_depthsampling.main.main import ds_main
 # *****************************************************************************
 # *** Define parameters
 
-# Meta-condition (within or outside of stimulus area):
-lstMetaCon = ['within', 'outside']
+# Meta-condition (within or outside of retinotopic stimulus area):
+lstMetaCon = ['stimulus', 'periphery']
 
 # Region of interest ('v1' or 'v2'):
 lstRoi = ['v1', 'v2']
@@ -162,7 +162,7 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
 
                 if idxRoi == 0:  # v1
                     if idxCon == 0:  # v1 simple contrasts
-                        lstLimY = [(-325.0, 25.0)] * len(lstSubIds)
+                        lstLimY = [(-400.0, 200.0)] * len(lstSubIds)
                     elif idxCon == 1:  # v1 Pd_min_Ps
                         lstLimY = [(-50.0, 50.0)] * len(lstSubIds)
                     elif idxCon == 2:  # v1 Pd_min_Cd
@@ -224,5 +224,5 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                         lstNstCon[idxCon][0]), varDpi, varNormIdx, lgcNormDiv,
                         strDpthMeans.format(lstMetaCon[idxMtaCn],
                         lstRoi[idxRoi], lstHmsph[idxHmsph],
-                        lstNstCon[idxCon][0]))
+                        lstNstCon[idxCon][0]), strMetaCon=lstMetaCon[idxMtaCn])
 # *****************************************************************************

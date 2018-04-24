@@ -25,11 +25,11 @@ import matplotlib.colors as colors
 
 
 def plt_dpth_prfl(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
-                   varYmax, lgcCnvPrct, lstConLbl, strXlabel, strYlabel,
-                   strTitle, lgcLgnd, strPath, vecX=None, varXmin=None,
-                   varXmax=None, varSizeX=1800.0, varSizeY=1600.0,
-                   varNumLblY=5, varPadY=(0.0, 0.0), aryClr=None,
-                   aryCnfLw=None, aryCnfUp=None, lstVrt=None, varRound=2):
+                  varYmax, lgcCnvPrct, lstConLbl, strXlabel, strYlabel,
+                  strTitle, lgcLgnd, strPath, vecX=None, varXmin=None,
+                  varXmax=None, varSizeX=1800.0, varSizeY=1600.0,
+                  varNumLblY=5, varPadY=(0.0, 0.0), aryClr=None,
+                  aryCnfLw=None, aryCnfUp=None, lstVrt=None, varRound=2):
     """
     Plot data across depth level for variable number of conditions.
 
@@ -289,8 +289,13 @@ def plt_dpth_prfl(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
                      frameon=False,
                      prop={'size': 26})
 
-    # Make plot & axis labels fit into figure:
-    # plt.tight_layout(pad=0.5)
+    # Make plot & axis labels fit into figure (this may not always work,
+    # depending on the layout of the plot, matplotlib sometimes throws a
+    # ValueError ("left cannot be >= right").
+    try:
+        plt.tight_layout(pad=0.5)
+    except ValueError:
+        pass
 
     # Save figure:
     fgr01.savefig(strPath,

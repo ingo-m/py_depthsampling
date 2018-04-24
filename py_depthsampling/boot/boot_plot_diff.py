@@ -60,12 +60,12 @@ def boot_plot(objDpth, strPath, lstConLbl, varNumIt=10000, varConLw=2.5,
         Label for y axis.
     lgcLgnd : bool
         Whether to show a legend.
-    sltDiff : list or None
+    lstDiff : list or None
         If None, the depth profiles are plotted separately for each condition.
         If a list of tuples of condition indices is provided, on each
         bootstrapping iteration the difference between the two conditions is
         calculated, and is plotted. The the second condition from the tuple is
-        subtracted from the first (e.g. if lgcLgnd = [(0, 1)], then condition 1
+        subtracted from the first (e.g. if lstDiff = [(0, 1)], then condition 1
         is subtracted from condition 0).
 
     Returns

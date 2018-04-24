@@ -289,11 +289,13 @@ def plt_dpth_prfl(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
                      frameon=False,
                      prop={'size': 26})
 
-    # Make plot & axis labels fit into figure (this may not always work):
-    # try:
-    plt.tight_layout(pad=0.5)
-    # except ...:
-    #     pass
+    # Make plot & axis labels fit into figure (this may not always work,
+    # depending on the layout of the plot, matplotlib sometimes throws a
+    # ValueError ("left cannot be >= right").
+    try:
+        plt.tight_layout(pad=0.5)
+    except ValueError:
+        pass
 
     # Save figure:
     fgr01.savefig(strPath,

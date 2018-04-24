@@ -43,7 +43,7 @@ def acr_subs_get_data(idxPrc,              # Process ID  #noqa
                       varThrSlct03,        # Criterion 3 - Threshold
                       lgcSlct04,           # Criterion 4 - Yes or no?
                       strVtkSlct04,        # Criterion 4 - VTK path
-                      varThrSlct04,        # Criterion 4 - Threshold
+                      tplThrSlct04,        # Criterion 4 - Threshold
                       lgcNormDiv,          # Normalisation - Yes or no?
                       varNormIdx,          # Normalisation - Reference
                       varDpi,              # Plot - Dots per inch
@@ -55,6 +55,7 @@ def acr_subs_get_data(idxPrc,              # Process ID  #noqa
                       strTitle,            # Plot - Title
                       strPltOtPre,         # Plot - Output file path prefix
                       strPltOtSuf,         # Plot - Output file path suffix
+                      strMetaCon,          # Metacondition (stim/periphery)
                       queOut):             # Queue for output list
     """
     Obtaining & plotting single subject data for across subject analysis.
@@ -153,7 +154,7 @@ def acr_subs_get_data(idxPrc,              # Process ID  #noqa
                    varThrSlct03,        # Criterion 3 - Threshold
                    lgcSlct04,           # Criterion 4 - Yes or no?
                    arySlct04,           # Criterion 4 - Data
-                   varThrSlct04,        # Criterion 4 - Threshold
+                   tplThrSlct04,        # Criterion 4 - Threshold
                    idxPrc)              # Process ID
     # **************************************************************************
 
@@ -170,7 +171,8 @@ def acr_subs_get_data(idxPrc,              # Process ID  #noqa
             strPrcdData,      # Data struc - Str. prcd. VTK data
             varNumLne,        # Data struc - Lns. prcd. data VTK
             strCsvRoi,        # Data struc - ROI CSV fle (outpt. naming)
-            vecInc)           # Vector with included vertices
+            vecInc,           # Vector with included vertices
+            strMetaCon)       # Metacondition (stimulus or periphery)
     # **************************************************************************
 
     # **************************************************************************

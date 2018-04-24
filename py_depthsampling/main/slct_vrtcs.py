@@ -8,10 +8,10 @@ Function of the depth sampling pipeline.
 # Part of py_depthsampling library
 # Copyright (C) 2017  Ingo Marquardt
 #
-# This program is free software: you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the Free
-# Software Foundation, either version 3 of the License, or (at your option) any
-# later version.
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -24,7 +24,7 @@ Function of the depth sampling pipeline.
 import numpy as np
 
 
-def slct_vrtcs(varNumCon,           # Number of conditions
+def slct_vrtcs(varNumCon,           # Number of conditions  #noqa
                lstDpthData01,       # List with depth-sampled data I
                lgcSlct01,           # Criterion 1 - Yes or no?
                aryRoiVrtx,          # Criterion 1 - Data (ROI)

@@ -26,12 +26,13 @@ import os
 import numpy as np  #noqa
 
 
-def vtk_msk(strSubId,      # Data struc - Subject ID
-                  strVtkDpth01,  # Data struc - Path first data vtk file
-                  strPrcdData,   # Data struc - Str. prcd. VTK data
-                  varNumLne,     # Data struc - Lns. prcd. data VTK
-                  strCsvRoi,     # Data struc - ROI CSV fle (for output naming)
-                  vecInc):       # Vertex inclusion vector
+def vtk_msk(strSubId,        # Data struc - Subject ID
+            strVtkDpth01,    # Data struc - Path first data vtk file
+            strPrcdData,     # Data struc - Str. prcd. VTK data
+            varNumLne,       # Data struc - Lns. prcd. data VTK
+            strCsvRoi,       # Data struc - ROI CSV fle (for output naming)
+            vecInc,          # Vertex inclusion vector
+            strMetaCon=''):  # Metacondition (stimulus or periphery)
     """
     Create surface mask for selected vertices.
 
@@ -125,8 +126,12 @@ def vtk_msk(strSubId,      # Data struc - Subject ID
     strRoi = os.path.splitext(os.path.split(strCsvRoi)[-1])[0]
 
     # Add output file name:
-    strVtkOt = (strVtkOt + '/' + strSubId + '_vertex_inclusion_mask_' +
-                strRoi + '.vtk')
+    if strMetaCon == '':
+        strVtkOt = (strVtkOt + '/' + strSubId + '_vertex_inclusion_mask_'
+                    + strRoi + '.vtk')
+    else:
+        strVtkOt = (strVtkOt + '/' + strSubId + '_vertex_inclusion_mask_'
+                    + strRoi + '_' + strMetaCon + '.vtk')
 
     # Create output csv object:
     objCsvOt = open(strVtkOt, 'w')

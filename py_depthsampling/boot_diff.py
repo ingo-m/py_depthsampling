@@ -46,7 +46,7 @@ strPthPrfOt = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{
 
 # Output path & prefix for plots (meta-condition, ROI, ROI, hemisphere, and
 # model index left open):
-strPthPltOt = '/home/john/PhD/PacMan_Plots/boot_diff/{}/{}/{}_{}_{}_'  #noqa
+strPthPltOt = '/home/john/PhD/PacMan_Plots/boot_diff/{}/{}/{}_{}{}'  #noqa
 
 # File type suffix for plot:
 strFlTp = '.png'

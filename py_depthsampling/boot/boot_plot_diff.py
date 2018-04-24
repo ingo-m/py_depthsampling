@@ -25,7 +25,7 @@ def boot_plot(objDpth, strPath, lstConLbl, varNumIt=10000, varConLw=2.5,
               varConUp=97.5, strTtl='', varYmin=0.0, varYmax=2.0,
               strXlabel='Cortical depth level (equivolume)',
               strYlabel='fMRI signal change [arbitrary units]',
-              lgcLgnd=False, tplDiff=None):
+              lgcLgnd=False, lstDiff=None):
     """
     Plot across-subject cortical depth profiles with confidence intervals.
 
@@ -60,12 +60,13 @@ def boot_plot(objDpth, strPath, lstConLbl, varNumIt=10000, varConLw=2.5,
         Label for y axis.
     lgcLgnd : bool
         Whether to show a legend.
-    tplDiff : tuple or None
+    sltDiff : list or None
         If None, the depth profiles are plotted separately for each condition.
-        If a tuple of condition indices is provided, on each bootstrapping
-        iteration the difference between the two conditions is calculated,
-        and is plotted. The the second condition from the tuple is subtracted
-        from the first (i.e. tplDiff[0] - tplDiff[1])
+        If a list of tuples of condition indices is provided, on each
+        bootstrapping iteration the difference between the two conditions is
+        calculated, and is plotted. The the second condition from the tuple is
+        subtracted from the first (e.g. if lgcLgnd = [(0, 1)], then condition 1
+        is subtracted from condition 0).
 
     Returns
     -------
@@ -118,17 +119,17 @@ def boot_plot(objDpth, strPath, lstConLbl, varNumIt=10000, varConLw=2.5,
                                high=varNumSub,
                                size=(varNumIt, varNumSmp))
 
-    if tplDiff is None:
+    if lstDiff is None:
         # Array for bootstrap samples, of the form
         # aryBoo[idxIteration, idxSubject, idxCondition, idxDpth]):
         aryBoo = np.zeros((varNumIt, varNumSub, varNumCon, varNumDpth))
     else:
+        # Set number of comparisons:
+        varNumCon = len(lstDiff)
         # Array for bootstrap samples, of the form
         # aryBoo[idxIteration, idxSubject, 1, idxDpth]) (3rd dimension is one
         # because the array will hold the difference between two conditions):
-        aryBoo = np.zeros((varNumIt, varNumSub, 1, varNumDpth))
-        # Set number of conditions to one (for plot):
-        varNumCon = 1
+        aryBoo = np.zeros((varNumIt, varNumSub, varNumCon, varNumDpth))
 
     # ------------------------------------------------------------------------
     # *** Bootstrap
@@ -137,17 +138,15 @@ def boot_plot(objDpth, strPath, lstConLbl, varNumIt=10000, varConLw=2.5,
     for idxIt in range(varNumIt):
         # Indices of current bootstrap sample:
         vecRnd = aryRnd[idxIt, :]
-        if tplDiff is None:
+        if lstDiff is None:
             # Put current bootstrap sample into array:
             aryBoo[idxIt, :, :, :] = aryDpth[vecRnd, :, :]
         else:
             # Calculate difference between conditions:
-            aryBoo[idxIt, :, 0, :] = np.subtract(aryDpth[vecRnd,
-                                                         tplDiff[0],
-                                                         :],
-                                                 aryDpth[vecRnd,
-                                                         tplDiff[1],
-                                                         :])
+            for idxDiff in range(varNumCon):
+                aryBoo[idxIt, :, idxDiff, :] = np.subtract(
+                    aryDpth[vecRnd, lstDiff[idxDiff][0], :],
+                    aryDpth[vecRnd, lstDiff[idxDiff][1], :])
 
     # Median for each bootstrap sample (across subjects within the bootstrap
     # sample):
@@ -166,21 +165,29 @@ def boot_plot(objDpth, strPath, lstConLbl, varNumIt=10000, varConLw=2.5,
     strXlabel = 'Cortical depth level (equivolume)'
     strYlabel = 'fMRI signal change [arbitrary units]'
 
-    if tplDiff is None:
+    if lstDiff is None:
+
         # Empirical median:
         aryEmpMed = np.median(aryDpth, axis=0)
+
     else:
+
         # Empirical median difference:
-        aryEmpMed = np.median(np.subtract(aryDpth[:, tplDiff[0], :],
-                                          aryDpth[:, tplDiff[1], :],
-                                          ).reshape(aryDpth.shape[0],
-                                                    1,
-                                                    aryDpth.shape[2]),
-                              axis=0)
-        # Adjust condition labels:
-        lstConLbl = [(lstConLbl[tplDiff[0]]
-                      + ' minus '
-                      + lstConLbl[tplDiff[1]])]
+        aryEmpMed = np.zeros((varNumCon, varNumDpth))
+        for idxDiff in range(varNumCon):
+            aryEmpMed[idxDiff, :] = np.median(
+                np.subtract(aryDpth[:, lstDiff[idxDiff][0], :],
+                            aryDpth[:, lstDiff[idxDiff][1], :],
+                            ),
+                axis=0)
+
+        # Create condition labels for differences:
+        lstDiffLbl = [None] * varNumCon
+        for idxDiff in range(varNumCon):
+            lstDiffLbl[idxDiff] = ((lstConLbl[lstDiff[idxDiff][0]])
+                                   + ' minus '
+                                   + (lstConLbl[lstDiff[idxDiff][1]]))
+        lstConLbl = lstDiffLbl
 
     plt_dpth_prfl(aryEmpMed, None, varNumDpth, varNumCon, 80.0, varYmin,
                   varYmax, False, lstConLbl, strXlabel, strYlabel, strTtl,

@@ -44,9 +44,9 @@ lstHmsph = ['lh', 'rh']
 # condition, and model index left open):
 strPthPrfOt = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npy'  #noqa
 
-# Output path & prefix for plots (meta-condition, ROI, ROI, hemisphere,
-# condition, and model index left open):
-strPthPltOt = '/home/john/PhD/PacMan_Plots/boot_diff/{}/{}/{}_{}_{}_{}_'  #noqa
+# Output path & prefix for plots (meta-condition, ROI, ROI, hemisphere, and
+# model index left open):
+strPthPltOt = '/home/john/PhD/PacMan_Plots/boot_diff/{}/{}/{}_{}_{}_'  #noqa
 
 # File type suffix for plot:
 strFlTp = '.png'
@@ -87,100 +87,64 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
     for idxMdl in range(len(lstMdl)):  #noqa
         for idxRoi in range(len(lstRoi)):
             for idxHmsph in range(len(lstHmsph)):
-                for idxDiff in range(len(lstDiff)):
 
-                    # Limits of axes need to be adjusted based on ROI,
-                    # condition, hemisphere.
+                # Limits of axes need to be adjusted based on ROI,
+                # condition, hemisphere.
 
-                    if idxRoi == 0:  # v1
+                if idxRoi == 0:  # v1
 
-                        if idxDiff == 0:  # v1 Pd_min_Cd
-                            if lstMetaCon[idxMtaCn] == 'stimulus':
-                                if lstMdl[idxMdl] == '':
-                                    varYmin = -100.0
-                                    varYmax = 100.0
-                                if lstMdl[idxMdl] == 'deconv_model_1':
-                                    varYmin = -100.0
-                                    varYmax = 100.0
-                            if lstMetaCon[idxMtaCn] == 'periphery':
-                                if lstMdl[idxMdl] == '':
-                                    varYmin = -100.0
-                                    varYmax = 100.0
-                                if lstMdl[idxMdl] == 'deconv_model_1':
-                                    varYmin = -100.0
-                                    varYmax = 100.0
+                    if lstMetaCon[idxMtaCn] == 'stimulus':
+                        if lstMdl[idxMdl] == '':
+                            varYmin = -100.0
+                            varYmax = 100.0
+                        if lstMdl[idxMdl] == 'deconv_model_1':
+                            varYmin = -100.0
+                            varYmax = 100.0
+                    if lstMetaCon[idxMtaCn] == 'periphery':
+                        if lstMdl[idxMdl] == '':
+                            varYmin = -100.0
+                            varYmax = 100.0
+                        if lstMdl[idxMdl] == 'deconv_model_1':
+                            varYmin = -100.0
+                            varYmax = 100.0
 
-                        elif idxDiff == 1:  # v1 Pd_min_Ps
-                            if lstMetaCon[idxMtaCn] == 'stimulus':
-                                if lstMdl[idxMdl] == '':
-                                    varYmin = -100.0
-                                    varYmax = 100.0
-                                if lstMdl[idxMdl] == 'deconv_model_1':
-                                    varYmin = -100.0
-                                    varYmax = 100.0
-                            if lstMetaCon[idxMtaCn] == 'periphery':
-                                if lstMdl[idxMdl] == '':
-                                    varYmin = -100.0
-                                    varYmax = 100.0
-                                if lstMdl[idxMdl] == 'deconv_model_1':
-                                    varYmin = -100.0
-                                    varYmax = 100.0
+                elif idxRoi == 1:  # v2
 
-                    elif idxRoi == 1:  # v2
+                    if lstMetaCon[idxMtaCn] == 'stimulus':
+                        if lstMdl[idxMdl] == '':
+                            varYmin = -100.0
+                            varYmax = 100.0
+                        if lstMdl[idxMdl] == 'deconv_model_1':
+                            varYmin = -100.0
+                            varYmax = 100.0
+                    if lstMetaCon[idxMtaCn] == 'periphery':
+                        if lstMdl[idxMdl] == '':
+                            varYmin = -100.0
+                            varYmax = 100.0
+                        if lstMdl[idxMdl] == 'deconv_model_1':
+                            varYmin = -100.0
+                            varYmax = 100.0
 
-                        if idxDiff == 0:  # v1 Pd_min_Cd
-                            if lstMetaCon[idxMtaCn] == 'stimulus':
-                                if lstMdl[idxMdl] == '':
-                                    varYmin = -100.0
-                                    varYmax = 100.0
-                                if lstMdl[idxMdl] == 'deconv_model_1':
-                                    varYmin = -100.0
-                                    varYmax = 100.0
-                            if lstMetaCon[idxMtaCn] == 'periphery':
-                                if lstMdl[idxMdl] == '':
-                                    varYmin = -100.0
-                                    varYmax = 100.0
-                                if lstMdl[idxMdl] == 'deconv_model_1':
-                                    varYmin = -100.0
-                                    varYmax = 100.0
-
-                        elif idxDiff == 1:  # v1 Pd_min_Ps
-                            if lstMetaCon[idxMtaCn] == 'stimulus':
-                                if lstMdl[idxMdl] == '':
-                                    varYmin = -100.0
-                                    varYmax = 100.0
-                                if lstMdl[idxMdl] == 'deconv_model_1':
-                                    varYmin = -100.0
-                                    varYmax = 100.0
-                            if lstMetaCon[idxMtaCn] == 'periphery':
-                                if lstMdl[idxMdl] == '':
-                                    varYmin = -100.0
-                                    varYmax = 100.0
-                                if lstMdl[idxMdl] == 'deconv_model_1':
-                                    varYmin = -100.0
-                                    varYmax = 100.0
-
-                    # Call drain model function:
-                    boot_plot(strPthPrfOt.format(lstMetaCon[idxMtaCn],
-                                                 lstRoi[idxRoi],
-                                                 lstHmsph[idxHmsph],
-                                                 'Pd',
-                                                 lstMdl[idxMdl]),
-                              strPthPltOt.format(lstMetaCon[idxMtaCn],
-                                                 lstRoi[idxRoi],
-                                                 lstRoi[idxRoi],
-                                                 lstHmsph[idxHmsph],
-                                                 str(idxDiff),
-                                                 lstMdl[idxMdl]),
-                              lstConLbl,
-                              varNumIt=10000,
-                              varConLw=2.5,
-                              varConUp=97.5,
-                              strTtl='',
-                              varYmin=varYmin,
-                              varYmax=varYmax,
-                              strXlabel='Cortical depth level (equivolume)',
-                              strYlabel='fMRI signal change [arbitrary units]',
-                              lgcLgnd=True,
-                              tplDiff=lstDiff[idxDiff])
+                # Call drain model function:
+                boot_plot(strPthPrfOt.format(lstMetaCon[idxMtaCn],
+                                             lstRoi[idxRoi],
+                                             lstHmsph[idxHmsph],
+                                             'Pd',
+                                             lstMdl[idxMdl]),
+                          strPthPltOt.format(lstMetaCon[idxMtaCn],
+                                             lstRoi[idxRoi],
+                                             lstRoi[idxRoi],
+                                             lstHmsph[idxHmsph],
+                                             lstMdl[idxMdl]),
+                          lstConLbl,
+                          varNumIt=10000,
+                          varConLw=2.5,
+                          varConUp=97.5,
+                          strTtl='',
+                          varYmin=varYmin,
+                          varYmax=varYmax,
+                          strXlabel='Cortical depth level (equivolume)',
+                          strYlabel='fMRI signal change [arbitrary units]',
+                          lgcLgnd=True,
+                          lstDiff=lstDiff)
 # -----------------------------------------------------------------------------

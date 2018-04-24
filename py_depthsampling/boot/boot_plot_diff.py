@@ -142,11 +142,20 @@ def boot_plot(objDpth, strPath, lstConLbl, varNumIt=10000, varConLw=2.5,
             # Put current bootstrap sample into array:
             aryBoo[idxIt, :, :, :] = aryDpth[vecRnd, :, :]
         else:
-            # Calculate difference between conditions:
+            # Calculate normalised difference between conditions (difference
+            # score ranging from -1 to 1; ((A - B) / (A + B)):
             for idxDiff in range(varNumCon):
-                aryBoo[idxIt, :, idxDiff, :] = np.subtract(
-                    aryDpth[vecRnd, lstDiff[idxDiff][0], :],
-                    aryDpth[vecRnd, lstDiff[idxDiff][1], :])
+                aryBoo[idxIt, :, idxDiff, :] = \
+                    np.divide(
+                        np.subtract(
+                            aryDpth[vecRnd, lstDiff[idxDiff][0], :],
+                            aryDpth[vecRnd, lstDiff[idxDiff][1], :]
+                            ),
+                        np.add(
+                            aryDpth[vecRnd, lstDiff[idxDiff][0], :],
+                            aryDpth[vecRnd, lstDiff[idxDiff][1], :]
+                            )
+                        )
 
     # Median for each bootstrap sample (across subjects within the bootstrap
     # sample):
@@ -176,9 +185,16 @@ def boot_plot(objDpth, strPath, lstConLbl, varNumIt=10000, varConLw=2.5,
         aryEmpMed = np.zeros((varNumCon, varNumDpth))
         for idxDiff in range(varNumCon):
             aryEmpMed[idxDiff, :] = np.median(
-                np.subtract(aryDpth[:, lstDiff[idxDiff][0], :],
-                            aryDpth[:, lstDiff[idxDiff][1], :],
-                            ),
+                np.divide(
+                    np.subtract(
+                        aryDpth[:, lstDiff[idxDiff][0], :],
+                        aryDpth[:, lstDiff[idxDiff][1], :]
+                        ),
+                    np.add(
+                        aryDpth[:, lstDiff[idxDiff][0], :],
+                        aryDpth[:, lstDiff[idxDiff][1], :]
+                        )
+                    ),
                 axis=0)
 
         # Create condition labels for differences:

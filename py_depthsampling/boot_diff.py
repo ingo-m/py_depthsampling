@@ -74,8 +74,10 @@ lstDiff = [(0, 1), (0, 2)]
 # Lower & upper bound of percentile bootstrap (in percent), for bootstrap
 # confidence interval (models 1, 2, and 3) - this value is only printed, not
 # plotted - or plotted confidence intervals in case of model 5:
-varCnfLw = 0.5
-varCnfUp = 99.5
+# varCnfLw = 0.5
+# varCnfUp = 99.5
+varCnfLw = 2.5
+varCnfUp = 97.5
 # -----------------------------------------------------------------------------
 
 
@@ -95,35 +97,35 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
 
                     if lstMetaCon[idxMtaCn] == 'stimulus':
                         if lstMdl[idxMdl] == '':
-                            varYmin = -100.0
-                            varYmax = 100.0
+                            varYmin = -0.25
+                            varYmax = 0.25
                         if lstMdl[idxMdl] == 'deconv_model_1':
-                            varYmin = -100.0
-                            varYmax = 100.0
+                            varYmin = -0.25
+                            varYmax = 0.25
                     if lstMetaCon[idxMtaCn] == 'periphery':
                         if lstMdl[idxMdl] == '':
-                            varYmin = -100.0
-                            varYmax = 100.0
+                            varYmin = -0.25
+                            varYmax = 0.25
                         if lstMdl[idxMdl] == 'deconv_model_1':
-                            varYmin = -100.0
-                            varYmax = 100.0
+                            varYmin = -0.25
+                            varYmax = 0.25
 
                 elif idxRoi == 1:  # v2
 
                     if lstMetaCon[idxMtaCn] == 'stimulus':
                         if lstMdl[idxMdl] == '':
-                            varYmin = -100.0
-                            varYmax = 100.0
+                            varYmin = -0.25
+                            varYmax = 0.25
                         if lstMdl[idxMdl] == 'deconv_model_1':
-                            varYmin = -100.0
-                            varYmax = 100.0
+                            varYmin = -0.25
+                            varYmax = 0.25
                     if lstMetaCon[idxMtaCn] == 'periphery':
                         if lstMdl[idxMdl] == '':
-                            varYmin = -100.0
-                            varYmax = 100.0
+                            varYmin = -0.25
+                            varYmax = 0.25
                         if lstMdl[idxMdl] == 'deconv_model_1':
-                            varYmin = -100.0
-                            varYmax = 100.0
+                            varYmin = -0.25
+                            varYmax = 0.25
 
                 # Call drain model function:
                 boot_plot(strPthPrfOt.format(lstMetaCon[idxMtaCn],
@@ -138,13 +140,13 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                                              lstMdl[idxMdl]),
                           lstConLbl,
                           varNumIt=10000,
-                          varConLw=2.5,
-                          varConUp=97.5,
+                          varConLw=varCnfLw,
+                          varConUp=varCnfUp,
                           strTtl='',
                           varYmin=varYmin,
                           varYmax=varYmax,
                           strXlabel='Cortical depth level (equivolume)',
-                          strYlabel='fMRI signal change [arbitrary units]',
+                          strYlabel='Diffrence score',
                           lgcLgnd=True,
                           lstDiff=lstDiff)
 # -----------------------------------------------------------------------------

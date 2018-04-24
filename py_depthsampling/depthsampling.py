@@ -78,7 +78,7 @@ lgcSlct02 = True
 # subject ID and hemisphere left open.)
 strVtkSlct02 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/R2_multi.vtk'  #noqa
 # Threshold for vertex selection:
-varThrSlct02 = 0.1
+varThrSlct02 = 0.15
 
 # (3)
 # Use vertex selection criterion 3 (vertices that are BELOW threshold are

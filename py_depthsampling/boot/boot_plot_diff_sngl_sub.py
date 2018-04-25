@@ -119,18 +119,17 @@ def boot_plot_sngl(objDpth, strPath, lstCon, lstConLbl, varMin=None,
         else:
 
             # Calculate difference scores:
-            for idxCon in range(varNumCon):
-                aryPlot = \
-                    np.divide(
-                        np.subtract(
-                            aryDpth[:, lstDiff[idxCon][0], :],
-                            aryDpth[:, lstDiff[idxCon][1], :]
-                            ),
-                        np.add(
-                            aryDpth[:, lstDiff[idxCon][0], :],
-                            aryDpth[:, lstDiff[idxCon][1], :]
-                            )
+            aryPlot = \
+                np.divide(
+                    np.subtract(
+                        aryDpth[:, lstDiff[idxCon][0], :],
+                        aryDpth[:, lstDiff[idxCon][1], :]
+                        ),
+                    np.add(
+                        aryDpth[:, lstDiff[idxCon][0], :],
+                        aryDpth[:, lstDiff[idxCon][1], :]
                         )
+                    )
 
         # ---------------------------------------------------------------------
         # *** Prepare figure attributes
@@ -224,15 +223,15 @@ def boot_plot_sngl(objDpth, strPath, lstCon, lstConLbl, varMin=None,
 
         # Find minimum and maximum values:
         if varMin is None:
-            # varMin = -0.5
-            varMin = np.percentile(aryPlot[:, :], 5.0)
+            varMin = -0.25
+            #varMin = np.percentile(aryPlot[:, :], 5.0)
             # Round:
-            varMin = (np.floor(varMin * 0.1) / 0.1)
+            #varMin = (np.floor(varMin * 0.1) / 0.1)
         if varMax is None:
-            # varMax = 0.5
-            varMax = np.percentile(aryPlot[:, :], 95.0)
+            varMax = 0.25
+            #varMax = np.percentile(aryPlot[:, :], 95.0)
             # Round:
-            varMax = (np.ceil(varMax * 0.1) / 0.1)
+            #varMax = (np.ceil(varMax * 0.1) / 0.1)
 
         # Lookup vector for negative colour range:
         vecClrRngNeg = np.linspace(varMin, 0.0, num=varNumClr)
@@ -344,6 +343,15 @@ def boot_plot_sngl(objDpth, strPath, lstCon, lstConLbl, varMin=None,
             strPathTmp = strPath.format((lstCon[lstDiff[idxCon][0]]
                                          + '_minus_'
                                          + lstCon[lstDiff[idxCon][1]]))
+
+#        print('idxCon')
+#        print(idxCon)
+#        print('lstDiff[idxCon]')
+#        print(lstDiff[idxCon])
+#        print('lstCon[lstDiff[idxCon][0]]')
+#        print(lstCon[lstDiff[idxCon][0]])
+#        print('lstCon[lstDiff[idxCon][1]]')
+#        print(lstCon[lstDiff[idxCon][1]])
 
         # Save figure:
         fig01.savefig(strPathTmp,

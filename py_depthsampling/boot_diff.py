@@ -170,5 +170,5 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                            lstConLbl,
                            strXlabel='Cortical depth level (equivolume)',
                            strYlabel='Subject',
-                           lstDiff=None)
+                           lstDiff=lstDiff)
 # -----------------------------------------------------------------------------

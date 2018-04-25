@@ -344,15 +344,6 @@ def boot_plot_sngl(objDpth, strPath, lstCon, lstConLbl, varMin=None,
                                          + '_minus_'
                                          + lstCon[lstDiff[idxCon][1]]))
 
-#        print('idxCon')
-#        print(idxCon)
-#        print('lstDiff[idxCon]')
-#        print(lstDiff[idxCon])
-#        print('lstCon[lstDiff[idxCon][0]]')
-#        print(lstCon[lstDiff[idxCon][0]])
-#        print('lstCon[lstDiff[idxCon][1]]')
-#        print(lstCon[lstDiff[idxCon][1]])
-
         # Save figure:
         fig01.savefig(strPathTmp,
                       dpi=160.0,

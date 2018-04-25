@@ -130,9 +130,10 @@ def ecc_plot_simple(aryMean, vecEccBin, strPathOut):
     # Set position of labels for the y-axis:
     axsTmp.set_yticks(vecYlblsPos)
     # Create list of strings for labels:
-    lstYlblsStr = map(str,
-                      np.around(vecEccBin, decimals=1)
-                      )
+    # lstYlblsStr = map(str,
+    #                   np.around(vecEccBin, decimals=1)
+    #                   )
+    lstYlblsStr = [str(x) for x in np.around(vecEccBin, decimals=1)]
     # Set the content of the labels (i.e. strings):
     axsTmp.set_yticklabels(lstYlblsStr,
                            alpha=0.9,
@@ -172,7 +173,8 @@ def ecc_plot_simple(aryMean, vecEccBin, strPathOut):
     vecClrLblsPos = np.linspace(varMin, varMax, num=3)
 
     # The labels (strings):
-    vecClrLblsStr = map(str, vecClrLblsPos)
+    # vecClrLblsStr = map(str, vecClrLblsPos)
+    vecClrLblsStr = [str(x) for x in vecClrLblsPos]
 
     # Set labels on coloubar:
     pltClrbr.set_ticks(vecClrLblsPos)

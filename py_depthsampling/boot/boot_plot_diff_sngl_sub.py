@@ -23,10 +23,9 @@ import matplotlib.colors as colors
 # from matplotlib.colors import BoundaryNorm
 
 
-def boot_plot_sngl(objDpth, strPath, lstConLbl, varYmin=None,
-                   varYmax=None, strXlabel='Cortical depth level (equivolume)',
-                   strYlabel='fMRI signal change [arbitrary units]',
-                   lstDiff=None):
+def boot_plot_sngl(objDpth, strPath, lstCon, lstConLbl, varMin=None,
+                   varMax=None, strXlabel='Cortical depth level (equivolume)',
+                   strYlabel='Subject', lstDiff=None):
     """
     Plot single subject cortical depth profiles or difference scores.
 
@@ -38,12 +37,17 @@ def boot_plot_sngl(objDpth, strPath, lstConLbl, varYmin=None,
         string with the path to an npy file containing the array.
     strPath : str
         Output path for plot, condition name left open.
+    lstCon : list
+        Abbreviated condition levels used to complete file names (e.g. 'Pd').
+        Number of abbreviated condition labels has to be the same as number of
+        conditions in `objDpth`.
     lstConLbl : list
-        List containing condition labels (strings). Number of condition labels
-        has to be the same as number of conditions in `objDpth`.
-    varYmin : float
+        List containing condition labels (strings), e.g. 'PacMan Dynamic'.
+        Number of condition labels has to be the same as number of conditions
+        in `objDpth`.
+    varMin : float
         Minimum of Y axis.
-    varYmax : float
+    varMax : float
         Maximum of Y axis.
     strXlabel : str
         Label for x axis.
@@ -99,10 +103,34 @@ def boot_plot_sngl(objDpth, strPath, lstConLbl, varYmin=None,
         varNumCon = len(lstDiff)
 
     # Get number of depth levels from input array:
-    # varNumDpth = aryDpth.shape[2]
+    varNumDpth = aryDpth.shape[2]
 
     # Loop through conditions:
     for idxCon in range(varNumCon):
+
+        # ---------------------------------------------------------------------
+        # *** Calculate difference scores
+
+        if lstDiff is None:
+
+            # Will plot simple cortical depth profiles:
+            aryPlot = aryDpth[:, idxCon, :]
+
+        else:
+
+            # Calculate difference scores:
+            for idxCon in range(varNumCon):
+                aryPlot = \
+                    np.divide(
+                        np.subtract(
+                            aryDpth[:, lstDiff[idxCon][0], :],
+                            aryDpth[:, lstDiff[idxCon][1], :]
+                            ),
+                        np.add(
+                            aryDpth[:, lstDiff[idxCon][0], :],
+                            aryDpth[:, lstDiff[idxCon][1], :]
+                            )
+                        )
 
         # ---------------------------------------------------------------------
         # *** Prepare figure attributes
@@ -112,16 +140,6 @@ def boot_plot_sngl(objDpth, strPath, lstConLbl, varYmin=None,
 
         # Font colour:
         vecFontClr = np.array([17.0/255.0, 85.0/255.0, 124.0/255.0])
-
-        # Find minimum and maximum values:
-        if varYmin is None:
-            varMin = np.percentile(aryDpth[:, idxCon, :], 0.0)
-            # Round:
-            varMin = (np.floor(varMin * 0.1) / 0.1)
-        if varYmax is None:
-            varMax = np.percentile(aryDpth[:, idxCon, :], 100.0)
-            # Round:
-            varMax = (np.ceil(varMax * 0.1) / 0.1)
 
         # Create main figure:
         fig01 = plt.figure(figsize=(4.0, 3.0),
@@ -144,14 +162,14 @@ def boot_plot_sngl(objDpth, strPath, lstConLbl, varYmin=None,
                            right=False)
 
         # Set and adjust common axes labels:
-        axsCmn.set_xlabel('Relative cortical depth',
+        axsCmn.set_xlabel(strXlabel,
                           alpha=1.0,
                           fontname=strFont,
                           fontweight='normal',
                           fontsize=7.0,
                           color=vecFontClr,
                           position=(0.5, 0.0))
-        axsCmn.set_ylabel('Subjects',
+        axsCmn.set_ylabel(strYlabel,
                           alpha=1.0,
                           fontname=strFont,
                           fontweight='normal',
@@ -159,16 +177,19 @@ def boot_plot_sngl(objDpth, strPath, lstConLbl, varYmin=None,
                           color=vecFontClr,
                           position=(0.0, 0.5))
 
-# Create condition labels for differences:
-lstDiffLbl = [None] * varNumCon
-for idxDiff in range(varNumCon):
-    lstDiffLbl[idxDiff] = ((lstConLbl[lstDiff[idxDiff][0]])
-                           + ' minus '
-                           + (lstConLbl[lstDiff[idxDiff][1]]))
-lstConLbl = lstDiffLbl
+        if lstDiff is None:
 
+            # Title for simple signal change plot:
+            strTtle = 'fMRI signal change'
+    
+        else:
+    
+            # Title for difference score plot:
+            strTtle = (lstConLbl[lstDiff[idxCon][0]]
+                       + ' minus '
+                       + lstConLbl[lstDiff[idxCon][1]])
 
-        axsCmn.set_title('fMRI signal change',
+        axsCmn.set_title(strTtle,
                          alpha=1.0,
                          fontname=strFont,
                          fontweight='bold',
@@ -201,6 +222,18 @@ lstConLbl = lstDiffLbl
         objCustClrMp = colors.LinearSegmentedColormap.from_list('custClrMp',
                                                                 aryClr03)
 
+        # Find minimum and maximum values:
+        if varMin is None:
+            # varMin = -0.5
+            varMin = np.percentile(aryPlot[:, :], 5.0)
+            # Round:
+            varMin = (np.floor(varMin * 0.1) / 0.1)
+        if varMax is None:
+            # varMax = 0.5
+            varMax = np.percentile(aryPlot[:, :], 95.0)
+            # Round:
+            varMax = (np.ceil(varMax * 0.1) / 0.1)
+
         # Lookup vector for negative colour range:
         vecClrRngNeg = np.linspace(varMin, 0.0, num=varNumClr)
 
@@ -215,29 +248,6 @@ lstConLbl = lstDiffLbl
         objClrNorm = colors.BoundaryNorm(vecClrRng, objCustClrMp.N)
 
         # ---------------------------------------------------------------------
-        # *** Calculate difference scores
-
-        if lstDiff is None:
-
-            # Will plot simple cortical depth profiles:
-            aryPlot = aryDpth[:, idxCon, :]
-
-        else:
-
-            # Calculate difference scores:
-            for idxDiff in range(varNumCon):
-                aryPlot = \
-                    np.divide(
-                        np.subtract(
-                            aryDpth[:, lstDiff[idxCon][0], :],
-                            aryDpth[:, lstDiff[idxCon][1], :]
-                            ),
-                        np.add(
-                            aryDpth[:, lstDiff[idxCon][0], :],
-                            aryDpth[:, lstDiff[idxCon][1], :]
-                            )
-                        )
-        # ---------------------------------------------------------------------
         # *** Create plot
 
         # Plot correlation coefficients of current depth level:
@@ -248,7 +258,7 @@ lstConLbl = lstDiffLbl
                                 cmap=objCustClrMp)
 
         # Position of labels for the x-axis:
-        vecXlblsPos = np.array([0, (aryDpth.shape[1] - 1)])
+        vecXlblsPos = np.array([0, (varNumDpth - 1)])
         # Set position of labels for the x-axis:
         axsTmp.set_xticks(vecXlblsPos)
         # Create list of strings for labels:
@@ -312,7 +322,7 @@ lstConLbl = lstDiffLbl
         vecClrLblsPos = np.hstack((vecClrLblsPos01, vecClrLblsPos02))
 
         # The labels (strings):
-        vecClrLblsStr = map(str, vecClrLblsPos)
+        vecClrLblsStr = [str(x) for x in vecClrLblsPos]
 
         # Set labels on coloubar:
         pltClrbr.set_ticks(vecClrLblsPos)
@@ -325,11 +335,15 @@ lstConLbl = lstDiffLbl
         # Make colour-bar axis invisible:
         axsClr.axis('off')
 
-        # Output path:
-        strPathTmp = strPath.format()
+        if lstDiff is None:
+            # Output path:
+            strPathTmp = strPath.format(lstCon[idxCon])
 
-
-
+        else:
+            # Output path difference scores:
+            strPathTmp = strPath.format((lstCon[lstDiff[idxCon][0]]
+                                         + '_minus_'
+                                         + lstCon[lstDiff[idxCon][1]]))
 
         # Save figure:
         fig01.savefig(strPathTmp,
@@ -341,4 +355,7 @@ lstConLbl = lstDiffLbl
                       pad_inches=0.2,
                       transparent=False,
                       frameon=None)
+
+        # Close figure:
+        plt.close(fig01)
         # ---------------------------------------------------------------------

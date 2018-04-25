@@ -68,9 +68,8 @@ def boot_plot_sngl(objDpth, strPath, lstCon, lstConLbl, varMin=None,
 
     Notes
     -----
-    Plot a normalised difference score of the cortical depth profiles between
-    two conditions (i.e. (A - B) / (A + B)) across cortical depth (x axis)
-    separately for each subjcet (y axis).
+    Plot difference of cortical depth profiles between two conditions across
+    cortical depth (x axis) separately for each subjcet (y axis).
 
     This version plots the values using two separate colourmaps for negative
     and positive values.
@@ -111,6 +110,10 @@ def boot_plot_sngl(objDpth, strPath, lstCon, lstConLbl, varMin=None,
         # ---------------------------------------------------------------------
         # *** Calculate difference scores
 
+        # Normalise within subjects (grand mean scaling):
+        # aryMne = np.absolute(np.mean(aryDpth[:, idxCon, :], axis=0))
+        # aryDpth[:, idxCon, :] = np.divide(aryDpth[:, idxCon, :], aryMne)
+
         if lstDiff is None:
 
             # Will plot simple cortical depth profiles:
@@ -119,17 +122,20 @@ def boot_plot_sngl(objDpth, strPath, lstCon, lstConLbl, varMin=None,
         else:
 
             # Calculate difference scores:
-            aryPlot = \
-                np.divide(
-                    np.subtract(
-                        aryDpth[:, lstDiff[idxCon][0], :],
-                        aryDpth[:, lstDiff[idxCon][1], :]
-                        ),
-                    np.add(
-                        aryDpth[:, lstDiff[idxCon][0], :],
-                        aryDpth[:, lstDiff[idxCon][1], :]
-                        )
-                    )
+            # NOTE: Relative difference score leads to inconsistent results.
+            # aryPlot = \
+            #     np.divide(
+            #         np.subtract(
+            #             aryDpth[:, lstDiff[idxCon][0], :],
+            #             aryDpth[:, lstDiff[idxCon][1], :]
+            #             ),
+            #         np.add(
+            #             aryDpth[:, lstDiff[idxCon][0], :],
+            #             aryDpth[:, lstDiff[idxCon][1], :]
+            #             )
+            #         )
+            aryPlot = np.subtract(aryDpth[:, lstDiff[idxCon][0], :],
+                                  aryDpth[:, lstDiff[idxCon][1], :])
 
         # ---------------------------------------------------------------------
         # *** Prepare figure attributes
@@ -180,9 +186,9 @@ def boot_plot_sngl(objDpth, strPath, lstCon, lstConLbl, varMin=None,
 
             # Title for simple signal change plot:
             strTtle = 'fMRI signal change'
-    
+
         else:
-    
+
             # Title for difference score plot:
             strTtle = (lstConLbl[lstDiff[idxCon][0]]
                        + ' minus '
@@ -223,15 +229,15 @@ def boot_plot_sngl(objDpth, strPath, lstCon, lstConLbl, varMin=None,
 
         # Find minimum and maximum values:
         if varMin is None:
-            varMin = -0.25
-            #varMin = np.percentile(aryPlot[:, :], 5.0)
+            # varMin = -0.25
+            varMin = np.percentile(aryPlot[:, :], 2.0)
             # Round:
-            #varMin = (np.floor(varMin * 0.1) / 0.1)
+            varMin = (np.floor(varMin * 10.0) / 10.0)
         if varMax is None:
-            varMax = 0.25
-            #varMax = np.percentile(aryPlot[:, :], 95.0)
+            # varMax = 0.25
+            varMax = np.percentile(aryPlot[:, :], 98.0)
             # Round:
-            #varMax = (np.ceil(varMax * 0.1) / 0.1)
+            varMax = (np.ceil(varMax * 10.0) / 10.0)
 
         # Lookup vector for negative colour range:
         vecClrRngNeg = np.linspace(varMin, 0.0, num=varNumClr)

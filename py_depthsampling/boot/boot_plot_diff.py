@@ -142,20 +142,28 @@ def boot_plot(objDpth, strPath, lstConLbl, varNumIt=10000, varConLw=2.5,
             # Put current bootstrap sample into array:
             aryBoo[idxIt, :, :, :] = aryDpth[vecRnd, :, :]
         else:
+            # NOTE: Relative difference score leads to inconsistent results.
             # Calculate normalised difference between conditions (difference
-            # score ranging from -1 to 1; ((A - B) / (A + B)):
+            # score ranging from -1 to 1; ((A - B) / abs(A + B)):
+            # for idxDiff in range(varNumCon):
+            #     aryBoo[idxIt, :, idxDiff, :] = \
+            #         np.divide(
+            #             np.subtract(
+            #                 aryDpth[vecRnd, lstDiff[idxDiff][0], :],
+            #                 aryDpth[vecRnd, lstDiff[idxDiff][1], :]
+            #                 ),
+            #             np.absolute(
+            #                 np.add(
+            #                     aryDpth[vecRnd, lstDiff[idxDiff][0], :],
+            #                     aryDpth[vecRnd, lstDiff[idxDiff][1], :]
+            #                     )
+            #                 )
+            #             )
+            # Calculate difference between conditions:
             for idxDiff in range(varNumCon):
                 aryBoo[idxIt, :, idxDiff, :] = \
-                    np.divide(
-                        np.subtract(
-                            aryDpth[vecRnd, lstDiff[idxDiff][0], :],
-                            aryDpth[vecRnd, lstDiff[idxDiff][1], :]
-                            ),
-                        np.add(
-                            aryDpth[vecRnd, lstDiff[idxDiff][0], :],
-                            aryDpth[vecRnd, lstDiff[idxDiff][1], :]
-                            )
-                        )
+                    np.subtract(aryDpth[vecRnd, lstDiff[idxDiff][0], :],
+                                aryDpth[vecRnd, lstDiff[idxDiff][1], :])
 
     # Median for each bootstrap sample (across subjects within the bootstrap
     # sample):
@@ -181,21 +189,29 @@ def boot_plot(objDpth, strPath, lstConLbl, varNumIt=10000, varConLw=2.5,
 
     else:
 
-        # Empirical median difference:
+        # Empirical median difference between conditions:
         aryEmpMed = np.zeros((varNumCon, varNumDpth))
+        # NOTE: Relative difference score leads to inconsistent results.
+        # for idxDiff in range(varNumCon):
+        #     aryEmpMed[idxDiff, :] = np.median(
+        #         np.divide(
+        #             np.subtract(
+        #                 aryDpth[:, lstDiff[idxDiff][0], :],
+        #                 aryDpth[:, lstDiff[idxDiff][1], :]
+        #                 ),
+        #             np.absolute(
+        #                 np.add(
+        #                     aryDpth[:, lstDiff[idxDiff][0], :],
+        #                     aryDpth[:, lstDiff[idxDiff][1], :]
+        #                     )
+        #                 )
+        #             ),
+        #         axis=0)
         for idxDiff in range(varNumCon):
             aryEmpMed[idxDiff, :] = np.median(
-                np.divide(
-                    np.subtract(
-                        aryDpth[:, lstDiff[idxDiff][0], :],
-                        aryDpth[:, lstDiff[idxDiff][1], :]
-                        ),
-                    np.add(
-                        aryDpth[:, lstDiff[idxDiff][0], :],
-                        aryDpth[:, lstDiff[idxDiff][1], :]
-                        )
-                    ),
-                axis=0)
+                    np.subtract(aryDpth[:, lstDiff[idxDiff][0], :],
+                                aryDpth[:, lstDiff[idxDiff][1], :]),
+                    axis=0)
 
         # Create condition labels for differences:
         lstDiffLbl = [None] * varNumCon

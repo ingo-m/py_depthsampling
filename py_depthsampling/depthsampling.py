@@ -36,8 +36,7 @@ lstRoi = ['v1', 'v2']
 lstHmsph = ['lh', 'rh']
 
 # List of subject identifiers:
-lstSubIds = ['20171023',
-             '20171109',
+lstSubIds = ['20171023',  # '20171109',
              '20171204_01',
              '20171204_02',
              '20171211',

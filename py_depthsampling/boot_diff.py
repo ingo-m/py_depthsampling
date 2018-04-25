@@ -102,35 +102,35 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
 
                     if lstMetaCon[idxMtaCn] == 'stimulus':
                         if lstMdl[idxMdl] == '':
-                            varYmin = -0.25
-                            varYmax = 0.25
+                            varYmin = -70.0
+                            varYmax = 70.0
                         if lstMdl[idxMdl] == 'deconv_model_1':
-                            varYmin = -0.25
-                            varYmax = 0.25
+                            varYmin = -70.0
+                            varYmax = 70.0
                     if lstMetaCon[idxMtaCn] == 'periphery':
                         if lstMdl[idxMdl] == '':
-                            varYmin = -0.25
-                            varYmax = 0.25
+                            varYmin = -70.0
+                            varYmax = 70.0
                         if lstMdl[idxMdl] == 'deconv_model_1':
-                            varYmin = -0.25
-                            varYmax = 0.25
+                            varYmin = -70.0
+                            varYmax = 70.0
 
                 elif idxRoi == 1:  # v2
 
                     if lstMetaCon[idxMtaCn] == 'stimulus':
                         if lstMdl[idxMdl] == '':
-                            varYmin = -0.25
-                            varYmax = 0.25
+                            varYmin = -70.0
+                            varYmax = 70.0
                         if lstMdl[idxMdl] == 'deconv_model_1':
-                            varYmin = -0.25
-                            varYmax = 0.25
+                            varYmin = -70.0
+                            varYmax = 70.0
                     if lstMetaCon[idxMtaCn] == 'periphery':
                         if lstMdl[idxMdl] == '':
-                            varYmin = -0.25
-                            varYmax = 0.25
+                            varYmin = -70.0
+                            varYmax = 70.0
                         if lstMdl[idxMdl] == 'deconv_model_1':
-                            varYmin = -0.25
-                            varYmax = 0.25
+                            varYmin = -70.0
+                            varYmax = 70.0
 
                 # Create average plots:
                 boot_plot(strPthData.format(lstMetaCon[idxMtaCn],

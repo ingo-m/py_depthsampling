@@ -36,13 +36,17 @@ condition) are combined across time and conditions to be plotted and analysed.
 # *** Import modules
 import pickle
 import numpy as np
-from ds_ertGetSubData import funcGetSubData
-from ds_ertPlt import funcPltErt
+from py_depthsampling.ert.ert_get_sub_data import funcGetSubData
+from py_depthsampling.ert.ert_plt import funcPltErt
 # *****************************************************************************
 
 
 # *****************************************************************************
 # *** Define parameters
+
+# Meta-condition (within or outside of retinotopic stimulus area):
+# lstMetaCon = ['stimulus', 'periphery']
+strMetaCon = 'periphery'
 
 # Load data from previously prepared pickle? If 'False', data is loaded from
 # vtk meshes (or npy files) and saved as pickle.
@@ -55,13 +59,11 @@ strRoi = 'v2'
 strHmsph = 'rh'
 
 # Name of pickle file from which to load time course data or save time course
-# data to (ROI name and hemisphere left open):
-strPthPic = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/era_long_{}_{}.pickle'  #noqa
-# strPthPic = '/media/PacMan_Depth_Data/Higher_Level_Analysis/era_long_{}_{}.pickle'  #noqa
+# data to (metacondition, ROI name, and hemisphere left open):
+strPthPic = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}/era_long_{}_{}.pickle'  #noqa
 
 # List of subject IDs:
-lstSubId = ['20171109',
-            '20171211',
+lstSubId = ['20171211',
             '20171213',
             '20180111',
             '20180118']
@@ -69,13 +71,13 @@ lstSubId = ['20171109',
 # Condition levels (used to complete file names):
 lstCon = ['pacman_dynamic_long']
 
-# Base name of vertex inclusion masks (subject ID, hemisphere, subject ID,
-# & ROI left open):
-strVtkMsk = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/{}_vertex_inclusion_mask_{}.vtk'  #noqa
+# Base name of vertex inclusion masks (subject ID, hemisphere, subject ID, ROI,
+# and metacondition left open):
+strVtkMsk = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/{}_vertex_inclusion_mask_{}_{}.vtk'  #noqa
 
 # Base name of single-volume vtk meshes that together make up the timecourse
 # (subject ID, hemisphere, stimulus level, and volume index left open):
-strVtkPth = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}_era/{}/vol_{}.vtk'  #noqa
+strVtkPth = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}_era/{}/vol_{}.vtk'  #noqa
 
 # Number of cortical depths:
 varNumDpth = 11
@@ -91,7 +93,7 @@ strPrcdData = 'SCALARS'
 varNumLne = 2
 
 # Limits of y-axis:
-varAcrSubsYmin = -0.06
+varAcrSubsYmin = -0.04
 varAcrSubsYmax = 0.04
 
 # Convert y-axis values to percent (i.e. divide label values by 100)?
@@ -116,16 +118,18 @@ varStimEnd = varStimStrt + 25.0  # 25 s stimulus plus prestimulus interval
 
 # Condition labels:
 # lstConLbl = ['72.0%', '16.3%', '6.1%', '2.5%']
-lstConLbl = ['Control dynamic', 'Pacman dynamic', 'Pacman static']
+# lstConLbl = ['Control dynamic', 'Pacman dynamic', 'Pacman static']
+lstConLbl = ['Pacman dynamic']
 
 # Plot legend - single subject plots:
 lgcLgnd01 = True
 # Plot legend - across subject plots:
 lgcLgnd02 = True
 
-# Output path for plots - prefix (ROI and hemisphere left open):
-strPltOtPre = '/home/john/PhD/PacMan_Plots/era_long/{}_{}/'
-# strPltOtPre = '/media/PacMan_Plots/era_long/{}_{}/'
+# Output path for plots - prefix (metacondition, ROI, and hemisphere left
+# open):
+strPltOtPre = '/home/john/PhD/PacMan_Plots/era_long/{}/{}_{}/'
+
 # Output path for plots - suffix:
 strPltOtSuf = '_ert_long.png'
 
@@ -140,8 +144,8 @@ varDpi = 70.0
 print('-Event-related timecourses depth sampling')
 
 # Complete strings:
-strPthPic = strPthPic.format(strRoi, strHmsph)
-strPltOtPre = strPltOtPre.format(strRoi, strHmsph)
+strPthPic = strPthPic.format(strMetaCon, strRoi, strHmsph)
+strPltOtPre = strPltOtPre.format(strMetaCon, strRoi, strHmsph)
 
 # Number of subjects:
 varNumSub = len(lstSubId)
@@ -175,7 +179,8 @@ else:
         print(('------Subject: ' + strSubID))
 
         # Complete file path of vertex inclusion mask for current subject:
-        strVtkMskTmp = strVtkMsk.format(strSubID, strHmsph, strSubID, strRoi)
+        strVtkMskTmp = strVtkMsk.format(strSubID, strHmsph, strSubID, strRoi,
+                                        strMetaCon)
 
         # Load data for current subject (returns array of the form:
         # aryRoiErt[varNumCon, varNumDpth, varNumVol]):

@@ -217,11 +217,6 @@ def boot_plot(objDpth, strPath, lstConLbl, varNumIt=10000, varConLw=2.5,
                                    + (lstConLbl[lstDiff[idxDiff][1]]))
         lstConLbl = lstDiffLbl
 
-    print('np.min(aryEmpMed)')
-    print(np.min(aryEmpMed))
-    print('np.max(aryEmpMed)')
-    print(np.max(aryEmpMed))
-
     plt_dpth_prfl(aryEmpMed, None, varNumDpth, varNumCon, 80.0, varYmin,
                   varYmax, False, lstConLbl, strXlabel, strYlabel, strTtl,
                   lgcLgnd, strPath, varSizeX=1800.0, varSizeY=1600.0,

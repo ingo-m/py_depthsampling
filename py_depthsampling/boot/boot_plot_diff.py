@@ -178,10 +178,6 @@ def boot_plot(objDpth, strPath, lstConLbl, varNumIt=10000, varConLw=2.5,
     # ------------------------------------------------------------------------
     # *** Plot result
 
-    # Labels for axes:
-    strXlabel = 'Cortical depth level (equivolume)'
-    strYlabel = 'fMRI signal change [arbitrary units]'
-
     if lstDiff is None:
 
         # Empirical median:
@@ -220,6 +216,11 @@ def boot_plot(objDpth, strPath, lstConLbl, varNumIt=10000, varConLw=2.5,
                                    + ' minus '
                                    + (lstConLbl[lstDiff[idxDiff][1]]))
         lstConLbl = lstDiffLbl
+
+    print('np.min(aryEmpMed)')
+    print(np.min(aryEmpMed))
+    print('np.max(aryEmpMed)')
+    print(np.max(aryEmpMed))
 
     plt_dpth_prfl(aryEmpMed, None, varNumDpth, varNumCon, 80.0, varYmin,
                   varYmax, False, lstConLbl, strXlabel, strYlabel, strTtl,

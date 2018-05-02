@@ -30,7 +30,7 @@ from py_depthsampling.main.main import ds_main
 lstMetaCon = ['stimulus', 'periphery']
 
 # Region of interest ('v1' or 'v2'):
-lstRoi = ['v1', 'v2']
+lstRoi = ['v1', 'v2', 'v3']
 
 # Hemispheres ('lh' or 'rh'):
 lstHmsph = ['lh', 'rh']

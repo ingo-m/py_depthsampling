@@ -266,7 +266,7 @@ def fix_roi_csv(strCsvRoi, strCsvRoiOut, strVtkIn, varNumHdrRoi=1,  #noqa
 
         # Skip first and last vertices (there would be no preceeding or
         # suceeding value for interpolation):
-        if (idxErr > 0) and (lstCsvRoi > idxErr):
+        if (idxErr > 1) and (len(lstCsvRoi) > idxErr):
 
             # Preceeding index:
             strTmpPre = lstCsvRoi[(idxErr - 1)].split(',')[1]

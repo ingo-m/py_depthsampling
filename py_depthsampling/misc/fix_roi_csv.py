@@ -313,6 +313,10 @@ def fix_roi_csv(strCsvRoi, strCsvRoiOut, strVtkIn, varNumHdrRoi=1,  #noqa
               + str(varErrCnt))
     print(strTmp)
 
+    # Replace header (to avoid problems with multiple delimiters, i.e. ' ' and
+    # ',').
+    lstCsvRoi[0] = 'header'
+
     # -------------------------------------------------------------------------
     # *** Save modified CSV file
 

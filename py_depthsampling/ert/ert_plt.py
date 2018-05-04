@@ -146,7 +146,7 @@ def ert_plt(aryRoiErtMeanDpth,  #noqa
     # axs01.set_xticklabels(lstXlbl)
 
     # Which y values to label with ticks:
-    vecYlbl = np.linspace(varYmin, varYmax, num=5, endpoint=True)
+    vecYlbl = np.linspace(varYmin, varYmax, num=6, endpoint=True)
     # vecYlbl = np.arange(varYmin, varYmax, 0.02)
     # vecYlbl = np.linspace(0.0, varYmax, num=5, endpoint=True)
     # Round:

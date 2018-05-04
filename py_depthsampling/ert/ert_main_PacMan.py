@@ -24,10 +24,10 @@ from py_depthsampling.ert.ert_get_sub_data import ert_get_sub_data
 from py_depthsampling.ert.ert_plt import ert_plt
 
 
-def ert_main(lstSubId, lstCon, lstConLbl, strHmsph, strRoi, strVtkMsk,
-             strVtkPth, varTr, varNumDpth, varNumVol, varStimStrt, varStimEnd,
-             strPthPic, lgcPic, strPltOtPre, strPltOtSuf, varNumLne=2,
-             strPrcdData='SCALARS', strXlabel='Time [s]',
+def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
+             strVtkMsk, strVtkPth, varTr, varNumDpth, varNumVol, varStimStrt,
+             varStimEnd, strPthPic, lgcPic, strPltOtPre, strPltOtSuf,
+             varNumLne=2, strPrcdData='SCALARS', strXlabel='Time [s]',
              strYlabel='Percent signal change', varAcrSubsYmin=-0.06,
              varAcrSubsYmax=0.04, lgcCnvPrct=True, lgcLgnd01=True,
              lgcLgnd02=True, varDpi=70.0):
@@ -39,14 +39,66 @@ def ert_main(lstSubId, lstCon, lstConLbl, strHmsph, strRoi, strVtkMsk,
     lstSubId : list
         List of subject IDs (list of strings, e.g. ['20171023', ...]).
     lstCon : list
-        Condition levels (used to complete file names)
-        lstConLbl, strHmsph, strRoi, strVtkMsk,
-                 strVtkPth, varTr, varNumDpth, varNumVol, varStimStrt, varStimEnd,
-                 strPthPic, lgcPic, strPltOtPre, strPltOtSuf, varNumLne=2,
-                 strPrcdData='SCALARS', strXlabel='Time [s]',
-                 strYlabel='Percent signal change', varAcrSubsYmin=-0.06,
-                 varAcrSubsYmax=0.04, lgcCnvPrct=True, lgcLgnd01=True,
-                 lgcLgnd02=True, varDpi=70.0
+        Condition levels (used to complete file names).
+    lstConLbl : list
+        Condition labels (for plot legend).
+    strMtaCn : string
+        Metacondition ('stimulus' or 'periphery').
+    strHmsph : string
+        Hemisphere ('rh' or 'lh').
+    strRoi : string
+        Region of interest ('v1', 'v2', or 'v3').
+    strVtkMsk : string
+        Path of vertex inclusion mask (subject ID, hemisphere, subject ID, ROI,
+        and metacondition left open).
+    strVtkPth : string
+        Base name of single-volume vtk meshes that together make up the
+        timecourse (subject ID, hemisphere, stimulus level, and volume index
+        left open).
+    varTr : int
+        Volume TR (in seconds, for the plot).
+    varNumDpth : int
+        Number of cortical depths.
+    varNumVol : int
+        Number of timepoints in functional time series.
+    varStimStrt : int
+        Volume index of start of stimulus period (i.e. index of first volume
+        during which stimulus was on - for the plot).
+    varStimEnd : int
+        Volume index of end of stimulus period (i.e. index of last volume
+        during which stimulus was on - for the plot).
+    strPthPic : string
+        Name of pickle file from which to load time course data or save time
+        course data to (metacondition, ROI, and hemisphere left open).
+    lgcPic : bool
+        Load data from previously prepared pickle? If 'False', data is loaded
+        from vtk meshes and saved as pickle.
+    strPltOtPre : string
+        Output path for plots - prefix, i.e. path and file name (metacondition,
+        ROI, and hemisphere left open).
+    strPltOtSuf : string
+        Output path for plots - suffix, i.e. file extension.
+    varNumLne : int
+        Number of lines between vertex-identification-string and first data
+        point.
+    strPrcdData : string
+        Beginning of string which precedes vertex data in data vtk files (i.e.
+        in the statistical maps).
+    strXlabel : string
+        Label for x axis.
+    strYlabel : string
+        Label for y axis.
+    varAcrSubsYmin : float
+        Lower limit of y-axis.
+    varAcrSubsYmax : float
+        Upper limit of y-axis.
+    lgcCnvPrct : bool
+        Convert y-axis values to percent (i.e. divide label values by 100)?
+    lgcLgnd01 : bool
+        Whether to plot legend - single subject plots.
+    lgcLgnd02 : bool
+        Whether to plot legend - group plots.
+    varDpi : float
 
     Returns
     -------
@@ -76,8 +128,8 @@ def ert_main(lstSubId, lstCon, lstConLbl, strHmsph, strRoi, strVtkMsk,
     print('-Event-related timecourses depth sampling')
 
     # Complete strings:
-    strPthPic = strPthPic.format(strRoi, strHmsph)
-    strPltOtPre = strPltOtPre.format(strRoi, strHmsph)
+    strPthPic = strPthPic.format(strMtaCn, strRoi, strHmsph)
+    strPltOtPre = strPltOtPre.format(strMtaCn, strRoi, strHmsph)
 
     # Number of subjects:
     varNumSub = len(lstSubId)
@@ -90,7 +142,7 @@ def ert_main(lstSubId, lstCon, lstConLbl, strHmsph, strRoi, strVtkMsk,
         print('---Loading data pickle')
 
         # Load previously prepared event-related timecourses from pickle:
-        dicAllSubsRoiErt = pickle.load(open(strPthPic, "rb"))
+        dicAllSubsRoiErt = pickle.load(open(strPthPic, 'rb'))
 
     else:
 
@@ -112,7 +164,7 @@ def ert_main(lstSubId, lstCon, lstConLbl, strHmsph, strRoi, strVtkMsk,
 
             # Complete file path of vertex inclusion mask for current subject:
             strVtkMskTmp = strVtkMsk.format(strSubID, strHmsph, strSubID,
-                                            strRoi)
+                                            strRoi, strMtaCn)
 
             # Load data for current subject (returns array of the form:
             # aryRoiErt[varNumCon, varNumDpth, varNumVol]):

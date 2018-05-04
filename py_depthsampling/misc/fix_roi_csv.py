@@ -189,7 +189,7 @@ def fix_roi_csv(strCsvRoi, strCsvRoiOut, strVtkIn, varNumHdrRoi=1,  #noqa
         # vertex within the array ('aryVtk'). This index is probably (but not
         # necessarily) identical to the vertex ID in the vtk mesh. To be safe,
         # we obtain the actual vtk vertex ID.
-        strTmpIdxMin = str(aryVtk[varTmpIdxMin, 0])
+        strTmpIdxMin = str(int(np.around(aryVtk[varTmpIdxMin, 0])))
 
         # We now have the index of the vertex from the vtk mesh which is
         # closest tot he current CSV ROI vertex. We replace the (possibly

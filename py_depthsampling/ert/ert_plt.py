@@ -26,26 +26,26 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 
 
-def funcPltErt(aryRoiErtMeanDpth,  #noqa
-               aryError,
-               varNumDpth,
-               varNumCon,
-               varNumVol,
-               varDpi,
-               varYmin,
-               varYmax,
-               varStimStrt,
-               varStimEnd,
-               varTr,
-               lstConLbl,
-               lgcLgnd,
-               strXlabel,
-               strYlabel,
-               lgcCnvPrct,
-               strTitle,
-               strPthOut,
-               varXlbl=2,
-               varTmeScl=1.0):
+def ert_plt(aryRoiErtMeanDpth,  #noqa
+            aryError,
+            varNumDpth,
+            varNumCon,
+            varNumVol,
+            varDpi,
+            varYmin,
+            varYmax,
+            varStimStrt,
+            varStimEnd,
+            varTr,
+            lstConLbl,
+            lgcLgnd,
+            strXlabel,
+            strYlabel,
+            lgcCnvPrct,
+            strTitle,
+            strPthOut,
+            varXlbl=2,
+            varTmeScl=1.0):
     """Plot event-related timecourses."""
     # Create figure:
     fgr01 = plt.figure(figsize=(1200.0/varDpi, 800.0/varDpi),

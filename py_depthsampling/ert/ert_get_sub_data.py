@@ -27,15 +27,15 @@ from py_depthsampling.get_data.load_vtk_single import load_vtk_single
 from py_depthsampling.get_data.load_vtk_multi import load_vtk_multi
 
 
-def funcGetSubData(strSubId,
-                   strHmsph,
-                   strVtkMsk,
-                   strVtkPth,
-                   lstCon,
-                   varNumVol,
-                   varNumDpth,
-                   strPrcdData,
-                   varNumLne):
+def ert_get_sub_data(strSubId,
+                     strHmsph,
+                     strVtkMsk,
+                     strVtkPth,
+                     lstCon,
+                     varNumVol,
+                     varNumDpth,
+                     strPrcdData,
+                     varNumLne):
     """
     Load data for event-related timecourse analysis.
 

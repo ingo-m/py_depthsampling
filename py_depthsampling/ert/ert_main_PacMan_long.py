@@ -36,8 +36,8 @@ condition) are combined across time and conditions to be plotted and analysed.
 # *** Import modules
 import pickle
 import numpy as np
-from py_depthsampling.ert.ert_get_sub_data import funcGetSubData
-from py_depthsampling.ert.ert_plt import funcPltErt
+from py_depthsampling.ert.ert_get_sub_data import ert_get_sub_data
+from py_depthsampling.ert.ert_plt import ert_plt
 # *****************************************************************************
 
 
@@ -184,18 +184,18 @@ else:
 
         # Load data for current subject (returns array of the form:
         # aryRoiErt[varNumCon, varNumDpth, varNumVol]):
-        dicAllSubsRoiErt[strSubID] = funcGetSubData(strSubID,
-                                                    strHmsph,
-                                                    strVtkMskTmp,
-                                                    strVtkPth,
-                                                    lstCon,
-                                                    varNumVol,
-                                                    varNumDpth,
-                                                    strPrcdData,
-                                                    varNumLne)
+        dicAllSubsRoiErt[strSubID] = ert_get_sub_data(strSubID,
+                                                      strHmsph,
+                                                      strVtkMskTmp,
+                                                      strVtkPth,
+                                                      lstCon,
+                                                      varNumVol,
+                                                      varNumDpth,
+                                                      strPrcdData,
+                                                      varNumLne)
 
     # Save event-related timecourses to disk as pickle:
-    pickle.dump(dicAllSubsRoiErt, open(strPthPic, "wb"))
+    pickle.dump(dicAllSubsRoiErt, open(strPthPic, 'wb'))
 # *****************************************************************************
 
 
@@ -242,26 +242,26 @@ if True:
             aryDummy = np.zeros(aryRoiErt[:, idxDpth, :].shape)
 
             # We create one plot per depth-level.
-            funcPltErt(aryRoiErt[:, idxDpth, :],
-                       aryDummy,
-                       varNumDpth,
-                       varNumCon,
-                       varNumVol,
-                       varDpi,
-                       varAcrSubsYmin,
-                       varAcrSubsYmax,
-                       varStimStrt,
-                       varStimEnd,
-                       varTr,
-                       lstConLbl,
-                       lgcLgnd01,
-                       strXlabel,
-                       strYlabel,
-                       lgcCnvPrct,
-                       strTmpTtl,
-                       strTmpPth,
-                       varXlbl=10,
-                       varTmeScl=varTmeScl)
+            ert_plt(aryRoiErt[:, idxDpth, :],
+                    aryDummy,
+                    varNumDpth,
+                    varNumCon,
+                    varNumVol,
+                    varDpi,
+                    varAcrSubsYmin,
+                    varAcrSubsYmax,
+                    varStimStrt,
+                    varStimEnd,
+                    varTr,
+                    lstConLbl,
+                    lgcLgnd01,
+                    strXlabel,
+                    strYlabel,
+                    lgcCnvPrct,
+                    strTmpTtl,
+                    strTmpPth,
+                    varXlbl=10,
+                    varTmeScl=varTmeScl)
 # *****************************************************************************
 
 
@@ -289,26 +289,26 @@ if True:
         arySdTmp = np.std(aryRoiErt, axis=1)
 
         # We create one plot per depth-level.
-        funcPltErt(aryMneTmp,
-                   arySdTmp,
-                   varNumDpth,
-                   varNumCon,
-                   varNumVol,
-                   varDpi,
-                   varAcrSubsYmin,
-                   varAcrSubsYmax,
-                   varStimStrt,
-                   varStimEnd,
-                   varTr,
-                   lstConLbl,
-                   lgcLgnd01,
-                   strXlabel,
-                   strYlabel,
-                   lgcCnvPrct,
-                   strTmpTtl,
-                   strTmpPth,
-                   varXlbl=10,
-                   varTmeScl=varTmeScl)
+        ert_plt(aryMneTmp,
+                arySdTmp,
+                varNumDpth,
+                varNumCon,
+                varNumVol,
+                varDpi,
+                varAcrSubsYmin,
+                varAcrSubsYmax,
+                varStimStrt,
+                varStimEnd,
+                varTr,
+                lstConLbl,
+                lgcLgnd01,
+                strXlabel,
+                strYlabel,
+                lgcCnvPrct,
+                strTmpTtl,
+                strTmpPth,
+                varXlbl=10,
+                varTmeScl=varTmeScl)
 # *****************************************************************************
 
 
@@ -347,26 +347,26 @@ for idxDpth in [0, 5, 10]:
     # aryRoiErtMean[varNumCon, varNumDpth, varNumVol]
 
     # We create one plot per depth-level.
-    funcPltErt(aryRoiErtMean[:, idxDpth, :],
-               aryRoiErtSem[:, idxDpth, :],
-               varNumDpth,
-               varNumCon,
-               varNumVol,
-               varDpi,
-               varAcrSubsYmin,
-               varAcrSubsYmax,
-               varStimStrt,
-               varStimEnd,
-               varTr,
-               lstConLbl,
-               lgcLgnd02,
-               strXlabel,
-               strYlabel,
-               lgcCnvPrct,
-               strTmpTtl,
-               strTmpPth,
-               varXlbl=10,
-               varTmeScl=varTmeScl)
+    ert_plt(aryRoiErtMean[:, idxDpth, :],
+            aryRoiErtSem[:, idxDpth, :],
+            varNumDpth,
+            varNumCon,
+            varNumVol,
+            varDpi,
+            varAcrSubsYmin,
+            varAcrSubsYmax,
+            varStimStrt,
+            varStimEnd,
+            varTr,
+            lstConLbl,
+            lgcLgnd02,
+            strXlabel,
+            strYlabel,
+            lgcCnvPrct,
+            strTmpTtl,
+            strTmpPth,
+            varXlbl=10,
+            varTmeScl=varTmeScl)
 # *****************************************************************************
 
 
@@ -401,24 +401,24 @@ strTmpTtl = ''
 strTmpPth = (strPltOtPre + 'acr_dpth_acr_subs' + strPltOtSuf)
 
 # We create one plot per depth-level.
-funcPltErt(aryMneDpthSub,
-           arySdDpthSub,
-           varNumDpth,
-           varNumCon,
-           varNumVol,
-           varDpi,
-           varAcrSubsYmin,
-           varAcrSubsYmax,
-           varStimStrt,
-           varStimEnd,
-           varTr,
-           lstConLbl,
-           lgcLgnd02,
-           strXlabel,
-           strYlabel,
-           lgcCnvPrct,
-           strTmpTtl,
-           strTmpPth,
-           varXlbl=10,
-           varTmeScl=varTmeScl)
+ert_plt(aryMneDpthSub,
+        arySdDpthSub,
+        varNumDpth,
+        varNumCon,
+        varNumVol,
+        varDpi,
+        varAcrSubsYmin,
+        varAcrSubsYmax,
+        varStimStrt,
+        varStimEnd,
+        varTr,
+        lstConLbl,
+        lgcLgnd02,
+        strXlabel,
+        strYlabel,
+        lgcCnvPrct,
+        strTmpTtl,
+        strTmpPth,
+        varXlbl=10,
+        varTmeScl=varTmeScl)
 # *****************************************************************************

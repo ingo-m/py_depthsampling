@@ -157,19 +157,6 @@ def fix_roi_csv(strCsvRoi, strCsvRoiOut, strVtkIn, varNumHdrRoi=1,  #noqa
     # -------------------------------------------------------------------------
     # *** Fix CSV ROI indices
 
-    # Round coordinates:
-    vecXrnd01 = np.around(aryVtk[:, 1], decimals=varRnd)
-    vecYrnd01 = np.around(aryVtk[:, 2], decimals=varRnd)
-    vecZrnd01 = np.around(aryVtk[:, 3], decimals=varRnd)
-
-    # Round with one extra decimal point:
-    vecXrnd02 = np.around(aryVtk[:, 1], decimals=(varRnd + 1))
-    vecYrnd02 = np.around(aryVtk[:, 2], decimals=(varRnd + 1))
-    vecZrnd02 = np.around(aryVtk[:, 3], decimals=(varRnd + 1))
-
-    # List for vertices for which no correspondence is found:
-    lstErr = []
-
     # Loop through CSV file:
     for idxCsv in range(varNumHdrRoi, len(lstCsvRoi)):
 
@@ -178,140 +165,45 @@ def fix_roi_csv(strCsvRoi, strCsvRoiOut, strVtkIn, varNumHdrRoi=1,  #noqa
         # x-coordinate, y-coordinate, z-coordinate.
         lstTmp = lstCsvRoi[idxCsv].split(',')
 
-        # Coordinates:
-        varTmpX = np.around(float(lstTmp[2]), decimals=varRnd)
-        varTmpY = np.around(float(lstTmp[3]), decimals=varRnd)
-        varTmpZ = np.around(float(lstTmp[4]), decimals=varRnd)
+        # Coordinates of current vertex (from CSV ROI; x, y, z):
+        vecTmpRoiCoor = np.array(lstTmp[2:5], dtype=np.float64)
 
-        # Create sets of vertex coordinates in vtk mesh that coincide with the
-        # coordinate of the current vertex from the csv file:
-        setTmpX = set(np.where(np.equal(vecXrnd01, varTmpX))[0])
-        setTmpY = set(np.where(np.equal(vecYrnd01, varTmpY))[0])
-        setTmpZ = set(np.where(np.equal(vecZrnd01, varTmpZ))[0])
+        # Eucledian distance between current ROI vertex and all vertices in
+        # vtk mesh:
+        aryTmpDst = np.sqrt(
+                            np.sum(
+                                   np.power(
+                                            np.subtract(aryVtk[:, 1:4],
+                                                        vecTmpRoiCoor[None,
+                                                                      :]
+                                                        ),
+                                            2.0),
+                                   axis=1)
+                            )
 
-        # List of intersections (i.e. vertices that have the same x, y, and z
-        # coordinate as the current vertex from the csv file):
-        lstInt = list(set.intersection(setTmpX, setTmpY, setTmpZ))
+        # Find vertex from vtk mesh with minimum distance to current ROI
+        # vertex:
+        varTmpIdxMin = np.argmin(aryTmpDst)
 
-        # If everything went ok, there should only be one vertex at the current
-        # position (otherwise consider reducing the rounding of coordinates):
-        if (len(lstInt) > 1):
+        # 'varTmpIdxMin' is the index of the vertex closest to the current ROI
+        # vertex within the array ('aryVtk'). This index is probably (but not
+        # necessarily) identical to the vertex ID in the vtk mesh. To be safe,
+        # we obtain the actual vtk vertex ID.
+        strTmpIdxMin = str(aryVtk[varTmpIdxMin, 0])
 
-            # Round one decimal point less, and see if there is a unique
-            # vertex.
+        # We now have the index of the vertex from the vtk mesh which is
+        # closest tot he current CSV ROI vertex. We replace the (possibly
+        # wrong) vertex index in the CSV ROI with the vtk mesh index.
 
-            # Coordinates:
-            varTmpX = np.around(float(lstTmp[2]), decimals=(varRnd + 1))
-            varTmpY = np.around(float(lstTmp[3]), decimals=(varRnd + 1))
-            varTmpZ = np.around(float(lstTmp[4]), decimals=(varRnd + 1))
+        # Replace old (wrong) index with new index:
+        lstTmp[1] = strTmpIdxMin
 
-            # Create sets of vertex coordinates in vtk mesh that coincide with
-            # the coordinate of the current vertex from the csv file:
-            setTmpX = set(np.where(np.equal(vecXrnd02, varTmpX))[0])
-            setTmpY = set(np.where(np.equal(vecYrnd02, varTmpY))[0])
-            setTmpZ = set(np.where(np.equal(vecZrnd02, varTmpZ))[0])
+        # Converte list of strings to string (same as original line from
+        # csv file, just with new index):
+        strTmp = ','.join(lstTmp)
 
-            # List of intersections (i.e. vertices that have the same x, y, and
-            # z coordinate as the current vertex from the csv file):
-            lstInt = list(set.intersection(setTmpX, setTmpY, setTmpZ))
-
-            if (len(lstInt) > 1):
-
-                # Error message:
-                strErrMsg = ('---Error: More than one vertex from reference '
-                             + 'VTK file has the same coordinates as vertex '
-                             + 'number '
-                             + str(idxCsv)
-                             + ' from CSV ROI file. There should only be one '
-                             + 'vertex per coordinate. Consider reduced '
-                             + 'rounding of vertex coordinates.')
-                raise ValueError(strErrMsg)
-
-        if (len(lstInt) == 1):
-
-            # The list of vertices at intersection of coordinates has length
-            # one, containing the index of the vertex (in the vtk mesh)
-            # corresponding to the current vertex in the CSV ROI. We replace
-            # the (possibly wrong) vertex index in the CSV ROI with the vtk
-            # mesh index.
-
-            # Convert index to string:
-            strTmpVtkIdx = str(lstInt[0])
-
-            # Replace old (wrong) index with new index:
-            lstTmp[1] = strTmpVtkIdx
-
-            # Converte list of strings to string (same as original line from
-            # csv file, just with new index):
-            strTmp = ','.join(lstTmp)
-
-            # Put modified line into csv list:
-            lstCsvRoi[idxCsv] = strTmp
-
-        elif (len(lstInt) == 0):
-
-            # Remember vertices without correspondence:
-            lstErr.append(idxCsv)
-
-    # Counter for vertices for which no correspondence can be established:
-    varErrCnt = 0
-
-    # If no corresponding points could be found, first check whether new
-    # (modified) vertex IDs of preceeding and suceeding vertices are in
-    # sequence (e.g. if preceeding ID is 60075 and suceeding ID is 60077,
-    # assign ID = 60076 to respective vertex). If this is not the case, remove
-    # this vertex from the ROI. Loop through missing elements in reverse order,
-    # because list indices change when removing elements.
-    for idxErr in list(reversed(lstErr)):
-
-        # Skip first and last vertices (there would be no preceeding or
-        # suceeding value for interpolation):
-        if (idxErr > 1) and (len(lstCsvRoi) > idxErr):
-
-            # Preceeding index:
-            strTmpPre = lstCsvRoi[(idxErr - 1)].split(',')[1]
-            # Suceesing index:
-            strTmpSce = lstCsvRoi[(idxErr + 1)].split(',')[1]
-
-            # Is succeeding index = preceeding index plus two?
-            if ((int(strTmpPre) + 2) == int(strTmpSce)):
-
-                # Get current line of csv file (split into list of strings,
-                # corresponding to parameter value (e.g. polar angle), vertex
-                # ID, x-coordinate, y-coordinate, z-coordinate.
-                lstTmp = lstCsvRoi[idxErr].split(',')
-
-                # Convert index to string:
-                strTmpVtkIdx = str((int(strTmpPre) + 1))
-
-                # Replace old (wrong) index with new index:
-                lstTmp[1] = strTmpVtkIdx
-
-                # Converte list of strings to string (same as original line
-                # from csv file, just with new index):
-                strTmp = ','.join(lstTmp)
-
-                # Put modified line into csv list:
-                lstCsvRoi[idxErr] = strTmp
-
-            else:
-
-                # Delete vertex.
-                del(lstCsvRoi[idxErr])
-                # Increment error counter:
-                varErrCnt += 1
-
-        else:
-
-            # Delete vertex.
-            del(lstCsvRoi[idxErr])
-            # Increment error counter:
-            varErrCnt += 1
-
-    strTmp = ('---Number of vertices in ROI CSV file for which no '
-              + 'corresponding vertex could be found in VTK mesh: '
-              + str(varErrCnt))
-    print(strTmp)
+        # Put modified line into csv list:
+        lstCsvRoi[idxCsv] = strTmp
 
     # Replace header (to avoid problems with multiple delimiters, i.e. ' ' and
     # ',').
@@ -369,3 +261,4 @@ for idxSub in lstSubIds:
             fix_roi_csv(strCsvRoi.format(idxSub, idxHmpsh, idxRoi),
                         strCsvRoiOut.format(idxSub, idxHmpsh, idxRoi),
                         strVtkIn.format(idxSub, idxHmpsh))
+# -----------------------------------------------------------------------------

@@ -2,7 +2,7 @@
 """
 Function of the depth sampling pipeline.
 
-@author: Ingo Marquardt, 04.11.2016
+(C) Ingo Marquardt, 04.11.2016
 """
 
 # Part of py_depthsampling library

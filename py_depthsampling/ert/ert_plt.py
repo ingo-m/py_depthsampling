@@ -26,26 +26,26 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 
 
-def funcPltErt(aryRoiErtMeanDpth,  #noqa
-               aryError,
-               varNumDpth,
-               varNumCon,
-               varNumVol,
-               varDpi,
-               varYmin,
-               varYmax,
-               varStimStrt,
-               varStimEnd,
-               varTr,
-               lstConLbl,
-               lgcLgnd,
-               strXlabel,
-               strYlabel,
-               lgcCnvPrct,
-               strTitle,
-               strPthOut,
-               varXlbl=2,
-               varTmeScl=1.0):
+def ert_plt(aryRoiErtMeanDpth,  #noqa
+            aryError,
+            varNumDpth,
+            varNumCon,
+            varNumVol,
+            varDpi,
+            varYmin,
+            varYmax,
+            varStimStrt,
+            varStimEnd,
+            varTr,
+            lstConLbl,
+            lgcLgnd,
+            strXlabel,
+            strYlabel,
+            lgcCnvPrct,
+            strTitle,
+            strPthOut,
+            varXlbl=2,
+            varTmeScl=1.0):
     """Plot event-related timecourses."""
     # Create figure:
     fgr01 = plt.figure(figsize=(1200.0/varDpi, 800.0/varDpi),
@@ -69,12 +69,11 @@ def funcPltErt(aryRoiErtMeanDpth,  #noqa
     # Subtract pre-stimulus interval:
     vecX = np.subtract(vecX, varStimStrt)
 
-
     # Time points to label in the negative range:
     vecXlblNeg = np.arange(
                            np.multiply(-1.0,
-                                      np.floor(varStimStrt)
-                                      ),
+                                       np.floor(varStimStrt)
+                                       ),
                            0.0,
                            int(varXlbl)
                            )
@@ -176,8 +175,8 @@ def funcPltErt(aryRoiErtMeanDpth,  #noqa
     axs01.tick_params(labelsize=36,  # Fontsize
                       length=8,     # Height of the ticks
                       width=2,       # Width of the ticks
-                      top='off',
-                      right='off')
+                      top=False,
+                      right=False)
 
     # Adjust labels:
     axs01.set_xlabel(strXlabel,

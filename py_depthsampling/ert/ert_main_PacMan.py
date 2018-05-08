@@ -1,27 +1,13 @@
 # -*- coding: utf-8 -*-
-"""
-Function of the depth sampling library.
-
-Function of the event-related timecourses depth sampling library.
-
-The purpose of this script is to plot event-related timecourses sampled across
-cortical depth levels.
-
-The input to this script are custom-made 'mesh time courses'. Timecourses have
-to be cut into event-related segments and averaged across trials (using the
-'ds_cutSgmnts.py' script of the depth-sampling library). Depth-sampling has to
-be performed with CBS tools, resulting in a 3D mesh for each time point. Here,
-3D meshes (with values for all depth-levels at one point in time, for one
-condition) are combined across time and conditions to be plotted and analysed.
-"""
+"""Function of the depth sampling library."""
 
 # Part of py_depthsampling library
-# Copyright (C) 2017  Ingo Marquardt
+# Copyright (C) 2018  Ingo Marquardt
 #
-# This program is free software: you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the Free
-# Software Foundation, either version 3 of the License, or (at your option) any
-# later version.
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -32,286 +18,281 @@ condition) are combined across time and conditions to be plotted and analysed.
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# *****************************************************************************
-# *** Import modules
 import pickle
 import numpy as np
-from ds_ertGetSubData import funcGetSubData
-from ds_ertPlt import funcPltErt
-# *****************************************************************************
+from py_depthsampling.ert.ert_get_sub_data import ert_get_sub_data
+from py_depthsampling.ert.ert_plt import ert_plt
 
 
-# *****************************************************************************
-# *** Define parameters
+def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
+             strVtkMsk, strVtkPth, varTr, varNumDpth, varNumVol, varStimStrt,
+             varStimEnd, strPthPic, lgcPic, strPltOtPre, strPltOtSuf,
+             varNumLne=2, strPrcdData='SCALARS', strXlabel='Time [s]',
+             strYlabel='Percent signal change', varAcrSubsYmin=-0.06,
+             varAcrSubsYmax=0.04, lgcCnvPrct=True, lgcLgnd01=True,
+             lgcLgnd02=True, varDpi=70.0):
+    """
+    Plot event-related timecourses sampled across cortical depth levels.
 
-# Load data from previously prepared pickle? If 'False', data is loaded from
-# vtk meshes and saved as pickle.
-lgcPic = False
+    Parameters
+    ----------
+    lstSubId : list
+        List of subject IDs (list of strings, e.g. ['20171023', ...]).
+    lstCon : list
+        Condition levels (used to complete file names).
+    lstConLbl : list
+        Condition labels (for plot legend).
+    strMtaCn : string
+        Metacondition ('stimulus' or 'periphery').
+    strHmsph : string
+        Hemisphere ('rh' or 'lh').
+    strRoi : string
+        Region of interest ('v1', 'v2', or 'v3').
+    strVtkMsk : string
+        Path of vertex inclusion mask (subject ID, hemisphere, subject ID, ROI,
+        and metacondition left open).
+    strVtkPth : string
+        Base name of single-volume vtk meshes that together make up the
+        timecourse (subject ID, hemisphere, stimulus level, and volume index
+        left open).
+    varTr : int
+        Volume TR (in seconds, for the plot).
+    varNumDpth : int
+        Number of cortical depths.
+    varNumVol : int
+        Number of timepoints in functional time series.
+    varStimStrt : int
+        Volume index of start of stimulus period (i.e. index of first volume
+        during which stimulus was on - for the plot).
+    varStimEnd : int
+        Volume index of end of stimulus period (i.e. index of last volume
+        during which stimulus was on - for the plot).
+    strPthPic : string
+        Name of pickle file from which to load time course data or save time
+        course data to (metacondition, ROI, and hemisphere left open).
+    lgcPic : bool
+        Load data from previously prepared pickle? If 'False', data is loaded
+        from vtk meshes and saved as pickle.
+    strPltOtPre : string
+        Output path for plots - prefix, i.e. path and file name (metacondition,
+        ROI, and hemisphere left open).
+    strPltOtSuf : string
+        Output path for plots - suffix, i.e. file extension.
+    varNumLne : int
+        Number of lines between vertex-identification-string and first data
+        point.
+    strPrcdData : string
+        Beginning of string which precedes vertex data in data vtk files (i.e.
+        in the statistical maps).
+    strXlabel : string
+        Label for x axis.
+    strYlabel : string
+        Label for y axis.
+    varAcrSubsYmin : float
+        Lower limit of y-axis.
+    varAcrSubsYmax : float
+        Upper limit of y-axis.
+    lgcCnvPrct : bool
+        Convert y-axis values to percent (i.e. divide label values by 100)?
+    lgcLgnd01 : bool
+        Whether to plot legend - single subject plots.
+    lgcLgnd02 : bool
+        Whether to plot legend - group plots.
+    varDpi : float
 
-# ROI ('v1' or 'v2'):
-strRoi = 'v2'
+    Returns
+    -------
+    This function has no return value. Plots are saved to disk.
 
-# Hemisphere ('rh' or 'lh'):
-strHmsph = 'rh'
+    Notes
+    -----
+    The input to this module are custom-made 'mesh time courses'. Timecourses
+    have to be cut into event-related segments and averaged across trials
+    (using the 'cut_sgmnts.py' script of the depth-sampling library, or
+    automatically as part of the PacMan analysis pipeline,
+    n_03x_py_evnt_rltd_avrgs.py). Depth-sampling has to be performed with CBS
+    tools, resulting in a 3D mesh for each time point. Here, 3D meshes (with
+    values for all depth-levels at one point in time, for one condition) are
+    combined across time and conditions to be plotted and analysed.
+    """
+    # *************************************************************************
+    # *** Preparations
 
-# Name of pickle file from which to load time course data or save time course
-# data to (ROI name and hemisphere left open):
-strPthPic = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/era_{}_{}.pickle'  #noqa
+    # Convert stimulus onset & offset times from volume indicies to seconds:
+    varStimStrt = float(varStimStrt) * varTr
+    varStimEnd = float(varStimEnd) * varTr
 
-# List of subject IDs:
-lstSubId = ['20171109',
-            '20171211',
-            '20171213',
-            '20180111',
-            '20180118']
+    # *************************************************************************
+    # *** Load data
 
-# Condition levels (used to complete file names):
-lstCon = ['control_dynamic', 'pacman_dynamic', 'pacman_static']
+    print('-Event-related timecourses depth sampling')
 
-# Base name of vertex inclusion masks (subject ID, hemisphere, subject ID,
-# & ROI left open):
-strVtkMsk = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}/{}_vertex_inclusion_mask_{}.vtk'  #noqa
+    # Complete strings:
+    strPthPic = strPthPic.format(strMtaCn, strRoi, strHmsph)
+    strPltOtPre = strPltOtPre.format(strMtaCn, strRoi, strHmsph)
 
-# Base name of single-volume vtk meshes that together make up the timecourse
-# (subject ID, hemisphere, stimulus level, and volume index left open):
-strVtkPth = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs_distcor/{}_era/{}/vol_{}.vtk'  #noqa
+    # Number of subjects:
+    varNumSub = len(lstSubId)
 
-# Number of cortical depths:
-varNumDpth = 11
+    # Number of conditions:
+    varNumCon = len(lstCon)
 
-# Number of timepoints:
-varNumVol = 19
+    if lgcPic:
 
-# Beginning of string which precedes vertex data in data vtk files (i.e. in the
-# statistical maps):
-strPrcdData = 'SCALARS'
+        print('---Loading data pickle')
 
-# Number of lines between vertex-identification-string and first data point:
-varNumLne = 2
+        # Load previously prepared event-related timecourses from pickle:
+        dicAllSubsRoiErt = pickle.load(open(strPthPic, 'rb'))
 
-# Limits of y-axis:
-varAcrSubsYmin = -0.06
-varAcrSubsYmax = 0.04
+    else:
 
-# Convert y-axis values to percent (i.e. divide label values by 100)?
-lgcCnvPrct = True
+        print('---Loading data from vtk meshes')
 
-# Label for axes:
-strXlabel = 'Time [s]'
-strYlabel = 'Percent signal change'
+        # Dictionary for ROI event-related averages. NOTE: Once the
+        # Depth-sampling can be scripted, this array should be extended to
+        # contain one timecourse per trial (per subject & depth level).
 
-# Volume index of start of stimulus period (i.e. index of first volume during
-# which stimulus was on - for the plot):
-varStimStrt = 5
-# Volume index of end of stimulus period (i.e. index of last volume during
-# which stimulus was on - for the plot):
-varStimEnd = 9
-# Volume TR (in seconds, for the plot):
-varTr = 2.079
+        # The keys for the dictionary will be the subject IDs, and for each
+        # subject there is an array of the form:
+        # aryRoiErt[varNumCon, varNumDpth, varNumVol]
+        dicAllSubsRoiErt = {}
 
-# Condition labels:
-# lstConLbl = ['72.0%', '16.3%', '6.1%', '2.5%']
-lstConLbl = ['Control dynamic', 'Pacman dynamic', 'Pacman static']
+        # Loop through subjects and load data:
+        for strSubID in lstSubId:
 
-# Plot legend - single subject plots:
-lgcLgnd01 = True
-# Plot legend - across subject plots:
-lgcLgnd02 = True
+            print(('------Subject: ' + strSubID))
 
-# Output path for plots - prfix (ROI and hemisphere left open):
-strPltOtPre = '/home/john/PhD/PacMan_Plots/era/{}_{}/'
-# Output path for plots - suffix:
-strPltOtSuf = '_ert.png'
+            # Complete file path of vertex inclusion mask for current subject:
+            strVtkMskTmp = strVtkMsk.format(strSubID, strHmsph, strSubID,
+                                            strRoi, strMtaCn)
 
-# Figure scaling factor:
-varDpi = 70.0
-# *****************************************************************************
+            # Load data for current subject (returns array of the form:
+            # aryRoiErt[varNumCon, varNumDpth, varNumVol]):
+            dicAllSubsRoiErt[strSubID] = ert_get_sub_data(strSubID,
+                                                          strHmsph,
+                                                          strVtkMskTmp,
+                                                          strVtkPth,
+                                                          lstCon,
+                                                          varNumVol,
+                                                          varNumDpth,
+                                                          strPrcdData,
+                                                          varNumLne)
 
+        # Save event-related timecourses to disk as pickle:
+        pickle.dump(dicAllSubsRoiErt, open(strPthPic, 'wb'))
 
-# *****************************************************************************
-# *** Preparations
+    # *************************************************************************
+    # *** Subtract baseline mean
 
-# Convert stimulus onset & offset times from volume indicies to seconds:
-varStimStrt = float(varStimStrt) * varTr
-varStimEnd = float(varStimEnd) * varTr
-# *****************************************************************************
-
-
-# *****************************************************************************
-# *** Load data
-
-print('-Event-related timecourses depth sampling')
-
-# Complete strings:
-strPthPic = strPthPic.format(strRoi, strHmsph)
-strPltOtPre = strPltOtPre.format(strRoi, strHmsph)
-
-# Number of subjects:
-varNumSub = len(lstSubId)
-
-# Number of conditions:
-varNumCon = len(lstCon)
-
-if lgcPic:
-
-    print('---Loading data pickle')
-
-    # Load previously prepared event-related timecourses from pickle:
-    dicAllSubsRoiErt = pickle.load(open(strPthPic, "rb"))
-
-else:
-
-    print('---Loading data from vtk meshes')
-
-    # Dictionary for ROI event-related averages. NOTE: Once the Depth-sampling
-    # can be scripted, this array should be extended to contain one timecourse
-    # per trial (per subject & depth level).
-
-    # The keys for the dictionary will be the subject IDs, and for each
-    # subject there is an array of the form:
-    # aryRoiErt[varNumCon, varNumDpth, varNumVol]
-    dicAllSubsRoiErt = {}
-
-    # Loop through subjects and load data:
-    for strSubID in lstSubId:
-
-        print(('------Subject: ' + strSubID))
-
-        # Complete file path of vertex inclusion mask for current subject:
-        strVtkMskTmp = strVtkMsk.format(strSubID, strHmsph, strSubID, strRoi)
-
-        # Load data for current subject (returns array of the form:
-        # aryRoiErt[varNumCon, varNumDpth, varNumVol]):
-        dicAllSubsRoiErt[strSubID] = funcGetSubData(strSubID,
-                                                    strHmsph,
-                                                    strVtkMskTmp,
-                                                    strVtkPth,
-                                                    lstCon,
-                                                    varNumVol,
-                                                    varNumDpth,
-                                                    strPrcdData,
-                                                    varNumLne)
-
-    # Save event-related timecourses to disk as pickle:
-    pickle.dump(dicAllSubsRoiErt, open(strPthPic, "wb"))
-# *****************************************************************************
-
-
-# *****************************************************************************
-# *** Subtract baseline mean
-
-# The input to this function are timecourses that have been normalised to the
-# pre-stimulus baseline. The datapoints are signal intensity relative to the
-# pre-stimulus baseline, and the pre-stimulus baseline has a mean of one. We
-# subtract one, so that the datapoints are percent signal change relative to
-# baseline.
-for strSubID, aryRoiErt in dicAllSubsRoiErt.items():
-    aryRoiErt = np.subtract(aryRoiErt, 1.0)
-    # Is this line necessary (hard copy)?
-    dicAllSubsRoiErt[strSubID] = aryRoiErt
-# *****************************************************************************
-
-
-# *****************************************************************************
-# *** Plot single subjet results
-
-if True:
-
-    print('---Ploting single-subjects event-related averages')
-
-    # Loop through subjects:
+    # The input to this function are timecourses that have been normalised to
+    # the pre-stimulus baseline. The datapoints are signal intensity relative
+    # to the pre-stimulus baseline, and the pre-stimulus baseline has a mean of
+    # one. We subtract one, so that the datapoints are percent signal change
+    # relative to baseline.
     for strSubID, aryRoiErt in dicAllSubsRoiErt.items():
+        aryRoiErt = np.subtract(aryRoiErt, 1.0)
+        # Is this line necessary (hard copy)?
+        dicAllSubsRoiErt[strSubID] = aryRoiErt
 
-        # Loop through depth levels (we only create plots for three depth
-        # levels):
-        for idxDpth in [0, 5, 10]:
+    # *************************************************************************
+    # *** Plot single subjet results
 
-            # Title for plot:
-            strTmpTtl = (strSubID + ' ERA, depth level ' + str(idxDpth))
+    if True:
 
-            # Output filename:
-            strTmpPth = (strPltOtPre + strSubID + '_dpth_' + str(idxDpth)
-                         + strPltOtSuf)
+        print('---Ploting single-subjects event-related averages')
 
-            # We don't have the variances across trials (within subjects),
-            # therefore we create an empty array as a placeholder. NOTE: This
-            # should be replaced by between-trial variance once the depth
-            # sampling is fully scriptable.
-            aryDummy = np.zeros(aryRoiErt[:, idxDpth, :].shape)
+        # Loop through subjects:
+        for strSubID, aryRoiErt in dicAllSubsRoiErt.items():
 
-            # We create one plot per depth-level.
-            funcPltErt(aryRoiErt[:, idxDpth, :],
-                       aryDummy,
-                       varNumDpth,
-                       varNumCon,
-                       varNumVol,
-                       varDpi,
-                       varAcrSubsYmin,
-                       varAcrSubsYmax,
-                       varStimStrt,
-                       varStimEnd,
-                       varTr,
-                       lstConLbl,
-                       lgcLgnd01,
-                       strXlabel,
-                       strYlabel,
-                       lgcCnvPrct,
-                       strTmpTtl,
-                       strTmpPth)
-# *****************************************************************************
+            # Loop through depth levels (we only create plots for three depth
+            # levels):
+            for idxDpth in [0, 5, 10]:
 
+                # Title for plot:
+                strTmpTtl = (strSubID + ' ERA, depth level ' + str(idxDpth))
 
-# *****************************************************************************
-# *** Plot across-subjects average
+                # Output filename:
+                strTmpPth = (strPltOtPre + strSubID + '_dpth_' + str(idxDpth)
+                             + strPltOtSuf)
 
-print('---Ploting across-subjects average')
+                # We don't have the variances across trials (within subjects),
+                # therefore we create an empty array as a placeholder. NOTE:
+                # This should be replaced by between-trial variance once the
+                # depth sampling is fully scriptable.
+                aryDummy = np.zeros(aryRoiErt[:, idxDpth, :].shape)
 
-# Create across-subjects data array of the form:
-# aryAllSubsRoiErt[varNumSub, varNumCon, varNumDpth, varNumVol]
-aryAllSubsRoiErt = np.zeros((varNumSub, varNumCon, varNumDpth, varNumVol))
-idxSub = 0
-for aryRoiErt in dicAllSubsRoiErt.values():
-    aryAllSubsRoiErt[idxSub, :, :, :] = aryRoiErt
-    idxSub += 1
+                # We create one plot per depth-level.
+                ert_plt(aryRoiErt[:, idxDpth, :],
+                        aryDummy,
+                        varNumDpth,
+                        varNumCon,
+                        varNumVol,
+                        varDpi,
+                        varAcrSubsYmin,
+                        varAcrSubsYmax,
+                        varStimStrt,
+                        varStimEnd,
+                        varTr,
+                        lstConLbl,
+                        lgcLgnd01,
+                        strXlabel,
+                        strYlabel,
+                        lgcCnvPrct,
+                        strTmpTtl,
+                        strTmpPth)
 
-# Calculate mean event-related time courses (mean across subjects):
-aryRoiErtMean = np.mean(aryAllSubsRoiErt, axis=0)
+    # *************************************************************************
+    # *** Plot across-subjects average
 
-# Calculate standard error of the mean (for error bar):
-aryRoiErtSem = np.divide(np.std(aryAllSubsRoiErt, axis=0),
-                         np.sqrt(varNumSub))
+    print('---Ploting across-subjects average')
 
-# Loop through depth levels:
-# for idxDpth in range(0, varNumDpth):
-for idxDpth in [0, 5, 10]:
+    # Create across-subjects data array of the form:
+    # aryAllSubsRoiErt[varNumSub, varNumCon, varNumDpth, varNumVol]
+    aryAllSubsRoiErt = np.zeros((varNumSub, varNumCon, varNumDpth, varNumVol))
+    idxSub = 0
+    for aryRoiErt in dicAllSubsRoiErt.values():
+        aryAllSubsRoiErt[idxSub, :, :, :] = aryRoiErt
+        idxSub += 1
 
-    # Title for plot:
-    # strTmpTtl = ('Event-related average, depth level ' + str(idxDpth))
-    strTmpTtl = ''
+    # Calculate mean event-related time courses (mean across subjects):
+    aryRoiErtMean = np.mean(aryAllSubsRoiErt, axis=0)
 
-    # Output filename:
-    strTmpPth = (strPltOtPre + 'acr_subs_dpth_' + str(idxDpth) + strPltOtSuf)
+    # Calculate standard error of the mean (for error bar):
+    aryRoiErtSem = np.divide(np.std(aryAllSubsRoiErt, axis=0),
+                             np.sqrt(varNumSub))
 
-    # The mean array now has the form:
-    # aryRoiErtMean[varNumCon, varNumDpth, varNumVol]
+    # Loop through depth levels:
+    # for idxDpth in range(0, varNumDpth):
+    for idxDpth in [0, 5, 10]:
 
-    # We create one plot per depth-level.
-    funcPltErt(aryRoiErtMean[:, idxDpth, :],
-               aryRoiErtSem[:, idxDpth, :],
-               varNumDpth,
-               varNumCon,
-               varNumVol,
-               varDpi,
-               varAcrSubsYmin,
-               varAcrSubsYmax,
-               varStimStrt,
-               varStimEnd,
-               varTr,
-               lstConLbl,
-               lgcLgnd02,
-               strXlabel,
-               strYlabel,
-               lgcCnvPrct,
-               strTmpTtl,
-               strTmpPth)
-# *****************************************************************************
+        # Title for plot:
+        # strTmpTtl = ('Event-related average, depth level ' + str(idxDpth))
+        strTmpTtl = ''
+
+        # Output filename:
+        strTmpPth = (strPltOtPre + 'acr_subs_dpth_' + str(idxDpth)
+                     + strPltOtSuf)
+
+        # The mean array now has the form:
+        # aryRoiErtMean[varNumCon, varNumDpth, varNumVol]
+
+        # We create one plot per depth-level.
+        ert_plt(aryRoiErtMean[:, idxDpth, :],
+                aryRoiErtSem[:, idxDpth, :],
+                varNumDpth,
+                varNumCon,
+                varNumVol,
+                varDpi,
+                varAcrSubsYmin,
+                varAcrSubsYmax,
+                varStimStrt,
+                varStimEnd,
+                varTr,
+                lstConLbl,
+                lgcLgnd02,
+                strXlabel,
+                strYlabel,
+                lgcCnvPrct,
+                strTmpTtl,
+                strTmpPth)
+    # *************************************************************************

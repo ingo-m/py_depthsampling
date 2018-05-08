@@ -18,7 +18,7 @@
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
-from ds_pltAcrDpth import funcPltAcrDpth
+from py_depthsampling.plot.plt_dpth_prfl import plt_dpth_prfl
 
 
 def bootPlot(objDpth, strPath, varNumIt=10000, varConLw=2.5, varConUp=97.5,
@@ -141,10 +141,9 @@ def bootPlot(objDpth, strPath, varNumIt=10000, varConLw=2.5, varConUp=97.5,
     # Empirical median:
     aryEmpMed = np.median(aryDpth, axis=0)
 
-    funcPltAcrDpth(aryEmpMed, None, varNumDpth, varNumCon, 80.0, 0.0, 2.0,
-                   False, lstConLbl, strXlabel, strYlabel, strTtl, lgcLgnd,
-                   strPath, varSizeX=1800.0, varSizeY=1600.0, varNumLblY=5,
-                   varPadY=(0.1, 0.1), aryCnfLw=aryPrct[0, :, :],
-                   aryCnfUp=aryPrct[1, :, :])
+    plt_dpth_prfl(aryEmpMed, None, varNumDpth, varNumCon, 80.0, 0.0, 2.0,
+                  False, lstConLbl, strXlabel, strYlabel, strTtl, lgcLgnd,
+                  strPath, varSizeX=1800.0, varSizeY=1600.0, varNumLblY=5,
+                  varPadY=(0.1, 0.1), aryCnfLw=aryPrct[0, :, :],
+                  aryCnfUp=aryPrct[1, :, :])
     # ------------------------------------------------------------------------
-

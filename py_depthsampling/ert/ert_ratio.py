@@ -10,7 +10,7 @@ depth levels. This analysis is performed at the group level (i.e. the ratio is
 calculated on the across-subjects event-related averages).
 
 The input to this script are event-related timecourses (for several subjects)
-that have been created with 'ds_ertMain' before (saved in an npy file).
+that have been created with 'ert_main' before (saved in an npy file).
 """
 
 # Part of py_depthsampling library
@@ -34,7 +34,7 @@ that have been created with 'ds_ertMain' before (saved in an npy file).
 # *** Import modules
 import pickle
 import numpy as np
-from ds_pltAcrDpth import funcPltAcrDpth
+from py_depthsampling.plot.plt_dpth_prfl import plt_dpth_prfl
 # *****************************************************************************
 
 
@@ -204,20 +204,20 @@ aryRatioSem = np.divide(np.std(aryRatio, axis=0),
                         np.sqrt(varNumSub))
 
 # Plot ratio across cortrtical depth:
-funcPltAcrDpth(aryRatioMean,
-               aryRatioSem,
-               varNumDpth,
-               varNumCon,
-               varDpi,
-               varYmin03,
-               varYmax03,
-               True,
-               lstConLbl,
-               strXlabel03,
-               strYlabel03,
-               strTtl03,
-               lgcLgnd03,
-               strPathOut03)
+plt_dpth_prfl(aryRatioMean,
+              aryRatioSem,
+              varNumDpth,
+              varNumCon,
+              varDpi,
+              varYmin03,
+              varYmax03,
+              True,
+              lstConLbl,
+              strXlabel03,
+              strYlabel03,
+              strTtl03,
+              lgcLgnd03,
+              strPathOut03)
 # *****************************************************************************
 
 
@@ -269,16 +269,12 @@ for strSubID, aryRoiErt in dicAllSubsRoiErt.items():
     # Extract the two time segment of the expected maximal response:
     aryPos = aryRoiErt[:, :, (tplIdxMax)]
 
-
-
     # Calculate 'grand mean', i.e. the mean PE across depth levels and
     # conditions, for the current subject:
     # varGrndMean = np.mean(aryPos[:, :])
 
     # Divide all values by the grand mean:
     # aryPos[:, :] = np.divide(aryPos[:, :], varGrndMean)
-
-
 
     # Take the mean over time within the segment:
     aryPosMean = np.mean(aryPos, axis=2)
@@ -290,20 +286,20 @@ for strSubID, aryRoiErt in dicAllSubsRoiErt.items():
     aryDummy = np.zeros(aryPosMean.shape)
 
     # Create single-subject depth plots for positive response:
-    funcPltAcrDpth(aryPosMean,   # Data for plot: aryData[Condition, Depth]
-                   aryDummy,   # Error shading: aryError[Condition, Depth]
-                   varNumDpth,   # Number of depth levels (on the x-axis)
-                   varNumCon,    # Number of conditions (separate lines)
-                   varDpi,       # Resolution of the output figure
-                   varYmin04,    # Minimum of Y axis
-                   varYmax04,    # Maximum of Y axis
-                   False,        # Boolean: whether to convert y axis to %
-                   lstConLbl,    # Labels for conditions (separate lines)
-                   strXlabel04,  # Label on x axis
-                   strYlabel04,  # Label on y axis
-                   strTtl04,     # Figure title
-                   lgcLgnd04,    # Boolean: whether to plot a legend
-                   strPathOut04.format(strRoi, strSubID))  # Output path figure
+    plt_dpth_prfl(aryPosMean,   # Data for plot: aryData[Condition, Depth]
+                  aryDummy,   # Error shading: aryError[Condition, Depth]
+                  varNumDpth,   # Number of depth levels (on the x-axis)
+                  varNumCon,    # Number of conditions (separate lines)
+                  varDpi,       # Resolution of the output figure
+                  varYmin04,    # Minimum of Y axis
+                  varYmax04,    # Maximum of Y axis
+                  False,        # Boolean: whether to convert y axis to %
+                  lstConLbl,    # Labels for conditions (separate lines)
+                  strXlabel04,  # Label on x axis
+                  strYlabel04,  # Label on y axis
+                  strTtl04,     # Figure title
+                  lgcLgnd04,    # Boolean: whether to plot a legend
+                  strPathOut04.format(strRoi, strSubID))  # Output path figure
 # *****************************************************************************
 
 
@@ -334,20 +330,20 @@ aryPosMean = np.mean(aryMax, axis=0)
 aryPosSem = np.divide(np.std(aryMax, axis=0),
                       np.sqrt(varNumSub))
 
-funcPltAcrDpth(aryPosMean,
-               aryPosSem,
-               varNumDpth,
-               varNumCon,
-               varDpi,
-               varYmin01,
-               varYmax01,
-               False,
-               lstConLbl,
-               strXlabel01,
-               strYlabel01,
-               strTtl01,
-               lgcLgnd01,
-               strPathOut01)
+plt_dpth_prfl(aryPosMean,
+              aryPosSem,
+              varNumDpth,
+              varNumCon,
+              varDpi,
+              varYmin01,
+              varYmax01,
+              False,
+              lstConLbl,
+              strXlabel01,
+              strYlabel01,
+              strTtl01,
+              lgcLgnd01,
+              strPathOut01)
 # *****************************************************************************
 
 
@@ -363,18 +359,18 @@ aryNegMean = np.mean(aryMin, axis=0)
 aryNegSem = np.divide(np.std(aryMin, axis=0),
                       np.sqrt(varNumSub))
 
-funcPltAcrDpth(aryNegMean,
-               aryNegSem,
-               varNumDpth,
-               varNumCon,
-               varDpi,
-               varYmin02,
-               varYmax02,
-               True,
-               lstConLbl,
-               strXlabel02,
-               strYlabel02,
-               strTtl02,
-               lgcLgnd02,
-               strPathOut02)
+plt_dpth_prfl(aryNegMean,
+              aryNegSem,
+              varNumDpth,
+              varNumCon,
+              varDpi,
+              varYmin02,
+              varYmax02,
+              True,
+              lstConLbl,
+              strXlabel02,
+              strYlabel02,
+              strTtl02,
+              lgcLgnd02,
+              strPathOut02)
 # *****************************************************************************

@@ -91,7 +91,7 @@ varNumLne = 2
 # Paths of csv files with ROI information (created with paraview on a vtk mesh
 # in the same space as the above vtk files; subject ID, hemisphere, and ROI
 # left open):
-strCsvRoi = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/{}.csv'  #noqa
+strCsvRoi = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/{}_mod.csv'  #noqa
 
 # Number of header lines in ROI CSV file:
 varNumHdrRoi = 1

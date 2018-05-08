@@ -60,12 +60,12 @@ def boot_plot(objDpth, strPath, lstConLbl, varNumIt=10000, varConLw=2.5,
         Label for y axis.
     lgcLgnd : bool
         Whether to show a legend.
-    sltDiff : list or None
+    lstDiff : list or None
         If None, the depth profiles are plotted separately for each condition.
         If a list of tuples of condition indices is provided, on each
         bootstrapping iteration the difference between the two conditions is
         calculated, and is plotted. The the second condition from the tuple is
-        subtracted from the first (e.g. if lgcLgnd = [(0, 1)], then condition 1
+        subtracted from the first (e.g. if lstDiff = [(0, 1)], then condition 1
         is subtracted from condition 0).
 
     Returns
@@ -142,11 +142,28 @@ def boot_plot(objDpth, strPath, lstConLbl, varNumIt=10000, varConLw=2.5,
             # Put current bootstrap sample into array:
             aryBoo[idxIt, :, :, :] = aryDpth[vecRnd, :, :]
         else:
+            # NOTE: Relative difference score leads to inconsistent results.
+            # Calculate normalised difference between conditions (difference
+            # score ranging from -1 to 1; ((A - B) / abs(A + B)):
+            # for idxDiff in range(varNumCon):
+            #     aryBoo[idxIt, :, idxDiff, :] = \
+            #         np.divide(
+            #             np.subtract(
+            #                 aryDpth[vecRnd, lstDiff[idxDiff][0], :],
+            #                 aryDpth[vecRnd, lstDiff[idxDiff][1], :]
+            #                 ),
+            #             np.absolute(
+            #                 np.add(
+            #                     aryDpth[vecRnd, lstDiff[idxDiff][0], :],
+            #                     aryDpth[vecRnd, lstDiff[idxDiff][1], :]
+            #                     )
+            #                 )
+            #             )
             # Calculate difference between conditions:
             for idxDiff in range(varNumCon):
-                aryBoo[idxIt, :, idxDiff, :] = np.subtract(
-                    aryDpth[vecRnd, lstDiff[idxDiff][0], :],
-                    aryDpth[vecRnd, lstDiff[idxDiff][1], :])
+                aryBoo[idxIt, :, idxDiff, :] = \
+                    np.subtract(aryDpth[vecRnd, lstDiff[idxDiff][0], :],
+                                aryDpth[vecRnd, lstDiff[idxDiff][1], :])
 
     # Median for each bootstrap sample (across subjects within the bootstrap
     # sample):
@@ -161,10 +178,6 @@ def boot_plot(objDpth, strPath, lstConLbl, varNumIt=10000, varConLw=2.5,
     # ------------------------------------------------------------------------
     # *** Plot result
 
-    # Labels for axes:
-    strXlabel = 'Cortical depth level (equivolume)'
-    strYlabel = 'fMRI signal change [arbitrary units]'
-
     if lstDiff is None:
 
         # Empirical median:
@@ -172,14 +185,29 @@ def boot_plot(objDpth, strPath, lstConLbl, varNumIt=10000, varConLw=2.5,
 
     else:
 
-        # Empirical median difference:
+        # Empirical median difference between conditions:
         aryEmpMed = np.zeros((varNumCon, varNumDpth))
+        # NOTE: Relative difference score leads to inconsistent results.
+        # for idxDiff in range(varNumCon):
+        #     aryEmpMed[idxDiff, :] = np.median(
+        #         np.divide(
+        #             np.subtract(
+        #                 aryDpth[:, lstDiff[idxDiff][0], :],
+        #                 aryDpth[:, lstDiff[idxDiff][1], :]
+        #                 ),
+        #             np.absolute(
+        #                 np.add(
+        #                     aryDpth[:, lstDiff[idxDiff][0], :],
+        #                     aryDpth[:, lstDiff[idxDiff][1], :]
+        #                     )
+        #                 )
+        #             ),
+        #         axis=0)
         for idxDiff in range(varNumCon):
             aryEmpMed[idxDiff, :] = np.median(
-                np.subtract(aryDpth[:, lstDiff[idxDiff][0], :],
-                            aryDpth[:, lstDiff[idxDiff][1], :],
-                            ),
-                axis=0)
+                    np.subtract(aryDpth[:, lstDiff[idxDiff][0], :],
+                                aryDpth[:, lstDiff[idxDiff][1], :]),
+                    axis=0)
 
         # Create condition labels for differences:
         lstDiffLbl = [None] * varNumCon

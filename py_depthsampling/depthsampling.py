@@ -19,6 +19,22 @@ are selected according to several criteria:
         (one depth level, e.g. mid-GM eccentricity).
 """
 
+# Part of py_depthsampling library
+# Copyright (C) 2018  Ingo Marquardt
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <http://www.gnu.org/licenses/>.
+
 
 from py_depthsampling.main.main import ds_main
 
@@ -30,14 +46,13 @@ from py_depthsampling.main.main import ds_main
 lstMetaCon = ['stimulus', 'periphery']
 
 # Region of interest ('v1' or 'v2'):
-lstRoi = ['v1', 'v2']
+lstRoi = ['v1', 'v2', 'v3']
 
 # Hemispheres ('lh' or 'rh'):
 lstHmsph = ['lh', 'rh']
 
 # List of subject identifiers:
-lstSubIds = ['20171023',
-             '20171109',
+lstSubIds = ['20171023',  # '20171109',
              '20171204_01',
              '20171204_02',
              '20171211',
@@ -65,7 +80,8 @@ lgcSlct01 = True
 # Base path of csv files with ROI definition (i.e. patch of cortex selected on
 # the surface, e.g. V1 or V2) - i.e. the first vertex selection criterion (with
 # subject ID, hemisphere, and ROI left open):
-strCsvRoi = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/{}.csv'
+# strCsvRoi = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/{}.csv'
+strCsvRoi = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/{}_mod.csv'
 # Number of header lines in ROI CSV file:
 varNumHdrRoi = 1
 
@@ -78,7 +94,7 @@ lgcSlct02 = True
 # subject ID and hemisphere left open.)
 strVtkSlct02 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/R2_multi.vtk'  #noqa
 # Threshold for vertex selection:
-varThrSlct02 = 0.1
+varThrSlct02 = 0.15
 
 # (3)
 # Use vertex selection criterion 3 (vertices that are BELOW threshold are
@@ -168,7 +184,7 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                     elif idxCon == 2:  # v1 Pd_min_Cd
                         lstLimY = [(-50.0, 50.0)] * len(lstSubIds)
 
-                elif idxRoi == 1:  # v2
+                elif (idxRoi == 1) or (idxRoi == 2):  # v2 & v3
                     if idxCon == 0:  # v2 simple contrasts
                         lstLimY = [(-500.0, 20.0)] * len(lstSubIds)
                     elif idxCon == 1:  # v2 Pd_min_Ps
@@ -192,7 +208,7 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                         varAcrSubsYmin = -70.0
                         varAcrSubsYmax = 70.0
 
-                elif idxRoi == 1:  # v2
+                elif (idxRoi == 1) or (idxRoi == 2):  # v2 & v3
                     if idxCon == 0:  # v2 simple contrasts
                         # Limits of y-axis for across subject plot:
                         varAcrSubsYmin = -500.0

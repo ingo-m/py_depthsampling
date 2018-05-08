@@ -23,19 +23,19 @@ Function of the event-related timecourses depth sampling sub-pipeline.
 
 import os
 import numpy as np
-from ds_loadVtkSingle import funcLoadVtkSingle
-from ds_loadVtkMulti import funcLoadVtkMulti
+from py_depthsampling.get_data.load_vtk_single import load_vtk_single
+from py_depthsampling.get_data.load_vtk_multi import load_vtk_multi
 
 
-def funcGetSubData(strSubId,
-                   strHmsph,
-                   strVtkMsk,
-                   strVtkPth,
-                   lstCon,
-                   varNumVol,
-                   varNumDpth,
-                   strPrcdData,
-                   varNumLne):
+def ert_get_sub_data(strSubId,
+                     strHmsph,
+                     strVtkMsk,
+                     strVtkPth,
+                     lstCon,
+                     varNumVol,
+                     varNumDpth,
+                     strPrcdData,
+                     varNumLne):
     """
     Load data for event-related timecourse analysis.
 
@@ -48,9 +48,9 @@ def funcGetSubData(strSubId,
 
     # Load vtk mask (with ROI definition - the event-related time course for
     # each depth-level is averaged across this ROI):
-    vecVtkMsk = funcLoadVtkSingle(strVtkMsk,
-                                  strPrcdData,
-                                  varNumLne)
+    vecVtkMsk = load_vtk_single(strVtkMsk,
+                                strPrcdData,
+                                varNumLne)
     # *************************************************************************
 
     # *************************************************************************
@@ -95,10 +95,10 @@ def funcGetSubData(strSubId,
                                                 str(idxVol).zfill(3))
 
                 # Load vtk mesh for current timepoint:
-                aryTmp = funcLoadVtkMulti(strVtkPthTmp,
-                                          strPrcdData,
-                                          varNumLne,
-                                          varNumDpth).astype(np.float16)
+                aryTmp = load_vtk_multi(strVtkPthTmp,
+                                        strPrcdData,
+                                        varNumLne,
+                                        varNumDpth).astype(np.float16)
 
                 aryErt[idxCon, :, idxVol, :] = aryTmp.T
 

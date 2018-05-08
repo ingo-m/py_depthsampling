@@ -241,8 +241,8 @@ def acr_subs_get_data(idxPrc,              # Process ID  #noqa
         # varGrndMean = np.median(aryDpthMean)
 
         # Divide all values by the grand mean:
-        aryDpthMean = np.divide(aryDpthMean, varGrndMean)
-        aryDpthConf = np.divide(aryDpthConf, varGrndMean)
+        aryDpthMean = np.divide(np.absolute(aryDpthMean), varGrndMean)
+        aryDpthConf = np.divide(np.absolute(aryDpthConf), varGrndMean)
     # **************************************************************************
 
     # **************************************************************************

@@ -252,7 +252,7 @@ strCsvRoi = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/{}.csv'
 strCsvRoiOut = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/{}_mod.csv'
 
 # Path of reference vtk file (subject ID and hemisphere left open):
-strVtkIn = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/polar_angle_thr.vtk'  #noqa
+strVtkIn = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_polar_angle_mid_GM_thr.vtk'  #noqa
 
 for idxSub in lstSubIds:
     for idxHmpsh in lstHmsph:

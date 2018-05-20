@@ -112,9 +112,10 @@ def acr_subs_get_data(idxPrc,              # Process ID  #noqa
         if idxPrc == 0:
             print('---------Importing fourth criterion vtk file (one depth '
                   + 'level).')
-        arySlct04 = load_vtk_single(strVtkSlct04,
-                                    strPrcdData,
-                                    varNumLne)
+        arySlct04 = load_vtk_multi(strVtkSlct04,
+                                   strPrcdData,
+                                   varNumLne,
+                                   varNumDpth)
     # Otherwise, create dummy array (for function I/O):
     else:
         arySlct04 = 0

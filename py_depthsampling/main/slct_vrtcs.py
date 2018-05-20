@@ -38,8 +38,8 @@ def slct_vrtcs(varNumCon,           # Number of conditions  #noqa
                arySlct04,           # Criterion 4 - Data
                tplThrSlct04,        # Criterion 4 - Threshold
                idxPrc):             # Process ID
-    """Function for selecting vertices. See ds_main.py for more information."""
-    # **************************************************************************
+    """Select vertices. See ds_main.py for more information."""
+    # *************************************************************************
     # Preparations
 
     # Original number of vertices in mesh:
@@ -57,9 +57,9 @@ def slct_vrtcs(varNumCon,           # Number of conditions  #noqa
 
     # Initialise number of included vertices:
     varNumInc = np.sum(vecInc)
-    # **************************************************************************
+    # *************************************************************************
 
-    # **************************************************************************
+    # *************************************************************************
     # *** (1) Select vertices contained within the ROI
 
     # Apply first selection criterion (ROI)?
@@ -86,11 +86,11 @@ def slct_vrtcs(varNumCon,           # Number of conditions  #noqa
         # processes:
         if idxPrc == 0:
             print('------------Remaining vertices: ' + str(varNumInc))
-    # **************************************************************************
+    # *************************************************************************
 
-    # **************************************************************************
+    # *************************************************************************
     # *** (2) Selection criterion 2
-    #         Vertices that are BELOW a certain threshold are excluded - mean
+    #         Vertices that are BELOW a certain threshold are excluded - median
     #         across depth levels.
 
     if lgcSlct02:
@@ -98,8 +98,8 @@ def slct_vrtcs(varNumCon,           # Number of conditions  #noqa
         if idxPrc == 0:
             print('---------Select vertices based on criterion 2')
 
-        # Get mean value across cortical depths:
-        vecMneSlct02 = np.mean(arySlct02, axis=1)
+        # Get median value across cortical depths:
+        vecMneSlct02 = np.median(arySlct02, axis=1)
 
         # Check whether vertex values are above the exclusion threshold:
         vecSlct02 = np.greater(vecMneSlct02, varThrSlct02)
@@ -115,9 +115,9 @@ def slct_vrtcs(varNumCon,           # Number of conditions  #noqa
         # processes:
         if idxPrc == 0:
             print('------------Remaining vertices: ' + str(varNumInc))
-    # **************************************************************************
+    # *************************************************************************
 
-    # **************************************************************************
+    # *************************************************************************
     # *** (3) Selection criterion 3
     #         Vertices that are BELOW a certain threshold are excluded -
     #         minimum across depth levels.
@@ -144,11 +144,11 @@ def slct_vrtcs(varNumCon,           # Number of conditions  #noqa
         # processes:
         if idxPrc == 0:
             print('------------Remaining vertices: ' + str(varNumInc))
-    # **************************************************************************
+    # *************************************************************************
 
-    # **************************************************************************
+    # *************************************************************************
     # *** (2) Selection criterion 4
-    #         Vertices that are WITHIN INTERVAL are included - mean across
+    #         Vertices that are WITHIN INTERVAL are included - median across
     #         depth levels).
 
     if lgcSlct04:
@@ -156,14 +156,13 @@ def slct_vrtcs(varNumCon,           # Number of conditions  #noqa
         if idxPrc == 0:
             print('---------Select vertices based on criterion 4')
 
-        # Get mean value across cortical depths:
-        # vecMneSlct04 = np.mean(np.absolute(arySlct04), axis=1)
-        # vecMneSlct04 = np.mean(arySlct04, axis=1)
+        # Get median value across cortical depths:
+        vecMneSlct04 = np.median(arySlct04, axis=1)
 
         # Check whether vertex values are within the interval (lower and upper
         # bound):
-        vecSlct04lowbound = np.greater(arySlct04, tplThrSlct04[0])
-        vecSlct04upbound = np.less(arySlct04, tplThrSlct04[1])
+        vecSlct04lowbound = np.greater(vecMneSlct04, tplThrSlct04[0])
+        vecSlct04upbound = np.less(vecMneSlct04, tplThrSlct04[1])
         vecSlct04 = np.logical_and(vecSlct04lowbound, vecSlct04upbound)
 
         # Apply second vertex selection criterion to inclusion-vector:
@@ -177,9 +176,9 @@ def slct_vrtcs(varNumCon,           # Number of conditions  #noqa
         # processes:
         if idxPrc == 0:
             print('------------Remaining vertices: ' + str(varNumInc))
-    # **************************************************************************
+    # *************************************************************************
 
-    # **************************************************************************
+    # *************************************************************************
     # *** Apply inclusion-vector to data
 
     if idxPrc == 0:
@@ -199,9 +198,9 @@ def slct_vrtcs(varNumCon,           # Number of conditions  #noqa
 
     if idxPrc == 0:
         print('---------Final number of vertices: ' + str(varNumInc))
-    # **************************************************************************
+    # *************************************************************************
 
-    # **************************************************************************
+    # *************************************************************************
     # *** Return
     return lstDpthData01, varNumInc, vecInc
-    # **************************************************************************
+    # *************************************************************************

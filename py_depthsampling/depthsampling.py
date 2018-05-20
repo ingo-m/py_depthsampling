@@ -60,19 +60,24 @@ lstSubIds = ['20171023',  # '20171109',
              '20180111',
              '20180118']
 
+# Pd_sst
+# Linear_sst
+
 # Condition levels (used to complete file names) - nested list:
-lstNstCon = [['Pd', 'Cd', 'Ps'],
-             ['Pd_min_Ps'],
-             ['Pd_min_Cd']]
+lstNstCon = [['Pd_sst', 'Cd_sst', 'Ps_sst']
+             ['Pd_min_Ps_sst'],
+             ['Pd_min_Cd_sst']]
 
 # Condition labels:
-lstNstConLbl = [['PacMan Dynamic', 'Control Dynamic', 'PacMan Static'],
-                ['PacMan D - PacMan S'],
-                ['PacMan D - Control D']]
+lstNstConLbl = [['PacMan Dynamic Sustained',
+                 'Control Dynamic Sustained',
+                 'PacMan Static Sustained'],
+                ['PacMan D - PacMan S (Sustained)'],
+                ['PacMan D - Control D (Sustained)']]
 
 # Base path of vtk files with depth-sampled data, e.g. parameter estimates
 # (with subject ID, hemisphere, and stimulus level left open):
-strVtkDpth01 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/{}_pe1.vtk'
+strVtkDpth01 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/feat_level_2_{}_cope.vtk'  #noqa
 
 # (1)
 # Restrict vertex selection to region of interest (ROI)?
@@ -80,19 +85,22 @@ lgcSlct01 = True
 # Base path of csv files with ROI definition (i.e. patch of cortex selected on
 # the surface, e.g. V1 or V2) - i.e. the first vertex selection criterion (with
 # subject ID, hemisphere, and ROI left open):
-# strCsvRoi = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/{}.csv'
-strCsvRoi = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/{}_mod.csv'
+# NOTE: The '_mod' subscript indicates that the csv files have been processed
+# by the funtion `py_depthsampling.misc.fix_roi_csv.fix_roi_csv` in order to
+# ensure that the indices of the ROI definition and the vtk meshes are
+# congruent.
+strCsvRoi = '/home/john/PhD/GitHub/PacMan/analysis/{}/08_depthsampling/{}/{}_mod.csv'  #noqa
 # Number of header lines in ROI CSV file:
 varNumHdrRoi = 1
 
 # (2)
 # Use vertex selection criterion 2 (vertices that are BELOW threshold are
-# excluded - mean across depth levels):
+# excluded - median across depth levels):
 lgcSlct02 = True
 # Path of vtk files with for vertex selection criterion. This vtk file is
 # supposed to contain one set of data values for each depth level. (With
 # subject ID and hemisphere left open.)
-strVtkSlct02 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/R2_multi.vtk'  #noqa
+strVtkSlct02 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_R2.vtk'  #noqa
 # Threshold for vertex selection:
 varThrSlct02 = 0.15
 
@@ -109,13 +117,12 @@ varThrSlct03 = 7000.0
 
 # (4)
 # Use vertex selection criterion 4 (vertices that are WITHIN INTERVAL are
-# included - one depth level):
+# included - median across depth levels):
 lgcSlct04 = True
 # Path of vtk files with for vertex selection criterion. This vtk file is
 # supposed to contain one set of data values for each depth level. (With
 # subject ID and hemisphere left open.)
-# strVtkSlct04 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/Pd_zstat1.vtk'  #noqa
-strVtkSlct04 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/eccentricity.vtk'  #noqa
+strVtkSlct04 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_eccentricity.vtk'  #noqa
 # Threshold for vertex selection - list of tuples (interval per meta-condition,
 # e.g. within & outside stimulus area):
 lstThrSlct04 = [(0.0, 3.0), (3.5, 4.0)]

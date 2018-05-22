@@ -49,12 +49,8 @@ def ecc_plot(aryMean, vecEccBin, strPathOut):
     varMax = np.percentile(aryMean, 100.0)
 
     # Round:
-    # varMin = (np.floor(varMin * 10.0) / 10.0)
-    # varMax = (np.ceil(varMax * 10.0) / 10.0)
     varMin = (np.floor(varMin * 0.1) / 0.1)
     varMax = (np.ceil(varMax * 0.1) / 0.1)
-    # varMin = np.floor(varMin)
-    # varMax = np.ceil(varMax)
 
     # Create main figure:
     fig01 = plt.figure(figsize=(4.0, 3.0),

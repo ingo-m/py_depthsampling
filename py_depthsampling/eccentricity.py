@@ -6,9 +6,10 @@ Plot statistical parameter by eccentricity & cortical depth.
 
 Plot a statistical parameter, such as parameter estimates, by pRF eccentricity
 and cortical depth from information contained in vtk files. To this end,
-information on the pRF eccentricity of each vertex is loaded from a vtk file.
-This vtk file is defined at a single cortical depth (e.g. mid-GM). Second, a
-vtk file with statistical information at different depth levels in needed.
+information on the pRF eccentricity of each vertex is loaded from a vtk file
+(the eccentricity at each vertex is defined as the median across depth levels,
+so as not to bias the selection to any depth level). Second, a vtk file with
+statistical information at different depth levels in needed.
 """
 
 # Part of py_depthsampling library
@@ -45,8 +46,7 @@ lstRoi = ['v1', 'v2']
 lstHmsph = ['lh', 'rh']
 
 # List of subject IDs:
-lstSubId = ['20171023',
-            '20171109',
+lstSubId = ['20171023',  # '20171109',
             '20171204_01',
             '20171204_02',
             '20171211',
@@ -55,11 +55,13 @@ lstSubId = ['20171023',
             '20180118']
 
 # Condition levels (used to complete file names):
-lstCon = ['Pd', 'Cd', 'Ps', 'Pd_min_Ps', 'Pd_min_Cd']
+# lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst', 'Pd_min_Ps_sst', 'Pd_min_Cd_sst',
+#           'Pd_trn', 'Cd_trn', 'Ps_trn', 'Pd_min_Ps_trn', 'Pd_min_Cd_trn']
+lstCon = ['Pd_sst', 'Pd_trn']
 
 # Path of vtk files with eccentricity information (subject ID and hemisphere
 # left open):
-strVtkEcc = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/eccentricity.vtk'  #noqa
+strVtkEcc = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_eccentricity.vtk'  #noqa
 
 # Eccentricity bins:
 vecEccBin = np.array([0.1,
@@ -77,7 +79,7 @@ vecEccBin = np.array([0.1,
 
 # Path of vtk file with statistical parameters (at several depth levels;
 # subject ID, hemisphere, and condition left open):
-strVtkParam = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/{}_pe1.vtk'  #noqa
+strVtkParam = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/feat_level_2_{}_cope.vtk'  #noqa
 # Number of depth levels in the parameter vtk files:
 varNumDpth = 11
 
@@ -91,14 +93,14 @@ varNumLne = 2
 # Paths of csv files with ROI information (created with paraview on a vtk mesh
 # in the same space as the above vtk files; subject ID, hemisphere, and ROI
 # left open):
-strCsvRoi = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/{}_mod.csv'  #noqa
+strCsvRoi = '/home/john/PhD/GitHub/PacMan/analysis/{}/08_depthsampling/{}/{}_mod.csv'  #noqa
 
 # Number of header lines in ROI CSV file:
 varNumHdrRoi = 1
 
 # Paths of vtk files with intensity information for thresholding (at all depth
 # levels, e.g. R2 from pRF analysis; subject ID, and hemisphere left open):
-strVtkThr = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/R2_multi.vtk'  #noqa
+strVtkThr = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_R2.vtk'  #noqa
 # Threshold (e.g. minimum R2 value - if vertex is below this value at any
 # depth level, vertex is excluded):
 varThr = 0.1

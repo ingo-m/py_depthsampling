@@ -44,8 +44,8 @@ def ert_plt(aryRoiErtMeanDpth,  #noqa
             lgcCnvPrct,
             strTitle,
             strPthOut,
-            varXlbl=2,
-            varTmeScl=1.0):
+            varTmeScl=1.0,
+            varXlbl=2):
     """Plot event-related timecourses."""
     # Create figure:
     fgr01 = plt.figure(figsize=(1200.0/varDpi, 800.0/varDpi),
@@ -132,7 +132,7 @@ def ert_plt(aryRoiErtMeanDpth,  #noqa
     axs01.spines['left'].set_visible(True)
 
     # Set x-axis range:
-    axs01.set_xlim([varStimStrt, varStimEnd])
+    # axs01.set_xlim([varStimStrt, varStimEnd])
     # Set y-axis range:
     axs01.set_ylim([varYmin, varYmax])
 
@@ -199,6 +199,20 @@ def ert_plt(aryRoiErtMeanDpth,  #noqa
                       color=(0.3, 0.3, 0.3),
                       linewidth=8.0,
                       label='_nolegend_')
+
+    print('vecX')
+    print(vecX)
+    print('vecXlbl')
+    print(vecXlbl)
+    print('varStimEnd')
+    print(varStimEnd)
+    print('varStimStrt')
+    print(varStimStrt)
+    print('(varStimEnd - varStimStrt)')
+    print((varStimEnd - varStimStrt))
+
+
+
 
     # Save figure:
     fgr01.savefig(strPthOut,

@@ -200,20 +200,6 @@ def ert_plt(aryRoiErtMeanDpth,  #noqa
                       linewidth=8.0,
                       label='_nolegend_')
 
-    print('vecX')
-    print(vecX)
-    print('vecXlbl')
-    print(vecXlbl)
-    print('varStimEnd')
-    print(varStimEnd)
-    print('varStimStrt')
-    print(varStimStrt)
-    print('(varStimEnd - varStimStrt)')
-    print((varStimEnd - varStimStrt))
-
-
-
-
     # Save figure:
     fgr01.savefig(strPthOut,
                   facecolor='w',

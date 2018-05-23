@@ -92,7 +92,7 @@ strYlabel = 'Percent signal change'
 varStimStrt = 5
 # Volume index of end of stimulus period (i.e. index of last volume during
 # which stimulus was on - for the plot):
-varStimEnd = 9
+varStimEnd = 10
 # Volume TR (in seconds, for the plot):
 varTr = 2.079
 

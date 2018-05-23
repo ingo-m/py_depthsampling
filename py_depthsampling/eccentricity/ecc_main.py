@@ -203,8 +203,8 @@ def eccentricity(lstSubId, strVtkEcc, vecEccBin, strVtkParam, varNumDpth,  #noqa
     strTmp = (strPathOut + '_acrsSubsMean.png')
 
     # Find minimum and maximum correlation values:
-    varMin = np.percentile(arySubData, 0.0)
-    varMax = np.percentile(arySubData, 100.0)
+    varMin = np.percentile(arySubData, 2.5)
+    varMax = np.percentile(arySubData, 97.5)
     # Round:
     varMin = (np.floor(varMin * 0.1) / 0.1)
     varMax = (np.ceil(varMax * 0.1) / 0.1)

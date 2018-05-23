@@ -60,20 +60,29 @@ lstSubIds = ['20171023',  # '20171109',
              '20180111',
              '20180118']
 
-# Pd_sst
-# Linear_sst
-
 # Condition levels (used to complete file names) - nested list:
-lstNstCon = [['Pd_sst', 'Cd_sst', 'Ps_sst']
+lstNstCon = [['Pd_sst', 'Cd_sst', 'Ps_sst'],
              ['Pd_min_Ps_sst'],
-             ['Pd_min_Cd_sst']]
+             ['Pd_min_Cd_sst'],
+             ['Linear_sst'],
+             ['Pd_trn', 'Cd_trn', 'Ps_trn'],
+             ['Pd_min_Ps_trn'],
+             ['Pd_min_Cd_trn'],
+             ['Linear_trn']]
 
 # Condition labels:
 lstNstConLbl = [['PacMan Dynamic Sustained',
                  'Control Dynamic Sustained',
                  'PacMan Static Sustained'],
                 ['PacMan D - PacMan S (Sustained)'],
-                ['PacMan D - Control D (Sustained)']]
+                ['PacMan D - Control D (Sustained)'],
+                ['Linear (Sustained)'],
+                ['PacMan Dynamic Transient',
+                 'Control Dynamic Transient',
+                 'PacMan Static Transient'],
+                ['PacMan D - PacMan S (Transient)'],
+                ['PacMan D - Control D (Transient)'],
+                ['Linear (Transient)']]
 
 # Base path of vtk files with depth-sampled data, e.g. parameter estimates
 # (with subject ID, hemisphere, and stimulus level left open):
@@ -201,7 +210,9 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
 
                 # Limits of y-axis for ACROSS SUBJECT PLOTS:
 
-                if idxRoi == 0:  # v1
+                # Stimulus:
+                if lstMetaCon[idxMtaCn] == 'stimulus':
+
                     if idxCon == 0:  # v1 simple contrasts
                         # Limits of y-axis for across subject plot:
                         varAcrSubsYmin = -500.0
@@ -215,19 +226,21 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                         varAcrSubsYmin = -70.0
                         varAcrSubsYmax = 70.0
 
-                elif (idxRoi == 1) or (idxRoi == 2):  # v2 & v3
-                    if idxCon == 0:  # v2 simple contrasts
-                        # Limits of y-axis for across subject plot:
-                        varAcrSubsYmin = -500.0
-                        varAcrSubsYmax = 200.0
-                    elif idxCon == 1:  # v2 Pd_min_Ps
-                        # Limits of y-axis for across subject plot:
-                        varAcrSubsYmin = -70.0
-                        varAcrSubsYmax = 70.0
-                    elif idxCon == 2:  # v2 Pd_min_Cd
-                        # Limits of y-axis for across subject plot:
-                        varAcrSubsYmin = -70.0
-                        varAcrSubsYmax = 70.0
+                # Periphery:
+                if lstMetaCon[idxMtaCn] == 'periphery':
+
+                        if idxCon == 0:  # v1 simple contrasts
+                            # Limits of y-axis for across subject plot:
+                            varAcrSubsYmin = 0.0
+                            varAcrSubsYmax = 500.0
+                        elif idxCon == 1:  # v1 Pd_min_Ps
+                            # Limits of y-axis for across subject plot:
+                            varAcrSubsYmin = -100.0
+                            varAcrSubsYmax = 100.0
+                        elif idxCon == 2:  # v1 Pd_min_Cd
+                            # Limits of y-axis for across subject plot:
+                            varAcrSubsYmin = -100.0
+                            varAcrSubsYmax = 100.0
 
                 # Title for mean plot:
                 strTitle = lstRoi[idxRoi].upper()

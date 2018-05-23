@@ -228,11 +228,11 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                     if (idxCon == 0) or (idxCon == 4):  # v1 simple contrasts
                         # Limits of y-axis for across subject plot:
                         varAcrSubsYmin = 0.0
-                        varAcrSubsYmax = 500.0
+                        varAcrSubsYmax = 750.0
                     else:  # differential contrasts
                         # Limits of y-axis for across subject plot:
-                        varAcrSubsYmin = -100.0
-                        varAcrSubsYmax = 100.0
+                        varAcrSubsYmin = -150.0
+                        varAcrSubsYmax = 150.0
 
                 # Title for mean plot:
                 strTitle = lstRoi[idxRoi].upper()

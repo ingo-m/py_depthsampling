@@ -30,7 +30,7 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
              varNumLne=2, strPrcdData='SCALARS', strXlabel='Time [s]',
              strYlabel='Percent signal change', varAcrSubsYmin=-0.06,
              varAcrSubsYmax=0.04, lgcCnvPrct=True, lgcLgnd01=True,
-             lgcLgnd02=True, varTmeScl=1.0, varXlbl=5, varDpi=70.0):
+             lgcLgnd02=True, varTmeScl=1.0, varXlbl=5, varYnum=6, varDpi=70.0):
     """
     Plot event-related timecourses sampled across cortical depth levels.
 
@@ -104,6 +104,8 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
     varXlbl : int
         Which x-values to label on the axis (e.g., if `varXlbl = 2`, every
         second x-value is labelled).
+    varYnum : int
+        Number of labels on the y axis.
     varDpi : float
         Resolution of resulting figure.
 
@@ -248,7 +250,8 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
                         strTmpTtl,
                         strTmpPth,
                         varTmeScl=varTmeScl,
-                        varXlbl=varXlbl)
+                        varXlbl=varXlbl,
+                        varYnum=varYnum)
 
     # *************************************************************************
     # *** Plot across-subjects average
@@ -305,7 +308,8 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
                 strTmpTtl,
                 strTmpPth,
                 varTmeScl=varTmeScl,
-                varXlbl=varXlbl)
+                varXlbl=varXlbl,
+                varYnum=varYnum)
 
     # *************************************************************************
     # *** Plot across-subjects average (mean across depth levels)
@@ -357,5 +361,6 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
             strTmpTtl,
             strTmpPth,
             varTmeScl=varTmeScl,
-            varXlbl=varXlbl)
+            varXlbl=varXlbl,
+            varYnum=varYnum)
     # *************************************************************************

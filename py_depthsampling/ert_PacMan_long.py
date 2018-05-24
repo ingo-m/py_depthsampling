@@ -115,6 +115,9 @@ strPltOtSuf = '_ert_long.png'
 # x-value is labelled).
 varXlbl = 10
 
+# Number of labels on the y axis:
+varYnum = 5
+
 # Figure scaling factor:
 varDpi = 70.0
 # *****************************************************************************
@@ -136,5 +139,6 @@ for idxMtaCn in range(len(lstMtaCn)):
                          strPltOtSuf, varAcrSubsYmin=varAcrSubsYmin,
                          varAcrSubsYmax=varAcrSubsYmax, lgcCnvPrct=lgcCnvPrct,
                          lgcLgnd01=lgcLgnd01, lgcLgnd02=lgcLgnd02,
-                         varTmeScl=varTmeScl, varXlbl=varXlbl, varDpi=varDpi)
+                         varTmeScl=varTmeScl, varXlbl=varXlbl, varYnum=varYnum,
+                         varDpi=varDpi)
 # *****************************************************************************

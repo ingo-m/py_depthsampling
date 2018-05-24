@@ -2,8 +2,8 @@
 """
 Plot difference between conditions.
 
-Plot  median between stimulus conditions difference, bootstrapped across
-subjects, with confidence intervals.
+Plot median of between stimulus conditions difference, with bootstrapped
+confidence intervals (percentile bootstrap).
 """
 
 # Part of py_depthsampling library
@@ -24,22 +24,22 @@ subjects, with confidence intervals.
 
 
 from py_depthsampling.boot.boot_plot_diff import boot_plot
-from py_depthsampling.boot.boot_plot_diff_sngl_sub import boot_plot_sngl
+# from py_depthsampling.boot.boot_plot_diff_sngl_sub import boot_plot_sngl
 
 # -----------------------------------------------------------------------------
 # *** Define parameters
 
 # Which draining model to plot ('' for none):
-lstMdl = ['', '_deconv_model_1']
+lstMdl = ['_deconv_model_1']  # ['', '_deconv_model_1']
 
 # Meta-condition (within or outside of retinotopic stimulus area):
-lstMetaCon = ['stimulus', 'periphery']
+lstMetaCon = ['stimulus']  # ['stimulus', 'periphery']
 
 # ROI ('v1' or 'v2'):
 lstRoi = ['v1', 'v2']
 
 # Hemisphere ('rh' or 'lh'):
-lstHmsph = ['lh', 'rh']
+lstHmsph = ['rh']  # ['lh', 'rh']
 
 # Path for corrected depth-profiles (meta-condition, ROI, hemisphere,
 # condition, and model index left open):
@@ -51,7 +51,7 @@ strPthPltOt = '/home/john/PhD/PacMan_Plots/boot_diff/{}/{}/{}_{}{}'  #noqa
 
 # Output path for single subject plot (heatmap), (ROI, metacondition,
 # hemisphere, drain model, and condition left open):
-sttPthPtlSnglOt = '/home/john/PhD/PacMan_Plots/boot_diff_sngle/{}_{}_{}{}_{}'
+# sttPthPtlSnglOt = '/home/john/PhD/PacMan_Plots/boot_diff_sngle/{}_{}_{}{}_{}'
 
 # File type suffix for plot:
 strFlTp = '.png'
@@ -64,10 +64,13 @@ strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'fMRI signal change [arbitrary units]'
 
 # Condition levels (used to complete file names):
-lstCon = ['Pd', 'Cd', 'Ps']
+lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
 
 # Condition labels:
-lstConLbl = ['PacMan Dynamic', 'Control Dynamic', 'PacMan Static']
+# lstConLbl = ['PacMan Dynamic Sustained',
+#              'Control Dynamic Sustained',
+#              'PacMan Static Sustained']
+lstConLbl = ['Pd_sst', 'Cd_sst', 'Ps_sst']
 
 # Which conditions to compare (list of tuples with condition indices):
 lstDiff = [(0, 1), (0, 2)]
@@ -102,47 +105,48 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
 
                     if lstMetaCon[idxMtaCn] == 'stimulus':
                         if lstMdl[idxMdl] == '':
-                            varYmin = -30.0
-                            varYmax = 90.0
-                        if lstMdl[idxMdl] == 'deconv_model_1':
-                            varYmin = -30.0
-                            varYmax = 90.0
+                            varYmin = -50.0
+                            varYmax = 50.0
+                        if lstMdl[idxMdl] == '_deconv_model_1':
+                            varYmin = -50.0
+                            varYmax = 50.0
                     if lstMetaCon[idxMtaCn] == 'periphery':
                         if lstMdl[idxMdl] == '':
-                            varYmin = -30.0
-                            varYmax = 90.0
-                        if lstMdl[idxMdl] == 'deconv_model_1':
-                            varYmin = -30.0
-                            varYmax = 90.0
+                            varYmin = -50.0
+                            varYmax = 50.0
+                        if lstMdl[idxMdl] == '_deconv_model_1':
+                            varYmin = -50.0
+                            varYmax = 50.0
 
                 elif idxRoi == 1:  # v2
 
                     if lstMetaCon[idxMtaCn] == 'stimulus':
                         if lstMdl[idxMdl] == '':
-                            varYmin = -30.0
-                            varYmax = 90.0
-                        if lstMdl[idxMdl] == 'deconv_model_1':
-                            varYmin = -30.0
-                            varYmax = 90.0
+                            varYmin = -50.0
+                            varYmax = 50.0
+                        if lstMdl[idxMdl] == '_deconv_model_1':
+                            varYmin = -50.0
+                            varYmax = 50.0
                     if lstMetaCon[idxMtaCn] == 'periphery':
                         if lstMdl[idxMdl] == '':
-                            varYmin = -30.0
-                            varYmax = 90.0
-                        if lstMdl[idxMdl] == 'deconv_model_1':
-                            varYmin = -30.0
-                            varYmax = 90.0
+                            varYmin = -50.0
+                            varYmax = 50.0
+                        if lstMdl[idxMdl] == '_deconv_model_1':
+                            varYmin = -50.0
+                            varYmax = 50.0
 
                 # Create average plots:
                 boot_plot(strPthData.format(lstMetaCon[idxMtaCn],
                                             lstRoi[idxRoi],
                                             lstHmsph[idxHmsph],
-                                            'Pd',
+                                            'Pd_sst',
                                             lstMdl[idxMdl]),
-                          strPthPltOt.format(lstMetaCon[idxMtaCn],
-                                             lstRoi[idxRoi],
-                                             lstRoi[idxRoi],
-                                             lstHmsph[idxHmsph],
-                                             lstMdl[idxMdl]),
+                          (strPthPltOt.format(lstMetaCon[idxMtaCn],
+                                              lstRoi[idxRoi],
+                                              lstRoi[idxRoi],
+                                              lstHmsph[idxHmsph],
+                                              lstMdl[idxMdl])
+                           + strFlTp),
                           lstConLbl,
                           varNumIt=10000,
                           varConLw=varCnfLw,
@@ -156,19 +160,20 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                           lstDiff=lstDiff)
 
             # Create single subject plot(s):
-            boot_plot_sngl(strPthData.format(lstMetaCon[idxMtaCn],
-                                             lstRoi[idxRoi],
-                                             lstHmsph[idxHmsph],
-                                             'Pd',
-                                             lstMdl[idxMdl]),
-                           sttPthPtlSnglOt.format(lstRoi[idxRoi],
-                                                  lstMetaCon[idxMtaCn],
-                                                  lstHmsph[idxHmsph],
-                                                  lstMdl[idxMdl],
-                                                  '{}'),
-                           lstCon,
-                           lstConLbl,
-                           strXlabel='Cortical depth level (equivolume)',
-                           strYlabel='Subject',
-                           lstDiff=lstDiff)
+            # boot_plot_sngl(strPthData.format(lstMetaCon[idxMtaCn],
+            #                                  lstRoi[idxRoi],
+            #                                  lstHmsph[idxHmsph],
+            #                                  'Pd_sst',
+            #                                  lstMdl[idxMdl]),
+            #                (sttPthPtlSnglOt.format(lstRoi[idxRoi],
+            #                                        lstMetaCon[idxMtaCn],
+            #                                        lstHmsph[idxHmsph],
+            #                                        lstMdl[idxMdl],
+            #                                        '{}')
+            #                 + strFlTp),
+            #                lstCon,
+            #                lstConLbl,
+            #                strXlabel='Cortical depth level (equivolume)',
+            #                strYlabel='Subject',
+            #                lstDiff=lstDiff)
 # -----------------------------------------------------------------------------

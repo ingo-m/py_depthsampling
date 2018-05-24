@@ -126,9 +126,7 @@ def boot_plot(objDpth, strPath, lstConLbl, varNumIt=10000, varConLw=2.5,
     else:
         # Set number of comparisons:
         varNumCon = len(lstDiff)
-        # Array for bootstrap samples, of the form
-        # aryBoo[idxIteration, idxSubject, 1, idxDpth]) (3rd dimension is one
-        # because the array will hold the difference between two conditions):
+        # Array for bootstrap samples:
         aryBoo = np.zeros((varNumIt, varNumSub, varNumCon, varNumDpth))
 
     # ------------------------------------------------------------------------

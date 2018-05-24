@@ -23,7 +23,7 @@ from scipy.interpolate import griddata
 from py_depthsampling.drain_model.drain_model_decon_01 import deconv_01
 
 
-def commute(aryEmpSnSb, strRoi, varMdl=1):
+def deconv(aryEmpSnSb, strRoi, varMdl=1):
     """
     Apply spatial deconvolution (drain model).
 

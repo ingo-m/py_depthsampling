@@ -41,7 +41,10 @@ Approach B:
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from py_depthsampling.commute.commute_deconv import commute
+import numpy as np
+from py_depthsampling.commute.commute_deconv import deconv
+from py_depthsampling.plot.plt_dpth_prfl import plt_dpth_prfl
+
 
 # -----------------------------------------------------------------------------
 # *** Define parameters
@@ -120,22 +123,52 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
             for idxHmsph in range(len(lstHmsph)):
                 for idxDiff in range(len(lstDiff)):
 
+                    # Condition names:
+                    strTmpCon01 = lstCon[lstDiff[idxDiff][0]]
+                    strTmpCon02 = lstCon[lstDiff[idxDiff][1]]
+
                     # Path of first depth profile:
                     strTmpPth01 = strPthPrf.format(
                         lstMetaCon[idxMtaCn], lstRoi[idxRoi],
-                        lstHmsph[idxHmsph], lstCon[lstDiff[idxDiff][0]])
+                        lstHmsph[idxHmsph], strTmpCon01)
 
                     # Path of second depth profile:
                     strTmpPth02 = strPthPrf.format(
                         lstMetaCon[idxMtaCn], lstRoi[idxRoi],
-                        lstHmsph[idxHmsph], lstCon[lstDiff[idxDiff][1]])
-
-                    print(strTmpPth01)
-                    print(strTmpPth02)
+                        lstHmsph[idxHmsph], strTmpCon02)
 
                     # Load original (i.e. non-convolved) single subject depth
-                    # profiles:
+                    # profiles (shape aryDpth[subject, depth]):
+                    aryDpth01 = np.load(strTmpPth01)
+                    aryDpth02 = np.load(strTmpPth02)
 
+                    # Dimensions:
+                    varNumSub = aryDpth01.shape[0]
+                    varNumDpth = aryDpth01.shape[1]
+
+                    # Reshape to aryDpth[subject, 1, depth] (dummy condition
+                    # dimension for compatibility):
+                    aryDpth01 = aryDpth01.reshape((varNumSub, 1, varNumDpth))
+                    aryDpth02 = aryDpth02.reshape((varNumSub, 1, varNumDpth))
+
+                    # (1) Apply deconvolution (separately for each subject and
+                    #     condition).
+                    aryDpth01 = deconv(aryDpth01, lstRoi[idxRoi], varMdl=1)
+                    aryDpth02 = deconv(aryDpth02, lstRoi[idxRoi], varMdl=1)
+
+                    # (2) Calculate difference between conditions (within
+                    #     subjects).
+                    aryDiff = np.subtract(aryDpth01, aryDpth02)
+
+                    # (3) Take median across subjects.
+                    aryMdn = np.median(aryDiff, axis=0)
+
+                    # Standard deviation TODO
+                    aryStd = np.std(aryDiff, axis=0)
+
+                    plt_dpth_prfl(aryMdn, aryStd, varNumDpth, 1, 90, -50.0,
+                                  50.0, False, 'Diff', 'Cortical depth', 'Diff',
+                                  'Title', False, '/home/john/PhD/PacMan_Plots/commutative/plot.png')
 # -----------------------------------------------------------------------------
 # *** Approach B
 

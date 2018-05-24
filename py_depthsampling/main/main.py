@@ -151,9 +151,14 @@ def ds_main(strRoi, strHmsph, lstSubIds, lstCon, lstConLbl, strVtkDpth01,
     # *** Save results
 
     # We save the mean parameter estimates of all subjects to disk. This file
-    # can be used to plot results from different ROIs in one plot.
+    # can be used to plot results from different ROIs in one plot. The depth
+    # profile for each condition is saved to a separate file (for consistency):
 
-    np.save(strDpthMeans, arySubDpthMns)
+    for idxCon in range(varNumCon):
+        # Form of the array that is saved to disk:
+        # arySubDpthMns[subject, depth]
+        np.save(strDpthMeans.format(lstCon[idxCon]),
+                arySubDpthMns[:, idxCon, :])
     # *************************************************************************
 
     # *************************************************************************

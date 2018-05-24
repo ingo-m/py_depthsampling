@@ -21,15 +21,17 @@ import numpy as np
 from py_depthsampling.plot.plt_dpth_prfl import plt_dpth_prfl
 
 
-def bootPlot(objDpth, strPath, varNumIt=10000, varConLw=2.5, varConUp=97.5,
-             strTtl='', strXlabel='Cortical depth level (equivolume)',
-             strYlabel='fMRI signal change [arbitrary units]',
-             lgcLgnd=False):
+def boot_plot(lstCon, objDpth, strPath, varNumIt=10000, varConLw=2.5,
+              varConUp=97.5, strTtl='',
+              strXlabel='Cortical depth level (equivolume)',
+              strYlabel='fMRI signal change [arbitrary units]', lgcLgnd=False):
     """
     Plot across-subject cortical depth profiles with confidence intervals.
 
     Parameters
     ----------
+    lstCon : list
+        Abbreviated condition levels used to complete file names (e.g. 'Pd').
     objDpth : np.array or str
         Array with single-subject cortical depth profiles, of the form:
         aryDpth[idxSub, idxCondition, idxDpth]. Either a numpy array or a
@@ -81,7 +83,19 @@ def bootPlot(objDpth, strPath, varNumIt=10000, varConLw=2.5, varConUp=97.5,
     if lgcAry:
         aryDpth = objDpth
     elif lgcStr:
-        aryDpth = np.load(objDpth)
+        # Load array for first condition to get dimensions:
+        aryTmpDpth = np.load(objDpth.format(lstCon[0]))
+        # Number of subjects:
+        varNumSub = aryTmpDpth.shape[0]
+        # Get number of depth levels from input array:
+        varNumDpth = aryTmpDpth.shape[1]
+        # Number of conditions:
+        varNumCon = len(lstCon)
+        # Array for depth profiles of form aryDpth[subject, condition, depth]:
+        aryDpth = np.zeros((varNumSub, varNumCon, varNumDpth))
+        # Load single-condition arrays from disk:
+        for idxCon in range(varNumCon):
+            aryDpth[:, idxCon, :] = np.load(objDpth.format(lstCon[idxCon]))
     else:
         print(('---Error in bootPlot: input needs to be numpy array or path '
                + 'to numpy array.'))

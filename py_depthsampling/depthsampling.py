@@ -251,6 +251,6 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                         lstHmsph[idxHmsph], lstRoi[idxRoi],
                         lstNstCon[idxCon][0]), varDpi, varNormIdx, lgcNormDiv,
                         strDpthMeans.format(lstMetaCon[idxMtaCn],
-                        lstRoi[idxRoi], lstHmsph[idxHmsph],
-                        lstNstCon[idxCon][0]), strMetaCon=lstMetaCon[idxMtaCn])
+                        lstRoi[idxRoi], lstHmsph[idxHmsph], '{}'),
+                        strMetaCon=lstMetaCon[idxMtaCn])
 # *****************************************************************************

@@ -6,6 +6,9 @@ Function of the event-related timecourses depth sampling library.
 
 Plot event-related timecourses sampled across cortical depth levels.
 
+NOTE: This version is used to plot event related timecourses for an additional
+experimental condition with long stimulus blocks (in a subset of subjects).
+
 The input to this module are custom-made 'mesh time courses'. Timecourses have
 to be cut into event-related segments and averaged across trials (using the
 'cut_sgmnts.py' script of the depth-sampling library, or automatically as part
@@ -30,30 +33,26 @@ lgcPic = False
 lstMtaCn = ['stimulus', 'periphery']
 
 # Region of interest ('v1' or 'v2'):
-lstRoi = ['v1', 'v2', 'v3']
+lstRoi = ['v1', 'v2']
 
 # Hemispheres ('lh' or 'rh'):
 lstHmsph = ['lh', 'rh']
 
 # List of subject identifiers:
-lstSubIds = ['20171023',  # '20171109',
-             '20171204_01',
-             '20171204_02',
-             '20171211',
+lstSubIds = ['20171211',
              '20171213',
              '20180111',
              '20180118']
 
 # Name of pickle file from which to load time course data or save time course
 # data to (metacondition, ROI, and hemisphere left open):
-strPthPic = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}/era_{}_{}.pickle'  #noqa
+strPthPic = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}/era_long_{}_{}.pickle'  #noqa
 
 # Condition levels (used to complete file names):
-lstCon = ['control_dynamic', 'pacman_dynamic', 'pacman_static']
+lstCon = ['pacman_dynamic_long']
 
 # Condition labels (for plot legend):
-# lstConLbl = ['72.0%', '16.3%', '6.1%', '2.5%']
-lstConLbl = ['Control dynamic', 'Pacman dynamic', 'Pacman static']
+lstConLbl = ['Pacman dynamic long']
 
 # Base name of vertex inclusion masks (subject ID, hemisphere, subject ID,
 # ROI, and metacondition left open):
@@ -67,7 +66,7 @@ strVtkPth = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}_era/{}/vol_{}.vt
 varNumDpth = 11
 
 # Number of timepoints:
-varNumVol = 19
+varNumVol = 400
 
 # Beginning of string which precedes vertex data in data vtk files (i.e. in the
 # statistical maps):
@@ -77,7 +76,7 @@ strPrcdData = 'SCALARS'
 varNumLne = 2
 
 # Limits of y-axis:
-varAcrSubsYmin = -0.06
+varAcrSubsYmin = -0.04
 varAcrSubsYmax = 0.04
 
 # Convert y-axis values to percent (i.e. divide label values by 100)?
@@ -87,14 +86,20 @@ lgcCnvPrct = True
 strXlabel = 'Time [s]'
 strYlabel = 'Percent signal change'
 
-# Volume index of start of stimulus period (i.e. index of first volume during
-# which stimulus was on - for the plot):
-varStimStrt = 5
-# Volume index of end of stimulus period (i.e. index of last volume during
-# which stimulus was on - for the plot):
-varStimEnd = 10
 # Volume TR (in seconds, for the plot):
 varTr = 2.079
+
+# Time scaling factor (factor by which timecourse was temporally upsampled; if
+# it was not upsampled, varTmeScl = 1.0):
+varTmeScl = 10.0
+
+# Stimulus onset in seconds (for the plot), in volumes (will be converted to
+# seconds later):
+varStimStrt = 5.0  # 5 volumes prestimulus interval in ERT
+
+# Stimulus offset in seconds (for the plot), in volumes (will be converted to
+# seconds later):
+varStimEnd = varStimStrt + (25.0 / varTr)  # 25 s stimulus plus prestimulus interval
 
 # Plot legend - single subject plots:
 lgcLgnd01 = True
@@ -102,9 +107,16 @@ lgcLgnd01 = True
 lgcLgnd02 = True
 
 # Output path for plots - prfix (metacondition, ROI, and hemisphere left open):
-strPltOtPre = '/home/john/PhD/PacMan_Plots/era/{}/{}_{}/'
+strPltOtPre = '/home/john/PhD/PacMan_Plots/era_long/{}/{}_{}/'
 # Output path for plots - suffix:
-strPltOtSuf = '_ert.png'
+strPltOtSuf = '_ert_long.png'
+
+# Which x-values to label on the axis (e.g., if `varXlbl = 2`, every second
+# x-value is labelled).
+varXlbl = 10
+
+# Number of labels on the y axis:
+varYnum = 5
 
 # Figure scaling factor:
 varDpi = 70.0
@@ -124,5 +136,9 @@ for idxMtaCn in range(len(lstMtaCn)):
                          lstHmsph[idxHmsph], lstRoi[idxRoi], strVtkMsk,
                          strVtkPth, varTr, varNumDpth, varNumVol, varStimStrt,
                          varStimEnd, strPthPic, lgcPic, strPltOtPre,
-                         strPltOtSuf)
+                         strPltOtSuf, varAcrSubsYmin=varAcrSubsYmin,
+                         varAcrSubsYmax=varAcrSubsYmax, lgcCnvPrct=lgcCnvPrct,
+                         lgcLgnd01=lgcLgnd01, lgcLgnd02=lgcLgnd02,
+                         varTmeScl=varTmeScl, varXlbl=varXlbl, varYnum=varYnum,
+                         varDpi=varDpi)
 # *****************************************************************************

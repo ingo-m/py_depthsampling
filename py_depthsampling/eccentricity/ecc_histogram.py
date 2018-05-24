@@ -31,8 +31,8 @@ def ecc_histogram(vecEcc, vecEccBin, strPathOut):
     fMRI responses at different retinotopic eccentricities.
     """
     # Lower and upper eccentricity bound of the visual stimulus:
-    varStimEccLw = 1.5
-    varStimEccUp = 4.0
+    varStimEccLw = 0.0
+    varStimEccUp = 3.75
 
     # Round the minimum & maximum for histogram endpoints:
     varHistXmin = 0.0  # np.floor(np.min(vecEcc))

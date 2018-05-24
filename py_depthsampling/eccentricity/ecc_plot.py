@@ -45,16 +45,12 @@ def ecc_plot(aryMean, vecEccBin, strPathOut):
     vecFontClr = np.array([17.0/255.0, 85.0/255.0, 124.0/255.0])
 
     # Find minimum and maximum correlation values:
-    varMin = np.percentile(aryMean, 0.0)
-    varMax = np.percentile(aryMean, 100.0)
+    varMin = np.percentile(aryMean, 2.5)
+    varMax = np.percentile(aryMean, 97.5)
 
     # Round:
-    # varMin = (np.floor(varMin * 10.0) / 10.0)
-    # varMax = (np.ceil(varMax * 10.0) / 10.0)
     varMin = (np.floor(varMin * 0.1) / 0.1)
     varMax = (np.ceil(varMax * 0.1) / 0.1)
-    # varMin = np.floor(varMin)
-    # varMax = np.ceil(varMax)
 
     # Create main figure:
     fig01 = plt.figure(figsize=(4.0, 3.0),

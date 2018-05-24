@@ -30,7 +30,7 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
              varNumLne=2, strPrcdData='SCALARS', strXlabel='Time [s]',
              strYlabel='Percent signal change', varAcrSubsYmin=-0.06,
              varAcrSubsYmax=0.04, lgcCnvPrct=True, lgcLgnd01=True,
-             lgcLgnd02=True, varDpi=70.0):
+             lgcLgnd02=True, varTmeScl=1.0, varXlbl=5, varYnum=6, varDpi=70.0):
     """
     Plot event-related timecourses sampled across cortical depth levels.
 
@@ -98,7 +98,16 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
         Whether to plot legend - single subject plots.
     lgcLgnd02 : bool
         Whether to plot legend - group plots.
+    varTmeScl : float
+        Time scaling factor (factor by which timecourse was temporally
+        upsampled; if it was not upsampled, varTmeScl = 1.0).
+    varXlbl : int
+        Which x-values to label on the axis (e.g., if `varXlbl = 2`, every
+        second x-value is labelled).
+    varYnum : int
+        Number of labels on the y axis.
     varDpi : float
+        Resolution of resulting figure.
 
     Returns
     -------
@@ -239,7 +248,10 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
                         strYlabel,
                         lgcCnvPrct,
                         strTmpTtl,
-                        strTmpPth)
+                        strTmpPth,
+                        varTmeScl=varTmeScl,
+                        varXlbl=varXlbl,
+                        varYnum=varYnum)
 
     # *************************************************************************
     # *** Plot across-subjects average
@@ -294,5 +306,61 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
                 strYlabel,
                 lgcCnvPrct,
                 strTmpTtl,
-                strTmpPth)
+                strTmpPth,
+                varTmeScl=varTmeScl,
+                varXlbl=varXlbl,
+                varYnum=varYnum)
+
+    # *************************************************************************
+    # *** Plot across-subjects average (mean across depth levels)
+
+    print('---Ploting across-subjects average - mean across depth levels')
+
+    # Event-related time courses have the form:
+    # aryAllSubsRoiErt[varNumSub, varNumCon, varNumDpth, varNumVol]
+
+    # Calculate mean across depth:
+    aryMneDpth = np.mean(aryAllSubsRoiErt, axis=2)
+
+    # Now of the form:
+    # aryMneTmp[varNumSub, varNumCon, varNumVol]
+
+    # Calculate mean across subjects:
+    aryMneDpthSub = np.mean(aryMneDpth, axis=0)
+
+    # Calculate SD across subjects:
+    arySdDpthSub = np.std(aryMneDpth, axis=0)
+
+    # Now of the form:
+    # aryMneDpthSub[varNumCon, varNumVol]
+    # arySdDpthSub[varNumCon, varNumVol]
+
+    # Title for plot:
+    strTmpTtl = ''
+
+    # Output filename:
+    strTmpPth = (strPltOtPre + 'acr_dpth_acr_subs' + strPltOtSuf)
+
+    # We create one plot per depth-level.
+    ert_plt(aryMneDpthSub,
+            arySdDpthSub,
+            varNumDpth,
+            varNumCon,
+            varNumVol,
+            varDpi,
+            varAcrSubsYmin,
+            varAcrSubsYmax,
+            varStimStrt,
+            varStimEnd,
+            varTr,
+            lstConLbl,
+            lgcLgnd02,
+            strXlabel,
+            strYlabel,
+            lgcCnvPrct,
+            strTmpTtl,
+            strTmpPth,
+            varTmeScl=varTmeScl,
+            varXlbl=varXlbl,
+            varYnum=varYnum)
     # *************************************************************************

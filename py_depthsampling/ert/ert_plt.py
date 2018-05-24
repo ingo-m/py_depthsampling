@@ -44,8 +44,9 @@ def ert_plt(aryRoiErtMeanDpth,  #noqa
             lgcCnvPrct,
             strTitle,
             strPthOut,
+            varTmeScl=1.0,
             varXlbl=2,
-            varTmeScl=1.0):
+            varYnum=6):
     """Plot event-related timecourses."""
     # Create figure:
     fgr01 = plt.figure(figsize=(1200.0/varDpi, 800.0/varDpi),
@@ -132,7 +133,7 @@ def ert_plt(aryRoiErtMeanDpth,  #noqa
     axs01.spines['left'].set_visible(True)
 
     # Set x-axis range:
-    axs01.set_xlim([varStimStrt, varStimEnd])
+    # axs01.set_xlim([varStimStrt, varStimEnd])
     # Set y-axis range:
     axs01.set_ylim([varYmin, varYmax])
 
@@ -146,7 +147,7 @@ def ert_plt(aryRoiErtMeanDpth,  #noqa
     # axs01.set_xticklabels(lstXlbl)
 
     # Which y values to label with ticks:
-    vecYlbl = np.linspace(varYmin, varYmax, num=6, endpoint=True)
+    vecYlbl = np.linspace(varYmin, varYmax, num=varYnum, endpoint=True)
     # vecYlbl = np.arange(varYmin, varYmax, 0.02)
     # vecYlbl = np.linspace(0.0, varYmax, num=5, endpoint=True)
     # Round:

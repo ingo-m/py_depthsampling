@@ -19,7 +19,6 @@
 
 
 import numpy as np
-from py_depthsampling.get_data.load_vtk_single import load_vtk_single
 from py_depthsampling.get_data.load_vtk_multi import load_vtk_multi
 from py_depthsampling.get_data.load_csv_roi import load_csv_roi
 
@@ -42,10 +41,13 @@ def ecc_get_data(strVtkEcc, strPrcdData, varNumLne, strVtkParam, varNumDpth,
     # *************************************************************************
     # *** Import data
 
-    # Import the eccentricity information (one value per vertex):
-    vecEcc = load_vtk_single(strVtkEcc,
-                             strPrcdData,
-                             varNumLne)
+    # Import the eccentricity information (one value per depth level):
+    aryEcc = load_vtk_multi(strVtkEcc,
+                            strPrcdData,
+                            varNumLne,
+                            varNumDpth)
+    # Get median value across cortical depths:
+    vecEcc = np.median(aryEcc, axis=1)
 
     # Import the parameter estimates (several values per vertex - one per
     # cortical depth level):
@@ -157,7 +159,7 @@ def ecc_get_data(strVtkEcc, strPrcdData, varNumLne, strVtkParam, varNumDpth,
     # Array for average statistical parameter within bin:
     aryMean = np.zeros(((varEccNum - 1), aryData.shape[1]))
 
-    print(('---------' + str(vecEccIdx)))
+    # print(('---------' + str(vecEccIdx)))
 
     # Array for number of vertices in each bin:
     vecBinNumVrtc = np.zeros((varEccNum - 1))

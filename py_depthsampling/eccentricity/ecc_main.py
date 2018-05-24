@@ -199,10 +199,24 @@ def eccentricity(lstSubId, strVtkEcc, vecEccBin, strVtkParam, varNumDpth,  #noqa
     arySubData = np.sum(arySubData, axis=2)
     arySubData = np.divide(arySubData, vecCntTtl[:, None])
 
-    # Plot across subjects mean:
+    # Output path for plot:
     strTmp = (strPathOut + '_acrsSubsMean.png')
 
+    # Find minimum and maximum correlation values:
+    varMin = np.percentile(arySubData, 2.5)
+    varMax = np.percentile(arySubData, 97.5)
+    # Round:
+    varMin = (np.floor(varMin * 0.1) / 0.1)
+    varMax = (np.ceil(varMax * 0.1) / 0.1)
+
+    # Do not use separate colour map if there are only positive or only
+    # negative values):
+    if not(np.less(varMin, 0.0) and np.greater(varMax, 0.0)):
+        lgcNegLkp = False
+
+    # Plot across subjects mean:
     if lgcNegLkp:
+
         ecc_plot(arySubData,
                  vecEccBin,
                  strTmp)

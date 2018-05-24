@@ -91,7 +91,7 @@ def boot_plot_sngl(objDpth, strPath, lstCon, lstConLbl, varMin=None,
         # Get number of depth levels from input array:
         varNumDpth = aryTmpDpth.shape[1]
         # Number of conditions:
-        varNumCon = len(lstDiff)
+        varNumCon = len(lstCon)
         # Array for depth profiles of form aryDpth[subject, condition, depth]:
         aryDpth = np.zeros((varNumSub, varNumCon, varNumDpth))
         # Load single-condition arrays from disk:

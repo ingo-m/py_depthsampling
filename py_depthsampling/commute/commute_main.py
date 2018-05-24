@@ -120,9 +120,6 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
             for idxHmsph in range(len(lstHmsph)):
                 for idxDiff in range(len(lstDiff)):
 
-                    # print(lstDiff[idxDiff][0])
-                    # print(lstDiff[idxDiff][1])
-
                     # Path of first depth profile:
                     strTmpPth01 = strPthPrf.format(
                         lstMetaCon[idxMtaCn], lstRoi[idxRoi],
@@ -133,7 +130,8 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                         lstMetaCon[idxMtaCn], lstRoi[idxRoi],
                         lstHmsph[idxHmsph], lstCon[lstDiff[idxDiff][1]])
 
-
+                    print(strTmpPth01)
+                    print(strTmpPth02)
 
                     # Load original (i.e. non-convolved) single subject depth
                     # profiles:

@@ -6,22 +6,24 @@ Test for commutative property of drain model (deconvolution) with respect to
 subtraction. In other words, does it make a difference whether we:
     - First apply the deconvolution (separately for each condition for each
       subject), subsequently calculate differences between conditions (within
-      subjects), and finally take the median across subjects
+      subjects), and finally take the mean across subjects
 or
     - First calculate the difference between conditions (within subject),
       apply the deconvolution on the difference score, and finally take the
-      median across subject?
-
+      mean across subject?
 
 Approach A:
 (1) Apply deconvolution (separately for each subject and condition).
 (2) Calculate difference between conditions (within subjects).
-(3) Take median across subjects.
+(3) Take mean across subjects.
 
 Approach B:
 (1) Calculate difference between conditions (within subject).
 (2) Apply deconvolution (on differences, separately for each subject).
-(3) Take median across subjects.
+(3) Take mean across subjects.
+
+Note: Median would be better than mean, but this would nee to be implemented in
+conjunction with (bootrapped?) confidence intervals.
 """
 
 # Part of py_depthsampling library
@@ -56,7 +58,7 @@ lstMdl = [1]
 lstMetaCon = ['stimulus']
 
 # ROI ('v1' or 'v2'):
-lstRoi = ['v1']
+lstRoi = ['v1', 'v2']
 
 # Hemisphere ('rh' or 'lh'):
 lstHmsph = ['rh']
@@ -67,7 +69,7 @@ strPthPrf = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}.
 
 # Output path & prefix for plots (meta-condition, ROI, hemisphere, condition,
 # and model index left open):
-strPthPltOt = '/home/john/PhD/PacMan_Plots/commutative/{}_{}_{}_{}_deconv_model_{}_'  #noqa
+strPthPltOt = '/home/john/PhD/PacMan_Plots/commutative/{}_{}_{}_deconv_model_{}_'  #noqa
 
 # File type suffix for plot:
 strFlTp = '.png'
@@ -100,11 +102,20 @@ lstDiff = [(0, 1), (0, 2)]
 # varCnfLw = 0.5
 # varCnfUp = 99.5
 
-# Limits of y-axis for across subject plot:
-varAcrSubsYmin01 = -400.0
-varAcrSubsYmax01 = 0.0
-varAcrSubsYmin02 = -400.0
-varAcrSubsYmax02 = 0.0
+# Limits of y-axis:
+varYmin = -50.0
+varYmax = 50.0
+
+# Figure scaling factor:
+varDpi = 80.0
+# -----------------------------------------------------------------------------
+
+
+# -----------------------------------------------------------------------------
+# *** Preparations
+
+# Number of comparisons:
+varNumDiff = len(lstDiff)
 # -----------------------------------------------------------------------------
 
 
@@ -114,18 +125,25 @@ varAcrSubsYmax02 = 0.0
 # Approach A:
 # (1) Apply deconvolution (separately for each subject and condition).
 # (2) Calculate difference between conditions (within subjects).
-# (3) Take median across subjects.
+# (3) Take mean across subjects.
 
 # Loop through models, ROIs, hemispheres, and conditions to create plots:
 for idxMtaCn in range(len(lstMetaCon)):  #noqa
     for idxMdl in range(len(lstMdl)):  #noqa
         for idxRoi in range(len(lstRoi)):
             for idxHmsph in range(len(lstHmsph)):
+
+                # List for condition labels:
+                lstConLbl = []
+
                 for idxDiff in range(len(lstDiff)):
 
                     # Condition names:
                     strTmpCon01 = lstCon[lstDiff[idxDiff][0]]
                     strTmpCon02 = lstCon[lstDiff[idxDiff][1]]
+
+                    # Append condition labels (for plot legend):
+                    lstConLbl.append((strTmpCon01 + ' minus ' + strTmpCon02))
 
                     # Path of first depth profile:
                     strTmpPth01 = strPthPrf.format(
@@ -146,6 +164,14 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                     varNumSub = aryDpth01.shape[0]
                     varNumDpth = aryDpth01.shape[1]
 
+                    # On first iteration, pre-allocate array for results (can
+                    # not be done earlier because number of depth levels needs
+                    # to be known):
+                    if idxDiff == 0:  # not('aryMneA' in locals()):
+                        # Array for results of approach A, mean & SD:
+                        aryMneA = np.zeros((varNumDiff, varNumDpth))
+                        aryStdA = np.zeros((varNumDiff, varNumDpth))
+
                     # Reshape to aryDpth[subject, 1, depth] (dummy condition
                     # dimension for compatibility):
                     aryDpth01 = aryDpth01.reshape((varNumSub, 1, varNumDpth))
@@ -160,21 +186,130 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                     #     subjects).
                     aryDiff = np.subtract(aryDpth01, aryDpth02)
 
-                    # (3) Take median across subjects.
-                    aryMdn = np.median(aryDiff, axis=0)
+                    # (3) Mean across subjects.
+                    aryMneA[idxDiff, :] = np.mean(aryDiff, axis=0)
 
-                    # Standard deviation TODO
-                    aryStd = np.std(aryDiff, axis=0)
+                    # Standard deviation:
+                    aryStdA[idxDiff, :] = np.std(aryDiff, axis=0)
 
-                    plt_dpth_prfl(aryMdn, aryStd, varNumDpth, 1, 90, -50.0,
-                                  50.0, False, 'Diff', 'Cortical depth', 'Diff',
-                                  'Title', False, '/home/john/PhD/PacMan_Plots/commutative/plot.png')
+                # Plot results:
+                plt_dpth_prfl(aryMneA,
+                              aryStdA,
+                              varNumDpth,
+                              varNumDiff,
+                              varDpi,
+                              varYmin,
+                              varYmax,
+                              False,
+                              lstConLbl,
+                              'Cortical depth level (equivolume)',
+                              'fMRI signal change (arbitraty units)',
+                              (lstRoi[idxRoi].upper()
+                               + ' '
+                               + lstHmsph[idxHmsph].upper()),
+                              True,
+                              (strPthPltOt.format(lstMetaCon[idxMtaCn],
+                                                  lstRoi[idxRoi],
+                                                  lstHmsph[idxHmsph],
+                                                  lstMdl[idxMdl])
+                               + 'approach_A' + strFlTp)
+                              )
+# -----------------------------------------------------------------------------
+
+
 # -----------------------------------------------------------------------------
 # *** Approach B
 
 # Approach B:
 # (1) Calculate difference between conditions (within subject).
 # (2) Apply deconvolution (on differences, separately for each subject).
-# (3) Take median across subjects.
+# (3) Take mean across subjects.
+
+# Loop through models, ROIs, hemispheres, and conditions to create plots:
+for idxMtaCn in range(len(lstMetaCon)):  #noqa
+    for idxMdl in range(len(lstMdl)):  #noqa
+        for idxRoi in range(len(lstRoi)):
+            for idxHmsph in range(len(lstHmsph)):
+
+                # List for condition labels:
+                lstConLbl = []
+
+                for idxDiff in range(len(lstDiff)):
+
+                    # Condition names:
+                    strTmpCon01 = lstCon[lstDiff[idxDiff][0]]
+                    strTmpCon02 = lstCon[lstDiff[idxDiff][1]]
+
+                    # Append condition labels (for plot legend):
+                    lstConLbl.append((strTmpCon01 + ' minus ' + strTmpCon02))
+
+                    # Path of first depth profile:
+                    strTmpPth01 = strPthPrf.format(
+                        lstMetaCon[idxMtaCn], lstRoi[idxRoi],
+                        lstHmsph[idxHmsph], strTmpCon01)
+
+                    # Path of second depth profile:
+                    strTmpPth02 = strPthPrf.format(
+                        lstMetaCon[idxMtaCn], lstRoi[idxRoi],
+                        lstHmsph[idxHmsph], strTmpCon02)
+
+                    # Load original (i.e. non-convolved) single subject depth
+                    # profiles (shape aryDpth[subject, depth]):
+                    aryDpth01 = np.load(strTmpPth01)
+                    aryDpth02 = np.load(strTmpPth02)
+
+                    # Dimensions:
+                    varNumSub = aryDpth01.shape[0]
+                    varNumDpth = aryDpth01.shape[1]
+
+                    # On first iteration, pre-allocate array for results (can
+                    # not be done earlier because number of depth levels needs
+                    # to be known):
+                    if idxDiff == 0:  # not('aryMneB' in locals()):
+                        # Array for results of approach A, mean & SD:
+                        aryMneB = np.zeros((varNumDiff, varNumDpth))
+                        aryStdB = np.zeros((varNumDiff, varNumDpth))
+
+                    # Reshape to aryDpth[subject, 1, depth] (dummy condition
+                    # dimension for compatibility):
+                    aryDpth01 = aryDpth01.reshape((varNumSub, 1, varNumDpth))
+                    aryDpth02 = aryDpth02.reshape((varNumSub, 1, varNumDpth))
+
+                    # (1) Calculate difference between conditions (within
+                    #     subject).
+                    aryDiff = np.subtract(aryDpth01, aryDpth02)
+
+                    # (2) Apply deconvolution (on differences, separately for
+                    #     each subject).
+                    aryDiff = deconv(aryDiff, lstRoi[idxRoi], varMdl=1)
+
+                    # (3) Take mean across subjects.
+                    aryMneB[idxDiff, :] = np.mean(aryDiff, axis=0)
+
+                    # Standard deviation:
+                    aryStdB[idxDiff, :] = np.std(aryDiff, axis=0)
+
+                # Plot results:
+                plt_dpth_prfl(aryMneB,
+                              aryStdB,
+                              varNumDpth,
+                              varNumDiff,
+                              varDpi,
+                              varYmin,
+                              varYmax,
+                              False,
+                              lstConLbl,
+                              'Cortical depth level (equivolume)',
+                              'fMRI signal change (arbitraty units)',
+                              (lstRoi[idxRoi].upper()
+                               + ' '
+                               + lstHmsph[idxHmsph].upper()),
+                              True,
+                              (strPthPltOt.format(lstMetaCon[idxMtaCn],
+                                                  lstRoi[idxRoi],
+                                                  lstHmsph[idxHmsph],
+                                                  lstMdl[idxMdl])
+                               + 'approach_B' + strFlTp)
+                              )
 
 # -----------------------------------------------------------------------------

@@ -81,7 +81,7 @@ varDpi = 80.0
 strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'fMRI signal change [arbitrary units]'
 
-# Condition levels (used to complete file names) - nested list:
+# Condition levels (used to complete file names):
 lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
 
 # Condition labels:

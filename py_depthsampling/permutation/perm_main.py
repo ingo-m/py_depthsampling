@@ -1,27 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Permutation test for difference in peak position for half-maximum response.
-
-The purpose of this script is to performe a permutation hypothesis test for a
-difference in the peak position in the cortical depth profiles of the response
-at half-maximum contrast between V1 and V2. More specifically, the equality of
-distributions of the peak positions is tested (i.e. a possible difference could
-be due to a difference in means, variance, or the shape of the distribution).
-
-The procedure is as follow:
-- Condition labels (i.e. V1 & V2) are permuted within subjects for each
-  permutation data set (i.e. on each iteration).
-- For each permutation dataset, the mean depth profile of the two groups (i.e.
-  randomly created 'V1' and 'V2' assignments) are calculated.
-- The contrast response function (CRF) is fitted for the two mean depth
-  profiles.
-- The response at half-maximum contrast is calculated from the fitted CRF.
-- The peak of the half-maximum contrast profile is identified for both
-  randomised groups.
-- The mean difference in peak position between the two randomised groups is the
-  null distribution.
-- The peak difference on the full profile is calculated, and the permutation
-  p-value with respect to the null distribution is produced.
+Permutation test for difference between conditions in depth profiles.
 
 Function of the depth sampling pipeline.
 """
@@ -42,241 +21,182 @@ Function of the depth sampling pipeline.
 # You should have received a copy of the GNU General Public License along with
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
 import numpy as np
-import multiprocessing as mp
-from ds_permCrf import perm_hlf_max_peak
-from ds_findPeak import find_peak
-from ds_crfParBoot02 import crf_par_02
 
 
-# ----------------------------------------------------------------------------
-# *** Define parameters
+def permute(aryDpth01, aryDpth02, varNumIt=10000, varLow=2.5, varUp=97.5):
+    """
+    Permutation test for difference between conditions in depth profiles.
+
+    Parameters
+    ----------
+    aryDpth01 : np.array
+        Array with depth profiles from first experimental condition (e.g.
+        'PacMan Dynamic'), shape: aryDpth01[subject, depth].
+    aryDpth02 : np.array
+        Array with depth profiles from second experimental condition (e.g.
+        'PacMan Static'), shape: aryDpth01[subject, depth].
+    varNumIt : int
+        Number of resampling iterations.
+    varLow : float
+        Lower bound of null distribution.
+    varUp : float
+        Upper bound of null distribution.
+
+    Returns
+    -------
+    aryNull : np.array
+        Array with parameters of permutation null distribution, shape
+        aryNull[3, varNumDpth]. First dimension corresponds to lower bound,
+        median, and upper bound of the permutation null distribution. For
+        instance, if `varLow = 2.5` and `varUp = 97.5`, the bounds of the 95%
+        confidence interval of the null distribution are returned.
+    vecP : np.array
+        Array with one p-value for each depth level (shape vecP[depth]),
+        pertaining to the probability of obtaining a difference between
+        conditions as equal to or greater than the empirically observed
+        condition difference.
+
+    Notes
+    -----
+    Compares cortical depth profiles from two different conditions (e.g. PacMan
+    dynamic vs. PacMan statis). Tests whether the difference between the two
+    conditions is significant at any cortical depth.
+
+    The procedure is as follow:
+    - Condition labels (i.e. 'PacMan Dynamic' and 'PacMan Static') are permuted
+      within subjects for each permutation data set (i.e. on each iteration).
+    - For each permutation dataset, the difference between the two conditions
+      (i.e. the randomly created 'PacMan Dynamic' and 'PacMan Static'
+      assignments) are calculated, separately for each subject. The result is
+      one depth profile per subject (with the difference between randomly
+      assigned conditions).
+    - The average difference across subejcts is calculated.
+    - The resulte is a distribution of condition differences for each depth
+      level (dimensions are `number of resampling iterations` * `number of
+      depth level`. This distribution is the null distribution.
+    - The empirical difference between conditions can be compared agains this
+      null distribution.
+    """
+    # -------------------------------------------------------------------------
+    # *** Preparations
+    print('-Permutation test')
+
+    # Number of subject:
+    varNumSubs = aryDpth01.shape[0]
+
+    # Number of depth levels:
+    varNumDpt = aryDpth01.shape[1]
+
+    # -------------------------------------------------------------------------
+    # *** Create null distribution
+
+    print('---Create null distribution')
+
+    # Random array that is used to permute condition labels within subjects, of
+    # the form aryRnd[idxIteration, idxSub]. For each iteration and subject,
+    # there is either a zero or a one. For instance, assume that conditions are
+    # 'PacMan Dynamic' and 'PacMan Static'. 'Zero' means that the actual
+    # condition value 'PacMan Dynamic' gets assigned to the permuted 'PacMan
+    # Dynamic' group, and the actual 'PacMan Static' value gets assigned to the
+    # permuted 'PacMan Static' group. 'One' means that the labels are switched,
+    # i.e. the actual 'PacMan Dynamic' value get assignet to the 'PacMan
+    # Static' group, and vice versa.
+    aryRnd = np.random.randint(0, high=2, size=(varNumIt, varNumSubs))
+
+    # We need two versions of the randomisation array, one for sampling from
+    # the first input array (e.g. 'PacMan Dynamic'), and a second version to
+    # sample from the second input array (e.g. 'PacMan Static'). (I.e. the
+    # second version is the opposite of the first version.)
+    aryRnd01 = np.equal(aryRnd, 1)
+    aryRnd02 = np.equal(aryRnd, 0)
+    del(aryRnd)
+
+    # Arrays for permuted depth profiles for the two randomised groups:
+    aryDpthRnd01 = np.zeros((varNumIt, varNumSubs, varNumDpt))
+    aryDpthRnd02 = np.zeros((varNumIt, varNumSubs, varNumDpt))
+
+    # Loop through iterations:
+    for idxIt in range(0, varNumIt):
+
+        # Assign values from original group 1 to permutation group 1:
+        aryDpthRnd01[idxIt, aryRnd01[idxIt, :], :] = \
+            aryDpth01[aryRnd01[idxIt, :], :]
+
+        # Assign values from original group 2 to permutation group 1:
+        aryDpthRnd01[idxIt, aryRnd02[idxIt, :], :] = \
+            aryDpth02[aryRnd02[idxIt, :], :]
 
-# Use existing resampling results or create new one ('load' or 'create')?
-strSwitch = 'create'
+        # Assign values from original group 1 to permutation group 2:
+        aryDpthRnd02[idxIt, aryRnd02[idxIt, :], :] = \
+            aryDpth01[aryRnd02[idxIt, :], :]
 
-# Corrected or  uncorrected depth profiles?
-strCrct = 'uncorrected'
+        # Assign values from original group 2 to permutation group 2:
+        aryDpthRnd02[idxIt, aryRnd01[idxIt, :], :] = \
+            aryDpth02[aryRnd01[idxIt, :], :]
 
-# Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
-# function).
-strFunc = 'power'
-
-# File to load resampling from / save resampling to (corrected/uncorrected and
-# power/hyper left open):
-strPthOut = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/crf_permutation_{}_{}.npz'  #noqa
-strPthOut = strPthOut.format(strCrct, strFunc)
+    # Within-subject difference between conditions (separately for each
+    # iteration, subject, and depth level):
+    aryPermDiff = np.subtract(aryDpthRnd01, aryDpthRnd02)
 
-# Path of depth-profiles:
-if strCrct == 'uncorrected':
-    objDpth01 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy'  #noqa
-    objDpth02 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2.npy'  #noqa
-if strCrct == 'corrected':
-    objDpth01 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected_model_1.npy'  #noqa
-    objDpth02 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2_corrected_model_1.npy'  #noqa
+    # Mean condition difference across subjects (separately for each iteration
+    # and depth level):
+    aryPermDiff = np.mean(aryPermDiff, axis=1)
 
-# Stimulus luminance contrast levels. NOTE: Should be between zero and one.
-# When using percent (i.e. from zero to 100), the search for the luminance at
-# half maximum response would need to be adjusted.
-vecEmpX = np.array([0.025, 0.061, 0.163, 0.72])
+    # Mean of permutation distribution - i.e. the mean difference between
+    # randomly permuted conditions - the mean difference expected by chance.
+    aryPermDiffMne = np.mean(aryPermDiff, axis=0)
 
-# Number of x-values for which to solve the function when calculating model
-# fit:
-varNumX = 1000
+    # Lower and upper bound of the permutation null distribution. For instance,
+    # if `varLow = 2.5` and `varUp = 97.5`, this corresponds to the bounds of
+    # the 95% confidence interval of the null distribution.
+    aryPermDiffPrcnt = np.percentile(aryPermDiff, (varLow, varUp), axis=0).T
 
-# Number of resampling iterations:
-varNumIt = 10000
+    # Create output array of shape aryNull[3, varNumDpth]. First dimension
+    # corresponds to lower bound, median, and upper bound of the permutation
+    # null distribution.
+    aryNull = np.array([aryPermDiffPrcnt[:, 0],
+                        aryPermDiffMne,
+                        aryPermDiffPrcnt[:, 1]])
 
-# Number of processes to run in parallel:
-varPar = 11
+    # -------------------------------------------------------------------------
+    # *** Calculate empirical difference
 
+    print('---Calculate empirical difference')
 
-# ----------------------------------------------------------------------------
-# *** Load / create resampling
+    # Empirical difference between conditions. First, calculate within-subject
+    # difference:
+    aryEmpDiff = np.subtract(aryDpth01, aryDpth02)
 
-print('-Permutation CRF fitting')
-print(('--Profiles: ' + strCrct.upper()))
-print(('--Function: ' + strFunc))
+    # Mean difference across subjects:
+    aryEmpDiffMne = np.mean(aryEmpDiff, axis=0)
 
-if strSwitch == 'load':
+    # -------------------------------------------------------------------------
+    # *** Calculate p-value
 
-    print('---Loading resampling results')
+    print('---Calculate p-value')
 
-    # Load previously prepared file:
-    # with open(strPthJson, 'r') as objJson:
-    #      lstJson = json.load(objJson)
+    # Array for p-value at each depth level:
+    vecP = np.zeros((varNumDpt))
 
-    # Retrieve numpy arrays from nested list:
-    # aryDpth01 = np.array(lstJson[0])
-    # aryDpth02 = np.array(lstJson[1])
-    # aryMdlY = np.array(lstJson[2])
-    # aryHlfMax = np.array(lstJson[3])
-    # arySemi = np.array(lstJson[4])
-    # aryRes = np.array(lstJson[5])
+    # Take absolute difference?
+    # aryPermDiff = np.absolute(aryPermDiff)
+    # aryEmpDiffMne = np.absolute(aryEmpDiffMne)
 
-    # Load data from npz file:
-    objNpz = np.load(strPthOut)
+    for idxDpt in range(varNumDpt):
 
-    # Retrieve arrays from npz object (dictionary):
-    aryDpth01 = objNpz['aryDpth01']
-    aryDpth02 = objNpz['aryDpth02']
-    aryMdlY = objNpz['aryMdlY']
-    aryHlfMax = objNpz['aryHlfMax']
-    arySemi = objNpz['arySemi']
-    aryRes = objNpz['aryRes']
+        # Number of resampling cases with a condition difference greater or
+        # equal to the 'actual', empricial difference between conditions:
+        vecP[idxDpt] = np.sum(
+                              np.greater_equal(
+                                               aryPermDiff[:, idxDpt],
+                                               aryEmpDiffMne[idxDpt]
+                                               )
+                              ).astype(np.float64)
 
-elif strSwitch == 'create':
+    # Convert count of cases into p-value:
+    vecP = np.divide(vecP, float(varNumIt))
 
-    # ------------------------------------------------------------------------
-    # *** Parallelised permutation & CRF fitting
-
-    print('---Parallelised resampling & CRF fitting')
-
-    aryDpth01, aryDpth02, aryMdlY, aryHlfMax, arySemi, aryRes = \
-        perm_hlf_max_peak(objDpth01, objDpth02, vecEmpX, strFunc=strFunc,
-                          varNumIt=varNumIt, varPar=varPar)
-
-    # ------------------------------------------------------------------------
-    # *** Save results
-
-    print('---Saving resampling results as npz object')
-
-    # Put results into nested list:
-    # lstJson = [aryDpth01.tolist(),  # Original depth profiles V1
-    #            aryDpth02.tolist(),  # Original depth profiles V2
-    #            aryMdlY.tolist(),    # Fitted y-values
-    #            aryHlfMax.tolist(),  # Predicted response at 50% contrast
-    #            arySemi.tolist(),    # Semisaturation contrast
-    #            aryRes.tolist()]     # Residual variance
-
-    # Save results to disk:
-    # with open(strPthJson, 'w') as objJson:
-    #      json.dump(lstJson, objJson)
-
-    # Save result as npz object:
-    np.savez(strPthOut,
-             aryDpth01=aryDpth01,
-             aryDpth02=aryDpth02,
-             aryMdlY=aryMdlY,
-             aryHlfMax=aryHlfMax,
-             arySemi=arySemi,
-             aryRes=aryRes)
-
-
-# ----------------------------------------------------------------------------
-# *** Find peaks in contrast at half maximum profiles
-
-print('---Find peaks in resampled contrast-at-half-maximum profiles, ROI 1')
-
-# Find peaks in first permutation group:
-vecPeaks01 = find_peak(aryHlfMax[0, :, :])
-
-print('---Find peaks in resampled contrast-at-half-maximum profiles, ROI 2')
-
-# Find peaks in second permutation group:
-vecPeaks02 = find_peak(aryHlfMax[1, :, :])
-
-
-# ----------------------------------------------------------------------------
-# *** Create null distribution
-
-print('---Create null distribution')
-
-# The mean difference in peak position between the two randomised groups is the
-# null distribution.
-vecNull = np.subtract(vecPeaks01, vecPeaks02)
-
-
-# ----------------------------------------------------------------------------
-# *** Empirical mean difference
-
-print('---Find peaks in empirical contrast-at-half-maximum profiles')
-
-# The peak difference on the full profile needs to be calculated for comparison
-# with the null distribution.
-
-# Number of subject:
-varNumSubs = aryDpth01.shape[0]
-
-# Number of conditions:
-varNumCon = aryDpth01.shape[1]
-
-# Number of depth levels:
-varNumDpt = aryDpth01.shape[2]
-
-# Put the two ROI depth profile arrays into one array of the form
-# aryDpth[idxRoi, idxSub, idxCondition, idxDpt]
-aryDpth = np.array([aryDpth01, aryDpth02])
-
-# Create a queue to put the results in:
-queOut = mp.Queue()
-
-# Pseudo-randomisation array to use the bootstrapping function to get empirical
-# CRF fit:
-aryRnd = np.arange(0, varNumSubs, 1)
-aryRnd = np.array(aryRnd, ndmin=2)
-
-# Fit contrast response function on empirical depth profiles:
-crf_par_02(0,
-           aryDpth,
-           vecEmpX,
-           strFunc,
-           aryRnd,
-           varNumX,
-           queOut)
-
-# Retrieve results from queue:
-lstCrf = queOut.get(True)
-_, aryEmpMdlY, aryEmpHlfMax, aryEmpSemi, aryEmpRes = lstCrf
-
-# Find peaks in empirical CRF fit:
-vecEmpPeaks01 = find_peak(aryEmpHlfMax[0, :, :])
-print(('------Peak in empirical contrast-at-half-maximum profile, ROI 1: '
-       + str(np.around(np.multiply(vecEmpPeaks01[0], 100.0), 2))
-       + '%'))
-
-# Find peaks in second permutation group:
-vecEmpPeaks02 = find_peak(aryEmpHlfMax[1, :, :])
-print(('------Peak in empirical contrast-at-half-maximum profile, ROI 2: '
-       + str(np.around(np.multiply(vecEmpPeaks02[0], 100.0), 2))
-       + '%'))
-
-# Absolute peak difference in empirical profiles:
-varPeakDiff = np.absolute(np.subtract(vecEmpPeaks01, vecEmpPeaks02))
-
-
-# ----------------------------------------------------------------------------
-# *** Calculate p-value
-
-print('---Calculate p-value')
-
-# Absolute of the mean difference in peak position between the two randomised
-# groups (null distribution).
-vecNullAbs = np.absolute(vecNull)
-
-# Number of resampled cases with absolute peak position difference that is at
-# least as large as the empirical peak difference (permutation p-value):
-varNumGe = np.sum(np.greater_equal(vecNullAbs, varPeakDiff))
-
-print('------Number of resampled cases with absolute peak position')
-print('      difference that is at least as large as the empirical peak')
-print(('      difference: '
-      + str(varNumGe)))
-
-# Total number of resampled cases with identified peak position:
-varNumPk = np.shape(vecNull)[0]
-
-print('------Total number of resampled cases with identified peak position:')
-print(('      ' + str(varNumPk)))
-
-# Ratio of resampled cases with absolute peak position difference that is at
-# least as large as the empirical peak difference (permutation p-value):
-varP = np.divide(float(varNumGe), float(varNumPk))
-
-print('------Permutation p-value for equality of distributions of peak')
-print('      position of contrast-at-half-maximum response depth profiles')
-print(('      between the two ROIs: '
-       + str(np.around(varP, decimals=5))))
-# ----------------------------------------------------------------------------
-
-print('-Done.')
+    return aryNull, vecP
+    # -------------------------------------------------------------------------

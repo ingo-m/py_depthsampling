@@ -49,7 +49,7 @@ def permute(aryDpth01, aryDpth02, varNumIt=10000, varLow=2.5, varUp=97.5):
     aryNull : np.array
         Array with parameters of permutation null distribution, shape
         aryNull[3, varNumDpth]. First dimension corresponds to lower bound,
-        median, and upper bound of the permutation null distribution. For
+        mean, and upper bound of the permutation null distribution. For
         instance, if `varLow = 2.5` and `varUp = 97.5`, the bounds of the 95%
         confidence interval of the null distribution are returned.
     vecP : np.array
@@ -57,6 +57,8 @@ def permute(aryDpth01, aryDpth02, varNumIt=10000, varLow=2.5, varUp=97.5):
         pertaining to the probability of obtaining a difference between
         conditions as equal to or greater than the empirically observed
         condition difference.
+    aryEmpDiffMdn : np.array
+        Empirical difference between conditions (mean across subjects).
 
     Notes
     -----
@@ -140,8 +142,8 @@ def permute(aryDpth01, aryDpth02, varNumIt=10000, varLow=2.5, varUp=97.5):
     # iteration, subject, and depth level):
     aryPermDiff = np.subtract(aryDpthRnd01, aryDpthRnd02)
 
-    # Mean condition difference across subjects (separately for each iteration
-    # and depth level):
+    # Mean condition difference across subjects (separately for each
+    # iteration and depth level):
     aryPermDiff = np.mean(aryPermDiff, axis=1)
 
     # Mean of permutation distribution - i.e. the mean difference between
@@ -154,7 +156,7 @@ def permute(aryDpth01, aryDpth02, varNumIt=10000, varLow=2.5, varUp=97.5):
     aryPermDiffPrcnt = np.percentile(aryPermDiff, (varLow, varUp), axis=0).T
 
     # Create output array of shape aryNull[3, varNumDpth]. First dimension
-    # corresponds to lower bound, median, and upper bound of the permutation
+    # corresponds to lower bound, mean, and upper bound of the permutation
     # null distribution.
     aryNull = np.array([aryPermDiffPrcnt[:, 0],
                         aryPermDiffMne,
@@ -170,7 +172,7 @@ def permute(aryDpth01, aryDpth02, varNumIt=10000, varLow=2.5, varUp=97.5):
     aryEmpDiff = np.subtract(aryDpth01, aryDpth02)
 
     # Mean difference across subjects:
-    aryEmpDiffMne = np.mean(aryEmpDiff, axis=0)
+    aryEmpDiffMdn = np.mean(aryEmpDiff, axis=0)
 
     # -------------------------------------------------------------------------
     # *** Calculate p-value
@@ -191,12 +193,12 @@ def permute(aryDpth01, aryDpth02, varNumIt=10000, varLow=2.5, varUp=97.5):
         vecP[idxDpt] = np.sum(
                               np.greater_equal(
                                                aryPermDiff[:, idxDpt],
-                                               aryEmpDiffMne[idxDpt]
+                                               aryEmpDiffMdn[idxDpt]
                                                )
                               ).astype(np.float64)
 
     # Convert count of cases into p-value:
     vecP = np.divide(vecP, float(varNumIt))
 
-    return aryNull, vecP
+    return aryNull, vecP, aryEmpDiffMdn
     # -------------------------------------------------------------------------

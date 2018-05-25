@@ -52,7 +52,7 @@ strPthPrf = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{
 
 # Output path & prefix for plots (meta-condition, ROI, hemisphere, condition,
 # and deconvolution suffix left open):
-strPthPltOt = '/home/john/PhD/PacMan_Plots/permutation/{}_{}_{}{}_'  #noqa
+strPthPltOt = '/home/john/PhD/PacMan_Plots/permutation/{}_{}_{}_{}{}_'  #noqa
 
 # File type suffix for plot:
 strFlTp = '.png'
@@ -68,15 +68,20 @@ strYlabel = 'fMRI signal change [arbitrary units]'
 lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
 
 # Condition labels:
-lstConLbl = ['PacMan Dynamic Sustained',
-             'Control Dynamic Sustained',
-             'PacMan Static Sustained']
+# lstConLbl = ['PacMan Dynamic Sustained',
+#              'Control Dynamic Sustained',
+#              'PacMan Static Sustained']
 
 # Which conditions to compare (list of tuples with condition indices):
 lstDiff = [(0, 1), (0, 2)]
 
 # Number of resampling iterations:
-varNumIt = 10000
+varNumIt = 100000
+
+# Upper and lower bound of confidence interval of permutation null
+# distribution (for plot):
+varLow = 2.5
+varUp = 97.5
 
 # Limits of y-axis:
 varYmin = -50.0
@@ -96,67 +101,123 @@ varNumDiff = len(lstDiff)
 
 
 # -----------------------------------------------------------------------------
-# ***
-
-
+# *** Permutation test
 
 # Loop through models, ROIs, hemispheres, and conditions to create plots:
 for idxMtaCn in range(len(lstMetaCon)):  #noqa
     for idxMdl in range(len(lstMdl)):  #noqa
         for idxRoi in range(len(lstRoi)):
             for idxHmsph in range(len(lstHmsph)):
-
-                # List for condition labels:
-                lstConLbl = []
-
                 for idxDiff in range(len(lstDiff)):
 
                     # Condition names:
                     strTmpCon01 = lstCon[lstDiff[idxDiff][0]]
                     strTmpCon02 = lstCon[lstDiff[idxDiff][1]]
 
-                    # Append condition labels (for plot legend):
-                    lstConLbl.append((strTmpCon01 + ' minus ' + strTmpCon02))
+                    # Plot title:
+                    strTtle = ((strTmpCon01 + ' minus ' + strTmpCon02))
+
+                    # Condition name for output file path:
+                    strPthCon = ((strTmpCon01 + '_min_' + strTmpCon02))
 
                     # Path of first depth profile:
                     strTmpPth01 = strPthPrf.format(
                         lstMetaCon[idxMtaCn], lstRoi[idxRoi],
-                        lstHmsph[idxHmsph], strTmpCon01)
+                        lstHmsph[idxHmsph], strTmpCon01, lstMdl[idxMdl])
 
                     # Path of second depth profile:
                     strTmpPth02 = strPthPrf.format(
                         lstMetaCon[idxMtaCn], lstRoi[idxRoi],
-                        lstHmsph[idxHmsph], strTmpCon02)
+                        lstHmsph[idxHmsph], strTmpCon02, lstMdl[idxMdl])
 
                     # Load single subject depth profiles (shape
                     # aryDpth[subject, depth]):
                     aryDpth01 = np.load(strTmpPth01)
                     aryDpth02 = np.load(strTmpPth02)
 
-                    permute(aryDpth01, aryDpth02, varNumIt=varNumIt)
+                    # Number of depth levels:
+                    varNumDpt = aryDpth01.shape[1]
 
+                    # Run permutation test:
+                    aryNull, vecP, aryEmpDiffMdn = permute(aryDpth01,
+                                                           aryDpth02,
+                                                           varNumIt=10000,
+                                                           varLow=varLow,
+                                                           varUp=varUp)
 
+                    # Data array to be passed into plotting function,
+                    # containing the empirical condition difference and the
+                    # permutation difference:
+                    aryPlot01 = np.zeros((2, varNumDpt))
+                    aryPlot01[0, :] = aryEmpDiffMdn.flatten()
+                    aryPlot01[1, :] = aryNull[1, :].flatten()
 
-                # Plot results:
-                plt_dpth_prfl(aryMneA,
-                              aryStdA,
-                              varNumDpth,
-                              varNumDiff,
-                              varDpi,
-                              varYmin,
-                              varYmax,
-                              False,
-                              lstConLbl,
-                              'Cortical depth level (equivolume)',
-                              'fMRI signal change (arbitraty units)',
-                              (lstRoi[idxRoi].upper()
-                               + ' '
-                               + lstHmsph[idxHmsph].upper()),
-                              True,
-                              (strPthPltOt.format(lstMetaCon[idxMtaCn],
-                                                  lstRoi[idxRoi],
-                                                  lstHmsph[idxHmsph],
-                                                  lstMdl[idxMdl])
-                               + 'approach_A' + strFlTp)
-                              )
+                    # Data array to be passed into plotting function,
+                    # containing the error shading (dummy array for empirical
+                    # data, because we do not plot the empirical variance for
+                    # better visibility, and the lower and upper bounds of the
+                    # permutation distribution:
+                    aryPlotErrLw = np.zeros((2, varNumDpt))
+                    aryPlotErrLw[1, :] = aryNull[0, :].flatten()
+                    aryPlotErrUp = np.zeros((2, varNumDpt))
+                    aryPlotErrUp[1, :] = aryNull[2, :].flatten()
+
+                    # Plot empirical condition difference and permutation null
+                    # distribution:
+                    plt_dpth_prfl(aryPlot01,
+                                  None,
+                                  varNumDpt,
+                                  varNumDiff,
+                                  varDpi,
+                                  varYmin,
+                                  varYmax,
+                                  False,
+                                  ['Empirical condition difference',
+                                   'Permutation null distribution'],
+                                  'Cortical depth level (equivolume)',
+                                  'fMRI signal change (arbitraty units)',
+                                  (lstRoi[idxRoi].upper()
+                                   + ' '
+                                   + lstHmsph[idxHmsph].upper()
+                                   + ' '
+                                   + strTtle),
+                                  True,
+                                  (strPthPltOt.format(lstMetaCon[idxMtaCn],
+                                                      lstRoi[idxRoi],
+                                                      lstHmsph[idxHmsph],
+                                                      strPthCon,
+                                                      lstMdl[idxMdl])
+                                   + strFlTp),
+                                  aryCnfLw=aryPlotErrLw,
+                                  aryCnfUp=aryPlotErrUp)
+
+                    # Reshape p-values for plot:
+                    vecP = vecP.reshape((1, varNumDpt))
+
+                    # Plot p-value:
+                    plt_dpth_prfl(vecP,
+                                  np.zeros(vecP.shape),
+                                  varNumDpt,
+                                  1,
+                                  varDpi,
+                                  0.0,
+                                  0.5,
+                                  False,
+                                  ['p-value'],
+                                  'Cortical depth level (equivolume)',
+                                  'p-value',
+                                  (lstRoi[idxRoi].upper()
+                                   + ' '
+                                   + lstHmsph[idxHmsph].upper()
+                                   + ' '
+                                   + strTtle),
+                                  False,
+                                  (strPthPltOt.format(lstMetaCon[idxMtaCn],
+                                                      lstRoi[idxRoi],
+                                                      lstHmsph[idxHmsph],
+                                                      strPthCon,
+                                                      lstMdl[idxMdl])
+                                   + 'pval'
+                                   + strFlTp),
+                                  varNumLblY=6)
 # -----------------------------------------------------------------------------

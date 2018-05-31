@@ -18,11 +18,51 @@
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
+import pandas as pd
+from py_depthsampling.get_data.load_csv_roi import load_csv_roi
+# from py_depthsampling.get_data.load_vtk_single import load_vtk_single
+from py_depthsampling.get_data.load_vtk_multi import load_vtk_multi
+import seaborn as sns
 
-/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/20180118/cbs/rh/eccentricity.vtk
-/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/20180118/cbs/rh/Pd_pe1.vtk
-/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/20180118/cbs/rh/polar_angle.vtk
-/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/20180118/cbs/rh/SD.vtk
+strPthR2 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/20180118/cbs/rh/pRF_results_R2.vtk'
+strPthSd = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/20180118/cbs/rh/pRF_results_SD.vtk'
+strPthX = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/20180118/cbs/rh/pRF_results_x_pos.vtk'
+strPthY = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/20180118/cbs/rh/pRF_results_y_pos.vtk'
+
+strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/20180118/cbs/rh/feat_level_2_Pd_sst_cope.vtk'
+
+strCsvRoi = '/home/john/PhD/GitHub/PacMan/analysis/20180118/08_depthsampling/rh/v1_mod.csv'
+
+# Extent of visual space from centre of the screen in negative x-direction
+# (i.e. from the fixation point to the left end of the screen) in degrees of
+# visual angle.
+varExtXmin = -5.19
+# Extent of visual space from centre of the screen in positive x-direction
+# (i.e. from the fixation point to the right end of the screen) in degrees of
+# visual angle.
+varExtXmax = 5.19
+# Extent of visual space from centre of the screen in negative y-direction
+# (i.e. from the fixation point to the lower end of the screen) in degrees of
+# visual angle.
+varExtYmin = -5.19
+# Extent of visual space from centre of the screen in positive y-direction
+# (i.e. from the fixation point to the upper end of the screen) in degrees of
+# visual angle.
+varExtYmax = 5.19
+
+
+
+
+
+
+# --------------
+# ***
+
+
+
+
+
+
 
 def project():
     """

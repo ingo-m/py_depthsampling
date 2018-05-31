@@ -24,25 +24,26 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from py_depthsampling.project.utilities import get_data
+from py_depthsampling.project.utilities import crt_gauss
 
 
 # -----------------------------------------------------------------------------
 # *** Define parameters
 
 # List of subject identifiers:
-lstSubIds = ['20171023',  # '20171109',
-             '20171204_01',
-             '20171204_02',
-             '20171211',
-             '20171213',
-             '20180111',
-             '20180118']
+lstSubIds = ['20171023']  #,  # '20171109',
+#             '20171204_01',
+#             '20171204_02',
+#             '20171211',
+#             '20171213',
+#             '20180111',
+#             '20180118']
 
 # Draining model suffix ('' for non-corrected profiles):
 lstMdl = ['']  # , '_deconv_model_1']
 
 # ROI ('v1' or 'v2'):
-lstRoi = ['v1', 'v2']
+lstRoi = ['v1']  # , 'v2']
 
 # Output path & prefix for plots (ROI, condition, and deconvolution suffix left
 # open):
@@ -59,7 +60,7 @@ strXlabel = 'x-position'
 strYlabel = 'y-position'
 
 # Condition levels (used to complete file names):
-lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
+lstCon = ['Pd_sst']  #, 'Cd_sst', 'Ps_sst']
 
 # Condition labels:
 # lstConLbl = ['PacMan Dynamic Sustained',
@@ -109,6 +110,12 @@ varExtYmin = -5.19
 # (i.e. from the fixation point to the upper end of the screen) in degrees of
 # visual angle.
 varExtYmax = 5.19
+
+# Number of bins for visual space representation in x- and y-direction (ratio
+# of number of x and y bins should correspond to ratio of size of visual space
+# in x- and y-directions).
+varNumX = 100
+varNumY = 100
 # -----------------------------------------------------------------------------
 
 
@@ -118,6 +125,9 @@ varExtYmax = 5.19
 # Number of subjects:
 varNumSub = len(lstSubIds)
 
+# Number of hemispheres:
+varNumHmsp = varNumSub * 2
+
 # Loop through models, ROIs, and conditions:
 for idxMdl in range(len(lstMdl)):
     for idxRoi in range(len(lstRoi)):
@@ -125,9 +135,6 @@ for idxMdl in range(len(lstMdl)):
 
             # -----------------------------------------------------------------
             # *** Load data
-
-            # Number of hemispheres:
-            varNumHmsp = varNumSub * 2
 
             # List for single-subject data vectors:
             lstData = [None] * varNumHmsp
@@ -145,25 +152,71 @@ for idxMdl in range(len(lstMdl)):
             lstY = [None] * varNumHmsp
 
             # Loop through subjects:
-            for idxSub in range(len(varNumSub)):
+            for idxSub in range(varNumSub):
 
-                # Temporary input paths:
+                # Temporary input paths for left hemisphere:
                 strTmpPthData = strPthData.format(lstSubIds[idxSub],
                                                   'lh', lstCon[idxCon])
                 strTmpPthR2 = strPthR2.format(lstSubIds[idxSub], 'lh')
                 strTmpPthSd = strPthSd.format(lstSubIds[idxSub], 'lh')
                 strTmpPthX = strPthX.format(lstSubIds[idxSub], 'lh')
                 strTmpPthY = strPthY.format(lstSubIds[idxSub], 'lh')
-                strTmpCsvRoi = strCsvRoi(lstSubIds[idxSub], 'lh',
+                strTmpCsvRoi = strCsvRoi.format(lstSubIds[idxSub], 'lh',
                                          lstRoi[idxRoi])
 
                 # Load single subject data for left hemisphere:
-                lstData[idxSub], lstR2[idxSub], lstSd[idxSub], lstX[idxSub],
+                lstData[idxSub], lstR2[idxSub], lstSd[idxSub], lstX[idxSub], \
                 lstY[idxSub] = get_data(
+                    strTmpPthData, strTmpPthR2, strTmpPthSd, strTmpPthX,
+                    strTmpPthY, strTmpCsvRoi, varNumDpth=varNumDpth)
+
+                # Temporary input paths for right hemisphere:
+                strTmpPthData = strPthData.format(lstSubIds[idxSub],
+                                                  'rh', lstCon[idxCon])
+                strTmpPthR2 = strPthR2.format(lstSubIds[idxSub], 'rh')
+                strTmpPthSd = strPthSd.format(lstSubIds[idxSub], 'rh')
+                strTmpPthX = strPthX.format(lstSubIds[idxSub], 'rh')
+                strTmpPthY = strPthY.format(lstSubIds[idxSub], 'rh')
+                strTmpCsvRoi = strCsvRoi.format(lstSubIds[idxSub], 'rh',
+                                         lstRoi[idxRoi])
+
+                # Load single subject data for right hemisphere:
+                lstData[(idxSub + varNumSub)], lstR2[(idxSub + varNumSub)], \
+                lstSd[(idxSub + varNumSub)], lstX[(idxSub + varNumSub)], \
+                lstY[(idxSub + varNumSub)] = get_data(
                     strTmpPthData, strTmpPthR2, strTmpPthSd, strTmpPthX,
                     strTmpPthY, strTmpCsvRoi, varNumDpth=varNumDpth)
 
             # -----------------------------------------------------------------
             # *** Combine single subject data
+
+            # 2D array with bins of visual space locations:
+            aryVslSpc = np.zeros((varNumX, varNumY))
+
+            # Vector with visual space coordinates of elements in `aryVslSpc`:
+            vecCorX = np.linspace(varExtXmin, varExtXmax, num=varNumX,
+                                  endpoint=True)
+            vecCorY = np.linspace(varExtYmin, varExtYmax, num=varNumY,
+                                  endpoint=True)
+
+            # Fill visual space array with data:
+            for idxHmsph in range(varNumHmsp):
+
+                for idxVrtx in range(lstData[idxHmsph].shape[0]):
+
+                    # Get pRF position and size of current vertex:
+                    varTmpX = lstX[idxHmsph][idxVrtx]
+                    varTmpY = lstY[idxHmsph][idxVrtx]
+                    varTmpSd = lstSd[idxHmsph][idxVrtx]
+
+                    # Convert from visual space coordinates to array indices TODO
+
+                    aryTmpGauss = crt_gauss(varNumX, varNumY, varTmpX, varTmpY,
+                                            varTmpSd)
+
+                    aryTmpGauss = np.multiply(aryTmpGauss,
+                                              lstData[idxHmsph][idxVrtx])
+
+                    aryVslSpc = np.add(aryVslSpc, aryTmpGauss)
 
 # -----------------------------------------------------------------------------

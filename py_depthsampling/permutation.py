@@ -48,11 +48,11 @@ lstHmsph = ['rh']
 
 # Path of depth-profile to load (meta-condition, ROI, hemisphere, condition,
 # and deconvolution suffix left open):
-strPthPrf = '/Users/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npy'  #noqa
+strPthPrf = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npy'  #noqa
 
 # Output path & prefix for plots (meta-condition, ROI, hemisphere, condition,
 # and deconvolution suffix left open):
-strPthPltOt = '/Users/john/Dropbox/PacMan_Plots/permutation/{}_{}_{}_{}{}_'  #noqa
+strPthPltOt = '/home/john/Dropbox/PacMan_Plots/permutation/{}_{}_{}_{}{}_'  #noqa
 
 # File type suffix for plot:
 strFlTp = '.svg'
@@ -88,8 +88,8 @@ varLow = 2.5
 varUp = 97.5
 
 # Limits of y-axis:
-varYmin = -50.0
-varYmax = 50.0
+varYmin = -40.0
+varYmax = 40.0
 
 # Figure scaling factor:
 varDpi = 80.0

@@ -232,7 +232,7 @@ for idxMdl in range(len(lstMdl)):
                                                 varTmpIdxY, varTmpIdxSd)
     
                         # Scale Gaussian to have its maximum at one:
-                        # aryTmpGauss = np.divide(aryTmpGauss, np.max(aryTmpGauss))
+                        aryTmpGauss = np.divide(aryTmpGauss, np.max(aryTmpGauss))
     
                         # Multiply current data value (e.g. parameter estimate)
                         # with Gaussian:

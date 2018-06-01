@@ -31,13 +31,13 @@ from py_depthsampling.project.utilities import crt_gauss
 # *** Define parameters
 
 # List of subject identifiers:
-lstSubIds = ['20171023']  #,  # '20171109',
-#             '20171204_01',
-#             '20171204_02',
-#             '20171211',
-#             '20171213',
-#             '20180111',
-#             '20180118']
+lstSubIds = ['20171023',  # '20171109',
+             '20171204_01',
+             '20171204_02',
+             '20171211',
+             '20171213',
+             '20180111',
+             '20180118']
 
 # Draining model suffix ('' for non-corrected profiles):
 lstMdl = ['']  # , '_deconv_model_1']
@@ -47,7 +47,8 @@ lstRoi = ['v1']  # , 'v2']
 
 # Output path & prefix for plots (ROI, condition, and deconvolution suffix left
 # open):
-strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/{}_{}_{}'  #noqa
+# strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/{}_{}_{}'  #noqa
+strPthPltOt = '/Users/john/Dropbox/PacMan_Plots/project/{}_{}_{}'  #noqa
 
 # File type suffix for plot:
 strFlTp = '.png'
@@ -89,7 +90,8 @@ strPthY = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_y_pos.
 
 # Path of csv file with ROI definition (subject ID, hemisphere, and ROI left
 # open).
-strCsvRoi = '/home/john/PhD/GitHub/PacMan/analysis/{}/08_depthsampling/{}/{}_mod.csv'  #noqa
+# strCsvRoi = '/home/john/PhD/GitHub/PacMan/analysis/{}/08_depthsampling/{}/{}_mod.csv'  #noqa
+strCsvRoi = '/Users/john/1_PhD/GitHub/PacMan/analysis/{}/08_depthsampling/{}/{}_mod.csv'  #noqa
 
 # Number of cortical depths.
 varNumDpth = 11
@@ -114,8 +116,8 @@ varExtYmax = 5.19
 # Number of bins for visual space representation in x- and y-direction (ratio
 # of number of x and y bins should correspond to ratio of size of visual space
 # in x- and y-directions).
-varNumX = 100
-varNumY = 100
+varNumX = 1000
+varNumY = 1000
 # -----------------------------------------------------------------------------
 
 
@@ -209,14 +211,35 @@ for idxMdl in range(len(lstMdl)):
                     varTmpY = lstY[idxHmsph][idxVrtx]
                     varTmpSd = lstSd[idxHmsph][idxVrtx]
 
-                    # Convert from visual space coordinates to array indices TODO
+                    # Convert pRF parameters (position and size) from degree
+                    # of visual angle into array indices:
+                    varTmpIdxX = (np.abs(vecCorX - varTmpX)).argmin()
+                    varTmpIdxY = (np.abs(vecCorY - varTmpY)).argmin()
 
-                    aryTmpGauss = crt_gauss(varNumX, varNumY, varTmpX, varTmpY,
-                                            varTmpSd)
+                    # The pRF size is converted from degree visual angle to
+                    # relative size with respect to the size of the array
+                    # representing the visual space (`aryVslSpc`).
+                    varTmpIdxSd = (varTmpSd
+                                   / ((np.abs(varExtXmin) + varExtXmax)
+                                      + (np.abs(varExtYmin) + varExtYmax)) * 0.5
+                                   * ((varNumX + varNumY) * 0.5))
 
-                    aryTmpGauss = np.multiply(aryTmpGauss,
-                                              lstData[idxHmsph][idxVrtx])
+                    # Only proceed if pRF size is not zero:
+                    if np.greater((2.0 * np.square(varTmpIdxSd)), 0.0):
 
-                    aryVslSpc = np.add(aryVslSpc, aryTmpGauss)
+                        # Create Gaussian at current pRF position:
+                        aryTmpGauss = crt_gauss(varNumX, varNumY, varTmpIdxX,
+                                                varTmpIdxY, varTmpIdxSd)
+    
+                        # Scale Gaussian to have its maximum at one:
+                        # aryTmpGauss = np.divide(aryTmpGauss, np.max(aryTmpGauss))
+    
+                        # Multiply current data value (e.g. parameter estimate)
+                        # with Gaussian:
+                        aryTmpGauss = np.multiply(aryTmpGauss,
+                                                  lstData[idxHmsph][idxVrtx])
+    
+                        # Add current pRF sample to visual space map:
+                        aryVslSpc = np.add(aryVslSpc, aryTmpGauss)
 
 # -----------------------------------------------------------------------------

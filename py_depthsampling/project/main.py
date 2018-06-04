@@ -48,8 +48,8 @@ lstMdl = ['']  # , '_deconv_model_1']
 # ROI ('v1' or 'v2'):
 lstRoi = ['v1']  # , 'v2']
 
-# Output path & prefix for plots (ROI, condition, and subject ID left open):
-strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/{}_{}{}'  #noqa
+# Output path & prefix for plots (ROI and condition left open):
+strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/{}_{}'  #noqa
 
 # File type suffix for plot:
 strFlTp = '.png'
@@ -329,20 +329,6 @@ for idxMdl in range(len(lstMdl)):  #noqa
 
                 # Save results to disk:
                 np.save(strPthNpyTmp, aryVslSpc)
-
-            # -----------------------------------------------------------------
-            # *** Plot single subject results
-
-            for idxSub in range(varNumSub):
-
-                # Output path for plot:
-                strPthPltOtTmp = (strPthPltOt.format(lstRoi[idxRoi],
-                                                     lstCon[idxCon],
-                                                     ('_' + lstSubIds[idxSub]))
-                                  + strFlTp)
-
-                # Create plot:
-                plot(aryVslSpc, strTtl, strXlabel, strYlabel, strPthPltOtTmp)
 
             # -----------------------------------------------------------------
             # *** Plot group results

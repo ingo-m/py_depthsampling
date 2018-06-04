@@ -23,7 +23,7 @@ import numpy as np
 import multiprocessing as mp
 from py_depthsampling.project.load_par import load_par
 from py_depthsampling.project.project_par import project_par
-from py_depthsampling.project.project_plot import project_plot
+from py_depthsampling.project.plot import plot
 
 
 # -----------------------------------------------------------------------------
@@ -48,9 +48,8 @@ lstMdl = ['']  # , '_deconv_model_1']
 # ROI ('v1' or 'v2'):
 lstRoi = ['v1']  # , 'v2']
 
-# Output path & prefix for plots (ROI and condition left open):
-strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/{}_{}'  #noqa
-# strPthPltOt = '/Users/john/Dropbox/PacMan_Plots/project/{}_{}_{}'  #noqa
+# Output path & prefix for plots (ROI, condition, and subject ID left open):
+strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/{}_{}{}'  #noqa
 
 # File type suffix for plot:
 strFlTp = '.png'
@@ -120,13 +119,13 @@ varExtYmax = 5.19
 
 # R2 threshold for vertex inclusion (vertices with R2 value below threshold are
 # not considered for plot):
-varThrR2 = 0.15
+varThrR2 = 0.3
 
 # Number of bins for visual space representation in x- and y-direction (ratio
 # of number of x and y bins should correspond to ratio of size of visual space
 # in x- and y-directions).
-varNumX = 500
-varNumY = 500
+varNumX = 100
+varNumY = 100
 # -----------------------------------------------------------------------------
 
 
@@ -332,14 +331,28 @@ for idxMdl in range(len(lstMdl)):  #noqa
                 np.save(strPthNpyTmp, aryVslSpc)
 
             # -----------------------------------------------------------------
-            # *** Plot results
+            # *** Plot single subject results
 
-            # Output path for plotL
+            for idxSub in range(varNumSub):
+
+                # Output path for plot:
+                strPthPltOtTmp = (strPthPltOt.format(lstRoi[idxRoi],
+                                                     lstCon[idxCon],
+                                                     ('_' + lstSubIds[idxSub]))
+                                  + strFlTp)
+
+                # Create plot:
+                plot(aryVslSpc, strTtl, strXlabel, strYlabel, strPthPltOtTmp)
+
+            # -----------------------------------------------------------------
+            # *** Plot group results
+
+            # Output path for plot:
             strPthPltOtTmp = (strPthPltOt.format(lstRoi[idxRoi],
-                                                 lstCon[idxCon])
+                                                 lstCon[idxCon],
+                                                 '')
                               + strFlTp)
 
             # Create plot:
-            project_plot(aryVslSpc, strTtl, strXlabel, strYlabel,
-                         strPthPltOtTmp)
+            plot(aryVslSpc, strTtl, strXlabel, strYlabel, strPthPltOtTmp)
 # -----------------------------------------------------------------------------

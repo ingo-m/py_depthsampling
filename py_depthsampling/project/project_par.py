@@ -78,7 +78,7 @@ def project_par(idxPrc, vecData, vecX, vecY, vecSd, vecR2, varThrR2, varNumX,
                                     vecIdxSd[idxVrtx])
 
             # Scale Gaussian to have its maximum at one:
-            aryTmpGauss = np.divide(aryTmpGauss, np.max(aryTmpGauss))
+            # aryTmpGauss = np.divide(aryTmpGauss, np.max(aryTmpGauss))
 
             # Multiply current data value (e.g. parameter estimate)
             # with Gaussian:

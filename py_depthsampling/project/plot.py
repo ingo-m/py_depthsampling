@@ -24,7 +24,7 @@ import matplotlib.colors as colors
 # from matplotlib.colors import BoundaryNorm
 
 
-def project_plot(aryVslSpc, strTtl, strXlabel, strYlabel, strPathOut):
+def plot(aryVslSpc, strTtl, strXlabel, strYlabel, strPathOut):
     """Plot visual space projection of parameter estimates."""
     # Font type:
     strFont = 'Liberation Sans'

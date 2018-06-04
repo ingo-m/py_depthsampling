@@ -18,17 +18,20 @@
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import os
 import numpy as np
-# import pandas as pd
-# import seaborn as sns
 import multiprocessing as mp
-import matplotlib.pyplot as plt
 from py_depthsampling.project.load_par import load_par
 from py_depthsampling.project.project_par import project_par
+from py_depthsampling.project.project_plot import project_plot
 
 
 # -----------------------------------------------------------------------------
 # *** Define parameters
+
+# Load/save existing projection from/to (ROI, condition, and deconvolution
+# suffix left open):
+strPthNpy = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project/{}_{}.npy'  #noqa
 
 # List of subject identifiers:
 lstSubIds = ['20171023',  # '20171109',
@@ -45,9 +48,8 @@ lstMdl = ['']  # , '_deconv_model_1']
 # ROI ('v1' or 'v2'):
 lstRoi = ['v1']  # , 'v2']
 
-# Output path & prefix for plots (ROI, condition, and deconvolution suffix left
-# open):
-strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/{}_{}_{}'  #noqa
+# Output path & prefix for plots (ROI and condition left open):
+strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/{}_{}'  #noqa
 # strPthPltOt = '/Users/john/Dropbox/PacMan_Plots/project/{}_{}_{}'  #noqa
 
 # File type suffix for plot:
@@ -60,8 +62,11 @@ varDpi = 80.0
 strXlabel = 'x-position'
 strYlabel = 'y-position'
 
+# Plot title:
+strTtl = 'Visual field projection'
+
 # Condition levels (used to complete file names):
-lstCon = ['Pd_sst']  #, 'Cd_sst', 'Ps_sst']
+lstCon = ['Pd_sst']  # , 'Cd_sst', 'Ps_sst']
 
 # Condition labels:
 # lstConLbl = ['PacMan Dynamic Sustained',
@@ -133,198 +138,208 @@ print('-Project parametric map into visual space')
 # Number of subjects:
 varNumSub = len(lstSubIds)
 
-# Number of hemispheres:
-varNumHmsp = varNumSub * 2
-
 # Loop through models, ROIs, and conditions:
 for idxMdl in range(len(lstMdl)):  #noqa
     for idxRoi in range(len(lstRoi)):
         for idxCon in range(len(lstCon)):
 
-            # -----------------------------------------------------------------
-            # *** Load data
+            # File name of npy file for current condition:
+            strPthNpyTmp = strPthNpy.format(lstRoi[idxRoi],
+                                            lstCon[idxCon])
 
-            print('--Load data')
+            if os.path.isfile(strPthNpyTmp):
 
-            # Number of processes to run in parallel:
-            varPar = len(lstSubIds)
+                # Load existing projection:
+                aryVslSpc = np.load(strPthNpyTmp)
 
-            # Create a queue to put the results in:
-            queOut = mp.Queue()
+            else:
 
-            # Empty list for processes:
-            lstPrcs = [None] * varPar
+                # -------------------------------------------------------------
+                # *** Load data
 
-            # Empty list for results of parallel processes:
-            lstRes = [None] * varPar
+                print('--Load data')
 
-            # Create processes:
-            for idxPrc in range(varPar):
-                lstPrcs[idxPrc] = mp.Process(target=load_par,
-                                             args=(lstSubIds[idxPrc],
-                                                   lstCon[idxCon],
-                                                   lstRoi[idxRoi],
-                                                   strPthData,
-                                                   strPthR2,
-                                                   strPthX,
-                                                   strPthY,
-                                                   strPthSd,
-                                                   strCsvRoi,
-                                                   varNumDpth,
-                                                   idxPrc,
-                                                   queOut)
-                                             )
+                # Number of processes to run in parallel:
+                varPar = varNumSub
 
-                # Daemon (kills processes when exiting):
-                lstPrcs[idxPrc].Daemon = True
+                # Create a queue to put the results in:
+                queOut = mp.Queue()
 
-            # Don't create more processes than number of subjects:
-            # varParTmp = int(np.min([varPar, len(lstSubIds)]))
+                # Empty list for processes:
+                lstPrcs = [None] * varPar
 
-            # Start processes:
-            for idxPrc in range(varPar):
-                lstPrcs[idxPrc].start()
+                # Empty list for results of parallel processes:
+                lstRes = [None] * varPar
 
-            # Collect results from queue:
-            for idxPrc in range(varPar):
-                lstRes[idxPrc] = queOut.get(True)
+                # Create processes:
+                for idxPrc in range(varPar):
+                    lstPrcs[idxPrc] = mp.Process(target=load_par,
+                                                 args=(lstSubIds[idxPrc],
+                                                       lstCon[idxCon],
+                                                       lstRoi[idxRoi],
+                                                       strPthData,
+                                                       strPthR2,
+                                                       strPthX,
+                                                       strPthY,
+                                                       strPthSd,
+                                                       strCsvRoi,
+                                                       varNumDpth,
+                                                       idxPrc,
+                                                       queOut)
+                                                 )
 
-            # Join processes:
-            for idxPrc in range(varPar):
-                lstPrcs[idxPrc].join()
+                    # Daemon (kills processes when exiting):
+                    lstPrcs[idxPrc].Daemon = True
 
-            # List for single-subject data vectors:
-            lstData = [None] * varPar
+                # Don't create more processes than number of subjects:
+                # varParTmp = int(np.min([varPar, len(lstSubIds)]))
 
-            # List of single subject R2 vectors:
-            lstR2 = [None] * varPar
+                # Start processes:
+                for idxPrc in range(varPar):
+                    lstPrcs[idxPrc].start()
 
-            # List for single subject SD vectors (pRF sizes):
-            lstSd = [None] * varPar
+                # Collect results from queue:
+                for idxPrc in range(varPar):
+                    lstRes[idxPrc] = queOut.get(True)
 
-            # List for single subject x-position vectors:
-            lstX = [None] * varPar
+                # Join processes:
+                for idxPrc in range(varPar):
+                    lstPrcs[idxPrc].join()
 
-            # List for single subject y-position vectors:
-            lstY = [None] * varPar
+                # List for single-subject data vectors:
+                lstData = [None] * varPar
 
-            # Put output into correct order (unnecessary in this context but
-            # kept for consistency):
-            for idxRes in range(varPar):
+                # List of single subject R2 vectors:
+                lstR2 = [None] * varPar
 
-                # Index of results (first item in output list):
-                varTmpIdx = lstRes[idxRes][0]
+                # List for single subject SD vectors (pRF sizes):
+                lstSd = [None] * varPar
 
-                # Put fitting results into list, in correct order:
-                lstData[varTmpIdx] = lstRes[idxRes][1]
-                lstR2[varTmpIdx] = lstRes[idxRes][2]
-                lstSd[varTmpIdx] = lstRes[idxRes][3]
-                lstX[varTmpIdx] = lstRes[idxRes][4]
-                lstY[varTmpIdx] = lstRes[idxRes][5]
+                # List for single subject x-position vectors:
+                lstX = [None] * varPar
 
-            # Concatenate arrays from all subjects:
-            vecData = np.concatenate(lstData[:])
-            vecR2 = np.concatenate(lstR2[:])
-            vecSd = np.concatenate(lstSd[:])
-            vecX = np.concatenate(lstX[:])
-            vecY = np.concatenate(lstY[:])
+                # List for single subject y-position vectors:
+                lstY = [None] * varPar
 
-            # Delete original lists:
-            del(lstData)
-            del(lstR2)
-            del(lstSd)
-            del(lstX)
-            del(lstY)
+                # Put output into correct order (unnecessary in this context
+                # but kept for consistency):
+                for idxRes in range(varPar):
 
-            # -----------------------------------------------------------------
-            # *** Project data into visual space
+                    # Index of results (first item in output list):
+                    varTmpIdx = lstRes[idxRes][0]
 
-            print('--Project data into visual space')
+                    # Put fitting results into list, in correct order:
+                    lstData[varTmpIdx] = lstRes[idxRes][1]
+                    lstR2[varTmpIdx] = lstRes[idxRes][2]
+                    lstSd[varTmpIdx] = lstRes[idxRes][3]
+                    lstX[varTmpIdx] = lstRes[idxRes][4]
+                    lstY[varTmpIdx] = lstRes[idxRes][5]
 
-            # Number of processes to run in parallel:
-            varPar = 11
+                # Concatenate arrays from all subjects:
+                vecData = np.concatenate(lstData[:])
+                vecR2 = np.concatenate(lstR2[:])
+                vecSd = np.concatenate(lstSd[:])
+                vecX = np.concatenate(lstX[:])
+                vecY = np.concatenate(lstY[:])
 
-            # Split data into chunks:
-            lstData = np.array_split(vecData, varPar)
-            lstR2 = np.array_split(vecR2, varPar)
-            lstSd = np.array_split(vecSd, varPar)
-            lstX = np.array_split(vecX, varPar)
-            lstY = np.array_split(vecY, varPar)
+                # Delete original lists:
+                del(lstData)
+                del(lstR2)
+                del(lstSd)
+                del(lstX)
+                del(lstY)
 
-            # Create a queue to put the results in:
-            queOut = mp.Queue()
+                # -------------------------------------------------------------
+                # *** Project data into visual space
 
-            # Empty list for processes:
-            lstPrcs = [None] * varPar
+                print('--Project data into visual space')
 
-            # Empty list for results of parallel processes:
-            lstRes = [None] * varPar
+                # Number of processes to run in parallel:
+                varPar = 11
 
-            # Create processes:
-            for idxPrc in range(varPar):
-                lstPrcs[idxPrc] = mp.Process(target=project_par,
-                                             args=(idxPrc,
-                                                   lstData[idxPrc],
-                                                   lstX[idxPrc],
-                                                   lstY[idxPrc],
-                                                   lstSd[idxPrc],
-                                                   lstR2[idxPrc],
-                                                   varThrR2,
-                                                   varNumX,
-                                                   varNumY,
-                                                   varExtXmin,
-                                                   varExtXmax,
-                                                   varExtYmin,
-                                                   varExtYmax,
-                                                   queOut)
-                                             )
+                # Split data into chunks:
+                lstData = np.array_split(vecData, varPar)
+                lstR2 = np.array_split(vecR2, varPar)
+                lstSd = np.array_split(vecSd, varPar)
+                lstX = np.array_split(vecX, varPar)
+                lstY = np.array_split(vecY, varPar)
 
-                # Daemon (kills processes when exiting):
-                lstPrcs[idxPrc].Daemon = True
+                # Create a queue to put the results in:
+                queOut = mp.Queue()
 
-            # Start processes:
-            for idxPrc in range(varPar):
-                lstPrcs[idxPrc].start()
+                # Empty list for processes:
+                lstPrcs = [None] * varPar
 
-            # Collect results from queue:
-            for idxPrc in range(varPar):
-                lstRes[idxPrc] = queOut.get(True)
+                # Empty list for results of parallel processes:
+                lstRes = [None] * varPar
 
-            # Join processes:
-            for idxPrc in range(varPar):
-                lstPrcs[idxPrc].join()
+                # Create processes:
+                for idxPrc in range(varPar):
+                    lstPrcs[idxPrc] = mp.Process(target=project_par,
+                                                 args=(idxPrc,
+                                                       lstData[idxPrc],
+                                                       lstX[idxPrc],
+                                                       lstY[idxPrc],
+                                                       lstSd[idxPrc],
+                                                       lstR2[idxPrc],
+                                                       varThrR2,
+                                                       varNumX,
+                                                       varNumY,
+                                                       varExtXmin,
+                                                       varExtXmax,
+                                                       varExtYmin,
+                                                       varExtYmax,
+                                                       queOut)
+                                                 )
 
-            # List for results after re-ordering:
-            lstVslSpc = [None] * varPar
+                    # Daemon (kills processes when exiting):
+                    lstPrcs[idxPrc].Daemon = True
 
-            # Put output into correct order (unnecessary in this context but
-            # kept for consistency):
-            for idxRes in range(varPar):
+                # Start processes:
+                for idxPrc in range(varPar):
+                    lstPrcs[idxPrc].start()
 
-                # Index of results (first item in output list):
-                varTmpIdx = lstRes[idxRes][0]
+                # Collect results from queue:
+                for idxPrc in range(varPar):
+                    lstRes[idxPrc] = queOut.get(True)
 
-                # Put fitting results into list, in correct order:
-                lstVslSpc[varTmpIdx] = lstRes[idxRes][1]
+                # Join processes:
+                for idxPrc in range(varPar):
+                    lstPrcs[idxPrc].join()
 
-            # Visual space array (2D array with bins of locations in visual
-            # space):
-            aryVslSpc = np.zeros((varNumX, varNumY))
+                # List for results after re-ordering:
+                lstVslSpc = [None] * varPar
 
-            # Add up results from separate processes:
-            for idxPrc in range(varPar):
-                aryVslSpc = np.add(lstVslSpc[idxPrc], aryVslSpc)
+                # Put output into correct order (unnecessary in this context
+                # but kept for consistency):
+                for idxRes in range(varPar):
+
+                    # Index of results (first item in output list):
+                    varTmpIdx = lstRes[idxRes][0]
+
+                    # Put fitting results into list, in correct order:
+                    lstVslSpc[varTmpIdx] = lstRes[idxRes][1]
+
+                # Visual space array (2D array with bins of locations in visual
+                # space):
+                aryVslSpc = np.zeros((varNumX, varNumY))
+
+                # Add up results from separate processes:
+                for idxPrc in range(varPar):
+                    aryVslSpc = np.add(lstVslSpc[idxPrc], aryVslSpc)
+
+                # Save results to disk:
+                np.save(strPthNpyTmp, aryVslSpc)
 
             # -----------------------------------------------------------------
             # *** Plot results
 
             # Output path for plotL
             strPthPltOtTmp = (strPthPltOt.format(lstRoi[idxRoi],
-                                                 lstCon[idxCon],
-                                                 lstMdl[idxMdl])
+                                                 lstCon[idxCon])
                               + strFlTp)
 
-            # Save plot:
-            plt.imsave(strPthPltOtTmp, aryVslSpc)
-
+            # Create plot:
+            project_plot(aryVslSpc, strTtl, strXlabel, strYlabel,
+                         strPthPltOtTmp)
 # -----------------------------------------------------------------------------

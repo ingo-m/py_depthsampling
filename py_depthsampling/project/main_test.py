@@ -49,7 +49,7 @@ lstMdl = ['']  # , '_deconv_model_1']
 lstRoi = ['v1', 'v2']
 
 # Output path & prefix for plots (ROI and condition left open):
-strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/{}_{}'  #noqa
+strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/{}_{}_blank'  #noqa
 
 # File type suffix for plot:
 strFlTp = '.png'

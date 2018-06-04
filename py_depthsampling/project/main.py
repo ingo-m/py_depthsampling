@@ -120,8 +120,8 @@ varThrR2 = 0.15
 # Number of bins for visual space representation in x- and y-direction (ratio
 # of number of x and y bins should correspond to ratio of size of visual space
 # in x- and y-directions).
-varNumX = 1000
-varNumY = 1000
+varNumX = 500
+varNumY = 500
 # -----------------------------------------------------------------------------
 
 
@@ -137,7 +137,7 @@ varNumSub = len(lstSubIds)
 varNumHmsp = varNumSub * 2
 
 # Loop through models, ROIs, and conditions:
-for idxMdl in range(len(lstMdl)):
+for idxMdl in range(len(lstMdl)):  #noqa
     for idxRoi in range(len(lstRoi)):
         for idxCon in range(len(lstCon)):
 
@@ -211,7 +211,7 @@ for idxMdl in range(len(lstMdl)):
             # Put output into correct order (unnecessary in this context but
             # kept for consistency):
             for idxRes in range(varPar):
-        
+
                 # Index of results (first item in output list):
                 varTmpIdx = lstRes[idxRes][0]
 
@@ -228,7 +228,7 @@ for idxMdl in range(len(lstMdl)):
             vecSd = np.concatenate(lstSd[:])
             vecX = np.concatenate(lstX[:])
             vecY = np.concatenate(lstY[:])
-            
+
             # Delete original lists:
             del(lstData)
             del(lstR2)
@@ -300,7 +300,7 @@ for idxMdl in range(len(lstMdl)):
             # Put output into correct order (unnecessary in this context but
             # kept for consistency):
             for idxRes in range(varPar):
-        
+
                 # Index of results (first item in output list):
                 varTmpIdx = lstRes[idxRes][0]
 
@@ -311,7 +311,7 @@ for idxMdl in range(len(lstMdl)):
             # space):
             aryVslSpc = np.zeros((varNumX, varNumY))
 
-            # Add results from processes up:
+            # Add up results from separate processes:
             for idxPrc in range(varPar):
                 aryVslSpc = np.add(lstVslSpc[idxPrc], aryVslSpc)
 

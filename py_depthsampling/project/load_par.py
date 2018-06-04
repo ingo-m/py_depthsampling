@@ -33,30 +33,30 @@ def load_par(strSub, strCon, strRoi, strPthData, strPthR2, strPthX, strPthY,
     multiprocessing queue.
     """
     # Temporary input paths for left hemisphere:
-    strPthData = strPthData.format(strSub, 'lh', strCon)
-    strPthData = strPthR2.format(strSub, 'lh')
-    strPthSd = strPthSd.format(strSub, 'lh')
-    strPthX = strPthX.format(strSub, 'lh')
-    strPthY = strPthY.format(strSub, 'lh')
-    strCsvRoi = strCsvRoi.format(strSub, 'lh', strRoi)
+    strPthLhData = strPthData.format(strSub, 'lh', strCon)
+    strPthLhR2 = strPthR2.format(strSub, 'lh')
+    strPthLhSd = strPthSd.format(strSub, 'lh')
+    strPthLhX = strPthX.format(strSub, 'lh')
+    strPthLhY = strPthY.format(strSub, 'lh')
+    strCsvLhRoi = strCsvRoi.format(strSub, 'lh', strRoi)
 
     # Load single subject data for left hemisphere:
     vecLhData, vecLhR2, vecLhSd, vecLhX, vecLhY = get_data(
-        strPthData, strPthData, strPthSd, strPthX, strPthY, strCsvRoi,
-        varNumDpth=varNumDpth)
+        strPthLhData, strPthLhR2, strPthLhSd, strPthLhX, strPthLhY,
+        strCsvLhRoi, varNumDpth=varNumDpth)
 
     # Temporary input paths for right hemisphere:
-    strPthData = strPthData.format(strSub, 'rh', strCon)
-    strPthData = strPthR2.format(strSub, 'rh')
-    strPthSd = strPthSd.format(strSub, 'rh')
-    strPthX = strPthX.format(strSub, 'rh')
-    strPthY = strPthY.format(strSub, 'rh')
-    strCsvRoi = strCsvRoi.format(strSub, 'rh', strRoi)
+    strPthRhData = strPthData.format(strSub, 'rh', strCon)
+    strPthRhR2 = strPthR2.format(strSub, 'rh')
+    strPthRhSd = strPthSd.format(strSub, 'rh')
+    strPthRhX = strPthX.format(strSub, 'rh')
+    strPthRhY = strPthY.format(strSub, 'rh')
+    strCsvRhRoi = strCsvRoi.format(strSub, 'rh', strRoi)
 
     # Load single subject data for right hemisphere:
     vecRhData, vecRhR2, vecRhSd, vecRhX, vecRhY = get_data(
-        strPthData, strPthData, strPthSd, strPthX, strPthY, strCsvRoi,
-        varNumDpth=varNumDpth)
+        strPthRhData, strPthRhR2, strPthRhSd, strPthRhX, strPthRhY,
+        strCsvRhRoi, varNumDpth=varNumDpth)
 
     # Concatenate LH and RH data:
     vecData = np.concatenate([vecLhData, vecRhData])

@@ -58,9 +58,7 @@ varDpi = 80.0
 
 # Condition levels (used to complete file names):
 lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst',
-          'Pd_trn', 'Cd_trn', 'Ps_trn',
-          'Pd_min_Ps_sst', 'Pd_min_Cd_sst', 'Cd_min_Ps_sst', 'Linear_sst',
-          'Pd_min_Ps_trn', 'Pd_min_Cd_trn', 'Cd_min_Ps_trn', 'Linear_trn']
+          'Pd_min_Ps_sst', 'Pd_min_Cd_sst', 'Cd_min_Ps_sst', 'Linear_sst']
 # lstCon = ['polar_angle', 'x_pos', 'y_pos', 'SD', 'R2']
 
 # Condition labels:
@@ -352,5 +350,7 @@ for idxMdl in range(len(lstMdl)):  #noqa
                  'Visual field projection',
                  'x-position',
                  'y-position',
-                 strPthPltOtTmp)
+                 strPthPltOtTmp,
+                 tpleLimX=(varExtXmin, varExtXmax, 3.0),
+                 tpleLimY=(varExtYmin, varExtYmax, 3.0))
 # -----------------------------------------------------------------------------

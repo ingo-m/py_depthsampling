@@ -24,7 +24,8 @@ import matplotlib.colors as colors
 # from matplotlib.colors import BoundaryNorm
 
 
-def plot(aryVslSpc, strTtl, strXlabel, strYlabel, strPathOut):
+def plot(aryVslSpc, strTtl, strXlabel, strYlabel, strPathOut, tpleLimX=None,
+         tpleLimY=None):
     """Plot visual space projection of parameter estimates."""
     # Font type:
     strFont = 'Liberation Sans'
@@ -130,12 +131,60 @@ def plot(aryVslSpc, strTtl, strXlabel, strYlabel, strPathOut):
 
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    # Plot correlation coefficients of current depth level:
+    # Create plot:
     pltTmpCorr = plt.imshow(aryVslSpc.T,
                             interpolation='none',  # 'bicubic',
                             origin='lower',
                             norm=objClrNorm,
                             cmap=objCustClrMp)
+
+    if not (tpleLimX is None):
+
+        # Position of x labels:
+        vecPosLblX = np.linspace(0.0,
+                                 (aryVslSpc.shape[0] - 1),
+                                 num=int(tpleLimX[2]),
+                                 endpoint=True)
+        vecPosLblX = np.around(vecPosLblX, decimals=2)
+        lstPosLblX = vecPosLblX.tolist()
+
+        # Set position of x labels:
+        axsTmp.set_xticks(lstPosLblX)
+
+        # Labels for x axis:
+        vecLblX = np.linspace(tpleLimX[0],
+                              tpleLimX[1],
+                              num=int(tpleLimX[2]),
+                              endpoint=True).tolist()
+        vecLblX = np.around(vecLblX, decimals=2)
+        lstLblX = vecLblX.tolist()
+
+        # Set axis labels:
+        axsTmp.set_xticklabels(lstLblX)
+
+    if not (tpleLimY is None):
+
+        # Position of y labels:
+        vecPosLblY = np.linspace(0.0,
+                                 (aryVslSpc.shape[0] - 1),
+                                 num=int(tpleLimY[2]),
+                                 endpoint=True)
+        vecPosLblY = np.around(vecPosLblY, decimals=2)
+        lstPosLblY = vecPosLblY.tolist()
+
+        # Set position of y labels:
+        axsTmp.set_yticks(lstPosLblY)
+
+        # Labels for y axis:
+        vecLblY = np.linspace(tpleLimY[0],
+                              tpleLimY[1],
+                              num=int(tpleLimY[2]),
+                              endpoint=True).tolist()
+        vecLblY = np.around(vecLblY, decimals=2)
+        lstLblY = vecLblY.tolist()
+
+        # Set axis labels:
+        axsTmp.set_yticklabels(lstLblY)
 
     # Turn of ticks:
     axsTmp.tick_params(labelcolor=([0.0, 0.0, 0.0]),

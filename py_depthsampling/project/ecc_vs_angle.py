@@ -58,9 +58,7 @@ varDpi = 80.0
 # Condition levels (used to complete file names):
 # lstCon = ['Pd_sst']
 lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst',
-          'Pd_trn', 'Cd_trn', 'Ps_trn',
-          'Pd_min_Ps_sst', 'Pd_min_Cd_sst', 'Cd_min_Ps_sst', 'Linear_sst',
-          'Pd_min_Ps_trn', 'Pd_min_Cd_trn', 'Cd_min_Ps_trn', 'Linear_trn']
+          'Pd_min_Ps_sst', 'Pd_min_Cd_sst', 'Cd_min_Ps_sst', 'Linear_sst']
 # lstCon = ['polar_angle', 'eccentricity', 'x_pos', 'y_pos', 'SD', 'R2']
 
 # Path of vtk mesh with data to project into visual space (e.g. parameter
@@ -249,15 +247,23 @@ for idxRoi in range(len(lstRoi)):  #noqa
 
         print('--Group parameter estimates by eccentricity and polar angle')
 
+        # Minimum/maximum polar angle:
+        varAnglMin = -np.pi
+        varAnlgMax = np.pi
+
         # Limits of polar angle bins:
-        vecBinAngl = np.linspace(-np.pi,
-                                 np.pi,
+        vecBinAngl = np.linspace(varAnglMin,
+                                 varAnlgMax,
                                  num=(varNumBinAngl + 1),
                                  endpoint=True)
 
+        # Minimum/maximum eccentricity:
+        varEccMin = 0.0
+        varEccMax = 6.0
+
         # Limits of eccentricity bins:
-        vecBinEcc = np.linspace(0.0,
-                                6.0,
+        vecBinEcc = np.linspace(varEccMin,
+                                varEccMax,
                                 num=(varNumBinEcc + 1),
                                 endpoint=True)
 
@@ -333,5 +339,7 @@ for idxRoi in range(len(lstRoi)):  #noqa
              'Parameter estimates',
              'Polar angle',
              'Eccentricity',
-             strPthPltOtTmp)
+             strPthPltOtTmp,
+             tpleLimX=(varAnglMin, varAnlgMax, 3.0),
+             tpleLimY=(varEccMin, varEccMax, 6.0))
 # -----------------------------------------------------------------------------

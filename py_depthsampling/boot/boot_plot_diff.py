@@ -21,8 +21,8 @@ import numpy as np
 from py_depthsampling.plot.plt_dpth_prfl import plt_dpth_prfl
 
 
-def boot_plot(objDpth, strPath, lstConLbl, varNumIt=10000, varConLw=2.5,
-              varConUp=97.5, strTtl='', varYmin=0.0, varYmax=2.0,
+def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,
+              varConLw=2.5, varConUp=97.5, strTtl='', varYmin=0.0, varYmax=2.0,
               strXlabel='Cortical depth level (equivolume)',
               strYlabel='fMRI signal change [arbitrary units]',
               lgcLgnd=False, lstDiff=None):
@@ -37,9 +37,11 @@ def boot_plot(objDpth, strPath, lstConLbl, varNumIt=10000, varConLw=2.5,
         string with the path to an npy file containing the array.
     strPath : str
         Output path for plot.
+    lstCon : list
+        Abbreviated condition levels used to complete file names (e.g. 'Pd').
     lstConLbl : list
         List containing condition labels (strings). Number of condition labels
-        has to be the same as number of conditions in `objDpth`.
+        has to be the same as number of conditions in `lstCon`.
     varNumIt : int
         Number of bootstrap iterations.
     varConLw : float
@@ -96,7 +98,19 @@ def boot_plot(objDpth, strPath, lstConLbl, varNumIt=10000, varConLw=2.5,
     if lgcAry:
         aryDpth = objDpth
     elif lgcStr:
-        aryDpth = np.load(objDpth)
+        # Load array for first condition to get dimensions:
+        aryTmpDpth = np.load(objDpth.format(lstCon[0]))
+        # Number of subjects:
+        varNumSub = aryTmpDpth.shape[0]
+        # Get number of depth levels from input array:
+        varNumDpth = aryTmpDpth.shape[1]
+        # Number of conditions:
+        varNumCon = len(lstCon)
+        # Array for depth profiles of form aryDpth[subject, condition, depth]:
+        aryDpth = np.zeros((varNumSub, varNumCon, varNumDpth))
+        # Load single-condition arrays from disk:
+        for idxCon in range(varNumCon):
+            aryDpth[:, idxCon, :] = np.load(objDpth.format(lstCon[idxCon]))
     else:
         print(('---Error in bootPlot: input needs to be numpy array or path '
                + 'to numpy array.'))
@@ -126,9 +140,7 @@ def boot_plot(objDpth, strPath, lstConLbl, varNumIt=10000, varConLw=2.5,
     else:
         # Set number of comparisons:
         varNumCon = len(lstDiff)
-        # Array for bootstrap samples, of the form
-        # aryBoo[idxIteration, idxSubject, 1, idxDpth]) (3rd dimension is one
-        # because the array will hold the difference between two conditions):
+        # Array for bootstrap samples:
         aryBoo = np.zeros((varNumIt, varNumSub, varNumCon, varNumDpth))
 
     # ------------------------------------------------------------------------

@@ -25,7 +25,7 @@ import csv
 import numpy as np
 
 
-def load_vtk_multi(strVtkIn,strPrcdData, varNumLne, varNumDpth):
+def load_vtk_multi(strVtkIn, strPrcdData, varNumLne, varNumDpth):
     """
     Function for loading vtk file with multiple data points per vertex.
 

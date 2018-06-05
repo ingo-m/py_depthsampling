@@ -39,12 +39,10 @@ def boot_plot_sngl(objDpth, strPath, lstCon, lstConLbl, varMin=None,
         Output path for plot, condition name left open.
     lstCon : list
         Abbreviated condition levels used to complete file names (e.g. 'Pd').
-        Number of abbreviated condition labels has to be the same as number of
-        conditions in `objDpth`.
     lstConLbl : list
         List containing condition labels (strings), e.g. 'PacMan Dynamic'.
         Number of condition labels has to be the same as number of conditions
-        in `objDpth`.
+        in `lstCon`.
     varMin : float
         Minimum of Y axis.
     varMax : float
@@ -86,7 +84,19 @@ def boot_plot_sngl(objDpth, strPath, lstCon, lstConLbl, varMin=None,
     if lgcAry:
         aryDpth = objDpth
     elif lgcStr:
-        aryDpth = np.load(objDpth)
+        # Load array for first condition to get dimensions:
+        aryTmpDpth = np.load(objDpth.format(lstCon[0]))
+        # Number of subjects:
+        varNumSub = aryTmpDpth.shape[0]
+        # Get number of depth levels from input array:
+        varNumDpth = aryTmpDpth.shape[1]
+        # Number of conditions:
+        varNumCon = len(lstCon)
+        # Array for depth profiles of form aryDpth[subject, condition, depth]:
+        aryDpth = np.zeros((varNumSub, varNumCon, varNumDpth))
+        # Load single-condition arrays from disk:
+        for idxCon in range(varNumCon):
+            aryDpth[:, idxCon, :] = np.load(objDpth.format(lstCon[idxCon]))
     else:
         print(('---Error in bootPlot: input needs to be numpy array or path '
                + 'to numpy array.'))

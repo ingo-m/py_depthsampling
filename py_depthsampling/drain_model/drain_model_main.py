@@ -20,6 +20,7 @@
 
 import numpy as np
 from scipy.interpolate import griddata
+from py_depthsampling.plot.plt_dpth_prfl import plt_dpth_prfl
 from py_depthsampling.plot.plt_dpth_prfl_acr_subs import plt_dpth_prfl_acr_subs
 from py_depthsampling.drain_model.drain_model_decon_01 import deconv_01
 from py_depthsampling.drain_model.drain_model_decon_02 import deconv_02
@@ -36,25 +37,38 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
                 varAcrSubsYmin01, varAcrSubsYmax01, varAcrSubsYmin02,
                 varAcrSubsYmax02):
     """Model-based correction of draining effect."""
-    # ----------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # *** Load depth profile from disk
 
     print('-Model-based correction of draining effect')
 
     print('---Loading data')
 
-    # Array with single-subject depth sampling results, of the form
+    # Load array for first condition to get dimensions:
+    aryTmpDpth = np.load(strPthPrf.format(lstCon[0]))
+    # Number of subjects:
+    varNumSub = aryTmpDpth.shape[0]
+    # Get number of depth levels from input array:
+    varNumDpth = aryTmpDpth.shape[1]
+    # Number of conditions:
+    varNumCon = len(lstCon)
+
+    # Array for single-subject depth sampling results, of the form
     # aryEmpSnSb[idxSub, idxCondition, idxDpth].
-    aryEmpSnSb = np.load(strPthPrf)
+    aryEmpSnSb = np.zeros((varNumSub, varNumCon, varNumDpth))
+
+    # Load single-condition arrays from disk:
+    for idxCon in range(varNumCon):
+        aryEmpSnSb[:, idxCon, :] = np.load(strPthPrf.format(lstCon[idxCon]))
 
     # Number of subjects:
-    varNumSub = aryEmpSnSb.shape[0]
+    # varNumSub = aryEmpSnSb.shape[0]
 
     # Number of conditions:
-    varNumCon = aryEmpSnSb.shape[1]
+    # varNumCon = aryEmpSnSb.shape[1]
 
     # Number of equi-volume depth levels in the input data:
-    varNumDpth = aryEmpSnSb.shape[2]
+    # varNumDpth = aryEmpSnSb.shape[2]
 
     # -------------------------------------------------------------------------
     # *** Subject-by-subject deconvolution
@@ -277,10 +291,15 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
     # *** Save corrected depth profiles
 
     if (varMdl != 4) and (varMdl != 5) and (varMdl != 6):
-        # Save array with single-subject corrected depth profiles, of the form
-        # aryDecon[idxSub, idxCondition, idxDpth].
-        np.save(strPthPrfOt,
-                aryDecon)
+
+        # Save deconvolved depth profiles to disk. The depth profile for each
+        # condition is saved to a separate file (for consistency):
+
+        for idxCon in range(varNumCon):
+            # Form of the array that is saved to disk:
+            # aryDecon[subject, depth]
+            np.save(strPthPrfOt.format(lstCon[idxCon]),
+                    aryDecon[:, idxCon, :])
 
     # -------------------------------------------------------------------------
     # *** Peak positions percentile bootstrap
@@ -506,26 +525,26 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
                            [230.0, 56.0, 60.0]))
         aryClr = np.divide(aryClr, 255.0)
 
-        plt_acr_dpth(aryComb,        # aryData[Condition, Depth]
-                     0,              # aryError[Con., Depth]
-                     varNumDpth,     # Number of depth levels (on the x-axis)
-                     3,              # Number of conditions (separate lines)
-                     varDpi,         # Resolution of the output figure
-                     0.0,            # Minimum of Y axis
-                     2.0,            # Maximum of Y axis
-                     False,          # Bool.: whether to convert y axis to %
-                     lstLblMdl5,     # Labels for conditions (separate lines)
-                     strXlabel,      # Label on x axis
-                     strYlabel,      # Label on y axis
-                     strTmpTtl,      # Figure title
-                     True,           # Boolean: whether to plot a legend
-                     (strPthPltOt + 'after' + strFlTp),
-                     varSizeX=2000.0,
-                     varSizeY=1400.0,
-                     aryCnfLw=aryErrLw,
-                     aryCnfUp=aryErrUp,
-                     aryClr=aryClr,
-                     vecX=vecIntpEqui)
+        plt_dpth_prfl(aryComb,        # aryData[Condition, Depth]
+                      0,              # aryError[Con., Depth]
+                      varNumDpth,     # Number of depth levels (on the x-axis)
+                      3,              # Number of conditions (separate lines)
+                      varDpi,         # Resolution of the output figure
+                      0.0,            # Minimum of Y axis
+                      2.0,            # Maximum of Y axis
+                      False,          # Bool.: whether to convert y axis to %
+                      lstLblMdl5,     # Labels for conditions (separate lines)
+                      strXlabel,      # Label on x axis
+                      strYlabel,      # Label on y axis
+                      strTmpTtl,      # Figure title
+                      True,           # Boolean: whether to plot a legend
+                      (strPthPltOt + 'after' + strFlTp),
+                      varSizeX=2000.0,
+                      varSizeY=1400.0,
+                      aryCnfLw=aryErrLw,
+                      aryCnfUp=aryErrUp,
+                      aryClr=aryClr,
+                      vecX=vecIntpEqui)
 
     elif varMdl == 6:
 
@@ -564,23 +583,23 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
         strXlabel = 'Cortical depth level (equivolume)'
         strYlabel = 'fMRI signal change [a.u.]'
 
-        plt_acr_dpth(aryDecon,           # aryData[Condition, Depth]
-                     aryErr,             # aryError[Con., Depth]
-                     varNumDpth,         # Number of depth levels (on x-axis)
-                     aryDecon.shape[0],  # Number conditions (separate lines)
-                     varDpi,             # Resolution of the output figure
-                     0.0,                # Minimum of Y axis
-                     2.0,                # Maximum of Y axis
-                     False,              # Bool: convert y axis to % ?
-                     lstLblMdl5,         # Condition labels (separate lines)
-                     strXlabel,          # Label on x axis
-                     strYlabel,          # Label on y axis
-                     strTmpTtl,          # Figure title
-                     True,               # Boolean: whether to plot a legend
-                     (strPthPltOt + 'after' + strFlTp),
-                     varSizeX=2000.0,
-                     varSizeY=1400.0,
-                     vecX=vecIntpEqui)
+        plt_dpth_prfl(aryDecon,           # aryData[Condition, Depth]
+                      aryErr,             # aryError[Con., Depth]
+                      varNumDpth,         # Number of depth levels (on x-axis)
+                      aryDecon.shape[0],  # Number conditions (separate lines)
+                      varDpi,             # Resolution of the output figure
+                      0.0,                # Minimum of Y axis
+                      2.0,                # Maximum of Y axis
+                      False,              # Bool: convert y axis to % ?
+                      lstLblMdl5,         # Condition labels (separate lines)
+                      strXlabel,          # Label on x axis
+                      strYlabel,          # Label on y axis
+                      strTmpTtl,          # Figure title
+                      True,               # Boolean: whether to plot a legend
+                      (strPthPltOt + 'after' + strFlTp),
+                      varSizeX=2000.0,
+                      varSizeY=1400.0,
+                      vecX=vecIntpEqui)
 
     # -------------------------------------------------------------------------
     print('-Done.')

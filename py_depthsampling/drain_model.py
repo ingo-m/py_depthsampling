@@ -114,15 +114,15 @@ lstHmsph = ['lh', 'rh']
 
 # Path of depth-profile to correct (meta-condition, ROI, hemisphere, and
 # condition left open):
-strPthPrf = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}.npy'  #noqa
+strPthPrf = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}.npy'  #noqa
 
 # Output path for corrected depth-profiles (meta-condition, ROI, hemisphere,
 # condition, and model index left open):
-strPthPrfOt = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}_deconv_model_{}.npy'  #noqa
+strPthPrfOt = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}_deconv_model_{}.npy'  #noqa
 
 # Output path & prefix for plots (meta-condition, ROI, ROI, hemisphere,
 # condition, and model index left open):
-strPthPltOt = '/home/john/PhD/PacMan_Plots/deconv/{}/{}/{}_{}_{}_deconv_model_{}_'  #noqa
+strPthPltOt = '/home/john/Dropbox/PacMan_Plots/deconv/{}/{}/{}_{}_{}_deconv_model_{}_'  #noqa
 
 # File type suffix for plot:
 strFlTp = '.png'
@@ -218,9 +218,9 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                             if lstMetaCon[idxMtaCn] == 'stimulus':
                                 # Limits of y-axis for across subject plot:
                                 varAcrSubsYmin01 = -400.0
-                                varAcrSubsYmax01 = 100.0
+                                varAcrSubsYmax01 = 0.0
                                 varAcrSubsYmin02 = -400.0
-                                varAcrSubsYmax02 = 100.0
+                                varAcrSubsYmax02 = 0.0
                             if lstMetaCon[idxMtaCn] == 'periphery':
                                 # Limits of y-axis for across subject plot:
                                 varAcrSubsYmin01 = 0.0
@@ -232,11 +232,10 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                     drain_model(lstMdl[idxMdl], lstRoi[idxRoi],
                                 lstHmsph[idxHmsph],
                                 strPthPrf.format(lstMetaCon[idxMtaCn],
-                                lstRoi[idxRoi], lstHmsph[idxHmsph],
-                                lstNstCon[idxCon][0]),
+                                lstRoi[idxRoi], lstHmsph[idxHmsph], '{}'),
                                 strPthPrfOt.format(lstMetaCon[idxMtaCn],
-                                lstRoi[idxRoi], lstHmsph[idxHmsph],
-                                lstNstCon[idxCon][0], lstMdl[idxMdl]),
+                                lstRoi[idxRoi], lstHmsph[idxHmsph], {},
+                                lstMdl[idxMdl]),
                                 strPthPltOt.format(lstMetaCon[idxMtaCn],
                                 lstRoi[idxRoi], lstRoi[idxRoi],
                                 lstHmsph[idxHmsph], lstNstCon[idxCon][0],

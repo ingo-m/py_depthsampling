@@ -29,8 +29,7 @@ from py_depthsampling.project.plot import plot
 # -----------------------------------------------------------------------------
 # *** Define parameters
 
-# Load/save existing projection from/to (ROI, condition, and deconvolution
-# suffix left open):
+# Load/save existing projection from/to (ROI, condition):
 strPthNpy = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project/{}_{}.npy'  #noqa
 
 # List of subject identifiers:

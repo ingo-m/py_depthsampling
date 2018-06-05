@@ -44,7 +44,7 @@ lstSubIds = ['20171023',
 lstMdl = ['']
 
 # ROI ('v1' or 'v2'):
-lstRoi = ['v1', 'v2', 'v3']
+lstRoi = ['v1']  #, 'v2', 'v3']
 
 # Output path & prefix for plots (ROI and condition left open):
 strPthPltOt = '/home/john/Dropbox/PacMan_Plots/ecc_vs_angle/{}_{}'  #noqa
@@ -56,10 +56,11 @@ strFlTp = '.png'
 varDpi = 80.0
 
 # Condition levels (used to complete file names):
-lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst',
-          'Pd_trn', 'Cd_trn', 'Ps_trn',
-          'Pd_min_Ps_sst', 'Pd_min_Cd_sst', 'Cd_min_Ps_sst', 'Linear_sst',
-          'Pd_min_Ps_trn', 'Pd_min_Cd_trn', 'Cd_min_Ps_trn', 'Linear_trn']
+lstCon = ['Pd_sst']
+# lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst',
+#           'Pd_trn', 'Cd_trn', 'Ps_trn',
+#           'Pd_min_Ps_sst', 'Pd_min_Cd_sst', 'Cd_min_Ps_sst', 'Linear_sst',
+#           'Pd_min_Ps_trn', 'Pd_min_Cd_trn', 'Cd_min_Ps_trn', 'Linear_trn']
 # lstCon = ['polar_angle', 'x_pos', 'y_pos', 'SD', 'R2']
 
 # Path of vtk mesh with data to project into visual space (e.g. parameter
@@ -151,7 +152,7 @@ for idxRoi in range(len(lstRoi)):  #noqa
 
         else:
 
-            # -------------------------------------------------------------
+            # -----------------------------------------------------------------
             # *** Load data
 
             print('--Load data')
@@ -218,8 +219,8 @@ for idxRoi in range(len(lstRoi)):  #noqa
             # List for single subject y-position vectors:
             lstEcc = [None] * varPar
 
-            # Put output into correct order (unnecessary in this context
-            # but kept for consistency):
+            # Put output into correct order (unnecessary in this context but
+            # kept for consistency):
             for idxRes in range(varPar):
 
                 # Index of results (first item in output list):
@@ -254,23 +255,18 @@ for idxRoi in range(len(lstRoi)):  #noqa
                      vecAngl=vecAngl,
                      vecEcc=vecEcc)
 
-            # -------------------------------------------------------------
-            # ***
+        # ---------------------------------------------------------------------
+        # *** Plot parameter estimates by eccentricity and polar angle
 
+        # Output path for plot:
+        strPthPltOtTmp = (strPthPltOt.format(lstRoi[idxRoi],
+                                             lstCon[idxCon])
+                          + strFlTp)
 
-
-#        # -----------------------------------------------------------------
-#        # *** Plot group results
-#
-#        # Output path for plot:
-#        strPthPltOtTmp = (strPthPltOt.format(lstRoi[idxRoi],
-#                                             lstCon[idxCon])
-#                          + strFlTp)
-#
-#        # Create plot:
-#        plot(aryVslSpc,
-#             'Visual field projection',
-#             'x-position',
-#             'y-position',
-#             strPthPltOtTmp)
+        # Create plot:
+        plot(aryVslSpc,
+             'Parameter estimates',
+             'Polar angle',
+             'Eccentricity',
+             strPthPltOtTmp)
 # -----------------------------------------------------------------------------

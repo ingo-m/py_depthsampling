@@ -61,7 +61,7 @@ varDpi = 80.0
 #           'Pd_trn', 'Cd_trn', 'Ps_trn',
 #           'Pd_min_Ps_sst', 'Pd_min_Cd_sst', 'Cd_min_Ps_sst', 'Linear_sst',
 #           'Pd_min_Ps_trn', 'Pd_min_Cd_trn', 'Cd_min_Ps_trn', 'Linear_trn']
-lstCon = ['polar_angle', 'x_pos', 'y_pos', 'SD', 'R2']
+lstCon = ['polar_angle', 'eccentricity', 'x_pos', 'y_pos', 'SD', 'R2']
 
 # Path of vtk mesh with data to project into visual space (e.g. parameter
 # estimates; subject ID, hemisphere, and contion level left open).
@@ -264,9 +264,13 @@ for idxRoi in range(len(lstRoi)):  #noqa
         # Number of vertices:
         varNumVrtc = vecData.shape[0]
 
-        # Array for bin indicies:
-        vecBinAnglIdx = np.zeros(varNumVrtc, dtype=np.int16)
-        vecBinEccIdx = np.zeros(varNumVrtc, dtype=np.int16)
+        # Array for bin indicies (subtract one because vertices that are
+        # not in any of the bins, e.g. out of the eccentricity range, are not
+        # supposed to end up in the first bin):
+        vecBinAnglIdx = np.subtract(np.zeros(varNumVrtc, dtype=np.int16),
+                                    int(1))
+        vecBinEccIdx = np.subtract(np.zeros(varNumVrtc, dtype=np.int16),
+                                   int(1))
 
         # Assign vertices to polar angle bins:
         for idxBin in range(varNumBinAngl):
@@ -311,9 +315,13 @@ for idxRoi in range(len(lstRoi)):  #noqa
                                      np.equal(vecBinEccIdx, idxEcc)
                                      )
 
-                # Mean over all vertices that are both in the current polar
-                # angle and eccentricity bin:
-                aryData[idxAngl, idxEcc] = np.mean(vecData[lgcTmp])
+                # Avoid division by zero if there are no vertices in the
+                # current bin:
+                if np.greater(np.sum(lgcTmp), int(0)):
+
+                    # Mean over all vertices that are both in the current polar
+                    # angle and eccentricity bin:
+                    aryData[idxAngl, idxEcc] = np.mean(vecData[lgcTmp])
 
         # Output path for plot:
         strPthPltOtTmp = (strPthPltOt.format(lstRoi[idxRoi],

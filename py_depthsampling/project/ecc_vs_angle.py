@@ -29,7 +29,7 @@ from py_depthsampling.project.plot import plot
 # *** Define parameters
 
 # Load/save existing data from/to (ROI and condition left open):
-strPthNpz = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/ecc_vs_angle/{}_{}.npy'  #noqa
+strPthNpz = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/ecc_vs_angle/{}_{}.npz'  #noqa
 
 # List of subject identifiers:
 lstSubIds = ['20171023',

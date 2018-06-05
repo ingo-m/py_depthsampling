@@ -44,6 +44,7 @@ def plot(aryVslSpc, strTtl, strXlabel, strYlabel, strPathOut):
     varMin = np.floor(varMin)
     varMax = np.ceil(varMax)
 
+    # Saveguard to avoid division by zero in case of no negative values:
     if np.less_equal(0.0, varMin):
         varMin = -1.0
 

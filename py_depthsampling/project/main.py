@@ -43,10 +43,10 @@ lstSubIds = ['20171023',  # '20171109',
              '20180118']
 
 # Draining model suffix ('' for non-corrected profiles):
-lstMdl = ['']  # , '_deconv_model_1']
+lstMdl = ['']
 
 # ROI ('v1' or 'v2'):
-lstRoi = ['v1']  # , 'v2']
+lstRoi = ['v1', 'v2', 'v3']
 
 # Output path & prefix for plots (ROI and condition left open):
 strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/{}_{}'  #noqa
@@ -57,15 +57,11 @@ strFlTp = '.png'
 # Figure scaling factor:
 varDpi = 80.0
 
-# Label for axes:
-strXlabel = 'x-position'
-strYlabel = 'y-position'
-
-# Plot title:
-strTtl = 'Visual field projection'
-
 # Condition levels (used to complete file names):
-lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
+lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst',
+          'Pd_trn', 'Cd_trn', 'Ps_trn',
+          'Pd_min_Ps_sst', 'Pd_min_Cd_sst', 'Cd_min_Ps_sst', 'Linear_sst',
+          'Pd_min_Ps_trn', 'Pd_min_Cd_trn', 'Cd_min_Ps_trn', 'Linear_trn']
 # lstCon = ['polar_angle', 'x_pos', 'y_pos', 'SD', 'R2']
 
 # Condition labels:
@@ -126,8 +122,8 @@ varThrR2 = 0.15
 # Number of bins for visual space representation in x- and y-direction (ratio
 # of number of x and y bins should correspond to ratio of size of visual space
 # in x- and y-directions).
-varNumX = 100
-varNumY = 100
+varNumX = 200
+varNumY = 200
 # -----------------------------------------------------------------------------
 
 
@@ -353,5 +349,9 @@ for idxMdl in range(len(lstMdl)):  #noqa
                               + strFlTp)
 
             # Create plot:
-            plot(aryVslSpc, strTtl, strXlabel, strYlabel, strPthPltOtTmp)
+            plot(aryVslSpc,
+                 'Visual field projection',
+                 'x-position',
+                 'y-position',
+                 strPthPltOtTmp)
 # -----------------------------------------------------------------------------

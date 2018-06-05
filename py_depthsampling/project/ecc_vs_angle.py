@@ -44,7 +44,7 @@ lstSubIds = ['20171023',
 lstMdl = ['']
 
 # ROI ('v1' or 'v2'):
-lstRoi = ['v1']  #, 'v2', 'v3']
+lstRoi = ['v1']  # , 'v2', 'v3']
 
 # Output path & prefix for plots (ROI and condition left open):
 strPthPltOt = '/home/john/Dropbox/PacMan_Plots/ecc_vs_angle/{}_{}'  #noqa
@@ -56,17 +56,17 @@ strFlTp = '.png'
 varDpi = 80.0
 
 # Condition levels (used to complete file names):
-lstCon = ['Pd_sst']
+# lstCon = ['Pd_sst']
 # lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst',
 #           'Pd_trn', 'Cd_trn', 'Ps_trn',
 #           'Pd_min_Ps_sst', 'Pd_min_Cd_sst', 'Cd_min_Ps_sst', 'Linear_sst',
 #           'Pd_min_Ps_trn', 'Pd_min_Cd_trn', 'Cd_min_Ps_trn', 'Linear_trn']
-# lstCon = ['polar_angle', 'x_pos', 'y_pos', 'SD', 'R2']
+lstCon = ['polar_angle', 'x_pos', 'y_pos', 'SD', 'R2']
 
 # Path of vtk mesh with data to project into visual space (e.g. parameter
 # estimates; subject ID, hemisphere, and contion level left open).
-strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/feat_level_2_{}_cope.vtk'  #noqa
-# strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_{}.vtk'  #noqa
+# strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/feat_level_2_{}_cope.vtk'  #noqa
+strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_{}.vtk'  #noqa
 
 # Path of vtk mesh with R2 values from pRF mapping (at multiple depth levels;
 # subject ID and hemisphere left open).
@@ -91,22 +91,11 @@ strCsvRoi = '/home/john/PhD/GitHub/PacMan/analysis/{}/08_depthsampling/{}/{}_mod
 # Number of cortical depths.
 varNumDpth = 11
 
-# Extent of visual space from centre of the screen in negative x-direction
-# (i.e. from the fixation point to the left end of the screen) in degrees of
-# visual angle.
-varExtXmin = -5.19
-# Extent of visual space from centre of the screen in positive x-direction
-# (i.e. from the fixation point to the right end of the screen) in degrees of
-# visual angle.
-varExtXmax = 5.19
-# Extent of visual space from centre of the screen in negative y-direction
-# (i.e. from the fixation point to the lower end of the screen) in degrees of
-# visual angle.
-varExtYmin = -5.19
-# Extent of visual space from centre of the screen in positive y-direction
-# (i.e. from the fixation point to the upper end of the screen) in degrees of
-# visual angle.
-varExtYmax = 5.19
+# Number of polar angle bins:
+varNumBinAngl = 10
+
+# Number of eccentricity bins:
+varNumBinEcc = 10
 
 # R2 threshold for vertex inclusion (vertices with R2 value below threshold are
 # not considered for plot):
@@ -256,7 +245,75 @@ for idxRoi in range(len(lstRoi)):  #noqa
                      vecEcc=vecEcc)
 
         # ---------------------------------------------------------------------
-        # *** Plot parameter estimates by eccentricity and polar angle
+        # *** Group parameter estimates by eccentricity and polar angle
+
+        print('--Group parameter estimates by eccentricity and polar angle')
+
+        # Limits of polar angle bins:
+        vecBinAngl = np.linspace(-np.pi,
+                                 np.pi,
+                                 num=(varNumBinAngl + 1),
+                                 endpoint=True)
+
+        # Limits of eccentricity bins:
+        vecBinEcc = np.linspace(0.0,
+                                2.0,
+                                num=(varNumBinEcc + 1),
+                                endpoint=True)
+
+        # Number of vertices:
+        varNumVrtc = vecData.shape[0]
+
+        # Array for bin indicies:
+        vecBinAnglIdx = np.zeros(varNumVrtc, dtype=np.int16)
+        vecBinEccIdx = np.zeros(varNumVrtc, dtype=np.int16)
+
+        # Assign vertices to polar angle bins:
+        for idxBin in range(varNumBinAngl):
+
+            # Find vertices with polar angle that is within current bin:
+            lgcTmp = np.multiply(
+                                 np.greater_equal(vecAngl,
+                                                  vecBinAngl[idxBin]),
+                                 np.less(vecAngl,
+                                         vecBinAngl[idxBin + 1])
+                                 )
+
+            # Set polar angle bin index to current bin:
+            vecBinAnglIdx[lgcTmp] = idxBin
+
+        # Assign vertices to eccentricity bins:
+        for idxBin in range(varNumBinEcc):
+
+            # Find vertices with eccentricity that is within current bin:
+            lgcTmp = np.multiply(
+                                 np.greater_equal(vecEcc,
+                                                  vecBinEcc[idxBin]),
+                                 np.less(vecEcc,
+                                         vecBinEcc[idxBin + 1])
+                                 )
+
+            # Set eccentricity bin index to current bin:
+            vecBinEccIdx[lgcTmp] = idxBin
+
+        # 2D array for average parameter estimate organised by polar angle
+        # and eccentricity:
+        aryData = np.zeros((varNumBinAngl, varNumBinEcc))
+
+        # Loop through polar angle and eccentricity bins:
+        for idxAngl in range(varNumBinAngl):
+            for idxEcc in range(varNumBinEcc):
+
+                # Conjunction of array indices that are both in current
+                # polar angle and eccentricity bins:
+                lgcTmp = np.multiply(
+                                     np.equal(vecBinAnglIdx, idxAngl),
+                                     np.equal(vecBinEccIdx, idxEcc)
+                                     )
+
+                # Mean over all vertices that are both in the current polar
+                # angle and eccentricity bin:
+                aryData[idxAngl, idxEcc] = np.mean(vecData[lgcTmp])
 
         # Output path for plot:
         strPthPltOtTmp = (strPthPltOt.format(lstRoi[idxRoi],
@@ -264,7 +321,7 @@ for idxRoi in range(len(lstRoi)):  #noqa
                           + strFlTp)
 
         # Create plot:
-        plot(aryVslSpc,
+        plot(aryData,
              'Parameter estimates',
              'Polar angle',
              'Eccentricity',

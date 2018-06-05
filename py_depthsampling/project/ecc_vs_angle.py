@@ -44,7 +44,7 @@ lstSubIds = ['20171023',
 lstMdl = ['']
 
 # ROI ('v1' or 'v2'):
-lstRoi = ['v1']  # , 'v2', 'v3']
+lstRoi = ['v1', 'v2', 'v3']
 
 # Output path & prefix for plots (ROI and condition left open):
 strPthPltOt = '/home/john/Dropbox/PacMan_Plots/ecc_vs_angle/{}_{}'  #noqa
@@ -57,16 +57,16 @@ varDpi = 80.0
 
 # Condition levels (used to complete file names):
 # lstCon = ['Pd_sst']
-# lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst',
-#           'Pd_trn', 'Cd_trn', 'Ps_trn',
-#           'Pd_min_Ps_sst', 'Pd_min_Cd_sst', 'Cd_min_Ps_sst', 'Linear_sst',
-#           'Pd_min_Ps_trn', 'Pd_min_Cd_trn', 'Cd_min_Ps_trn', 'Linear_trn']
-lstCon = ['polar_angle', 'eccentricity', 'x_pos', 'y_pos', 'SD', 'R2']
+lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst',
+          'Pd_trn', 'Cd_trn', 'Ps_trn',
+          'Pd_min_Ps_sst', 'Pd_min_Cd_sst', 'Cd_min_Ps_sst', 'Linear_sst',
+          'Pd_min_Ps_trn', 'Pd_min_Cd_trn', 'Cd_min_Ps_trn', 'Linear_trn']
+# lstCon = ['polar_angle', 'eccentricity', 'x_pos', 'y_pos', 'SD', 'R2']
 
 # Path of vtk mesh with data to project into visual space (e.g. parameter
 # estimates; subject ID, hemisphere, and contion level left open).
-# strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/feat_level_2_{}_cope.vtk'  #noqa
-strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_{}.vtk'  #noqa
+strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/feat_level_2_{}_cope.vtk'  #noqa
+# strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_{}.vtk'  #noqa
 
 # Path of vtk mesh with R2 values from pRF mapping (at multiple depth levels;
 # subject ID and hemisphere left open).
@@ -92,10 +92,10 @@ strCsvRoi = '/home/john/PhD/GitHub/PacMan/analysis/{}/08_depthsampling/{}/{}_mod
 varNumDpth = 11
 
 # Number of polar angle bins:
-varNumBinAngl = 10
+varNumBinAngl = 11
 
 # Number of eccentricity bins:
-varNumBinEcc = 10
+varNumBinEcc = 11
 
 # R2 threshold for vertex inclusion (vertices with R2 value below threshold are
 # not considered for plot):
@@ -257,7 +257,7 @@ for idxRoi in range(len(lstRoi)):  #noqa
 
         # Limits of eccentricity bins:
         vecBinEcc = np.linspace(0.0,
-                                2.0,
+                                6.0,
                                 num=(varNumBinEcc + 1),
                                 endpoint=True)
 

@@ -37,6 +37,10 @@ def project_par(idxPrc, vecData, vecX, vecY, vecSd, vecR2, varThrR2, varNumX,
     # space):
     aryVslSpc = np.zeros((varNumX, varNumY))
 
+    # Array for normalisation (parameter estimates are summed up over the
+    # visual field; the array is needed to normalise the sum):
+    aryNorm = np.zeros((varNumX, varNumY))
+
     # Vector with visual space coordinates of elements in `aryVslSpc`:
     vecCorX = np.linspace(varExtXmin, varExtXmax, num=varNumX,
                           endpoint=True)
@@ -80,6 +84,9 @@ def project_par(idxPrc, vecData, vecX, vecY, vecSd, vecR2, varThrR2, varNumX,
             # Scale Gaussian to have its maximum at one:
             # aryTmpGauss = np.divide(aryTmpGauss, np.max(aryTmpGauss))
 
+            # Add non-scaled Gaussian to normalisation array:
+            aryNorm = np.add(aryNorm, aryTmpGauss)
+
             # Multiply current data value (e.g. parameter estimate)
             # with Gaussian:
             aryTmpGauss = np.multiply(aryTmpGauss, vecData[idxVrtx])
@@ -88,7 +95,7 @@ def project_par(idxPrc, vecData, vecX, vecY, vecSd, vecR2, varThrR2, varNumX,
             aryVslSpc = np.add(aryVslSpc, aryTmpGauss)
 
     # Create list containing subject data, and the process ID:
-    lstOut = [idxPrc, aryVslSpc]
+    lstOut = [idxPrc, aryVslSpc, aryNorm]
 
     # Put output to queue:
     queOut.put(lstOut)

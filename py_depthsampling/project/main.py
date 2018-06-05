@@ -46,7 +46,7 @@ lstSubIds = ['20171023',  # '20171109',
 lstMdl = ['']  # , '_deconv_model_1']
 
 # ROI ('v1' or 'v2'):
-lstRoi = ['v1', 'v2']
+lstRoi = ['v1']  # , 'v2']
 
 # Output path & prefix for plots (ROI and condition left open):
 strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/{}_{}'  #noqa
@@ -66,6 +66,7 @@ strTtl = 'Visual field projection'
 
 # Condition levels (used to complete file names):
 lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
+# lstCon = ['polar_angle', 'x_pos', 'y_pos', 'SD', 'R2']
 
 # Condition labels:
 # lstConLbl = ['PacMan Dynamic Sustained',
@@ -75,6 +76,7 @@ lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
 # Path of vtk mesh with data to project into visual space (e.g. parameter
 # estimates; subject ID, hemisphere, and contion level left open).
 strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/feat_level_2_{}_cope.vtk'  #noqa
+# strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_{}.vtk'  #noqa
 
 # Path of vtk mesh with R2 values from pRF mapping (at multiple depth levels;
 # subject ID and hemisphere left open).
@@ -306,8 +308,10 @@ for idxMdl in range(len(lstMdl)):  #noqa
                 for idxPrc in range(varPar):
                     lstPrcs[idxPrc].join()
 
-                # List for results after re-ordering:
+                # List for results after re-ordering (visual space arrays and
+                # normalisation arrays):
                 lstVslSpc = [None] * varPar
+                lstNorm = [None] * varPar
 
                 # Put output into correct order (unnecessary in this context
                 # but kept for consistency):
@@ -318,14 +322,24 @@ for idxMdl in range(len(lstMdl)):  #noqa
 
                     # Put fitting results into list, in correct order:
                     lstVslSpc[varTmpIdx] = lstRes[idxRes][1]
+                    lstNorm[varTmpIdx] = lstRes[idxRes][2]
 
                 # Visual space array (2D array with bins of locations in visual
                 # space):
                 aryVslSpc = np.zeros((varNumX, varNumY))
 
+                # Array for normalisation (parameter estimates are summed up
+                # over the visual field; the normalisation array is needed to
+                # normalise the sum):
+                aryNorm = np.zeros((varNumX, varNumY))
+
                 # Add up results from separate processes:
                 for idxPrc in range(varPar):
                     aryVslSpc = np.add(lstVslSpc[idxPrc], aryVslSpc)
+                    aryNorm = np.add(lstNorm[idxPrc], aryNorm)
+
+                # Normalise:
+                aryVslSpc = np.divide(aryVslSpc, aryNorm)
 
                 # Save results to disk:
                 np.save(strPthNpyTmp, aryVslSpc)

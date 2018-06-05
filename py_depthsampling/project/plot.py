@@ -39,10 +39,13 @@ def plot(aryVslSpc, strTtl, strXlabel, strYlabel, strPathOut):
     # Round:
     # varMin = (np.floor(varMin * 10.0) / 10.0)
     # varMax = (np.ceil(varMax * 10.0) / 10.0)
-    varMin = (np.floor(varMin * 0.1) / 0.1)
-    varMax = (np.ceil(varMax * 0.1) / 0.1)
-    # varMin = np.floor(varMin)
-    # varMax = np.ceil(varMax)
+    # varMin = (np.floor(varMin * 0.1) / 0.1)
+    # varMax = (np.ceil(varMax * 0.1) / 0.1)
+    varMin = np.floor(varMin)
+    varMax = np.ceil(varMax)
+
+    if np.less_equal(0.0, varMin):
+        varMin = -1.0
 
     # Create main figure:
     fig01 = plt.figure(figsize=(4.0, 3.0),
@@ -127,7 +130,7 @@ def plot(aryVslSpc, strTtl, strXlabel, strYlabel, strPathOut):
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     # Plot correlation coefficients of current depth level:
-    pltTmpCorr = plt.imshow(aryVslSpc,
+    pltTmpCorr = plt.imshow(aryVslSpc.T,
                             interpolation='none',  # 'bicubic',
                             origin='lower',
                             norm=objClrNorm,

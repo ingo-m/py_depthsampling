@@ -57,14 +57,14 @@ varDpi = 80.0
 
 # Condition levels (used to complete file names):
 # lstCon = ['Pd_sst']
-lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst',
-          'Pd_min_Ps_sst', 'Pd_min_Cd_sst', 'Cd_min_Ps_sst', 'Linear_sst']
-# lstCon = ['polar_angle', 'eccentricity', 'x_pos', 'y_pos', 'SD', 'R2']
+# lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst',
+#           'Pd_min_Ps_sst', 'Pd_min_Cd_sst', 'Cd_min_Ps_sst', 'Linear_sst']
+lstCon = ['polar_angle', 'eccentricity', 'x_pos', 'y_pos', 'SD', 'R2']
 
 # Path of vtk mesh with data to project into visual space (e.g. parameter
 # estimates; subject ID, hemisphere, and contion level left open).
-strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/feat_level_2_{}_cope.vtk'  #noqa
-# strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_{}.vtk'  #noqa
+# strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/feat_level_2_{}_cope.vtk'  #noqa
+strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_{}.vtk'  #noqa
 
 # Path of vtk mesh with R2 values from pRF mapping (at multiple depth levels;
 # subject ID and hemisphere left open).
@@ -246,6 +246,12 @@ for idxRoi in range(len(lstRoi)):  #noqa
         # *** Group parameter estimates by eccentricity and polar angle
 
         print('--Group parameter estimates by eccentricity and polar angle')
+
+        # Mask out vertices that are below R2 threshold:
+        lgcR2 = np.greater(vecR2, varThrR2)
+        vecData = vecData[lgcR2]
+        vecAngl = vecAngl[lgcR2]
+        vecEcc = vecEcc[lgcR2]
 
         # Minimum/maximum polar angle:
         varAnglMin = -np.pi

@@ -65,11 +65,11 @@ lstHmsph = ['rh']
 
 # Path of depth-profile to correct (meta-condition, ROI, hemisphere, and
 # condition left open):
-strPthPrf = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}.npy'  #noqa
+strPthPrf = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}.npy'  #noqa
 
 # Output path & prefix for plots (meta-condition, ROI, hemisphere, condition,
 # and model index left open):
-strPthPltOt = '/home/john/PhD/PacMan_Plots/commutative/{}_{}_{}_deconv_model_{}_'  #noqa
+strPthPltOt = '/home/john/Dropbox/PacMan_Plots/commutative/{}_{}_{}_deconv_model_{}_'  #noqa
 
 # File type suffix for plot:
 strFlTp = '.png'

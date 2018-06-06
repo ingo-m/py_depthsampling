@@ -26,7 +26,7 @@ from py_depthsampling.get_data.load_vtk_multi import load_vtk_multi
 
 def get_data(strData, strPthR2, strPthSd, strPthX, strPthY, strCsvRoi,
              varNumDpth=11, strPrcdData='SCALARS', varNumLne=2,
-             varNumHdrRoi=1):
+             varNumHdrRoi=1, lstDpth=None):
     """
     Load data for projection into visual space.
 
@@ -55,6 +55,10 @@ def get_data(strData, strPthR2, strPthSd, strPthX, strPthY, strCsvRoi,
         point in vtk meshes.
     varNumHdrRoi : int
         Number of header lines in ROI CSV file.
+    lstDpth : list
+        List with depth levels to average over. For instance, if `lstDpth = [0,
+        1, 2]`, the average over the first three depth levels is calculated. If
+        `None`, average over all depth levels.
 
     Returns
     -------
@@ -126,11 +130,23 @@ def get_data(strData, strPthR2, strPthSd, strPthX, strPthY, strCsvRoi,
     # -------------------------------------------------------------------------
     # *** Average across depth levels
 
-    vecData = np.mean(aryData, axis=1)
-    vecR2 = np.mean(aryR2, axis=1)
-    vecSd = np.mean(arySd, axis=1)
-    vecX = np.mean(aryX, axis=1)
-    vecY = np.mean(aryY, axis=1)
+    if lstDpth is None:
+
+        # Average over all depth levels:
+        vecData = np.mean(aryData, axis=1)
+        vecR2 = np.mean(aryR2, axis=1)
+        vecSd = np.mean(arySd, axis=1)
+        vecX = np.mean(aryX, axis=1)
+        vecY = np.mean(aryY, axis=1)
+
+    else:
+
+        # Average over selected depth levels:
+        vecData = np.mean(aryData[lstDpth, :], axis=1)
+        vecR2 = np.mean(aryR2[lstDpth, :], axis=1)
+        vecSd = np.mean(arySd[lstDpth, :], axis=1)
+        vecX = np.mean(aryX[lstDpth, :], axis=1)
+        vecY = np.mean(aryY[lstDpth, :], axis=1)
 
     return vecData, vecR2, vecSd, vecX, vecY
 

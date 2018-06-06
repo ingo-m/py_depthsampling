@@ -29,8 +29,9 @@ from py_depthsampling.project.plot import plot
 # -----------------------------------------------------------------------------
 # *** Define parameters
 
-# Load/save existing projection from/to (ROI, condition):
-strPthNpy = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project/{}_{}.npy'  #noqa
+# Load/save existing projection from/to (ROI, condition, depth level label left
+# open):
+strPthNpy = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project/{}_{}_{}.npy'  #noqa
 
 # List of subject identifiers:
 lstSubIds = ['20171023',  # '20171109',
@@ -41,14 +42,20 @@ lstSubIds = ['20171023',  # '20171109',
              '20180111',
              '20180118']
 
-# Draining model suffix ('' for non-corrected profiles):
-lstMdl = ['']
+# Nested list with depth levels to average over. For instance, if `lstDpth =
+# [[0, 1, 2], [3, 4, 5]]`, on a first iteration, the average over the first
+# three depth levels is calculated, and on a second iteration the average over
+# the subsequent three depth levels is calculated. If 1lstDpth= [[None]]1,
+# average over all depth levels.
+lstDpth = [None, [0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11]]
+# Depth level condition labels (output file will contain this label):
+lstDpthLbl = ['allGM', 'deepGM', 'midGM', 'superficialGM']
 
 # ROI ('v1' or 'v2'):
 lstRoi = ['v1', 'v2', 'v3']
 
-# Output path & prefix for plots (ROI and condition left open):
-strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/{}_{}'  #noqa
+# Output path & prefix for plots (ROI, condition, depth level label left open):
+strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/{}_{}_{}'  #noqa
 
 # File type suffix for plot:
 strFlTp = '.png'
@@ -132,14 +139,15 @@ print('-Project parametric map into visual space')
 # Number of subjects:
 varNumSub = len(lstSubIds)
 
-# Loop through models, ROIs, and conditions:
-for idxMdl in range(len(lstMdl)):  #noqa
+# Loop through depth levels, ROIs, and conditions:
+for idxDpth in range(len(lstDpth)):  #noqa
     for idxRoi in range(len(lstRoi)):
         for idxCon in range(len(lstCon)):
 
             # File name of npy file for current condition:
             strPthNpyTmp = strPthNpy.format(lstRoi[idxRoi],
-                                            lstCon[idxCon])
+                                            lstCon[idxCon],
+                                            lstDpthLbl[idxDpth])
 
             if os.path.isfile(strPthNpyTmp):
 
@@ -178,6 +186,7 @@ for idxMdl in range(len(lstMdl)):  #noqa
                                                        strPthSd,
                                                        strCsvRoi,
                                                        varNumDpth,
+                                                       lstDpth[idxDpth],
                                                        idxPrc,
                                                        queOut)
                                                  )
@@ -342,7 +351,8 @@ for idxMdl in range(len(lstMdl)):  #noqa
 
             # Output path for plot:
             strPthPltOtTmp = (strPthPltOt.format(lstRoi[idxRoi],
-                                                 lstCon[idxCon])
+                                                 lstCon[idxCon],
+                                                 lstDpthLbl[idxDpth])
                               + strFlTp)
 
             # Create plot:

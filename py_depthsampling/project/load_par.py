@@ -23,7 +23,7 @@ from py_depthsampling.project.utilities import get_data
 
 
 def load_par(strSub, strCon, strRoi, strPthData, strPthR2, strPthX, strPthY,
-             strPthSd, strCsvRoi, varNumDpth, idxPrc, queOut):
+             strPthSd, strCsvRoi, varNumDpth, lstDpth, idxPrc, queOut):
     """
     Load single subject vtk meshes in parallel.
 
@@ -43,7 +43,7 @@ def load_par(strSub, strCon, strRoi, strPthData, strPthR2, strPthX, strPthY,
     # Load single subject data for left hemisphere:
     vecLhData, vecLhR2, vecLhSd, vecLhX, vecLhY = get_data(
         strPthLhData, strPthLhR2, strPthLhSd, strPthLhX, strPthLhY,
-        strCsvLhRoi, varNumDpth=varNumDpth)
+        strCsvLhRoi, varNumDpth=varNumDpth, lstDpth=lstDpth)
 
     # Temporary input paths for right hemisphere:
     strPthRhData = strPthData.format(strSub, 'rh', strCon)
@@ -56,7 +56,7 @@ def load_par(strSub, strCon, strRoi, strPthData, strPthR2, strPthX, strPthY,
     # Load single subject data for right hemisphere:
     vecRhData, vecRhR2, vecRhSd, vecRhX, vecRhY = get_data(
         strPthRhData, strPthRhR2, strPthRhSd, strPthRhX, strPthRhY,
-        strCsvRhRoi, varNumDpth=varNumDpth)
+        strCsvRhRoi, varNumDpth=varNumDpth, lstDpth=lstDpth)
 
     # Concatenate LH and RH data:
     vecData = np.concatenate([vecLhData, vecRhData])

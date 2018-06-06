@@ -44,7 +44,7 @@ lstSubIds = ['20171023',
 lstMdl = ['']
 
 # ROI ('v1' or 'v2'):
-lstRoi = ['v1', 'v2', 'v3']
+lstRoi = ['v1'] #, 'v2', 'v3']
 
 # Output path & prefix for plots (ROI and condition left open):
 strPthPltOt = '/home/john/Dropbox/PacMan_Plots/ecc_vs_angle/{}_{}'  #noqa
@@ -56,10 +56,10 @@ strFlTp = '.png'
 varDpi = 80.0
 
 # Condition levels (used to complete file names):
-# lstCon = ['Pd_sst']
+lstCon = ['Pd_sst']
 # lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst',
 #           'Pd_min_Ps_sst', 'Pd_min_Cd_sst', 'Cd_min_Ps_sst', 'Linear_sst']
-lstCon = ['polar_angle', 'eccentricity', 'x_pos', 'y_pos', 'SD', 'R2']
+# lstCon = ['polar_angle', 'eccentricity', 'x_pos', 'y_pos', 'SD', 'R2']
 
 # Path of vtk mesh with data to project into visual space (e.g. parameter
 # estimates; subject ID, hemisphere, and contion level left open).
@@ -169,6 +169,7 @@ for idxRoi in range(len(lstRoi)):  #noqa
                                                    strPthSd,
                                                    strCsvRoi,
                                                    varNumDpth,
+                                                   None,
                                                    idxPrc,
                                                    queOut)
                                              )

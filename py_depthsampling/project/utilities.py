@@ -142,11 +142,11 @@ def get_data(strData, strPthR2, strPthSd, strPthX, strPthY, strCsvRoi,
     else:
 
         # Average over selected depth levels:
-        vecData = np.mean(aryData[lstDpth, :], axis=1)
-        vecR2 = np.mean(aryR2[lstDpth, :], axis=1)
-        vecSd = np.mean(arySd[lstDpth, :], axis=1)
-        vecX = np.mean(aryX[lstDpth, :], axis=1)
-        vecY = np.mean(aryY[lstDpth, :], axis=1)
+        vecData = np.mean(aryData[:, lstDpth], axis=1)
+        vecR2 = np.mean(aryR2[:, lstDpth], axis=1)
+        vecSd = np.mean(arySd[:, lstDpth], axis=1)
+        vecX = np.mean(aryX[:, lstDpth], axis=1)
+        vecY = np.mean(aryY[:, lstDpth], axis=1)
 
     return vecData, vecR2, vecSd, vecX, vecY
 

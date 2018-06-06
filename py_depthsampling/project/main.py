@@ -47,7 +47,7 @@ lstSubIds = ['20171023',  # '20171109',
 # three depth levels is calculated, and on a second iteration the average over
 # the subsequent three depth levels is calculated. If 1lstDpth= [[None]]1,
 # average over all depth levels.
-lstDpth = [None, [0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11]]
+lstDpth = [None, [0, 1, 2], [4, 5, 6], [8, 9, 10]]
 # Depth level condition labels (output file will contain this label):
 lstDpthLbl = ['allGM', 'deepGM', 'midGM', 'superficialGM']
 

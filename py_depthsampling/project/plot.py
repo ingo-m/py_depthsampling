@@ -46,8 +46,14 @@ def plot(aryVslSpc, strTtl, strXlabel, strYlabel, strPathOut, tpleLimX=None,
     varMax = np.ceil(varMax)
 
     # Saveguard to avoid division by zero in case of no negative values:
-    if np.less_equal(0.0, varMin):
-        varMin = -1.0
+    # if np.less_equal(0.0, varMin):
+    #     varMin = -1.0
+
+    # Same scale for negative and positive colour bar:
+    if np.greater(np.absolute(varMin), varMax):
+        varMax = np.absolute(varMin)
+    else:
+        varMin = np.multiply(-1.0, np.absolute(varMax))
 
     # Create main figure:
     fig01 = plt.figure(figsize=(4.0, 3.0),

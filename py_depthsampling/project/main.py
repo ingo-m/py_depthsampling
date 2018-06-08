@@ -96,8 +96,8 @@ strPthY = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_y_pos.
 
 # Path of csv file with ROI definition (subject ID, hemisphere, and ROI left
 # open).
-strCsvRoi = '/home/john/PhD/GitHub/PacMan/analysis/{}/08_depthsampling/{}/{}_mod.csv'  #noqa
-# strCsvRoi = '/Users/john/1_PhD/GitHub/PacMan/analysis/{}/08_depthsampling/{}/{}_mod.csv'  #noqa
+strCsvRoi = '/home/john/PhD/GitLab/PacMan/analysis/{}/08_depthsampling/{}/{}_mod.csv'  #noqa
+# strCsvRoi = '/Users/john/1_PhD/GitLab/PacMan/analysis/{}/08_depthsampling/{}/{}_mod.csv'  #noqa
 
 # Number of cortical depths.
 varNumDpth = 11

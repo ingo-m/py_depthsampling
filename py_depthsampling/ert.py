@@ -78,7 +78,7 @@ varNumLne = 2
 
 # Limits of y-axis:
 varAcrSubsYmin = -0.04
-varAcrSubsYmax = 0.03
+varAcrSubsYmax = 0.02
 
 # Number of labels on y-axis:
 varYnum = 4

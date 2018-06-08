@@ -77,8 +77,8 @@ strPrcdData = 'SCALARS'
 varNumLne = 2
 
 # Limits of y-axis:
-varAcrSubsYmin = -0.06
-varAcrSubsYmax = 0.04
+varAcrSubsYmin = -0.04
+varAcrSubsYmax = 0.03
 
 # Convert y-axis values to percent (i.e. divide label values by 100)?
 lgcCnvPrct = True

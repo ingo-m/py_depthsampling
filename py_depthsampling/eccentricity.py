@@ -43,7 +43,7 @@ from py_depthsampling.eccentricity.ecc_main import eccentricity
 lstRoi = ['v1', 'v2']
 
 # Hemispheres ('lh' or 'rh'):
-lstHmsph = ['lh', 'rh']
+lstHmsph = ['rh', 'lh']
 
 # List of subject IDs:
 lstSubId = ['20171023',  # '20171109',
@@ -103,13 +103,16 @@ varNumHdrRoi = 1
 strVtkThr = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_R2.vtk'  #noqa
 # Threshold (e.g. minimum R2 value - if vertex is below this value at any
 # depth level, vertex is excluded):
-varThr = 0.1
+varThr = 0.15
 
 # Use separate lookup tables for negative values?
 lgcNegLkp = True
 
 # Output basename (ROI, hemisphere, and condition left open):
 strPathOut = '/home/john/Dropbox/PacMan_Plots/eccentricity/plots/ecc_{}_{}_{}'
+
+# File type for plots:
+strFleTyp = '.svg'
 # *****************************************************************************
 
 
@@ -129,5 +132,5 @@ for idxRoi in range(len(lstRoi)):
                          lstHmsph[idxHmsph], lstRoi[idxRoi]), varNumHdrRoi,
                          strVtkThr.format('{}', lstHmsph[idxHmsph]), varThr,
                          lgcNegLkp, strPathOut.format(lstHmsph[idxHmsph],
-                         lstRoi[idxRoi], lstCon[idxCon]))
+                         lstRoi[idxRoi], lstCon[idxCon]), strFleTyp=strFleTyp)
 # *****************************************************************************

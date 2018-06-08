@@ -206,7 +206,7 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
     # *************************************************************************
     # *** Plot single subjet results
 
-    if True:
+    if False:
 
         print('---Ploting single-subjects event-related averages')
 

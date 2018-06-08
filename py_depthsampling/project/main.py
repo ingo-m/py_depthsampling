@@ -355,9 +355,16 @@ for idxDpth in range(len(lstDpth)):  #noqa
                                                  lstDpthLbl[idxDpth])
                               + strFlTp)
 
+            # Plot title:
+            strTmpTtl = (lstRoi[idxRoi]
+                         + ' '
+                         + lstCon[idxCon]
+                         + ' '
+                         + lstDpthLbl[idxDpth])
+
             # Create plot:
             plot(aryVslSpc,
-                 'Visual field projection',
+                 strTmpTtl,
                  'x-position',
                  'y-position',
                  strPthPltOtTmp,

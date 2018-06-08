@@ -93,7 +93,7 @@ varNumLne = 2
 # Paths of csv files with ROI information (created with paraview on a vtk mesh
 # in the same space as the above vtk files; subject ID, hemisphere, and ROI
 # left open):
-strCsvRoi = '/home/john/PhD/GitHub/PacMan/analysis/{}/08_depthsampling/{}/{}_mod.csv'  #noqa
+strCsvRoi = '/home/john/PhD/GitLab/PacMan/analysis/{}/08_depthsampling/{}/{}_mod.csv'  #noqa
 
 # Number of header lines in ROI CSV file:
 varNumHdrRoi = 1
@@ -109,7 +109,7 @@ varThr = 0.1
 lgcNegLkp = True
 
 # Output basename (ROI, hemisphere, and condition left open):
-strPathOut = '/home/john/PhD/PacMan_Plots/eccentricity/plots/ecc_{}_{}_{}'
+strPathOut = '/home/john/Dropbox/PacMan_Plots/eccentricity/plots/ecc_{}_{}_{}'
 # *****************************************************************************
 
 

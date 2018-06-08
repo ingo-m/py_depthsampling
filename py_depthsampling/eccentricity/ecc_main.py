@@ -211,17 +211,16 @@ def eccentricity(lstSubId, strVtkEcc, vecEccBin, strVtkParam, varNumDpth,  #noqa
 
     # Do not use separate colour map if there are only positive or only
     # negative values):
-    if not(np.less(varMin, 0.0) and np.greater(varMax, 0.0)):
-        lgcNegLkp = False
+    # if not(np.less(varMin, 0.0) and np.greater(varMax, 0.0)):
+    #     lgcNegLkp = False
 
     # Plot across subjects mean:
-    if lgcNegLkp:
-
-        ecc_plot(arySubData,
-                 vecEccBin,
-                 strTmp)
-    else:
-        ecc_plot_simple(arySubData,
-                        vecEccBin,
-                        strTmp)
+    # if lgcNegLkp:
+    ecc_plot(arySubData,
+             vecEccBin,
+             strTmp)
+    # else:
+    #     ecc_plot_simple(arySubData,
+    #                     vecEccBin,
+    #                     strTmp)
     # *************************************************************************

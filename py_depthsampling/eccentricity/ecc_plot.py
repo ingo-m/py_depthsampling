@@ -52,6 +52,12 @@ def ecc_plot(aryMean, vecEccBin, strPathOut):
     varMin = (np.floor(varMin * 0.1) / 0.1)
     varMax = (np.ceil(varMax * 0.1) / 0.1)
 
+    # Same scale for negative and positive colour bar:
+    if np.greater(np.absolute(varMin), varMax):
+        varMax = np.absolute(varMin)
+    else:
+        varMin = np.multiply(-1.0, np.absolute(varMax))
+
     # Create main figure:
     fig01 = plt.figure(figsize=(4.0, 3.0),
                        dpi=200.0,

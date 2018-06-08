@@ -58,6 +58,7 @@ def ecc_plot(aryMean, vecEccBin, strPathOut):
     else:
         varMin = np.multiply(-1.0, np.absolute(varMax))
 
+    # Fixed axis limites for comparing plots across conditions/ROIs:
     # varMin = -400.0
     # varMax = 400.0
 

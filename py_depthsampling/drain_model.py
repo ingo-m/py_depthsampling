@@ -128,11 +128,11 @@ strPthPltOt = '/home/john/Dropbox/PacMan_Plots/deconv/{}/{}/{}_{}_{}_deconv_mode
 strFlTp = '.svg'
 
 # Figure scaling factor:
-varDpi = 80.0
+varDpi = 100.0
 
 # Label for axes:
 strXlabel = 'Cortical depth level (equivolume)'
-strYlabel = 'fMRI signal change [arbitrary units]'
+strYlabel = 'fMRI signal change [a.u.]'
 
 # Condition levels (used to complete file names) - nested list:
 # lstNstCon = [['Pd', 'Cd', 'Ps'],

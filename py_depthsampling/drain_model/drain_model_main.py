@@ -133,10 +133,11 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
             # lower layers plus half  its own thickness):
             vecPosMdl = np.array([0.1, 0.25, 0.5, 0.8, 0.95])
 
-        elif strRoi == 'v2':
-            print('------Interpolation - V2')
-            # Relative position of the layers (accordign to Weber et al., 2008,
-            # Figure 5C, p. 2322). We start with the absolute depth:
+        elif (strRoi == 'v2') or ((strRoi == 'v3')):
+            print('------Interpolation - V2/V3')
+            # Relative position of the layers, accordign to Weber et al., 2008,
+            # Figure 5C, p. 2322. Their data is on 'extrastriate cortex', from
+            # V2 to V5. We start with the absolute depth:
             vecPosMdl = np.array([160.0, 590.0, 1110.0, 1400.0, 1620.0])
             # Divide by overall thickness (1.7 mm):
             vecPosMdl = np.divide(vecPosMdl, 1700.0)

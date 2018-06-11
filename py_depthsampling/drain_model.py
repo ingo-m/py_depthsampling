@@ -106,8 +106,8 @@ lstMdl = [1]
 # Meta-condition (within or outside of retinotopic stimulus area):
 lstMetaCon = ['stimulus', 'periphery']
 
-# ROI ('v1' or 'v2'):
-lstRoi = ['v1', 'v2']
+# ROI ('v1', 'v2' or 'v3'):
+lstRoi = ['v1', 'v2', 'v3']
 
 # Hemisphere ('rh' or 'lh'):
 lstHmsph = ['lh', 'rh']
@@ -125,7 +125,7 @@ strPthPrfOt = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_
 strPthPltOt = '/home/john/Dropbox/PacMan_Plots/deconv/{}/{}/{}_{}_{}_deconv_model_{}_'  #noqa
 
 # File type suffix for plot:
-strFlTp = '.png'
+strFlTp = '.svg'
 
 # Figure scaling factor:
 varDpi = 80.0

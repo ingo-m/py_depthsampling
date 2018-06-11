@@ -28,6 +28,7 @@ from py_depthsampling.drain_model.drain_model_decon_03 import deconv_03
 from py_depthsampling.drain_model.drain_model_decon_04 import deconv_04
 from py_depthsampling.drain_model.drain_model_decon_05 import deconv_05
 from py_depthsampling.drain_model.drain_model_decon_06 import deconv_06
+from py_depthsampling.drain_model.drain_model_decon_07 import deconv_07
 from py_depthsampling.main.find_peak import find_peak
 
 
@@ -201,6 +202,12 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
         elif varMdl == 6:
                 aryDecon5[idxSub, :, :, :] = \
                     deconv_06(varNumCon, aryEmp5, lstFctr)
+
+        # (7) Deconvolution based on Markuerkiaga et al. (2016); same as (1),
+        #     but using matrix inversion instead of iterative subtraction.
+        if varMdl == 7:
+            aryDecon5[idxSub, :, :] = deconv_07(varNumCon,
+                                                aryEmp5SnSb[idxSub, :, :])
 
         # ---------------------------------------------------------------------
         # *** Interpolation

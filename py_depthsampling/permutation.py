@@ -38,10 +38,10 @@ from py_depthsampling.plot.plt_dpth_prfl import plt_dpth_prfl
 lstMdl = ['', '_deconv_model_1']
 
 # Meta-condition (within or outside of retinotopic stimulus area):
-lstMetaCon = ['stimulus', 'periphery']
+lstMetaCon = ['stimulus']  # , 'periphery']
 
-# ROI ('v1' or 'v2'):
-lstRoi = ['v1', 'v2']
+# ROI ('v1', 'v2', or 'v3'):
+lstRoi = ['v1', 'v2', 'v3']
 
 # Hemisphere ('rh' or 'lh'):
 lstHmsph = ['rh']
@@ -57,12 +57,9 @@ strPthPltOt = '/home/john/Dropbox/PacMan_Plots/permutation/{}_{}_{}_{}{}_'  #noq
 # File type suffix for plot:
 strFlTp = '.svg'
 
-# Figure scaling factor:
-varDpi = 80.0
-
 # Label for axes:
 strXlabel = 'Cortical depth level (equivolume)'
-strYlabel = 'fMRI signal change [arbitrary units]'
+strYlabel = 'fMRI signal change [a.u.]'
 
 # Condition levels (used to complete file names):
 # lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst',
@@ -92,7 +89,7 @@ varYmin = -40.0
 varYmax = 40.0
 
 # Figure scaling factor:
-varDpi = 80.0
+varDpi = 100.0
 # -----------------------------------------------------------------------------
 
 
@@ -196,7 +193,7 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                                       ['Empirical condition difference',
                                        'Permutation null distribution'],
                                       'Cortical depth level (equivolume)',
-                                      'fMRI signal change (arbitraty units)',
+                                      'fMRI signal change [a.u.]',
                                       (lstRoi[idxRoi].upper()
                                        + ' '
                                        + lstHmsph[idxHmsph].upper()

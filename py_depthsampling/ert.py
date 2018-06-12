@@ -49,11 +49,11 @@ lstSubIds = ['20171023',  # '20171109',
 strPthPic = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/era_{}_{}.pickle'  #noqa
 
 # Condition levels (used to complete file names):
-lstCon = ['control_dynamic', 'pacman_dynamic', 'pacman_static']
+lstCon = ['pacman_dynamic', 'pacman_static', 'control_dynamic']
 
 # Condition labels (for plot legend):
 # lstConLbl = ['72.0%', '16.3%', '6.1%', '2.5%']
-lstConLbl = ['Control dynamic', 'Pacman dynamic', 'Pacman static']
+lstConLbl = ['Pacman dynamic', 'Pacman static', 'Control dynamic']
 
 # Base name of vertex inclusion masks (subject ID, hemisphere, subject ID,
 # ROI, and metacondition left open):
@@ -110,7 +110,7 @@ strPltOtPre = '/home/john/Dropbox/PacMan_Plots/era/{}/{}_{}/'
 strPltOtSuf = '_ert.svg'
 
 # Figure scaling factor:
-varDpi = 70.0
+varDpi = 100.0
 # *****************************************************************************
 
 

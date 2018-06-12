@@ -35,33 +35,33 @@ lstMdl = ['_deconv_model_1']  # ['', '_deconv_model_1']
 # Meta-condition (within or outside of retinotopic stimulus area):
 lstMetaCon = ['stimulus']  # ['stimulus', 'periphery']
 
-# ROI ('v1' or 'v2'):
-lstRoi = ['v1', 'v2']
+# ROI ('v1', 'v2', or 'v3'):
+lstRoi = ['v1', 'v2', 'v3']
 
 # Hemisphere ('rh' or 'lh'):
 lstHmsph = ['rh']  # ['lh', 'rh']
 
 # Path for corrected depth-profiles (meta-condition, ROI, hemisphere,
 # condition, and model index left open):
-strPthData = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npy'  #noqa
+strPthData = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npy'  #noqa
 
 # Output path & prefix for plots (meta-condition, ROI, ROI, hemisphere, and
 # model index left open):
-strPthPltOt = '/home/john/PhD/PacMan_Plots/boot_diff/{}/{}/{}_{}{}'  #noqa
+strPthPltOt = '/home/john/Dropbox/PacMan_Plots/boot_diff/{}/{}/{}_{}{}'  #noqa
 
 # Output path for single subject plot (heatmap), (ROI, metacondition,
 # hemisphere, drain model, and condition left open):
 # sttPthPtlSnglOt = '/home/john/PhD/PacMan_Plots/boot_diff_sngle/{}_{}_{}{}_{}'
 
 # File type suffix for plot:
-strFlTp = '.png'
+strFlTp = '.svg'
 
 # Figure scaling factor:
-varDpi = 80.0
+varDpi = 100.0
 
 # Label for axes:
 strXlabel = 'Cortical depth level (equivolume)'
-strYlabel = 'fMRI signal change [arbitrary units]'
+strYlabel = 'fMRI signal change [a.u.]'
 
 # Condition levels (used to complete file names):
 lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
@@ -73,7 +73,7 @@ lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
 lstConLbl = ['Pd_sst', 'Cd_sst', 'Ps_sst']
 
 # Which conditions to compare (list of tuples with condition indices):
-lstDiff = [(0, 1), (0, 2)]
+lstDiff = [(0, 1), (0, 2), (1, 2)]
 
 # Number of resampling iterations for peak finding (for models 1, 2, and 3) or
 # random noise samples (models 4 and 5):
@@ -155,8 +155,8 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                           strTtl='',
                           varYmin=varYmin,
                           varYmax=varYmax,
-                          strXlabel='Cortical depth level (equivolume)',
-                          strYlabel='Difference score',
+                          strXlabel=strXlabel,
+                          strYlabel=strYlabel,
                           lgcLgnd=True,
                           lstDiff=lstDiff)
 

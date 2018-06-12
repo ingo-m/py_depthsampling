@@ -157,7 +157,7 @@ strPltOtPre = '/home/john/PhD/PacMan_Plots/pe/{}/plots_{}/'
 strPltOtSuf = '_{}_{}_{}.png'
 
 # Figure scaling factor:
-varDpi = 80.0
+varDpi = 100.0
 
 # If normalisation - data from which input file to divide by?
 # (Indexing starts at zero.) Note: This functionality is not used at the

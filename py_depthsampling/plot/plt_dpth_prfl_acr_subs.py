@@ -106,7 +106,6 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
     if vecWghts is None:
         aryAcrSubDpthMean = np.mean(arySubDpthMns, axis=0)
     else:
-        print('weighted average')
         aryAcrSubDpthMean = np.average(arySubDpthMns, weights=vecWghts, axis=0)
 
     if strErr == 'conf95':

@@ -64,11 +64,11 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
     for idxCon in range(varNumCon):
         objNpz = np.load(strPthPrf.format(lstCon[idxCon]))
         aryEmpSnSb[:, idxCon, :] = objNpz['arySubDpthMns']
-
-    # Array for number of vertices (for weighted averaging across subjects;
+    # Array with number of vertices (for weighted averaging across subjects;
     # since the deconvolution is done separately for each subject, this vector
     # is only loaded to be passed on to the file with the deconvolved depth
-    # profiles for weighted averaging in downstream analysis steps).
+    # profiles for weighted averaging in downstream analysis steps), shape:
+    # vecNumInc[subjects].
     vecNumInc = objNpz['vecNumInc']
 
     # Number of subjects:
@@ -440,7 +440,8 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
                                strTmpPth,
                                strFlTp,
                                strErr='sem',
-                               vecX=vecPosEmp)
+                               vecX=vecPosEmp,
+                               vecWghts=vecNumInc)
 
         # Across-subjects mean after deconvolution:
         strTmpTtl = '{} after deconvolution'.format(strRoi.upper())
@@ -459,7 +460,8 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
                                strTmpPth,
                                strFlTp,
                                strErr='sem',
-                               vecX=vecIntpEqui)
+                               vecX=vecIntpEqui,
+                               vecWghts=vecNumInc)
 
     elif varMdl == 4:
 

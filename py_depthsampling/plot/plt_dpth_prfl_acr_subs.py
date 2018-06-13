@@ -38,7 +38,8 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
                            varSizeX=1800.0,
                            varSizeY=1600.0,
                            strErr='conf95',
-                           vecX=None):
+                           vecX=None,
+                           vecWghts=None):
     """
     Calculate & plot across-subjects mean depth profiles.
 
@@ -93,9 +94,20 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
     vecX : np.array
         1D array with x-position of data points. If not provided, data points
         are equally spaced in the range ```range(0, varNumDpth)```.
+    vecWghts : np.array
+        1D array with weights for averaging across subjects. In case that
+        ROIs have different sizes across subjects, the number of vertices (of
+        each subject's ROI) can be provided here. If `vecWghts = None`, the
+        non-weighted average is calculate (i.e. the 'normal' average with equal
+        weights per subject). NOTE: Weighting of error bars (SEM, SD,
+        confidence interval, or percentile) not implemented yet.
     """
     # Across-subjects mean:
-    aryAcrSubDpthMean = np.mean(arySubDpthMns, axis=0)
+    if vecWghts is None:
+        aryAcrSubDpthMean = np.mean(arySubDpthMns, axis=0)
+    else:
+        print('weighted average')
+        aryAcrSubDpthMean = np.average(arySubDpthMns, weights=vecWghts, axis=0)
 
     if strErr == 'conf95':
         # Calculate 95% confidence interval for the mean, obtained by

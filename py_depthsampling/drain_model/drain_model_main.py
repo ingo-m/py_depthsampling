@@ -46,7 +46,9 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
     print('---Loading data')
 
     # Load array for first condition to get dimensions:
-    aryTmpDpth = np.load(strPthPrf.format(lstCon[0]))
+    objNpz = np.load(strPthPrf.format(lstCon[0]))
+    aryTmpDpth = objNpz['arySubDpthMns']
+
     # Number of subjects:
     varNumSub = aryTmpDpth.shape[0]
     # Get number of depth levels from input array:
@@ -60,7 +62,14 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
 
     # Load single-condition arrays from disk:
     for idxCon in range(varNumCon):
-        aryEmpSnSb[:, idxCon, :] = np.load(strPthPrf.format(lstCon[idxCon]))
+        objNpz = np.load(strPthPrf.format(lstCon[idxCon]))
+        aryEmpSnSb[:, idxCon, :] = objNpz['arySubDpthMns']
+
+    # Array for number of vertices (for weighted averaging across subjects;
+    # since the deconvolution is done separately for each subject, this vector
+    # is only loaded to be passed on to the file with the deconvolved depth
+    # profiles for weighted averaging in downstream analysis steps).
+    vecNumInc = objNpz['vecNumInc']
 
     # Number of subjects:
     # varNumSub = aryEmpSnSb.shape[0]
@@ -304,10 +313,19 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
         # condition is saved to a separate file (for consistency):
 
         for idxCon in range(varNumCon):
+
             # Form of the array that is saved to disk:
             # aryDecon[subject, depth]
-            np.save(strPthPrfOt.format(lstCon[idxCon]),
-                    aryDecon[:, idxCon, :])
+
+            # In addition, a vector with the number of vertices (for that ROI
+            # in tha subject) is saved, in order to be able to normalise when
+            # averaging over subjects. Shape: vecNumInc[subject]
+
+            # Save subject-level depth profiles, and number of vertices per
+            # subject:
+            np.savez(strPthPrfOt.format(lstCon[idxCon]),
+                     arySubDpthMns=aryDecon[:, idxCon, :],
+                     vecNumInc=vecNumInc)
 
     # -------------------------------------------------------------------------
     # *** Peak positions percentile bootstrap

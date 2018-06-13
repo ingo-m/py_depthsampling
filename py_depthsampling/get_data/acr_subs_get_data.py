@@ -279,7 +279,8 @@ def acr_subs_get_data(idxPrc,              # Process ID  #noqa
 
     # Output list:
     lstOut = [idxPrc,
-              aryDpthMean]
+              aryDpthMean,
+              varNumInc]
 
     queOut.put(lstOut)
     # **************************************************************************

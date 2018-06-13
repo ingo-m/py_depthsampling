@@ -49,7 +49,7 @@ lstMetaCon = ['stimulus', 'periphery']
 lstRoi = ['v1', 'v2', 'v3']
 
 # Hemispheres ('lh' or 'rh'):
-lstHmsph = ['lh', 'rh']
+lstHmsph = ['rh', 'lh']
 
 # List of subject identifiers:
 lstSubIds = ['20171023',  # '20171109',
@@ -61,25 +61,25 @@ lstSubIds = ['20171023',  # '20171109',
              '20180118']
 
 # Condition levels (used to complete file names) - nested list:
-lstNstCon = [['Pd_sst', 'Cd_sst', 'Ps_sst'],
+lstNstCon = [['Pd_sst', 'Ps_sst', 'Cd_sst'],
              ['Pd_min_Ps_sst'],
              ['Pd_min_Cd_sst'],
              ['Linear_sst'],
-             ['Pd_trn', 'Cd_trn', 'Ps_trn'],
+             ['Pd_trn', 'Ps_trn', 'Cd_trn'],
              ['Pd_min_Ps_trn'],
              ['Pd_min_Cd_trn'],
              ['Linear_trn']]
 
 # Condition labels:
 lstNstConLbl = [['PacMan Dynamic Sustained',
-                 'Control Dynamic Sustained',
-                 'PacMan Static Sustained'],
+                 'PacMan Static Sustained',
+                 'Control Dynamic Sustained'],
                 ['PacMan D - PacMan S (Sustained)'],
                 ['PacMan D - Control D (Sustained)'],
                 ['Linear (Sustained)'],
                 ['PacMan Dynamic Transient',
-                 'Control Dynamic Transient',
-                 'PacMan Static Transient'],
+                 'PacMan Static Transient',
+                 'Control Dynamic Transient'],
                 ['PacMan D - PacMan S (Transient)'],
                 ['PacMan D - Control D (Transient)'],
                 ['Linear (Transient)']]
@@ -134,7 +134,7 @@ lgcSlct04 = True
 strVtkSlct04 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_eccentricity.vtk'  #noqa
 # Threshold for vertex selection - list of tuples (interval per meta-condition,
 # e.g. within & outside stimulus area):
-lstThrSlct04 = [(0.0, 3.0), (3.5, 4.0)]
+lstThrSlct04 = [(0.1, 3.0), (3.5, 4.0)]
 
 # Number of cortical depths:
 varNumDpth = 11
@@ -147,7 +147,7 @@ strPrcdData = 'SCALARS'
 varNumLne = 2
 
 # Label for axes:
-strXlabel = 'Cortical depth level (equivolume)'
+strXlabel = 'Cortical depth level'
 strYlabel = 'fMRI signal [a.u.]'
 
 # Output path for plots - prefix:
@@ -170,7 +170,7 @@ varNormIdx = 0
 lgcNormDiv = False
 
 # Output path for depth samling results (within subject means):
-strDpthMeans = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}.npy'  #noqa
+strDpthMeans = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}.npz'  #noqa
 
 # Maximum number of processes to run in parallel: *** NOT IMPLEMENTED
 # varPar = 10

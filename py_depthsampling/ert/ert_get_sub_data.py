@@ -153,6 +153,9 @@ def ert_get_sub_data(strSubId,
     # Apply selection to timecourses:
     aryErt = aryErt[:, :, :, vecInc]
 
+    # Get number of vertices (for weighted across-subjects averaging):
+    varNumVrtc = aryErt.shape[3]
+
     # Average across vertices:
     aryErt = np.mean(aryErt, axis=3)
     # *************************************************************************
@@ -160,5 +163,5 @@ def ert_get_sub_data(strSubId,
     # *************************************************************************
     # *** Return
 
-    return aryErt
+    return [aryErt, varNumVrtc]
     # *************************************************************************

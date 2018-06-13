@@ -175,8 +175,11 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
             strVtkMskTmp = strVtkMsk.format(strSubID, strHmsph, strSubID,
                                             strRoi, strMtaCn)
 
-            # Load data for current subject (returns array of the form:
-            # aryRoiErt[varNumCon, varNumDpth, varNumVol]):
+            # Load data for current subject (returns a list with two elements:
+            # First, an array of the form
+            #    aryRoiErt[varNumCon, varNumDpth, varNumVol]
+            # and the number of vertices contained in the ROI (a single
+            # integer):
             dicAllSubsRoiErt[strSubID] = ert_get_sub_data(strSubID,
                                                           strHmsph,
                                                           strVtkMskTmp,
@@ -198,10 +201,14 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
     # to the pre-stimulus baseline, and the pre-stimulus baseline has a mean of
     # one. We subtract one, so that the datapoints are percent signal change
     # relative to baseline.
-    for strSubID, aryRoiErt in dicAllSubsRoiErt.items():
+    for strSubID, lstItem in dicAllSubsRoiErt.items():
+        # Get event related time courses from list (second entry in list is the
+        # number of vertices contained in this ROI).
+        aryRoiErt = lstItem[0]
+        # Subtract baseline mean:
         aryRoiErt = np.subtract(aryRoiErt, 1.0)
         # Is this line necessary (hard copy)?
-        dicAllSubsRoiErt[strSubID] = aryRoiErt
+        dicAllSubsRoiErt[strSubID] = [aryRoiErt, lstItem[1]]
 
     # *************************************************************************
     # *** Plot single subjet results
@@ -211,7 +218,11 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
         print('---Ploting single-subjects event-related averages')
 
         # Loop through subjects:
-        for strSubID, aryRoiErt in dicAllSubsRoiErt.items():
+        for strSubID, lstItem in dicAllSubsRoiErt.items():
+
+            # Get event related time courses from list (second entry in list is
+            # the number of vertices contained in this ROI).
+            aryRoiErt = lstItem[0]
 
             # Loop through depth levels (we only create plots for three depth
             # levels):
@@ -261,16 +272,46 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
     # Create across-subjects data array of the form:
     # aryAllSubsRoiErt[varNumSub, varNumCon, varNumDpth, varNumVol]
     aryAllSubsRoiErt = np.zeros((varNumSub, varNumCon, varNumDpth, varNumVol))
+
+    # Vector for number of vertices per subject (used for weighted averaging):
+    vecNumVrtcs = np.zeros((varNumSub))
+
     idxSub = 0
-    for aryRoiErt in dicAllSubsRoiErt.values():
+
+    for lstItem in dicAllSubsRoiErt.values():
+
+        # Get event related time courses from list.
+        aryRoiErt = lstItem[0]
+
+        # Get number of vertices for this subject:
+        vecNumVrtcs[idxSub] = lstItem[1]
+
         aryAllSubsRoiErt[idxSub, :, :, :] = aryRoiErt
+
         idxSub += 1
 
     # Calculate mean event-related time courses (mean across subjects):
-    aryRoiErtMean = np.mean(aryAllSubsRoiErt, axis=0)
+    aryRoiErtMean = np.average(aryAllSubsRoiErt, weights=vecNumVrtcs, axis=0)
+
+    # Weighted variance:
+    aryAcrSubDpthVar = np.average(
+                                  np.power(
+                                           np.subtract(
+                                                       aryAllSubsRoiErt,
+                                                       aryRoiErtMean[None,
+                                                                     :, :, :]
+                                                       ),
+                                           2.0
+                                           ),
+                                  axis=0,
+                                  weights=vecNumVrtcs
+                                  )
+
+    # Weighted standard deviation:
+    aryAcrSubDpthSd = np.sqrt(aryAcrSubDpthVar)
 
     # Calculate standard error of the mean (for error bar):
-    aryRoiErtSem = np.divide(np.std(aryAllSubsRoiErt, axis=0),
+    aryRoiErtSem = np.divide(aryAcrSubDpthSd,
                              np.sqrt(varNumSub))
 
     # Loop through depth levels:
@@ -319,17 +360,30 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
     # Event-related time courses have the form:
     # aryAllSubsRoiErt[varNumSub, varNumCon, varNumDpth, varNumVol]
 
-    # Calculate mean across depth:
+    # Calculate mean across depth (within subjects):
     aryMneDpth = np.mean(aryAllSubsRoiErt, axis=2)
 
     # Now of the form:
-    # aryMneTmp[varNumSub, varNumCon, varNumVol]
+    # aryMneDpth[varNumSub, varNumCon, varNumVol]
 
     # Calculate mean across subjects:
-    aryMneDpthSub = np.mean(aryMneDpth, axis=0)
+    aryMneDpthSub = np.average(aryMneDpth, weights=vecNumVrtcs, axis=0)
 
-    # Calculate SD across subjects:
-    arySdDpthSub = np.std(aryMneDpth, axis=0)
+    # Weighted variance (across subjects):
+    aryVarDpthSub = np.average(
+                               np.power(
+                                        np.subtract(
+                                                    aryMneDpth,
+                                                    aryMneDpthSub[None, :, :]
+                                                    ),
+                                        2.0
+                                        ),
+                               axis=0,
+                               weights=vecNumVrtcs
+                               )
+
+    # Weighted standard deviation (across subjects):
+    arySdDpthSub = np.sqrt(aryVarDpthSub)
 
     # Now of the form:
     # aryMneDpthSub[varNumCon, varNumVol]

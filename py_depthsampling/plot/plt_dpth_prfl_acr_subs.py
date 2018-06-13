@@ -47,7 +47,7 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
     ----------
     arySubDpthMns : np.array
         Array with depth data to be plotted, of the form:
-        aryDpthMeans[Subject, Condition, Depth]
+        arySubDpthMns[Subject, Condition, Depth]
     varNumSubs : int
         Number of subect
     varNumDpth : int
@@ -99,8 +99,8 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
         ROIs have different sizes across subjects, the number of vertices (of
         each subject's ROI) can be provided here. If `vecWghts = None`, the
         non-weighted average is calculate (i.e. the 'normal' average with equal
-        weights per subject). NOTE: Weighting of error bars (SEM, SD,
-        confidence interval, or percentile) not implemented yet.
+        weights per subject). NOTE: Weighted error bars are not implemented for
+        the option `strErr = prct95`.
     """
     # Across-subjects mean:
     if vecWghts is None:
@@ -108,13 +108,34 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
     else:
         aryAcrSubDpthMean = np.average(arySubDpthMns, weights=vecWghts, axis=0)
 
+    # For simplicity, create dummy weighting vector (with equal weights per
+    # subject) if none was provided:
+    if vecWghts is None:
+        vecWghts = np.ones((varNumSubs))
+
     if strErr == 'conf95':
+        # Weighted variance:
+        aryAcrSubDpthVar = np.average(
+                                      np.power(
+                                               np.subtract(
+                                                           arySubDpthMns,
+                                                           aryAcrSubDpthMean[
+                                                               None, :, :]
+                                                           ),
+                                               2.0
+                                               ),
+                                      axis=0,
+                                      weights=vecWghts
+                                      )
+
+        # Weighted standard deviation:
+        aryAcrSubDpthSd = np.sqrt(aryAcrSubDpthVar)
+
         # Calculate 95% confidence interval for the mean, obtained by
         # multiplying the standard error of the mean (SEM) by 1.96. We obtain
         # the SEM by dividing the standard deviation by the squareroot of the
         # sample size n.
-        aryArcSubDpthConf = np.multiply(np.divide(np.std(arySubDpthMns,
-                                                         axis=0),
+        aryArcSubDpthConf = np.multiply(np.divide(aryAcrSubDpthSd,
                                                   np.sqrt(varNumSubs)),
                                         1.96)
         # Lower bound (as deviation from the mean):
@@ -123,16 +144,48 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
         aryArcSubDpthConfUp = np.add(aryAcrSubDpthMean, aryArcSubDpthConf)
 
     elif strErr == 'sd':
-        # Calculate standard deviation across subjects:
-        aryArcSubDpthConf = np.std(arySubDpthMns, axis=0)
+        # Weighted variance:
+        aryAcrSubDpthVar = np.average(
+                                      np.power(
+                                               np.subtract(
+                                                           arySubDpthMns,
+                                                           aryAcrSubDpthMean[
+                                                               None, :, :]
+                                                           ),
+                                               2.0
+                                               ),
+                                      axis=0,
+                                      weights=vecWghts
+                                      )
+
+        # Weighted standard deviation:
+        aryAcrSubDpthSd = np.sqrt(aryAcrSubDpthVar)
+        aryArcSubDpthConf = aryAcrSubDpthSd
         # Lower bound (as deviation from the mean):
         aryArcSubDpthConfLw = np.subtract(aryAcrSubDpthMean, aryArcSubDpthConf)
         # Upper bound (as deviation from the mean):
         aryArcSubDpthConfUp = np.add(aryAcrSubDpthMean, aryArcSubDpthConf)
 
     elif strErr == 'sem':
+        # Weighted variance:
+        aryAcrSubDpthVar = np.average(
+                                      np.power(
+                                               np.subtract(
+                                                           arySubDpthMns,
+                                                           aryAcrSubDpthMean[
+                                                               None, :, :]
+                                                           ),
+                                               2.0
+                                               ),
+                                      axis=0,
+                                      weights=vecWghts
+                                      )
+
+        # Weighted standard deviation:
+        aryAcrSubDpthSd = np.sqrt(aryAcrSubDpthVar)
+
         # Calculate standard error of the mean.
-        aryArcSubDpthConf = np.divide(np.std(arySubDpthMns, axis=0),
+        aryArcSubDpthConf = np.divide(aryAcrSubDpthSd,
                                       np.sqrt(varNumSubs))
         # Lower bound (as deviation from the mean):
         aryArcSubDpthConfLw = np.subtract(aryAcrSubDpthMean, aryArcSubDpthConf)

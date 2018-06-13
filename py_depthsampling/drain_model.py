@@ -104,13 +104,13 @@ from py_depthsampling.drain_model.drain_model_main import drain_model
 lstMdl = [1]
 
 # Meta-condition (within or outside of retinotopic stimulus area):
-lstMetaCon = ['stimulus', 'periphery']
+lstMetaCon = ['stimulus'] # ['stimulus', 'periphery']
 
 # ROI ('v1', 'v2' or 'v3'):
 lstRoi = ['v1', 'v2', 'v3']
 
 # Hemisphere ('rh' or 'lh'):
-lstHmsph = ['lh', 'rh']
+lstHmsph = ['rh'] # ['lh', 'rh']
 
 # Path of depth-profile to correct (meta-condition, ROI, hemisphere, and
 # condition left open):

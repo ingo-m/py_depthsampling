@@ -30,7 +30,7 @@ from py_depthsampling.boot.boot_plot_diff import boot_plot
 # *** Define parameters
 
 # Which draining model to plot ('' for none):
-lstMdl = ['_deconv_model_1']  # ['', '_deconv_model_1']
+lstMdl = ['', '_deconv_model_1']
 
 # Meta-condition (within or outside of retinotopic stimulus area):
 lstMetaCon = ['stimulus']  # ['stimulus', 'periphery']
@@ -64,13 +64,13 @@ strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'fMRI signal change [a.u.]'
 
 # Condition levels (used to complete file names):
-lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
+lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
 
 # Condition labels:
 # lstConLbl = ['PacMan Dynamic Sustained',
 #              'Control Dynamic Sustained',
 #              'PacMan Static Sustained']
-lstConLbl = ['Pd_sst', 'Cd_sst', 'Ps_sst']
+lstConLbl = lstCon
 
 # Which conditions to compare (list of tuples with condition indices):
 lstDiff = [(0, 1), (0, 2), (1, 2)]

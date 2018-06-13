@@ -35,10 +35,10 @@ from py_depthsampling.plot.plt_dpth_prfl import plt_dpth_prfl
 # *** Define parameters
 
 # Draining model suffix ('' for non-corrected profiles):
-lstMdl = ['', '_deconv_model_1']
+lstMdl = [''] # , '_deconv_model_1']
 
 # Meta-condition (within or outside of retinotopic stimulus area):
-lstMetaCon = ['stimulus']  # , 'periphery']
+lstMetaCon = ['stimulus']
 
 # ROI ('v1', 'v2', or 'v3'):
 lstRoi = ['v1', 'v2', 'v3']
@@ -64,17 +64,11 @@ strYlabel = 'fMRI signal change [a.u.]'
 # Condition levels (used to complete file names):
 # lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst',
 #           'Pd_trn', 'Cd_trn', 'Ps_trn']
-lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
+lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
 
-# Condition labels:
-# lstConLbl = ['PacMan Dynamic Sustained',
-#              'Control Dynamic Sustained',
-#              'PacMan Static Sustained']
 
 # Which conditions to compare (list of tuples with condition indices):
-# lstDiff = [(0, 1), (0, 2),
-#            (3, 4), (3, 5)]
-lstDiff = [(0, 1), (0, 2), (1, 2)]
+lstDiff = [(0, 1), (0, 2), (2, 1)]
 
 # Number of resampling iterations:
 varNumIt = 1000000
@@ -85,8 +79,8 @@ varLow = 2.5
 varUp = 97.5
 
 # Limits of y-axis:
-varYmin = -40.0
-varYmax = 40.0
+varYmin = -50.0
+varYmax = 50.0
 
 # Figure scaling factor:
 varDpi = 100.0

@@ -98,7 +98,7 @@ lgcSlct01 = True
 # by the funtion `py_depthsampling.misc.fix_roi_csv.fix_roi_csv` in order to
 # ensure that the indices of the ROI definition and the vtk meshes are
 # congruent.
-strCsvRoi = '/home/john/PhD/GitHub/PacMan/analysis/{}/08_depthsampling/{}/{}_mod.csv'  #noqa
+strCsvRoi = '/home/john/PhD/GitLab/PacMan/analysis/{}/08_depthsampling/{}/{}_mod.csv'  #noqa
 # Number of header lines in ROI CSV file:
 varNumHdrRoi = 1
 
@@ -151,7 +151,7 @@ strXlabel = 'Cortical depth level (equivolume)'
 strYlabel = 'fMRI signal [a.u.]'
 
 # Output path for plots - prefix:
-strPltOtPre = '/home/john/PhD/PacMan_Plots/pe/{}/plots_{}/'
+strPltOtPre = '/home/john/Dropbox/PacMan_Plots/pe/{}/plots_{}/'
 
 # Output path for plots - suffix:
 strPltOtSuf = '_{}_{}_{}.png'
@@ -170,7 +170,7 @@ varNormIdx = 0
 lgcNormDiv = False
 
 # Output path for depth samling results (within subject means):
-strDpthMeans = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}.npy'  #noqa
+strDpthMeans = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}.npy'  #noqa
 
 # Maximum number of processes to run in parallel: *** NOT IMPLEMENTED
 # varPar = 10

@@ -133,8 +133,10 @@ def plt_dpth_prfl(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
 
     if aryClr is None:
         # Prepare colour map:
-        objClrNorm = colors.Normalize(vmin=0, vmax=(varNumCon - 1))
-        objCmap = plt.cm.winter
+        # objClrNorm = colors.Normalize(vmin=0, vmax=(varNumCon - 1))
+        # objCmap = plt.cm.winter
+        objClrNorm = colors.Normalize(vmin=0, vmax=9)
+        objCmap = plt.cm.tab10
 
     # Loop through conditions:
     for idxCon in range(0, varNumCon):

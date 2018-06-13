@@ -150,8 +150,10 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
         vecX = np.linspace(0.0, 1.0, num=varNumDpth, endpoint=True)
 
     # Prepare colour map:
-    objClrNorm = colors.Normalize(vmin=0, vmax=(varNumCon - 1))
-    objCmap = plt.cm.winter
+    # objClrNorm = colors.Normalize(vmin=0, vmax=(varNumCon - 1))
+    # objCmap = plt.cm.winter
+    objClrNorm = colors.Normalize(vmin=0, vmax=9)
+    objCmap = plt.cm.tab10
 
     # Loop through input files:
     for idxIn in range(0, varNumCon):

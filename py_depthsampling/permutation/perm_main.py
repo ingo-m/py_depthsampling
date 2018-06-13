@@ -25,7 +25,8 @@ Function of the depth sampling pipeline.
 import numpy as np
 
 
-def permute(aryDpth01, aryDpth02, varNumIt=10000, varLow=2.5, varUp=97.5):
+def permute(aryDpth01, aryDpth02, vecNumInc=None, varNumIt=10000, varLow=2.5,
+            varUp=97.5):
     """
     Permutation test for difference between conditions in depth profiles.
 
@@ -37,6 +38,10 @@ def permute(aryDpth01, aryDpth02, varNumIt=10000, varLow=2.5, varUp=97.5):
     aryDpth02 : np.array
         Array with depth profiles from second experimental condition (e.g.
         'PacMan Static'), shape: aryDpth01[subject, depth].
+    vecNumInc : np.array
+        1D array with number of vertices per subject, used for weighted
+        averaging across subjects. If `None`, number of vertices is assumed to
+        be equal across subjects.
     varNumIt : int
         Number of resampling iterations.
     varLow : float
@@ -91,6 +96,11 @@ def permute(aryDpth01, aryDpth02, varNumIt=10000, varLow=2.5, varUp=97.5):
     # Number of depth levels:
     varNumDpt = aryDpth01.shape[1]
 
+    # If number of vertices per subject is not provided, assume it to be the
+    # same across subjects (for weighted averaging):
+    if vecNumInc is None:
+        vecNumInc = np.ones((varNumSubs))
+
     # -------------------------------------------------------------------------
     # *** Create null distribution
 
@@ -144,7 +154,8 @@ def permute(aryDpth01, aryDpth02, varNumIt=10000, varLow=2.5, varUp=97.5):
 
     # Mean condition difference across subjects (separately for each
     # iteration and depth level):
-    aryPermDiff = np.mean(aryPermDiff, axis=1)
+    # aryPermDiff = np.mean(aryPermDiff, axis=1)
+    aryPermDiff = np.average(aryPermDiff, weights=vecNumInc, axis=1)
 
     # Mean of permutation distribution - i.e. the mean difference between
     # randomly permuted conditions - the mean difference expected by chance.

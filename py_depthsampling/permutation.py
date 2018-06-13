@@ -48,7 +48,7 @@ lstHmsph = ['rh']
 
 # Path of depth-profile to load (meta-condition, ROI, hemisphere, condition,
 # and deconvolution suffix left open):
-strPthPrf = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npy'  #noqa
+strPthPrf = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npz'  #noqa
 
 # Output path & prefix for plots (meta-condition, ROI, hemisphere, condition,
 # and deconvolution suffix left open):
@@ -58,7 +58,7 @@ strPthPltOt = '/home/john/Dropbox/PacMan_Plots/permutation/{}_{}_{}_{}{}_'  #noq
 strFlTp = '.svg'
 
 # Label for axes:
-strXlabel = 'Cortical depth level (equivolume)'
+strXlabel = 'Cortical depth level'
 strYlabel = 'fMRI signal change [a.u.]'
 
 # Condition levels (used to complete file names):
@@ -144,18 +144,34 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
 
                         # Load single subject depth profiles (shape
                         # aryDpth[subject, depth]):
-                        aryDpth01 = np.load(strTmpPth01)
-                        aryDpth02 = np.load(strTmpPth02)
+                        objNpz01 = np.load(strTmpPth01)
+                        aryDpth01 = objNpz01['arySubDpthMns']
+                        objNpz02 = np.load(strTmpPth02)
+                        aryDpth02 = objNpz02['arySubDpthMns']
+
+                        # Array with number of vertices (for weighted averaging
+                        # across subjects), shape: vecNumInc[subjects].
+                        vecNumInc01 = objNpz01['vecNumInc']
+                        vecNumInc02 = objNpz02['vecNumInc']
+
+                        # Number of vertices are assumed to be the same for the
+                        # two conditions (since the data is sampled from the
+                        # same ROI). If not, raise an error.
+                        if np.all(np.equal(vecNumInc01, vecNumInc02)):
+                            vecNumInc = vecNumInc01
+                        else:
+                            strErrMsg = ('ERROR. Number of vertices within ROI'
+                                         + ' is not consistent across'
+                                         + ' conditions.')
+                            raise ValueError(strErrMsg)
 
                         # Number of depth levels:
                         varNumDpt = aryDpth01.shape[1]
 
                         # Run permutation test:
-                        aryNull, vecP, aryEmpDiffMdn = permute(aryDpth01,
-                                                               aryDpth02,
-                                                               varNumIt=10000,
-                                                               varLow=varLow,
-                                                               varUp=varUp)
+                        aryNull, vecP, aryEmpDiffMdn = permute(
+                            aryDpth01, aryDpth02, vecNumInc=vecNumInc,
+                            varNumIt=10000, varLow=varLow, varUp=varUp)
 
                         # Data array to be passed into plotting function,
                         # containing the empirical condition difference and the

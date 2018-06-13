@@ -183,7 +183,7 @@ def permute(aryDpth01, aryDpth02, vecNumInc=None, varNumIt=10000, varLow=2.5,
     aryEmpDiff = np.subtract(aryDpth01, aryDpth02)
 
     # Mean difference across subjects:
-    aryEmpDiffMdn = np.mean(aryEmpDiff, axis=0)
+    aryEmpDiffMdn = np.average(aryEmpDiff, weights=vecNumInc, axis=0)
 
     # -------------------------------------------------------------------------
     # *** Calculate p-value

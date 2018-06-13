@@ -35,7 +35,7 @@ from py_depthsampling.plot.plt_dpth_prfl import plt_dpth_prfl
 # *** Define parameters
 
 # Draining model suffix ('' for non-corrected profiles):
-lstMdl = [''] # , '_deconv_model_1']
+lstMdl = ['', '_deconv_model_1']
 
 # Meta-condition (within or outside of retinotopic stimulus area):
 lstMetaCon = ['stimulus']
@@ -68,7 +68,7 @@ lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
 
 
 # Which conditions to compare (list of tuples with condition indices):
-lstDiff = [(0, 1), (0, 2), (2, 1)]
+lstDiff = [(0, 1), (0, 2), (1, 2)]
 
 # Number of resampling iterations:
 varNumIt = 1000000
@@ -222,30 +222,32 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                         # Reshape p-values for plot:
                         vecP = vecP.reshape((1, varNumDpt))
 
-                        # Plot p-value:
-                        plt_dpth_prfl(vecP,
-                                      np.zeros(vecP.shape),
-                                      varNumDpt,
-                                      1,
-                                      varDpi,
-                                      0.0,
-                                      0.5,
-                                      False,
-                                      ['p-value'],
-                                      'Cortical depth level (equivolume)',
-                                      'p-value',
-                                      (lstRoi[idxRoi].upper()
-                                       + ' '
-                                       + lstHmsph[idxHmsph].upper()
-                                       + ' '
-                                       + strTtle),
-                                      False,
-                                      (strPthPltOt.format(lstMetaCon[idxMtaCn],
-                                                          lstRoi[idxRoi],
-                                                          lstHmsph[idxHmsph],
-                                                          strPthCon,
-                                                          lstMdl[idxMdl])
-                                       + 'pval'
-                                       + strFlTp),
-                                      varNumLblY=6)
+                        if False:
+
+                            # Plot p-value:
+                            plt_dpth_prfl(vecP,
+                                          np.zeros(vecP.shape),
+                                          varNumDpt,
+                                          1,
+                                          varDpi,
+                                          0.0,
+                                          0.5,
+                                          False,
+                                          ['p-value'],
+                                          'Cortical depth level (equivolume)',
+                                          'p-value',
+                                          (lstRoi[idxRoi].upper()
+                                           + ' '
+                                           + lstHmsph[idxHmsph].upper()
+                                           + ' '
+                                           + strTtle),
+                                          False,
+                                          (strPthPltOt.format(
+                                               lstMetaCon[idxMtaCn],
+                                               lstRoi[idxRoi],
+                                               lstHmsph[idxHmsph],
+                                               strPthCon, lstMdl[idxMdl])
+                                           + 'pval'
+                                           + strFlTp),
+                                          varNumLblY=6)
 # -----------------------------------------------------------------------------

@@ -268,8 +268,8 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
     axs01.set_xticklabels(['WM', 'CSF'])
 
     # Which y values to label with ticks:
-    varAcrSubsYmin = (np.ceil(varAcrSubsYmin * 0.01) / 0.01)
-    varAcrSubsYmax = (np.floor(varAcrSubsYmax * 0.01) / 0.01)
+    # varAcrSubsYmin = (np.ceil(varAcrSubsYmin * 0.01) / 0.01)
+    # varAcrSubsYmax = (np.floor(varAcrSubsYmax * 0.01) / 0.01)
     vecYlbl = np.linspace(np.ceil(varAcrSubsYmin),
                           np.floor(varAcrSubsYmax),
                           num=5,

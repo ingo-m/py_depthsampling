@@ -134,7 +134,7 @@ lgcSlct04 = True
 strVtkSlct04 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_eccentricity.vtk'  #noqa
 # Threshold for vertex selection - list of tuples (interval per meta-condition,
 # e.g. within & outside stimulus area):
-lstThrSlct04 = [(0.1, 3.0), (3.5, 4.0)]
+lstThrSlct04 = [(0.75, 3.0), (3.5, 4.0)]
 
 # Number of cortical depths:
 varNumDpth = 11

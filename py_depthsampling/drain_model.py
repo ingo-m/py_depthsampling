@@ -199,9 +199,9 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                         if idxCon == 0:  # v1 simple contrasts
                             if lstMetaCon[idxMtaCn] == 'stimulus':
                                 # Limits of y-axis for across subject plot:
-                                varAcrSubsYmin01 = -400.0
+                                varAcrSubsYmin01 = -450.0
                                 varAcrSubsYmax01 = 0.0
-                                varAcrSubsYmin02 = -400.0
+                                varAcrSubsYmin02 = -450.0
                                 varAcrSubsYmax02 = 0.0
                             if lstMetaCon[idxMtaCn] == 'periphery':
                                 # Limits of y-axis for across subject plot:
@@ -214,9 +214,9 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                         if idxCon == 0:  # v2 simple contrasts
                             if lstMetaCon[idxMtaCn] == 'stimulus':
                                 # Limits of y-axis for across subject plot:
-                                varAcrSubsYmin01 = -400.0
+                                varAcrSubsYmin01 = -450.0
                                 varAcrSubsYmax01 = 0.0
-                                varAcrSubsYmin02 = -400.0
+                                varAcrSubsYmin02 = -450.0
                                 varAcrSubsYmax02 = 0.0
                             if lstMetaCon[idxMtaCn] == 'periphery':
                                 # Limits of y-axis for across subject plot:

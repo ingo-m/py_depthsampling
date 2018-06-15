@@ -75,6 +75,7 @@ lstNstConLbl = lstNstCon
 
 # Base path of vtk files with depth-sampled data, e.g. parameter estimates
 # (with subject ID, hemisphere, and stimulus level left open):
+# strVtkDpth01 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/feat_level_2_{}_zstat.vtk'  #noqa
 strVtkDpth01 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/feat_level_2_{}_cope.vtk'  #noqa
 
 # (1)
@@ -137,9 +138,11 @@ varNumLne = 2
 
 # Label for axes:
 strXlabel = 'Cortical depth level'
+# strYlabel = 'z-value'
 strYlabel = 'fMRI signal [a.u.]'
 
 # Output path for plots - prefix:
+# strPltOtPre = '/home/john/PhD/PacMan_Plots/z/{}/plots_{}/'
 strPltOtPre = '/home/john/PhD/PacMan_Plots/pe/{}/plots_{}/'
 
 # Output path for plots - suffix:
@@ -159,6 +162,7 @@ varNormIdx = 0
 lgcNormDiv = False
 
 # Output path for depth samling results (within subject means):
+# strDpthMeans = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}_zstat.npz'  #noqa
 strDpthMeans = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}.npz'  #noqa
 
 # Maximum number of processes to run in parallel: *** NOT IMPLEMENTED

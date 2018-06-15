@@ -49,7 +49,7 @@ lstMetaCon = ['stimulus', 'periphery']
 lstRoi = ['v1', 'v2', 'v3']
 
 # Hemispheres ('lh' or 'rh'):
-lstHmsph = ['rh', 'lh']
+lstHmsph = ['rh'] #, 'lh']
 
 # List of subject identifiers:
 lstSubIds = ['20171023',  # '20171109',
@@ -64,25 +64,14 @@ lstSubIds = ['20171023',  # '20171109',
 lstNstCon = [['Pd_sst', 'Ps_sst', 'Cd_sst'],
              ['Pd_min_Ps_sst'],
              ['Pd_min_Cd_sst'],
-             ['Linear_sst'],
+             ['Pd_min_Cd_Ps_sst'],
              ['Pd_trn', 'Ps_trn', 'Cd_trn'],
              ['Pd_min_Ps_trn'],
              ['Pd_min_Cd_trn'],
-             ['Linear_trn']]
+             ['Pd_min_Cd_Ps_sst']]
 
 # Condition labels:
-lstNstConLbl = [['PacMan Dynamic Sustained',
-                 'PacMan Static Sustained',
-                 'Control Dynamic Sustained'],
-                ['PacMan D - PacMan S (Sustained)'],
-                ['PacMan D - Control D (Sustained)'],
-                ['Linear (Sustained)'],
-                ['PacMan Dynamic Transient',
-                 'PacMan Static Transient',
-                 'Control Dynamic Transient'],
-                ['PacMan D - PacMan S (Transient)'],
-                ['PacMan D - Control D (Transient)'],
-                ['Linear (Transient)']]
+lstNstConLbl = lstNstCon
 
 # Base path of vtk files with depth-sampled data, e.g. parameter estimates
 # (with subject ID, hemisphere, and stimulus level left open):
@@ -151,7 +140,7 @@ strXlabel = 'Cortical depth level'
 strYlabel = 'fMRI signal [a.u.]'
 
 # Output path for plots - prefix:
-strPltOtPre = '/home/john/Dropbox/PacMan_Plots/pe/{}/plots_{}/'
+strPltOtPre = '/home/john/PhD/PacMan_Plots/pe/{}/plots_{}/'
 
 # Output path for plots - suffix:
 strPltOtSuf = '_{}_{}_{}.png'

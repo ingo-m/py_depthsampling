@@ -56,8 +56,10 @@ def plot(aryVslSpc, strTtl, strXlabel, strYlabel, strPathOut, tpleLimX=None,
         varMin = np.multiply(-1.0, np.absolute(varMax))
 
     # Fixed axis limites for comparing plots across conditions/ROIs:
-    # varMin = -250.0
-    # varMax = 250.0
+    varMin = -250.0
+    varMax = 250.0
+    # varMin = -5.0
+    # varMax = 5.0
 
     # Create main figure:
     fig01 = plt.figure(figsize=(4.0, 3.0),

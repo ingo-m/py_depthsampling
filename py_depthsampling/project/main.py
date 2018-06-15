@@ -32,6 +32,7 @@ from py_depthsampling.project.plot import plot
 # Load/save existing projection from/to (ROI, condition, depth level label left
 # open):
 strPthNpy = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project/{}_{}_{}.npy'  #noqa
+# strPthNpy = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project/{}_{}_{}_z.npy'  #noqa
 
 # List of subject identifiers:
 lstSubIds = ['20171023',  # '20171109',
@@ -55,7 +56,8 @@ lstDpthLbl = ['allGM', 'deepGM', 'midGM', 'superficialGM']
 lstRoi = ['v1', 'v2', 'v3']
 
 # Output path & prefix for plots (ROI, condition, depth level label left open):
-strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/{}_{}_{}'  #noqa
+strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/pe/{}_{}_{}'  #noqa
+# strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/z/{}_{}_{}'  #noqa
 
 # File type suffix for plot:
 strFlTp = '.svg'
@@ -64,18 +66,17 @@ strFlTp = '.svg'
 varDpi = 80.0
 
 # Condition levels (used to complete file names):
-lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
-#          'Pd_min_Ps_sst', 'Pd_min_Cd_sst', 'Cd_min_Ps_sst', 'Linear_sst']
+lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst',
+          'Pd_trn', 'Cd_trn', 'Ps_trn',
+          'Pd_min_Ps_sst', 'Pd_min_Cd_sst', 'Cd_min_Ps_sst',
+          'Pd_min_Cd_Ps_sst',
+          'Pd_min_Cd_Ps_trn']
 # lstCon = ['polar_angle', 'x_pos', 'y_pos', 'SD', 'R2']
-
-# Condition labels:
-# lstConLbl = ['PacMan Dynamic Sustained',
-#              'Control Dynamic Sustained',
-#              'PacMan Static Sustained']
 
 # Path of vtk mesh with data to project into visual space (e.g. parameter
 # estimates; subject ID, hemisphere, and contion level left open).
 strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/feat_level_2_{}_cope.vtk'  #noqa
+# strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/feat_level_2_{}_zstat.vtk'  #noqa
 # strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_{}.vtk'  #noqa
 
 # Path of vtk mesh with R2 values from pRF mapping (at multiple depth levels;

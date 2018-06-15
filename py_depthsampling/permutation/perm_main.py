@@ -24,6 +24,20 @@ Function of the depth sampling pipeline.
 
 import numpy as np
 
+#objNpz01 = np.load('/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/v1_rh_Pd_sst.npz')
+#objNpz02 = np.load('/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/v1_rh_Ps_sst.npz')
+#aryDpth01 = objNpz01['arySubDpthMns']
+#aryDpth02 = objNpz02['arySubDpthMns']
+#vecNumInc = objNpz01['vecNumInc']
+#varNumIt=10000
+#varLow=2.5
+#varUp=97.5
+#np.save('/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/v1_rh_Pd_sst_forR.npy',
+#        aryDpth01)
+#np.save('/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/v1_rh_Ps_sst_forR.npy',
+#        aryDpth02)
+#np.save('/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/v1_rh_vecNumInc_forR.npy',
+#        vecNumInc)
 
 def permute(aryDpth01, aryDpth02, vecNumInc=None, varNumIt=10000, varLow=2.5,
             varUp=97.5):

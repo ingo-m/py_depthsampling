@@ -2,7 +2,7 @@
 """
 Plot difference between conditions.
 
-Plot median of between stimulus conditions difference, with bootstrapped
+Plot mean of between stimulus conditions difference, with bootstrapped
 confidence intervals (percentile bootstrap).
 """
 
@@ -26,6 +26,7 @@ confidence intervals (percentile bootstrap).
 from py_depthsampling.boot.boot_plot_diff import boot_plot
 # from py_depthsampling.boot.boot_plot_diff_sngl_sub import boot_plot_sngl
 
+
 # -----------------------------------------------------------------------------
 # *** Define parameters
 
@@ -43,7 +44,7 @@ lstHmsph = ['rh']  # ['lh', 'rh']
 
 # Path for corrected depth-profiles (meta-condition, ROI, hemisphere,
 # condition, and model index left open):
-strPthData = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npy'  #noqa
+strPthData = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npz'  #noqa
 
 # Output path & prefix for plots (meta-condition, ROI, ROI, hemisphere, and
 # model index left open):
@@ -67,13 +68,10 @@ strYlabel = 'fMRI signal change [a.u.]'
 lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
 
 # Condition labels:
-# lstConLbl = ['PacMan Dynamic Sustained',
-#              'Control Dynamic Sustained',
-#              'PacMan Static Sustained']
 lstConLbl = lstCon
 
 # Which conditions to compare (list of tuples with condition indices):
-lstDiff = [(0, 1), (0, 2), (1, 2)]
+lstDiff = [(0, 1), (0, 2), (2, 1)]
 
 # Number of resampling iterations for peak finding (for models 1, 2, and 3) or
 # random noise samples (models 4 and 5):
@@ -82,8 +80,6 @@ lstDiff = [(0, 1), (0, 2), (1, 2)]
 # Lower & upper bound of percentile bootstrap (in percent), for bootstrap
 # confidence interval (models 1, 2, and 3) - this value is only printed, not
 # plotted - or plotted confidence intervals in case of model 5:
-# varCnfLw = 0.5
-# varCnfUp = 99.5
 varCnfLw = 2.5
 varCnfUp = 97.5
 # -----------------------------------------------------------------------------
@@ -118,7 +114,7 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                             varYmin = -50.0
                             varYmax = 50.0
 
-                elif idxRoi == 1:  # v2
+                elif (idxRoi == 1) or (idxRoi == 3):  # v2 & v3
 
                     if lstMetaCon[idxMtaCn] == 'stimulus':
                         if lstMdl[idxMdl] == '':

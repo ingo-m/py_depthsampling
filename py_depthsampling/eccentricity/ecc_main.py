@@ -30,7 +30,7 @@ from py_depthsampling.eccentricity.ecc_histogram import ecc_histogram
 
 def eccentricity(lstSubId, strVtkEcc, vecEccBin, strVtkParam, varNumDpth,  #noqa
                  strPrcdData, varNumLne, strCsvRoi, varNumHdrRoi, strVtkThr,
-                 varThr, lgcNegLkp, strPathOut):
+                 varThr, lgcNegLkp, strPathOut, strFleTyp='.svg'):
     """
     Plot statistical parameter by eccentricity & cortical depth.
 
@@ -96,7 +96,8 @@ def eccentricity(lstSubId, strVtkEcc, vecEccBin, strVtkParam, varNumDpth,  #noqa
             strTmp = (strPathOut
                       + '_sngl_sub_'
                       + lstSubId[idxSub]
-                      + '_ecc.png')
+                      + '_ecc'
+                      + strFleTyp)
 
             ecc_histogram(lstSubEcc[idxSub],
                           vecEccBin,
@@ -113,7 +114,7 @@ def eccentricity(lstSubId, strVtkEcc, vecEccBin, strVtkParam, varNumDpth,  #noqa
     for idxSub in lstSubEcc:
         vecEccAcrSubs = np.append(vecEccAcrSubs, idxSub)
 
-    strTmp = (strPathOut + '_acrsSubsEcc.png')
+    strTmp = (strPathOut + '_acrsSubsEcc' + strFleTyp)
 
     ecc_histogram(vecEccAcrSubs,
                   vecEccBin,
@@ -162,7 +163,7 @@ def eccentricity(lstSubId, strVtkEcc, vecEccBin, strVtkParam, varNumDpth,  #noqa
 
             print(('------Dataset: ' + lstSubId[idxSub]))
 
-            strTmp = (strPathOut + '_sngl_sub_' + lstSubId[idxSub] + '.png')
+            strTmp = (strPathOut + '_sngl_sub_' + lstSubId[idxSub] + strFleTyp)
 
             ecc_plot(lstSubMean[idxSub],
                      vecEccBin,
@@ -200,7 +201,7 @@ def eccentricity(lstSubId, strVtkEcc, vecEccBin, strVtkParam, varNumDpth,  #noqa
     arySubData = np.divide(arySubData, vecCntTtl[:, None])
 
     # Output path for plot:
-    strTmp = (strPathOut + '_acrsSubsMean.png')
+    strTmp = (strPathOut + '_acrsSubsMean' + strFleTyp)
 
     # Find minimum and maximum correlation values:
     varMin = np.percentile(arySubData, 2.5)
@@ -211,17 +212,16 @@ def eccentricity(lstSubId, strVtkEcc, vecEccBin, strVtkParam, varNumDpth,  #noqa
 
     # Do not use separate colour map if there are only positive or only
     # negative values):
-    if not(np.less(varMin, 0.0) and np.greater(varMax, 0.0)):
-        lgcNegLkp = False
+    # if not(np.less(varMin, 0.0) and np.greater(varMax, 0.0)):
+    #     lgcNegLkp = False
 
     # Plot across subjects mean:
-    if lgcNegLkp:
-
-        ecc_plot(arySubData,
-                 vecEccBin,
-                 strTmp)
-    else:
-        ecc_plot_simple(arySubData,
-                        vecEccBin,
-                        strTmp)
+    # if lgcNegLkp:
+    ecc_plot(arySubData,
+             vecEccBin,
+             strTmp)
+    # else:
+    #     ecc_plot_simple(arySubData,
+    #                     vecEccBin,
+    #                     strTmp)
     # *************************************************************************

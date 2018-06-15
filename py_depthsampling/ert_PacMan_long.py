@@ -46,7 +46,7 @@ lstSubIds = ['20171211',
 
 # Name of pickle file from which to load time course data or save time course
 # data to (metacondition, ROI, and hemisphere left open):
-strPthPic = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}/era_long_{}_{}.pickle'  #noqa
+strPthPic = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/era_long_{}_{}.pickle'  #noqa
 
 # Condition levels (used to complete file names):
 lstCon = ['pacman_dynamic_long']
@@ -77,7 +77,10 @@ varNumLne = 2
 
 # Limits of y-axis:
 varAcrSubsYmin = -0.04
-varAcrSubsYmax = 0.04
+varAcrSubsYmax = 0.03
+
+# Number of labels on the y axis:
+varYnum = 8
 
 # Convert y-axis values to percent (i.e. divide label values by 100)?
 lgcCnvPrct = True
@@ -107,16 +110,13 @@ lgcLgnd01 = True
 lgcLgnd02 = True
 
 # Output path for plots - prfix (metacondition, ROI, and hemisphere left open):
-strPltOtPre = '/home/john/PhD/PacMan_Plots/era_long/{}/{}_{}/'
+strPltOtPre = '/home/john/Dropbox/PacMan_Plots/era_long/{}/{}_{}/'
 # Output path for plots - suffix:
-strPltOtSuf = '_ert_long.png'
+strPltOtSuf = '_ert_long.svg'
 
 # Which x-values to label on the axis (e.g., if `varXlbl = 2`, every second
 # x-value is labelled).
 varXlbl = 10
-
-# Number of labels on the y axis:
-varYnum = 5
 
 # Figure scaling factor:
 varDpi = 70.0

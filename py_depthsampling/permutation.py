@@ -38,17 +38,17 @@ from py_depthsampling.plot.plt_dpth_prfl import plt_dpth_prfl
 lstMdl = ['', '_deconv_model_1']
 
 # Meta-condition (within or outside of retinotopic stimulus area):
-lstMetaCon = ['stimulus', 'periphery']
+lstMetaCon = ['stimulus']
 
-# ROI ('v1' or 'v2'):
-lstRoi = ['v1', 'v2']
+# ROI ('v1', 'v2', or 'v3'):
+lstRoi = ['v1', 'v2', 'v3']
 
 # Hemisphere ('rh' or 'lh'):
 lstHmsph = ['rh']
 
 # Path of depth-profile to load (meta-condition, ROI, hemisphere, condition,
 # and deconvolution suffix left open):
-strPthPrf = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npy'  #noqa
+strPthPrf = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npz'  #noqa
 
 # Output path & prefix for plots (meta-condition, ROI, hemisphere, condition,
 # and deconvolution suffix left open):
@@ -57,26 +57,17 @@ strPthPltOt = '/home/john/Dropbox/PacMan_Plots/permutation/{}_{}_{}_{}{}_'  #noq
 # File type suffix for plot:
 strFlTp = '.svg'
 
-# Figure scaling factor:
-varDpi = 80.0
-
 # Label for axes:
-strXlabel = 'Cortical depth level (equivolume)'
-strYlabel = 'fMRI signal change [arbitrary units]'
+strXlabel = 'Cortical depth level'
+strYlabel = 'fMRI signal change [a.u.]'
 
 # Condition levels (used to complete file names):
 # lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst',
 #           'Pd_trn', 'Cd_trn', 'Ps_trn']
-lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
+lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
 
-# Condition labels:
-# lstConLbl = ['PacMan Dynamic Sustained',
-#              'Control Dynamic Sustained',
-#              'PacMan Static Sustained']
 
 # Which conditions to compare (list of tuples with condition indices):
-# lstDiff = [(0, 1), (0, 2),
-#            (3, 4), (3, 5)]
 lstDiff = [(0, 1), (0, 2), (1, 2)]
 
 # Number of resampling iterations:
@@ -88,11 +79,11 @@ varLow = 2.5
 varUp = 97.5
 
 # Limits of y-axis:
-varYmin = -40.0
-varYmax = 40.0
+varYmin = -50.0
+varYmax = 50.0
 
 # Figure scaling factor:
-varDpi = 80.0
+varDpi = 100.0
 # -----------------------------------------------------------------------------
 
 
@@ -153,18 +144,34 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
 
                         # Load single subject depth profiles (shape
                         # aryDpth[subject, depth]):
-                        aryDpth01 = np.load(strTmpPth01)
-                        aryDpth02 = np.load(strTmpPth02)
+                        objNpz01 = np.load(strTmpPth01)
+                        aryDpth01 = objNpz01['arySubDpthMns']
+                        objNpz02 = np.load(strTmpPth02)
+                        aryDpth02 = objNpz02['arySubDpthMns']
+
+                        # Array with number of vertices (for weighted averaging
+                        # across subjects), shape: vecNumInc[subjects].
+                        vecNumInc01 = objNpz01['vecNumInc']
+                        vecNumInc02 = objNpz02['vecNumInc']
+
+                        # Number of vertices are assumed to be the same for the
+                        # two conditions (since the data is sampled from the
+                        # same ROI). If not, raise an error.
+                        if np.all(np.equal(vecNumInc01, vecNumInc02)):
+                            vecNumInc = vecNumInc01
+                        else:
+                            strErrMsg = ('ERROR. Number of vertices within ROI'
+                                         + ' is not consistent across'
+                                         + ' conditions.')
+                            raise ValueError(strErrMsg)
 
                         # Number of depth levels:
                         varNumDpt = aryDpth01.shape[1]
 
                         # Run permutation test:
-                        aryNull, vecP, aryEmpDiffMdn = permute(aryDpth01,
-                                                               aryDpth02,
-                                                               varNumIt=10000,
-                                                               varLow=varLow,
-                                                               varUp=varUp)
+                        aryNull, vecP, aryEmpDiffMdn = permute(
+                            aryDpth01, aryDpth02, vecNumInc=vecNumInc,
+                            varNumIt=10000, varLow=varLow, varUp=varUp)
 
                         # Data array to be passed into plotting function,
                         # containing the empirical condition difference and the
@@ -196,7 +203,7 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                                       ['Empirical condition difference',
                                        'Permutation null distribution'],
                                       'Cortical depth level (equivolume)',
-                                      'fMRI signal change (arbitraty units)',
+                                      'fMRI signal change [a.u.]',
                                       (lstRoi[idxRoi].upper()
                                        + ' '
                                        + lstHmsph[idxHmsph].upper()
@@ -215,30 +222,32 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                         # Reshape p-values for plot:
                         vecP = vecP.reshape((1, varNumDpt))
 
-                        # Plot p-value:
-                        plt_dpth_prfl(vecP,
-                                      np.zeros(vecP.shape),
-                                      varNumDpt,
-                                      1,
-                                      varDpi,
-                                      0.0,
-                                      0.5,
-                                      False,
-                                      ['p-value'],
-                                      'Cortical depth level (equivolume)',
-                                      'p-value',
-                                      (lstRoi[idxRoi].upper()
-                                       + ' '
-                                       + lstHmsph[idxHmsph].upper()
-                                       + ' '
-                                       + strTtle),
-                                      False,
-                                      (strPthPltOt.format(lstMetaCon[idxMtaCn],
-                                                          lstRoi[idxRoi],
-                                                          lstHmsph[idxHmsph],
-                                                          strPthCon,
-                                                          lstMdl[idxMdl])
-                                       + 'pval'
-                                       + strFlTp),
-                                      varNumLblY=6)
+                        if False:
+
+                            # Plot p-value:
+                            plt_dpth_prfl(vecP,
+                                          np.zeros(vecP.shape),
+                                          varNumDpt,
+                                          1,
+                                          varDpi,
+                                          0.0,
+                                          0.5,
+                                          False,
+                                          ['p-value'],
+                                          'Cortical depth level (equivolume)',
+                                          'p-value',
+                                          (lstRoi[idxRoi].upper()
+                                           + ' '
+                                           + lstHmsph[idxHmsph].upper()
+                                           + ' '
+                                           + strTtle),
+                                          False,
+                                          (strPthPltOt.format(
+                                               lstMetaCon[idxMtaCn],
+                                               lstRoi[idxRoi],
+                                               lstHmsph[idxHmsph],
+                                               strPthCon, lstMdl[idxMdl])
+                                           + 'pval'
+                                           + strFlTp),
+                                          varNumLblY=6)
 # -----------------------------------------------------------------------------

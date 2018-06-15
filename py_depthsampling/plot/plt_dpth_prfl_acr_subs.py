@@ -38,7 +38,8 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
                            varSizeX=1800.0,
                            varSizeY=1600.0,
                            strErr='conf95',
-                           vecX=None):
+                           vecX=None,
+                           vecWghts=None):
     """
     Calculate & plot across-subjects mean depth profiles.
 
@@ -46,7 +47,7 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
     ----------
     arySubDpthMns : np.array
         Array with depth data to be plotted, of the form:
-        aryDpthMeans[Subject, Condition, Depth]
+        arySubDpthMns[Subject, Condition, Depth]
     varNumSubs : int
         Number of subect
     varNumDpth : int
@@ -93,17 +94,48 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
     vecX : np.array
         1D array with x-position of data points. If not provided, data points
         are equally spaced in the range ```range(0, varNumDpth)```.
+    vecWghts : np.array
+        1D array with weights for averaging across subjects. In case that
+        ROIs have different sizes across subjects, the number of vertices (of
+        each subject's ROI) can be provided here. If `vecWghts = None`, the
+        non-weighted average is calculate (i.e. the 'normal' average with equal
+        weights per subject). NOTE: Weighted error bars are not implemented for
+        the option `strErr = prct95`.
     """
     # Across-subjects mean:
-    aryAcrSubDpthMean = np.mean(arySubDpthMns, axis=0)
+    if vecWghts is None:
+        aryAcrSubDpthMean = np.mean(arySubDpthMns, axis=0)
+    else:
+        aryAcrSubDpthMean = np.average(arySubDpthMns, weights=vecWghts, axis=0)
+
+    # For simplicity, create dummy weighting vector (with equal weights per
+    # subject) if none was provided:
+    if vecWghts is None:
+        vecWghts = np.ones((varNumSubs))
 
     if strErr == 'conf95':
+        # Weighted variance:
+        aryAcrSubDpthVar = np.average(
+                                      np.power(
+                                               np.subtract(
+                                                           arySubDpthMns,
+                                                           aryAcrSubDpthMean[
+                                                               None, :, :]
+                                                           ),
+                                               2.0
+                                               ),
+                                      axis=0,
+                                      weights=vecWghts
+                                      )
+
+        # Weighted standard deviation:
+        aryAcrSubDpthSd = np.sqrt(aryAcrSubDpthVar)
+
         # Calculate 95% confidence interval for the mean, obtained by
         # multiplying the standard error of the mean (SEM) by 1.96. We obtain
         # the SEM by dividing the standard deviation by the squareroot of the
         # sample size n.
-        aryArcSubDpthConf = np.multiply(np.divide(np.std(arySubDpthMns,
-                                                         axis=0),
+        aryArcSubDpthConf = np.multiply(np.divide(aryAcrSubDpthSd,
                                                   np.sqrt(varNumSubs)),
                                         1.96)
         # Lower bound (as deviation from the mean):
@@ -112,16 +144,48 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
         aryArcSubDpthConfUp = np.add(aryAcrSubDpthMean, aryArcSubDpthConf)
 
     elif strErr == 'sd':
-        # Calculate standard deviation across subjects:
-        aryArcSubDpthConf = np.std(arySubDpthMns, axis=0)
+        # Weighted variance:
+        aryAcrSubDpthVar = np.average(
+                                      np.power(
+                                               np.subtract(
+                                                           arySubDpthMns,
+                                                           aryAcrSubDpthMean[
+                                                               None, :, :]
+                                                           ),
+                                               2.0
+                                               ),
+                                      axis=0,
+                                      weights=vecWghts
+                                      )
+
+        # Weighted standard deviation:
+        aryAcrSubDpthSd = np.sqrt(aryAcrSubDpthVar)
+        aryArcSubDpthConf = aryAcrSubDpthSd
         # Lower bound (as deviation from the mean):
         aryArcSubDpthConfLw = np.subtract(aryAcrSubDpthMean, aryArcSubDpthConf)
         # Upper bound (as deviation from the mean):
         aryArcSubDpthConfUp = np.add(aryAcrSubDpthMean, aryArcSubDpthConf)
 
     elif strErr == 'sem':
+        # Weighted variance:
+        aryAcrSubDpthVar = np.average(
+                                      np.power(
+                                               np.subtract(
+                                                           arySubDpthMns,
+                                                           aryAcrSubDpthMean[
+                                                               None, :, :]
+                                                           ),
+                                               2.0
+                                               ),
+                                      axis=0,
+                                      weights=vecWghts
+                                      )
+
+        # Weighted standard deviation:
+        aryAcrSubDpthSd = np.sqrt(aryAcrSubDpthVar)
+
         # Calculate standard error of the mean.
-        aryArcSubDpthConf = np.divide(np.std(arySubDpthMns, axis=0),
+        aryArcSubDpthConf = np.divide(aryAcrSubDpthSd,
                                       np.sqrt(varNumSubs))
         # Lower bound (as deviation from the mean):
         aryArcSubDpthConfLw = np.subtract(aryAcrSubDpthMean, aryArcSubDpthConf)
@@ -150,8 +214,10 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
         vecX = np.linspace(0.0, 1.0, num=varNumDpth, endpoint=True)
 
     # Prepare colour map:
-    objClrNorm = colors.Normalize(vmin=0, vmax=(varNumCon - 1))
-    objCmap = plt.cm.winter
+    # objClrNorm = colors.Normalize(vmin=0, vmax=(varNumCon - 1))
+    # objCmap = plt.cm.winter
+    objClrNorm = colors.Normalize(vmin=0, vmax=9)
+    objCmap = plt.cm.tab10
 
     # Loop through input files:
     for idxIn in range(0, varNumCon):
@@ -202,6 +268,8 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
     axs01.set_xticklabels(['WM', 'CSF'])
 
     # Which y values to label with ticks:
+    # varAcrSubsYmin = (np.ceil(varAcrSubsYmin * 0.01) / 0.01)
+    # varAcrSubsYmax = (np.floor(varAcrSubsYmax * 0.01) / 0.01)
     vecYlbl = np.linspace(np.ceil(varAcrSubsYmin),
                           np.floor(varAcrSubsYmax),
                           num=5,

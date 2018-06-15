@@ -28,6 +28,7 @@ from py_depthsampling.drain_model.drain_model_decon_03 import deconv_03
 from py_depthsampling.drain_model.drain_model_decon_04 import deconv_04
 from py_depthsampling.drain_model.drain_model_decon_05 import deconv_05
 from py_depthsampling.drain_model.drain_model_decon_06 import deconv_06
+from py_depthsampling.drain_model.drain_model_decon_07 import deconv_07
 from py_depthsampling.main.find_peak import find_peak
 
 
@@ -45,7 +46,9 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
     print('---Loading data')
 
     # Load array for first condition to get dimensions:
-    aryTmpDpth = np.load(strPthPrf.format(lstCon[0]))
+    objNpz = np.load(strPthPrf.format(lstCon[0]))
+    aryTmpDpth = objNpz['arySubDpthMns']
+
     # Number of subjects:
     varNumSub = aryTmpDpth.shape[0]
     # Get number of depth levels from input array:
@@ -59,7 +62,14 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
 
     # Load single-condition arrays from disk:
     for idxCon in range(varNumCon):
-        aryEmpSnSb[:, idxCon, :] = np.load(strPthPrf.format(lstCon[idxCon]))
+        objNpz = np.load(strPthPrf.format(lstCon[idxCon]))
+        aryEmpSnSb[:, idxCon, :] = objNpz['arySubDpthMns']
+    # Array with number of vertices (for weighted averaging across subjects;
+    # since the deconvolution is done separately for each subject, this vector
+    # is only loaded to be passed on to the file with the deconvolved depth
+    # profiles for weighted averaging in downstream analysis steps), shape:
+    # vecNumInc[subjects].
+    vecNumInc = objNpz['vecNumInc']
 
     # Number of subjects:
     # varNumSub = aryEmpSnSb.shape[0]
@@ -133,10 +143,11 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
             # lower layers plus half  its own thickness):
             vecPosMdl = np.array([0.1, 0.25, 0.5, 0.8, 0.95])
 
-        elif strRoi == 'v2':
-            print('------Interpolation - V2')
-            # Relative position of the layers (accordign to Weber et al., 2008,
-            # Figure 5C, p. 2322). We start with the absolute depth:
+        elif (strRoi == 'v2') or ((strRoi == 'v3')):
+            print('------Interpolation - V2/V3')
+            # Relative position of the layers, accordign to Weber et al., 2008,
+            # Figure 5C, p. 2322. Their data is on 'extrastriate cortex', from
+            # V2 to V5. We start with the absolute depth:
             vecPosMdl = np.array([160.0, 590.0, 1110.0, 1400.0, 1620.0])
             # Divide by overall thickness (1.7 mm):
             vecPosMdl = np.divide(vecPosMdl, 1700.0)
@@ -200,6 +211,12 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
         elif varMdl == 6:
                 aryDecon5[idxSub, :, :, :] = \
                     deconv_06(varNumCon, aryEmp5, lstFctr)
+
+        # (7) Deconvolution based on Markuerkiaga et al. (2016); same as (1),
+        #     but using matrix inversion instead of iterative subtraction.
+        if varMdl == 7:
+            aryDecon5[idxSub, :, :] = deconv_07(varNumCon,
+                                                aryEmp5SnSb[idxSub, :, :])
 
         # ---------------------------------------------------------------------
         # *** Interpolation
@@ -296,10 +313,19 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
         # condition is saved to a separate file (for consistency):
 
         for idxCon in range(varNumCon):
+
             # Form of the array that is saved to disk:
             # aryDecon[subject, depth]
-            np.save(strPthPrfOt.format(lstCon[idxCon]),
-                    aryDecon[:, idxCon, :])
+
+            # In addition, a vector with the number of vertices (for that ROI
+            # in tha subject) is saved, in order to be able to normalise when
+            # averaging over subjects. Shape: vecNumInc[subject]
+
+            # Save subject-level depth profiles, and number of vertices per
+            # subject:
+            np.savez(strPthPrfOt.format(lstCon[idxCon]),
+                     arySubDpthMns=aryDecon[:, idxCon, :],
+                     vecNumInc=vecNumInc)
 
     # -------------------------------------------------------------------------
     # *** Peak positions percentile bootstrap
@@ -414,7 +440,8 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
                                strTmpPth,
                                strFlTp,
                                strErr='sem',
-                               vecX=vecPosEmp)
+                               vecX=vecPosEmp,
+                               vecWghts=vecNumInc)
 
         # Across-subjects mean after deconvolution:
         strTmpTtl = '{} after deconvolution'.format(strRoi.upper())
@@ -433,7 +460,8 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
                                strTmpPth,
                                strFlTp,
                                strErr='sem',
-                               vecX=vecIntpEqui)
+                               vecX=vecIntpEqui,
+                               vecWghts=vecNumInc)
 
     elif varMdl == 4:
 

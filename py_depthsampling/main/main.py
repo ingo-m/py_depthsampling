@@ -125,9 +125,14 @@ def ds_main(strRoi, strHmsph, lstSubIds, lstCon, lstConLbl, strVtkDpth01,
     for idxSub in range(0, varNumSubs):
         lstPrcs[idxSub].join()
 
-    # Create list  to put the function output into the correct order:
-    # lstPrcId = [None] * varNumSubs
+    # Create list  to put the function output into the correct order (not
+    # really necessary here, but kept for consistency).
+
+    # List for arrays with depth profiles.
     lstSubData01 = [None] * varNumSubs
+
+    # Vector for number of vertices contained in the ROI:
+    vecNumInc = np.zeros((varNumSubs))
 
     # Put output into correct order:
     for idxRes in range(0, varNumSubs):
@@ -137,6 +142,7 @@ def ds_main(strRoi, strHmsph, lstSubIds, lstCon, lstConLbl, strVtkDpth01,
 
         # Put fitting results into list, in correct order:
         lstSubData01[varTmpIdx] = lstParResult[idxRes][1]
+        vecNumInc[varTmpIdx] = lstParResult[idxRes][2]
 
     # Array with single-subject depth sampling results, of the form
     # aryDpthMeans[idxSub, idxCondition, idxDpth].
@@ -155,10 +161,19 @@ def ds_main(strRoi, strHmsph, lstSubIds, lstCon, lstConLbl, strVtkDpth01,
     # profile for each condition is saved to a separate file (for consistency):
 
     for idxCon in range(varNumCon):
+
         # Form of the array that is saved to disk:
         # arySubDpthMns[subject, depth]
-        np.save(strDpthMeans.format(lstCon[idxCon]),
-                arySubDpthMns[:, idxCon, :])
+
+        # In addition, a vector with the number of vertices (for that ROI in
+        # tha subject) is saved, in order to be able to normalise when
+        # averaging over subjects. Shape: vecNumInc[subject]
+
+        # Save subject-level depth profiles, and number of vertices per
+        # subject:
+        np.savez(strDpthMeans.format(lstCon[idxCon]),
+                 arySubDpthMns=arySubDpthMns[:, idxCon, :],
+                 vecNumInc=vecNumInc)
     # *************************************************************************
 
     # *************************************************************************
@@ -178,5 +193,6 @@ def ds_main(strRoi, strHmsph, lstSubIds, lstCon, lstConLbl, strVtkDpth01,
                            strYlabel,
                            strTitle,
                            strPltOtPre,
-                           strPltOtSuf)
+                           strPltOtSuf,
+                           vecWghts=vecNumInc)
     # *************************************************************************

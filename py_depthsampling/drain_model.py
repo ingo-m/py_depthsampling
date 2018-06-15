@@ -104,54 +104,51 @@ from py_depthsampling.drain_model.drain_model_main import drain_model
 lstMdl = [1]
 
 # Meta-condition (within or outside of retinotopic stimulus area):
-lstMetaCon = ['stimulus', 'periphery']
+lstMetaCon = ['stimulus']  # ['stimulus', 'periphery']
 
-# ROI ('v1' or 'v2'):
-lstRoi = ['v1', 'v2']
+# ROI ('v1', 'v2' or 'v3'):
+lstRoi = ['v1', 'v2', 'v3']
 
 # Hemisphere ('rh' or 'lh'):
-lstHmsph = ['lh', 'rh']
+lstHmsph = ['rh']  # ['lh', 'rh']
 
 # Path of depth-profile to correct (meta-condition, ROI, hemisphere, and
 # condition left open):
-strPthPrf = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}.npy'  #noqa
+strPthPrf = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}.npz'  #noqa
 
 # Output path for corrected depth-profiles (meta-condition, ROI, hemisphere,
 # condition, and model index left open):
-strPthPrfOt = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}_deconv_model_{}.npy'  #noqa
+strPthPrfOt = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}_deconv_model_{}.npz'  #noqa
 
 # Output path & prefix for plots (meta-condition, ROI, ROI, hemisphere,
 # condition, and model index left open):
 strPthPltOt = '/home/john/Dropbox/PacMan_Plots/deconv/{}/{}/{}_{}_{}_deconv_model_{}_'  #noqa
 
 # File type suffix for plot:
-strFlTp = '.png'
+strFlTp = '.svg'
 
 # Figure scaling factor:
-varDpi = 80.0
+varDpi = 100.0
 
 # Label for axes:
-strXlabel = 'Cortical depth level (equivolume)'
-strYlabel = 'fMRI signal change [arbitrary units]'
+strXlabel = 'Cortical depth level'
+strYlabel = 'fMRI signal change [a.u.]'
 
 # Condition levels (used to complete file names) - nested list:
 # lstNstCon = [['Pd', 'Cd', 'Ps'],
 #              ['Pd_min_Ps'],
 #              ['Pd_min_Cd']]
 # NOTE: Higher level contrast should be calculated again after deconvolution.
-lstNstCon = [['Pd_sst', 'Cd_sst', 'Ps_sst'],
-             ['Pd_trn', 'Cd_trn', 'Ps_trn']]
+lstNstCon = [['Pd_sst', 'Ps_sst', 'Cd_sst'],
+             ['Pd_trn', 'Ps_trn', 'Cd_trn']]
 
 # Condition labels:
-# lstNstConLbl = [['PacMan Dynamic', 'Control Dynamic', 'PacMan Static'],
-#                 ['PacMan D - PacMan S'],
-#                 ['PacMan D - Control D']]
 lstNstConLbl = [['PacMan Dynamic Sustained',
-                 'Control Dynamic Sustained',
-                 'PacMan Static Sustained'],
+                 'PacMan Static Sustained',
+                 'Control Dynamic Sustained'],
                 ['PacMan Dynamic Transient',
-                 'Control Dynamic Transient',
-                 'PacMan Static Transient']]
+                 'PacMan Static Transient',
+                 'Control Dynamic Transient']]
 
 # Number of resampling iterations for peak finding (for models 1, 2, and 3) or
 # random noise samples (models 4 and 5):
@@ -202,9 +199,9 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                         if idxCon == 0:  # v1 simple contrasts
                             if lstMetaCon[idxMtaCn] == 'stimulus':
                                 # Limits of y-axis for across subject plot:
-                                varAcrSubsYmin01 = -400.0
+                                varAcrSubsYmin01 = -450.0
                                 varAcrSubsYmax01 = 0.0
-                                varAcrSubsYmin02 = -400.0
+                                varAcrSubsYmin02 = -450.0
                                 varAcrSubsYmax02 = 0.0
                             if lstMetaCon[idxMtaCn] == 'periphery':
                                 # Limits of y-axis for across subject plot:
@@ -217,9 +214,9 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                         if idxCon == 0:  # v2 simple contrasts
                             if lstMetaCon[idxMtaCn] == 'stimulus':
                                 # Limits of y-axis for across subject plot:
-                                varAcrSubsYmin01 = -400.0
+                                varAcrSubsYmin01 = -450.0
                                 varAcrSubsYmax01 = 0.0
-                                varAcrSubsYmin02 = -400.0
+                                varAcrSubsYmin02 = -450.0
                                 varAcrSubsYmax02 = 0.0
                             if lstMetaCon[idxMtaCn] == 'periphery':
                                 # Limits of y-axis for across subject plot:

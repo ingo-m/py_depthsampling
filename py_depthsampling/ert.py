@@ -46,14 +46,14 @@ lstSubIds = ['20171023',  # '20171109',
 
 # Name of pickle file from which to load time course data or save time course
 # data to (metacondition, ROI, and hemisphere left open):
-strPthPic = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}/era_{}_{}.pickle'  #noqa
+strPthPic = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/era_{}_{}.pickle'  #noqa
 
 # Condition levels (used to complete file names):
-lstCon = ['control_dynamic', 'pacman_dynamic', 'pacman_static']
+lstCon = ['pacman_dynamic', 'pacman_static', 'control_dynamic']
 
 # Condition labels (for plot legend):
 # lstConLbl = ['72.0%', '16.3%', '6.1%', '2.5%']
-lstConLbl = ['Control dynamic', 'Pacman dynamic', 'Pacman static']
+lstConLbl = ['Pacman dynamic', 'Pacman static', 'Control dynamic']
 
 # Base name of vertex inclusion masks (subject ID, hemisphere, subject ID,
 # ROI, and metacondition left open):
@@ -77,8 +77,11 @@ strPrcdData = 'SCALARS'
 varNumLne = 2
 
 # Limits of y-axis:
-varAcrSubsYmin = -0.06
-varAcrSubsYmax = 0.04
+varAcrSubsYmin = -0.04
+varAcrSubsYmax = 0.02
+
+# Number of labels on y-axis:
+varYnum = 4
 
 # Convert y-axis values to percent (i.e. divide label values by 100)?
 lgcCnvPrct = True
@@ -102,12 +105,12 @@ lgcLgnd01 = True
 lgcLgnd02 = True
 
 # Output path for plots - prfix (metacondition, ROI, and hemisphere left open):
-strPltOtPre = '/home/john/PhD/PacMan_Plots/era/{}/{}_{}/'
+strPltOtPre = '/home/john/Dropbox/PacMan_Plots/era/{}/{}_{}/'
 # Output path for plots - suffix:
-strPltOtSuf = '_ert.png'
+strPltOtSuf = '_ert.svg'
 
 # Figure scaling factor:
-varDpi = 70.0
+varDpi = 100.0
 # *****************************************************************************
 
 
@@ -124,5 +127,6 @@ for idxMtaCn in range(len(lstMtaCn)):
                          lstHmsph[idxHmsph], lstRoi[idxRoi], strVtkMsk,
                          strVtkPth, varTr, varNumDpth, varNumVol, varStimStrt,
                          varStimEnd, strPthPic, lgcPic, strPltOtPre,
-                         strPltOtSuf)
+                         strPltOtSuf, varAcrSubsYmin=varAcrSubsYmin,
+                         varAcrSubsYmax=varAcrSubsYmax, varYnum=varYnum)
 # *****************************************************************************

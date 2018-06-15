@@ -249,29 +249,31 @@ def acr_subs_get_data(idxPrc,              # Process ID  #noqa
     # **************************************************************************
     # *** Create plot
 
-    # File name for figure:
-    strPltOt = strPltOtPre + strSubId + strPltOtSuf
+    if False:
 
-    # Title, including information about number of vertices:
-    strTitleTmp = (strTitle
-                   + ', '
-                   + str(varNumInc)
-                   + ' vertices')
+        # File name for figure:
+        strPltOt = strPltOtPre + strSubId + strPltOtSuf
 
-    plt_dpth_prfl(aryDpthMean,  # Data: aryData[Condition, Depth]
-                  aryDpthConf,  # Error shading: aryError[Condition, Depth]
-                  varNumDpth,   # Number of depth levels (on the x-axis)
-                  varNumCon,    # Number of conditions (separate lines)
-                  varDpi,       # Resolution of the output figure
-                  varYmin,      # Minimum of Y axis
-                  varYmax,      # Maximum of Y axis
-                  False,        # Boolean: whether to convert y axis to %
-                  lstConLbl,    # Labels for conditions (separate lines)
-                  strXlabel,    # Label on x axis
-                  strYlabel,    # Label on y axis
-                  strTitleTmp,  # Figure title
-                  True,         # Boolean: whether to plot a legend
-                  strPltOt)
+        # Title, including information about number of vertices:
+        strTitleTmp = (strTitle
+                       + ', '
+                       + str(varNumInc)
+                       + ' vertices')
+
+        plt_dpth_prfl(aryDpthMean,  # Data: aryData[Condition, Depth]
+                      aryDpthConf,  # Error shading: aryError[Condition, Depth]
+                      varNumDpth,   # Number of depth levels (on the x-axis)
+                      varNumCon,    # Number of conditions (separate lines)
+                      varDpi,       # Resolution of the output figure
+                      varYmin,      # Minimum of Y axis
+                      varYmax,      # Maximum of Y axis
+                      False,        # Boolean: whether to convert y axis to %
+                      lstConLbl,    # Labels for conditions (separate lines)
+                      strXlabel,    # Label on x axis
+                      strYlabel,    # Label on y axis
+                      strTitleTmp,  # Figure title
+                      True,         # Boolean: whether to plot a legend
+                      strPltOt)
     # **************************************************************************
 
     # **************************************************************************
@@ -279,7 +281,8 @@ def acr_subs_get_data(idxPrc,              # Process ID  #noqa
 
     # Output list:
     lstOut = [idxPrc,
-              aryDpthMean]
+              aryDpthMean,
+              varNumInc]
 
     queOut.put(lstOut)
     # **************************************************************************

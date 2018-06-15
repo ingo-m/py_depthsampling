@@ -52,6 +52,16 @@ def ecc_plot(aryMean, vecEccBin, strPathOut):
     varMin = (np.floor(varMin * 0.1) / 0.1)
     varMax = (np.ceil(varMax * 0.1) / 0.1)
 
+    # Same scale for negative and positive colour bar:
+    if np.greater(np.absolute(varMin), varMax):
+        varMax = np.absolute(varMin)
+    else:
+        varMin = np.multiply(-1.0, np.absolute(varMax))
+
+    # Fixed axis limites for comparing plots across conditions/ROIs:
+    # varMin = -400.0
+    # varMax = 400.0
+
     # Create main figure:
     fig01 = plt.figure(figsize=(4.0, 3.0),
                        dpi=200.0,
@@ -73,7 +83,7 @@ def ecc_plot(aryMean, vecEccBin, strPathOut):
                        right=False)
 
     # Set and adjust common axes labels:
-    axsCmn.set_xlabel('V1 relative cortical depth',
+    axsCmn.set_xlabel('Cortical depth',
                       alpha=1.0,
                       fontname=strFont,
                       fontweight='normal',
@@ -136,7 +146,7 @@ def ecc_plot(aryMean, vecEccBin, strPathOut):
 
     # Plot correlation coefficients of current depth level:
     pltTmpCorr = plt.imshow(aryMean,
-                            interpolation='none',  # 'bicubic',
+                            interpolation='nearest',  # 'none',  # 'bicubic',
                             origin='lower',
                             norm=objClrNorm,
                             cmap=objCustClrMp)

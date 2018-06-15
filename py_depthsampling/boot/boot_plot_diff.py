@@ -17,15 +17,16 @@
 # You should have received a copy of the GNU General Public License along with
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
 import numpy as np
 from py_depthsampling.plot.plt_dpth_prfl import plt_dpth_prfl
 
 
-def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,
+def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,  #noqa
               varConLw=2.5, varConUp=97.5, strTtl='', varYmin=0.0, varYmax=2.0,
               strXlabel='Cortical depth level (equivolume)',
               strYlabel='fMRI signal change [arbitrary units]',
-              lgcLgnd=False, lstDiff=None):
+              lgcLgnd=False, lstDiff=None, vecNumInc=None):
     """
     Plot across-subject cortical depth profiles with confidence intervals.
 
@@ -69,6 +70,13 @@ def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,
         calculated, and is plotted. The the second condition from the tuple is
         subtracted from the first (e.g. if lstDiff = [(0, 1)], then condition 1
         is subtracted from condition 0).
+    vecNumInc : np.array
+        1D array with weights for weighted averaging over subjects (e.g. number
+        of vertices per subject). If the array is loaded from disk (i.e. if
+        `objDpth` is the path to an `*.npz` file stored on disk), `vecNumInc`
+        has to be in the `*.npz` file. If `objDpth` is a numpy array containing
+        the data, `vecNumInc` should also be provided as an input arguments.
+        Otherwise, weights are set to be equal across subjects.
 
     Returns
     -------
@@ -77,16 +85,16 @@ def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,
 
     Notes
     -----
-    Plot across-subject median cortical depth profiles with percentile
+    Plot across-subject mean cortical depth profiles with percentile
     bootstrap confidence intervals. This function bootstraps (i.e. resamples
     with replacement) from an array of single-subject depth profiles,
-    calculates a confidence interval of the median across bootstrap iterations
-    and plots the empirical median & bootstrap confidence intervals along the
+    calculates a confidence interval of the mean across bootstrap iterations
+    and plots the empirical mean & bootstrap confidence intervals along the
     cortical depth.
 
     Function of the depth sampling pipeline.
     """
-    # ------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # *** Prepare bootstrapping
 
     # Test whether the input is a numpy array or a string (with the path to a
@@ -97,9 +105,15 @@ def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,
     # If input is a string, load array from npy file:
     if lgcAry:
         aryDpth = objDpth
+        # If weights are not provided, set equal weight of one for each
+        # subject:
+        if vecNumInc is None:
+            vecNumInc = np.ones((aryDpth.shape[0]))
+
     elif lgcStr:
         # Load array for first condition to get dimensions:
-        aryTmpDpth = np.load(objDpth.format(lstCon[0]))
+        objNpz = np.load(objDpth.format(lstCon[0]))
+        aryTmpDpth = objNpz['arySubDpthMns']
         # Number of subjects:
         varNumSub = aryTmpDpth.shape[0]
         # Get number of depth levels from input array:
@@ -110,7 +124,12 @@ def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,
         aryDpth = np.zeros((varNumSub, varNumCon, varNumDpth))
         # Load single-condition arrays from disk:
         for idxCon in range(varNumCon):
-            aryDpth[:, idxCon, :] = np.load(objDpth.format(lstCon[idxCon]))
+            objNpz = np.load(objDpth.format(lstCon[idxCon]))
+            aryDpth[:, idxCon, :] = objNpz['arySubDpthMns']
+        # Array with number of vertices (for weighted averaging across
+        # subjects), shape: vecNumInc[subjects].
+        vecNumInc = objNpz['vecNumInc']
+
     else:
         print(('---Error in bootPlot: input needs to be numpy array or path '
                + 'to numpy array.'))
@@ -143,6 +162,10 @@ def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,
         # Array for bootstrap samples:
         aryBoo = np.zeros((varNumIt, varNumSub, varNumCon, varNumDpth))
 
+    # Array with number of vertices per subject for each bootstrapping sample
+    # (needed for weighted averaging), shape: aryWght[iterations, subjects]
+    aryWght = np.zeros((varNumIt, varNumSub))
+
     # ------------------------------------------------------------------------
     # *** Bootstrap
 
@@ -154,72 +177,83 @@ def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,
             # Put current bootstrap sample into array:
             aryBoo[idxIt, :, :, :] = aryDpth[vecRnd, :, :]
         else:
-            # NOTE: Relative difference score leads to inconsistent results.
-            # Calculate normalised difference between conditions (difference
-            # score ranging from -1 to 1; ((A - B) / abs(A + B)):
-            # for idxDiff in range(varNumCon):
-            #     aryBoo[idxIt, :, idxDiff, :] = \
-            #         np.divide(
-            #             np.subtract(
-            #                 aryDpth[vecRnd, lstDiff[idxDiff][0], :],
-            #                 aryDpth[vecRnd, lstDiff[idxDiff][1], :]
-            #                 ),
-            #             np.absolute(
-            #                 np.add(
-            #                     aryDpth[vecRnd, lstDiff[idxDiff][0], :],
-            #                     aryDpth[vecRnd, lstDiff[idxDiff][1], :]
-            #                     )
-            #                 )
-            #             )
             # Calculate difference between conditions:
             for idxDiff in range(varNumCon):
                 aryBoo[idxIt, :, idxDiff, :] = \
                     np.subtract(aryDpth[vecRnd, lstDiff[idxDiff][0], :],
                                 aryDpth[vecRnd, lstDiff[idxDiff][1], :])
 
-    # Median for each bootstrap sample (across subjects within the bootstrap
+        # Put number of vertices per subject into respective array (for
+        # weighted averaging):
+        aryWght[idxIt, :] = vecNumInc[vecRnd]
+
+    # Mean for each bootstrap sample (across subjects within the bootstrap
     # sample):
-    aryBooMed = np.median(aryBoo, axis=1)
+
+    # Sum of weights over subjects (i.e. total number of vertices across
+    # subjects, one value per iteration; for scaling).
+    vecSum = np.sum(aryWght, axis=1)
+
+    # Multiply depth profiles by weights (weights are broadcasted over
+    # conditions and depth levels):
+    aryTmp = np.multiply(aryBoo, aryWght[:, :, None, None])
+
+    # Sum over subjects, and scale by number of vertices (sum of vertices is
+    # broadcasted over conditions and depth levels):
+    aryBooMne = np.divide(
+                          np.sum(aryTmp, axis=1),
+                          vecSum[:, None, None]
+                          )
 
     # Delete large bootstrap array:
     del(aryBoo)
 
-    # Percentile bootstrap for median:
-    aryPrct = np.percentile(aryBooMed, (varConLw, varConUp), axis=0)
+    # Percentile bootstrap for mean:
+    aryPrct = np.percentile(aryBooMne, (varConLw, varConUp), axis=0)
 
     # ------------------------------------------------------------------------
     # *** Plot result
 
     if lstDiff is None:
 
-        # Empirical median:
-        aryEmpMed = np.median(aryDpth, axis=0)
+        # Sum of weights over subjects (i.e. total number of vertices across
+        # subjects; for scaling).
+        varSum = np.sum(vecNumInc)
+
+        # Multiply depth profiles by weights (weights are broadcasted over
+        # conditions and depth levels):
+        aryTmp = np.multiply(aryDpth, vecNumInc[:, None, None])
+
+        # Sum over subjects, and scale by total number of vertices:
+        aryEmpMne = np.divide(
+                              np.sum(aryTmp, axis=0),
+                              varSum
+                              )
 
     else:
 
-        # Empirical median difference between conditions:
-        aryEmpMed = np.zeros((varNumCon, varNumDpth))
-        # NOTE: Relative difference score leads to inconsistent results.
-        # for idxDiff in range(varNumCon):
-        #     aryEmpMed[idxDiff, :] = np.median(
-        #         np.divide(
-        #             np.subtract(
-        #                 aryDpth[:, lstDiff[idxDiff][0], :],
-        #                 aryDpth[:, lstDiff[idxDiff][1], :]
-        #                 ),
-        #             np.absolute(
-        #                 np.add(
-        #                     aryDpth[:, lstDiff[idxDiff][0], :],
-        #                     aryDpth[:, lstDiff[idxDiff][1], :]
-        #                     )
-        #                 )
-        #             ),
-        #         axis=0)
+        # Empirical mean difference between conditions:
+        aryEmpMne = np.zeros((varNumCon, varNumDpth))
+
         for idxDiff in range(varNumCon):
-            aryEmpMed[idxDiff, :] = np.median(
-                    np.subtract(aryDpth[:, lstDiff[idxDiff][0], :],
-                                aryDpth[:, lstDiff[idxDiff][1], :]),
-                    axis=0)
+
+            # Sum of weights over subjects (i.e. total number of vertices
+            # across subjects; for scaling).
+            varSum = np.sum(vecNumInc)
+
+            # Difference in cortical depth profiles between conditions:
+            aryDiff = np.subtract(aryDpth[:, lstDiff[idxDiff][0], :],
+                                  aryDpth[:, lstDiff[idxDiff][1], :])
+
+            # Multiply depth profiles by weights (weights are broadcasted over
+            # depth levels):
+            aryDiff = np.multiply(aryDiff, vecNumInc[:, None])
+
+            # Sum over subjects, and scale by total number of vertices:
+            aryEmpMne[idxDiff, :] = np.divide(
+                                              np.sum(aryDiff, axis=0),
+                                              varSum
+                                              )
 
         # Create condition labels for differences:
         lstDiffLbl = [None] * varNumCon
@@ -229,7 +263,7 @@ def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,
                                    + (lstConLbl[lstDiff[idxDiff][1]]))
         lstConLbl = lstDiffLbl
 
-    plt_dpth_prfl(aryEmpMed, None, varNumDpth, varNumCon, 80.0, varYmin,
+    plt_dpth_prfl(aryEmpMne, None, varNumDpth, varNumCon, 80.0, varYmin,
                   varYmax, False, lstConLbl, strXlabel, strYlabel, strTtl,
                   lgcLgnd, strPath, varSizeX=1800.0, varSizeY=1600.0,
                   varNumLblY=5, varPadY=(0.1, 0.1), aryCnfLw=aryPrct[0, :, :],

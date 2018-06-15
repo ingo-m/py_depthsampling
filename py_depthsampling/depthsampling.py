@@ -49,7 +49,7 @@ lstMetaCon = ['stimulus', 'periphery']
 lstRoi = ['v1', 'v2', 'v3']
 
 # Hemispheres ('lh' or 'rh'):
-lstHmsph = ['lh', 'rh']
+lstHmsph = ['rh'] #, 'lh']
 
 # List of subject identifiers:
 lstSubIds = ['20171023',  # '20171109',
@@ -61,31 +61,21 @@ lstSubIds = ['20171023',  # '20171109',
              '20180118']
 
 # Condition levels (used to complete file names) - nested list:
-lstNstCon = [['Pd_sst', 'Cd_sst', 'Ps_sst'],
+lstNstCon = [['Pd_sst', 'Ps_sst', 'Cd_sst'],
              ['Pd_min_Ps_sst'],
              ['Pd_min_Cd_sst'],
-             ['Linear_sst'],
-             ['Pd_trn', 'Cd_trn', 'Ps_trn'],
+             ['Pd_min_Cd_Ps_sst'],
+             ['Pd_trn', 'Ps_trn', 'Cd_trn'],
              ['Pd_min_Ps_trn'],
              ['Pd_min_Cd_trn'],
-             ['Linear_trn']]
+             ['Pd_min_Cd_Ps_sst']]
 
 # Condition labels:
-lstNstConLbl = [['PacMan Dynamic Sustained',
-                 'Control Dynamic Sustained',
-                 'PacMan Static Sustained'],
-                ['PacMan D - PacMan S (Sustained)'],
-                ['PacMan D - Control D (Sustained)'],
-                ['Linear (Sustained)'],
-                ['PacMan Dynamic Transient',
-                 'Control Dynamic Transient',
-                 'PacMan Static Transient'],
-                ['PacMan D - PacMan S (Transient)'],
-                ['PacMan D - Control D (Transient)'],
-                ['Linear (Transient)']]
+lstNstConLbl = lstNstCon
 
 # Base path of vtk files with depth-sampled data, e.g. parameter estimates
 # (with subject ID, hemisphere, and stimulus level left open):
+# strVtkDpth01 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/feat_level_2_{}_zstat.vtk'  #noqa
 strVtkDpth01 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/feat_level_2_{}_cope.vtk'  #noqa
 
 # (1)
@@ -98,7 +88,7 @@ lgcSlct01 = True
 # by the funtion `py_depthsampling.misc.fix_roi_csv.fix_roi_csv` in order to
 # ensure that the indices of the ROI definition and the vtk meshes are
 # congruent.
-strCsvRoi = '/home/john/PhD/GitHub/PacMan/analysis/{}/08_depthsampling/{}/{}_mod.csv'  #noqa
+strCsvRoi = '/home/john/PhD/GitLab/PacMan/analysis/{}/08_depthsampling/{}/{}_mod.csv'  #noqa
 # Number of header lines in ROI CSV file:
 varNumHdrRoi = 1
 
@@ -134,7 +124,7 @@ lgcSlct04 = True
 strVtkSlct04 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_eccentricity.vtk'  #noqa
 # Threshold for vertex selection - list of tuples (interval per meta-condition,
 # e.g. within & outside stimulus area):
-lstThrSlct04 = [(0.0, 3.0), (3.5, 4.0)]
+lstThrSlct04 = [(0.75, 3.0), (3.5, 4.0)]
 
 # Number of cortical depths:
 varNumDpth = 11
@@ -147,17 +137,19 @@ strPrcdData = 'SCALARS'
 varNumLne = 2
 
 # Label for axes:
-strXlabel = 'Cortical depth level (equivolume)'
+strXlabel = 'Cortical depth level'
+# strYlabel = 'z-value'
 strYlabel = 'fMRI signal [a.u.]'
 
 # Output path for plots - prefix:
+# strPltOtPre = '/home/john/PhD/PacMan_Plots/z/{}/plots_{}/'
 strPltOtPre = '/home/john/PhD/PacMan_Plots/pe/{}/plots_{}/'
 
 # Output path for plots - suffix:
 strPltOtSuf = '_{}_{}_{}.png'
 
 # Figure scaling factor:
-varDpi = 80.0
+varDpi = 100.0
 
 # If normalisation - data from which input file to divide by?
 # (Indexing starts at zero.) Note: This functionality is not used at the
@@ -170,7 +162,8 @@ varNormIdx = 0
 lgcNormDiv = False
 
 # Output path for depth samling results (within subject means):
-strDpthMeans = '/home/john/PhD/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}.npy'  #noqa
+# strDpthMeans = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}_zstat.npz'  #noqa
+strDpthMeans = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}.npz'  #noqa
 
 # Maximum number of processes to run in parallel: *** NOT IMPLEMENTED
 # varPar = 10

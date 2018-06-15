@@ -49,7 +49,7 @@ def ert_plt(aryRoiErtMeanDpth,  #noqa
             varYnum=6):
     """Plot event-related timecourses."""
     # Create figure:
-    fgr01 = plt.figure(figsize=(1200.0/varDpi, 800.0/varDpi),
+    fgr01 = plt.figure(figsize=(900.0/varDpi, 600.0/varDpi),
                        dpi=varDpi)
     # Create axis:
     axs01 = fgr01.add_subplot(111)
@@ -93,8 +93,10 @@ def ert_plt(aryRoiErtMeanDpth,  #noqa
     # varIdxZero = np.where((np.around(vecX, decimals=5) == 0.0))[0]
 
     # Prepare colour map:
-    objClrNorm = colors.Normalize(vmin=0, vmax=(varNumCon - 1))
-    objCmap = plt.cm.winter
+    # objClrNorm = colors.Normalize(vmin=0, vmax=(varNumCon - 1))
+    # objCmap = plt.cm.winter
+    objClrNorm = colors.Normalize(vmin=0, vmax=9)
+    objCmap = plt.cm.tab10
 
     # Loop through conditions:
     # for idxCon in [3, 2, 1, 0]:
@@ -200,6 +202,14 @@ def ert_plt(aryRoiErtMeanDpth,  #noqa
                       color=(0.3, 0.3, 0.3),
                       linewidth=8.0,
                       label='_nolegend_')
+
+    # Make plot & axis labels fit into figure (this may not always work,
+    # depending on the layout of the plot, matplotlib sometimes throws a
+    # ValueError ("left cannot be >= right").
+    try:
+        plt.tight_layout(pad=0.5)
+    except ValueError:
+        pass
 
     # Save figure:
     fgr01.savefig(strPthOut,

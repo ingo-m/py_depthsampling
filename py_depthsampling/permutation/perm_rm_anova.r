@@ -40,32 +40,18 @@ aryPthInEmp <- c('/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/sti
                  '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/v1_rh_Ps_sst_forR.npy',
                  '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/v1_rh_vecNumInc_forR.npy')
 
+aryPthInEmp <- c('/Users/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/v1_rh_Pd_sst_forR.npy',
+                 '/Users/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/v1_rh_Ps_sst_forR.npy',
+                 '/User/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/v1_rh_vecNumInc_forR.npy')
 
 
 # TODO convert npz to npy in python
 
 aryEmp01  <- npyLoad(aryPthInEmp[1])
+aryEmp02  <- npyLoad(aryPthInEmp[2])
 
 
-print('---Number of resampling iterations:')
-print(varNumIt)
 
-strResults <- c(strResults, 'Number of resampling iterations:', varNumIt, '')
-
-# Loop through input files:
-for (strTmp in aryPthIn) {
-
-  strMsg <- cat('--Input: ', strTmp)
-  print(strMsg)
-
-  strResults <- c(strResults,
-                  '#######################################################################',
-                  strTmp,
-                  '')
-
-  # Load empirical semisaturation constant from disk (i.e. semisaturation constant
-  # fitted on the full dataset; needs to be created with ds_crfMain.py):
-  aryEmpSemi  <- npyLoad(strTmp)
 
   # Put data into data frame object:
   datEmpSemi  <- data.frame(aryEmpSemi)

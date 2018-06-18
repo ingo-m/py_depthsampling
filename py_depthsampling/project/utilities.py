@@ -24,8 +24,8 @@ from py_depthsampling.get_data.load_csv_roi import load_csv_roi
 from py_depthsampling.get_data.load_vtk_multi import load_vtk_multi
 
 
-def get_data(strData, strPthR2, strPthSd, strPthX, strPthY, strCsvRoi,
-             varNumDpth=11, strPrcdData='SCALARS', varNumLne=2,
+def get_data(strData, strPthMneEpi, strPthR2, strPthSd, strPthX, strPthY,
+             strCsvRoi, varNumDpth=11, strPrcdData='SCALARS', varNumLne=2,
              varNumHdrRoi=1, lstDpth=None):
     """
     Load data for projection into visual space.
@@ -86,6 +86,12 @@ def get_data(strData, strPthR2, strPthSd, strPthX, strPthY, strCsvRoi,
                              varNumLne,
                              varNumDpth)
 
+    # Load mean EPI:
+    aryMneEpi = load_vtk_multi(strPthMneEpi,
+                               strPrcdData,
+                               varNumLne,
+                               varNumDpth)
+
     # Load R2 map:
     aryR2 = load_vtk_multi(strPthR2,
                            strPrcdData,
@@ -122,6 +128,7 @@ def get_data(strData, strPthR2, strPthSd, strPthX, strPthY, strCsvRoi,
 
     # Only keep vertices that are contained in the ROI:
     aryData = aryData[vecRoiIdx, :]
+    aryMneEpi = aryMneEpi[vecRoiIdx, :]
     aryR2 = aryR2[vecRoiIdx, :]
     arySd = arySd[vecRoiIdx, :]
     aryX = aryX[vecRoiIdx, :]
@@ -134,6 +141,7 @@ def get_data(strData, strPthR2, strPthSd, strPthX, strPthY, strCsvRoi,
 
         # Average over all depth levels:
         vecData = np.mean(aryData, axis=1)
+        vecMneEpi = np.mean(aryMneEpi, axis=1)
         vecR2 = np.mean(aryR2, axis=1)
         vecSd = np.mean(arySd, axis=1)
         vecX = np.mean(aryX, axis=1)
@@ -143,12 +151,13 @@ def get_data(strData, strPthR2, strPthSd, strPthX, strPthY, strCsvRoi,
 
         # Average over selected depth levels:
         vecData = np.mean(aryData[:, lstDpth], axis=1)
+        vecMneEpi = np.mean(aryMneEpi[:, lstDpth], axis=1)
         vecR2 = np.mean(aryR2[:, lstDpth], axis=1)
         vecSd = np.mean(arySd[:, lstDpth], axis=1)
         vecX = np.mean(aryX[:, lstDpth], axis=1)
         vecY = np.mean(aryY[:, lstDpth], axis=1)
 
-    return vecData, vecR2, vecSd, vecX, vecY
+    return vecData, vecMneEpi, vecR2, vecSd, vecX, vecY
 
 
 def crt_gauss(varSizeX, varSizeY, varPosX, varPosY, varSd):

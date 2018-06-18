@@ -187,19 +187,19 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
 
                 if idxRoi == 0:  # v1
                     if idxCon == 0:  # v1 simple contrasts
-                        lstLimY = [(-400.0, 200.0)] * len(lstSubIds)
+                        lstLimY = [(-4.0, 2.0)] * len(lstSubIds)
                     elif idxCon == 1:  # v1 Pd_min_Ps
-                        lstLimY = [(-50.0, 50.0)] * len(lstSubIds)
+                        lstLimY = [(-0.5, 0.5)] * len(lstSubIds)
                     elif idxCon == 2:  # v1 Pd_min_Cd
-                        lstLimY = [(-50.0, 50.0)] * len(lstSubIds)
+                        lstLimY = [(-0.5, 0.5)] * len(lstSubIds)
 
                 elif (idxRoi == 1) or (idxRoi == 2):  # v2 & v3
                     if idxCon == 0:  # v2 simple contrasts
-                        lstLimY = [(-500.0, 20.0)] * len(lstSubIds)
+                        lstLimY = [(-5.0, 0.2)] * len(lstSubIds)
                     elif idxCon == 1:  # v2 Pd_min_Ps
-                        lstLimY = [(-50.0, 50.0)] * len(lstSubIds)
+                        lstLimY = [(-0.5, 0.5)] * len(lstSubIds)
                     elif idxCon == 2:  # v2 Pd_min_Cd
-                        lstLimY = [(-50.0, 50.0)] * len(lstSubIds)
+                        lstLimY = [(-0.5, 0.5)] * len(lstSubIds)
 
                 # Limits of y-axis for ACROSS SUBJECT PLOTS:
 
@@ -208,12 +208,12 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
 
                     if (idxCon == 0) or (idxCon == 4):  # v1 simple contrasts
                         # Limits of y-axis for across subject plot:
-                        varAcrSubsYmin = -500.0
-                        varAcrSubsYmax = 200.0
+                        varAcrSubsYmin = -5.0
+                        varAcrSubsYmax = 2.0
                     else:  # differential contrasts
                         # Limits of y-axis for across subject plot:
-                        varAcrSubsYmin = -100.0
-                        varAcrSubsYmax = 100.0
+                        varAcrSubsYmin = -1.0
+                        varAcrSubsYmax = 1.0
 
                 # Periphery:
                 if lstMetaCon[idxMtaCn] == 'periphery':
@@ -221,11 +221,11 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                     if (idxCon == 0) or (idxCon == 4):  # v1 simple contrasts
                         # Limits of y-axis for across subject plot:
                         varAcrSubsYmin = 0.0
-                        varAcrSubsYmax = 750.0
+                        varAcrSubsYmax = 2.0
                     else:  # differential contrasts
                         # Limits of y-axis for across subject plot:
-                        varAcrSubsYmin = -150.0
-                        varAcrSubsYmax = 150.0
+                        varAcrSubsYmin = -0.5
+                        varAcrSubsYmax = 0.5
 
                 # Title for mean plot:
                 strTitle = lstRoi[idxRoi].upper()

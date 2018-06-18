@@ -68,7 +68,7 @@ def acr_subs_get_data(idxPrc,              # Process ID  #noqa
     if idxPrc == 0:
         print('------Loading single subject data: ' + strSubId)
 
-    # **************************************************************************
+    # *************************************************************************
     # *** Import data
 
     # Import CSV file with ROI definition
@@ -137,9 +137,63 @@ def acr_subs_get_data(idxPrc,              # Process ID  #noqa
         if idxPrc == 0:
             print('------------File ' + str(idxIn + 1) + ' out of '
                   + str(varNumCon))
-    # **************************************************************************
+    # *************************************************************************
 
-    # **************************************************************************
+
+
+    # *************************************************************************
+    # *** Convert cope to percent signal change
+
+    # According to the FSL documentation
+    # (https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FEAT/UserGuide), the PEs can be
+    # scaled to signal change with respect to the mean (over time within
+    # voxel): "This is achieved by scaling the PE or COPE values by (100*) the
+    # peak-peak height of the regressor (or effective regressor in the case of
+    # COPEs) and then by dividing by mean_func (the mean over time of
+    # filtered_func_data)." However, this PSC would be with respect to the
+    # temporal mean, but we are interested in the PSC with respect to
+    # pre-stimulus baseline. Thus, we extracte the difference (a scaling
+    # factor) between these two (i.e. temporal mean vs. pre-stimulus baseline)
+    # from the respective FSL design matrix (`design.mat` in the FEAT
+    # directory). The scaling factor is approximately 1.4 (slightly different
+    # values for sustained and transient predictors, but close enough not to
+    # matter). This scaling factor needs to be applied after the procedure
+    # described in the FSL documentation. Thus, the final PSC calculation is
+    # calculated as follows: `(PE * (100 * peak-peak height) / tmean) * 1.4`.
+    # The pp-height is obtained from `design.mat`.
+
+    # Only perform scaling if the data is from an FSL cope file:
+    if 'cope' in lstVtkDpth01[0]:
+        print('---------Convert cope to percent signal change.')
+
+        # The peak-peak height depends on the predictor (i.e. condition).
+        if 'sst' in lstVtkDpth01[0]:
+            varPpheight = 1.268049
+        elif 'trn' in lstVtkDpth01[0]:
+            varPpheight = 0.2269044
+
+        # Loop through input data files:
+        for idxIn in range(0, varNumCon):
+
+            # Get PEs:
+            aryTmp = lstDpthData01[idxIn]
+
+            # Apply PSC scaling, as described above:
+            aryTmp = np.multiply(
+                                 np.divide(
+                                           np.multiply(aryTmp,
+                                                       (100.0 * varPpheight)
+                                                       ),
+                                           arySlct03),
+                                 1.4
+                                 )
+
+            # Put scaled PEs back into list (now PSC with respect to
+            # pre-stimulus baseline):
+            lstDpthData01[idxIn] = aryTmp
+    # *************************************************************************
+
+    # *************************************************************************
     # *** Select vertices
 
     lstDpthData01, varNumInc, vecInc = \
@@ -157,9 +211,9 @@ def acr_subs_get_data(idxPrc,              # Process ID  #noqa
                    arySlct04,           # Criterion 4 - Data
                    tplThrSlct04,        # Criterion 4 - Threshold
                    idxPrc)              # Process ID
-    # **************************************************************************
+    # *************************************************************************
 
-    # **************************************************************************
+    # *************************************************************************
     # *** Create VTK mesh mask
 
     if idxPrc == 0:
@@ -174,9 +228,9 @@ def acr_subs_get_data(idxPrc,              # Process ID  #noqa
             strCsvRoi,        # Data struc - ROI CSV fle (outpt. naming)
             vecInc,           # Vector with included vertices
             strMetaCon)       # Metacondition (stimulus or periphery)
-    # **************************************************************************
+    # *************************************************************************
 
-    # **************************************************************************
+    # *************************************************************************
     # *** Calculate mean & conficende interval
 
     if idxPrc == 0:
@@ -244,9 +298,9 @@ def acr_subs_get_data(idxPrc,              # Process ID  #noqa
         # Divide all values by the grand mean:
         aryDpthMean = np.divide(np.absolute(aryDpthMean), varGrndMean)
         aryDpthConf = np.divide(np.absolute(aryDpthConf), varGrndMean)
-    # **************************************************************************
+    # *************************************************************************
 
-    # **************************************************************************
+    # *************************************************************************
     # *** Create plot
 
     if False:
@@ -274,9 +328,9 @@ def acr_subs_get_data(idxPrc,              # Process ID  #noqa
                       strTitleTmp,  # Figure title
                       True,         # Boolean: whether to plot a legend
                       strPltOt)
-    # **************************************************************************
+    # *************************************************************************
 
-    # **************************************************************************
+    # *************************************************************************
     # *** Return
 
     # Output list:
@@ -285,4 +339,4 @@ def acr_subs_get_data(idxPrc,              # Process ID  #noqa
               varNumInc]
 
     queOut.put(lstOut)
-    # **************************************************************************
+    # *************************************************************************

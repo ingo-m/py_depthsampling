@@ -35,21 +35,22 @@
 library(RcppCNPy)
 
 
+aryEmp01[1, ]
+
 # Input files:
 aryPthInEmp <- c('/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/v1_rh_Pd_sst_forR.npy',
                  '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/v1_rh_Ps_sst_forR.npy',
                  '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/v1_rh_vecNumInc_forR.npy')
-
-aryPthInEmp <- c('/Users/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/v1_rh_Pd_sst_forR.npy',
-                 '/Users/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/v1_rh_Ps_sst_forR.npy',
-                 '/User/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/v1_rh_vecNumInc_forR.npy')
-
 
 # TODO convert npz to npy in python
 
 aryEmp01  <- npyLoad(aryPthInEmp[1])
 aryEmp02  <- npyLoad(aryPthInEmp[2])
 
+
+dfEmp01 = data.frame(aryEmp01)
+
+?data.frame
 
 
 

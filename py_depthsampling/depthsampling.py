@@ -142,8 +142,8 @@ strXlabel = 'Cortical depth level'
 strYlabel = 'fMRI signal [a.u.]'
 
 # Output path for plots - prefix:
-# strPltOtPre = '/home/john/PhD/PacMan_Plots/z/{}/plots_{}/'
-strPltOtPre = '/home/john/PhD/PacMan_Plots/pe/{}/plots_{}/'
+# strPltOtPre = '/home/john/Dropbox/PacMan_Plots/z/{}/plots_{}/'
+strPltOtPre = '/home/john/Dropbox/PacMan_Plots/pe/{}/plots_{}/'
 
 # Output path for plots - suffix:
 strPltOtSuf = '_{}_{}_{}.png'

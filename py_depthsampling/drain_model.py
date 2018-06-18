@@ -199,31 +199,31 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                         if idxCon == 0:  # v1 simple contrasts
                             if lstMetaCon[idxMtaCn] == 'stimulus':
                                 # Limits of y-axis for across subject plot:
-                                varAcrSubsYmin01 = -450.0
+                                varAcrSubsYmin01 = -5.0
                                 varAcrSubsYmax01 = 0.0
-                                varAcrSubsYmin02 = -450.0
+                                varAcrSubsYmin02 = -5.0
                                 varAcrSubsYmax02 = 0.0
                             if lstMetaCon[idxMtaCn] == 'periphery':
                                 # Limits of y-axis for across subject plot:
                                 varAcrSubsYmin01 = 0.0
-                                varAcrSubsYmax01 = 600.0
+                                varAcrSubsYmax01 = 6.0
                                 varAcrSubsYmin02 = 0.0
-                                varAcrSubsYmax02 = 600.0
+                                varAcrSubsYmax02 = 6.0
 
                     elif idxRoi == 1:  # v2
                         if idxCon == 0:  # v2 simple contrasts
                             if lstMetaCon[idxMtaCn] == 'stimulus':
                                 # Limits of y-axis for across subject plot:
-                                varAcrSubsYmin01 = -450.0
+                                varAcrSubsYmin01 = -5.0
                                 varAcrSubsYmax01 = 0.0
-                                varAcrSubsYmin02 = -450.0
+                                varAcrSubsYmin02 = -5.0
                                 varAcrSubsYmax02 = 0.0
                             if lstMetaCon[idxMtaCn] == 'periphery':
                                 # Limits of y-axis for across subject plot:
                                 varAcrSubsYmin01 = 0.0
-                                varAcrSubsYmax01 = 600.0
+                                varAcrSubsYmax01 = 6.0
                                 varAcrSubsYmin02 = 0.0
-                                varAcrSubsYmax02 = 600.0
+                                varAcrSubsYmax02 = 6.0
 
                     # Call drain model function:
                     drain_model(lstMdl[idxMdl], lstRoi[idxRoi],

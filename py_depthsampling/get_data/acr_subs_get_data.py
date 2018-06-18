@@ -139,8 +139,6 @@ def acr_subs_get_data(idxPrc,              # Process ID  #noqa
                   + str(varNumCon))
     # *************************************************************************
 
-
-
     # *************************************************************************
     # *** Convert cope to percent signal change
 
@@ -176,17 +174,21 @@ def acr_subs_get_data(idxPrc,              # Process ID  #noqa
         for idxIn in range(0, varNumCon):
 
             # Get PEs:
-            aryTmp = lstDpthData01[idxIn]
+            aryTmp = lstDpthData01[idxIn].astype(np.float64)
+
+            # In order to avoid division by zero, avoid zero-voxels:
+            lgcTmp = np.not_equal(arySlct03, 0.0)
 
             # Apply PSC scaling, as described above:
-            aryTmp = np.multiply(
-                                 np.divide(
-                                           np.multiply(aryTmp,
-                                                       (100.0 * varPpheight)
-                                                       ),
-                                           arySlct03),
-                                 1.4
-                                 )
+            aryTmp[lgcTmp] = np.multiply(
+                                         np.divide(
+                                                   np.multiply(aryTmp[lgcTmp],
+                                                               (100.0
+                                                                * varPpheight)
+                                                               ),
+                                                   arySlct03[lgcTmp]),
+                                         1.0  # 1.4
+                                         )
 
             # Put scaled PEs back into list (now PSC with respect to
             # pre-stimulus baseline):

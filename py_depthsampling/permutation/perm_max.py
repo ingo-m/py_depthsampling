@@ -160,7 +160,8 @@ def permute_max(aryDpth01, aryDpth02, vecNumInc=None, varNumIt=10000):
     aryPermDiff = np.average(aryPermDiff, weights=vecNumInc, axis=1)
 
     # Maximum difference across cortical depth:
-    vecPermDiffMax = np.max(aryPermDiff, axis=1)
+    # vecPermDiffMax = np.max(aryPermDiff, axis=1)
+    vecPermDiffMax = np.max(np.absolute(aryPermDiff), axis=1)
 
     # -------------------------------------------------------------------------
     # *** Calculate empirical difference
@@ -175,7 +176,8 @@ def permute_max(aryDpth01, aryDpth02, vecNumInc=None, varNumIt=10000):
     aryEmpDiffMne = np.average(aryEmpDiff, weights=vecNumInc, axis=0)
 
     # Maximum difference across cortical depth:
-    varEmpDiffMneMax = np.max(aryEmpDiffMne)
+    # varEmpDiffMneMax = np.max(aryEmpDiffMne)
+    varEmpDiffMneMax = np.max(np.absolute(aryEmpDiffMne))
 
     # -------------------------------------------------------------------------
     # *** Calculate p-value

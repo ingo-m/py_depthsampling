@@ -63,7 +63,7 @@ lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
 lstDiff = [(0, 1), (0, 2), (1, 2)]
 
 # Number of resampling iterations:
-varNumIt = 10000
+varNumIt = 100000
 # -----------------------------------------------------------------------------
 
 

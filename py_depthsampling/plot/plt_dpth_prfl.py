@@ -174,7 +174,7 @@ def plt_dpth_prfl(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
             plot02 = axs01.fill_between(vecX,  #noqa
                                         aryCnfLw[idxCon, :],
                                         aryCnfUp[idxCon, :],
-                                        alpha=0.4,
+                                        alpha=0.1,
                                         edgecolor=vecClrTmp,
                                         facecolor=vecClrTmp,
                                         linewidth=0,

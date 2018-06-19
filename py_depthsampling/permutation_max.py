@@ -28,6 +28,7 @@ Inputs are *.npy files containing depth profiles for each subject.
 
 import numpy as np
 from py_depthsampling.permutation.perm_max import permute_max
+import pandas as pd
 
 
 # -----------------------------------------------------------------------------
@@ -81,8 +82,15 @@ varNumDiff = len(lstDiff)
 # Loop through models, ROIs, hemispheres, and conditions to create plots:
 for idxMtaCn in range(len(lstMetaCon)):  #noqa
     for idxMdl in range(len(lstMdl)):  #noqa
-        for idxRoi in range(len(lstRoi)):
-            for idxHmsph in range(len(lstHmsph)):
+        for idxHmsph in range(len(lstHmsph)):
+
+            # Array for p-values:
+            aryData = np.zeros((len(lstRoi), len(lstCon)))
+
+            # List for comparison labels:
+            lstLbls = [None] * len(lstDiff)
+
+            for idxRoi in range(len(lstRoi)):
                 for idxDiff in range(len(lstDiff)):
 
                     # Condition names:
@@ -139,21 +147,45 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                                          + ' conditions.')
                             raise ValueError(strErrMsg)
 
-
-
                         # Run permutation test:
                         varP = permute_max(aryDpth01,
                                            aryDpth02,
                                            vecNumInc=vecNumInc,
                                            varNumIt=varNumIt)
 
+
+                        aryData[idxRoi, idxDiff] = varP
+
                         strMsg = ('---Permutation p-value \n'
-                                  + '   Model: ' + lstMdl[idxMdl] + '\n'
-                                  + '   Meta-condition: ' + lstMetaCon[idxMtaCn] + '\n'
-                                  + '   ROI: ' + lstRoi[idxRoi] + '\n'
-                                  + '   Hemisphere: ' + lstHmsph[idxHmsph]
-                                  + '   Condition: ' + strTmpCon01 + ' minus ' + strTmpCon02 + '\n'
-                                  + '   p = '+ str(varP))
+                                  + '   Model: '
+                                  + lstMdl[idxMdl]
+                                  + '\n'
+                                  + '   Meta-condition: '
+                                  + lstMetaCon[idxMtaCn]
+                                  + '\n'
+                                  + '   ROI: '
+                                  + lstRoi[idxRoi]
+                                  + '\n'
+                                  + '   Hemisphere: '
+                                  + lstHmsph[idxHmsph]
+                                  + '   Condition: '
+                                  + strTmpCon01
+                                  + ' minus '
+                                  + strTmpCon02
+                                  + '\n'
+                                  + '   p = '
+                                  + str(varP))
 
                         print(strMsg)
+
+                        # Column label for dataframe:
+                        lstLbls[idxDiff] = (strTmpCon01 + '-' + strTmpCon02)
+
+            # p-values into dataframe:
+            dfData = pd.DataFrame(data=aryData,
+                                  index=lstRoi,
+                                  columns=lstLbls)
+            print('')
+            print(dfData)
+            print('')
 # -----------------------------------------------------------------------------

@@ -30,6 +30,9 @@ from py_depthsampling.boot.boot_plot_diff import boot_plot
 # -----------------------------------------------------------------------------
 # *** Define parameters
 
+# Which parameter to plot - 'mean' or 'median'.
+strParam = 'mean'
+
 # Which draining model to plot ('' for none):
 lstMdl = ['', '_deconv_model_1']
 
@@ -42,7 +45,7 @@ lstRoi = ['v1', 'v2', 'v3']
 # Hemisphere ('rh' or 'lh'):
 lstHmsph = ['rh']  # ['lh', 'rh']
 
-# Path for corrected depth-profiles (meta-condition, ROI, hemisphere,
+# Path of corrected depth-profiles (meta-condition, ROI, hemisphere,
 # condition, and model index left open):
 strPthData = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npz'  #noqa
 
@@ -73,15 +76,14 @@ lstConLbl = lstCon
 # Which conditions to compare (list of tuples with condition indices):
 lstDiff = [(0, 1), (0, 2), (2, 1)]
 
-# Number of resampling iterations for peak finding (for models 1, 2, and 3) or
-# random noise samples (models 4 and 5):
-# varNumIt = 10000
+# Number of resampling iterations:
+varNumIt = 1000000
 
 # Lower & upper bound of percentile bootstrap (in percent), for bootstrap
 # confidence interval (models 1, 2, and 3) - this value is only printed, not
 # plotted - or plotted confidence intervals in case of model 5:
-varCnfLw = 2.5
-varCnfUp = 97.5
+varCnfLw = 5.0
+varCnfUp = 95.0
 # -----------------------------------------------------------------------------
 
 
@@ -145,7 +147,7 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                            + strFlTp),
                           lstCon,
                           lstConLbl,
-                          varNumIt=10000,
+                          varNumIt=varNumIt,
                           varConLw=varCnfLw,
                           varConUp=varCnfUp,
                           strTtl='',
@@ -154,7 +156,8 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                           strXlabel=strXlabel,
                           strYlabel=strYlabel,
                           lgcLgnd=True,
-                          lstDiff=lstDiff)
+                          lstDiff=lstDiff,
+                          strParam=strParam)
 
             # Create single subject plot(s):
             # boot_plot_sngl(strPthData.format(lstMetaCon[idxMtaCn],

@@ -19,6 +19,7 @@
 
 
 import numpy as np
+import rpy2.robjects as robjects
 from py_depthsampling.plot.plt_dpth_prfl import plt_dpth_prfl
 
 
@@ -26,7 +27,7 @@ def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,  #noqa
               varConLw=2.5, varConUp=97.5, strTtl='', varYmin=0.0, varYmax=2.0,
               strXlabel='Cortical depth level (equivolume)',
               strYlabel='fMRI signal change [arbitrary units]',
-              lgcLgnd=False, lstDiff=None, vecNumInc=None):
+              lgcLgnd=False, lstDiff=None, vecNumInc=None, strParam='mean'):
     """
     Plot across-subject cortical depth profiles with confidence intervals.
 
@@ -77,6 +78,10 @@ def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,  #noqa
         has to be in the `*.npz` file. If `objDpth` is a numpy array containing
         the data, `vecNumInc` should also be provided as an input arguments.
         Otherwise, weights are set to be equal across subjects.
+    strParam : string
+        Which parameter to plot; 'mean' or 'median'. If `strParam = 'median'`,
+        an R function is imported for calculating the weighted median.
+        Dependency (in python): `rpy2`, dependency (in R): `spatstat`.
 
     Returns
     -------
@@ -85,12 +90,12 @@ def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,  #noqa
 
     Notes
     -----
-    Plot across-subject mean cortical depth profiles with percentile
+    Plot across-subject mean or median cortical depth profiles with percentile
     bootstrap confidence intervals. This function bootstraps (i.e. resamples
     with replacement) from an array of single-subject depth profiles,
-    calculates a confidence interval of the mean across bootstrap iterations
-    and plots the empirical mean & bootstrap confidence intervals along the
-    cortical depth.
+    calculates a confidence interval of the mean/median across bootstrap
+    iterations and plots the empirical mean/median & bootstrap confidence
+    intervals along the cortical depth.
 
     Function of the depth sampling pipeline.
     """
@@ -187,23 +192,49 @@ def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,  #noqa
         # weighted averaging):
         aryWght[idxIt, :] = vecNumInc[vecRnd]
 
-    # Mean for each bootstrap sample (across subjects within the bootstrap
-    # sample):
+    if strParam == 'mean':
 
-    # Sum of weights over subjects (i.e. total number of vertices across
-    # subjects, one value per iteration; for scaling).
-    vecSum = np.sum(aryWght, axis=1)
+        # Mean for each bootstrap sample (across subjects within the bootstrap
+        # sample):
 
-    # Multiply depth profiles by weights (weights are broadcasted over
-    # conditions and depth levels):
-    aryTmp = np.multiply(aryBoo, aryWght[:, :, None, None])
+        # Sum of weights over subjects (i.e. total number of vertices across
+        # subjects, one value per iteration; for scaling).
+        vecSum = np.sum(aryWght, axis=1)
 
-    # Sum over subjects, and scale by number of vertices (sum of vertices is
-    # broadcasted over conditions and depth levels):
-    aryBooMne = np.divide(
-                          np.sum(aryTmp, axis=1),
-                          vecSum[:, None, None]
-                          )
+        # Multiply depth profiles by weights (weights are broadcasted over
+        # conditions and depth levels):
+        aryTmp = np.multiply(aryBoo, aryWght[:, :, None, None])
+
+        # Sum over subjects, and scale by number of vertices (sum of vertices
+        # is broadcasted over conditions and depth levels):
+        aryBooMne = np.divide(
+                              np.sum(aryTmp, axis=1),
+                              vecSum[:, None, None]
+                              )
+
+    elif strParam == 'median':
+
+        # Define R function for calculation of weighted median:
+        strFuncR = """
+         funcR <- function(lstData, lstWght){
+         library(spatstat)
+         varWm <- weighted.median(lstData, lstWght)
+         return(varWm)
+         }
+        """
+        objFuncR = robjects.r(strFuncR)
+
+        # Array for weighted median difference between conditions:
+        aryBooMne = np.zeros((varNumIt, varNumCon, varNumDpth))
+
+        # Calculate weighted median difference between conditions in R (yes
+        # this is slow):
+        for idxIt in range(varNumIt):
+            for idxCon in range(varNumCon):
+                for idxDpth in range(varNumDpth):
+                    aryBooMne[idxIt, idxCon, idxDpth] = \
+                        objFuncR(list(aryBoo[idxIt, :, idxCon, idxDpth]),
+                                 list(aryWght[idxIt, :]))[0]
 
     # Delete large bootstrap array:
     del(aryBoo)
@@ -216,19 +247,33 @@ def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,  #noqa
 
     if lstDiff is None:
 
-        # Sum of weights over subjects (i.e. total number of vertices across
-        # subjects; for scaling).
-        varSum = np.sum(vecNumInc)
+        if strParam == 'mean':
 
-        # Multiply depth profiles by weights (weights are broadcasted over
-        # conditions and depth levels):
-        aryTmp = np.multiply(aryDpth, vecNumInc[:, None, None])
+            # Sum of weights over subjects (i.e. total number of vertices
+            # across subjects; for scaling).
+            varSum = np.sum(vecNumInc)
 
-        # Sum over subjects, and scale by total number of vertices:
-        aryEmpMne = np.divide(
-                              np.sum(aryTmp, axis=0),
-                              varSum
-                              )
+            # Multiply depth profiles by weights (weights are broadcasted over
+            # conditions and depth levels):
+            aryTmp = np.multiply(aryDpth, vecNumInc[:, None, None])
+
+            # Sum over subjects, and scale by total number of vertices:
+            aryEmpMne = np.divide(
+                                  np.sum(aryTmp, axis=0),
+                                  varSum
+                                  )
+
+        elif strParam == 'median':
+
+            # Array for weighted median difference between conditions:
+            aryEmpMne = np.zeros((varNumCon, varNumDpth))
+
+            # Calculate weighted median in R (yes this is slow):
+            for idxCon in range(varNumCon):
+                for idxDpth in range(varNumDpth):
+                    aryEmpMne[idxCon, idxDpth] = \
+                        objFuncR(list(aryDpth[:, idxCon, idxDpth]),
+                                 list(vecNumInc))[0]
 
     else:
 
@@ -237,23 +282,40 @@ def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,  #noqa
 
         for idxDiff in range(varNumCon):
 
-            # Sum of weights over subjects (i.e. total number of vertices
-            # across subjects; for scaling).
-            varSum = np.sum(vecNumInc)
+            if strParam == 'mean':
 
-            # Difference in cortical depth profiles between conditions:
-            aryDiff = np.subtract(aryDpth[:, lstDiff[idxDiff][0], :],
-                                  aryDpth[:, lstDiff[idxDiff][1], :])
+                # Sum of weights over subjects (i.e. total number of vertices
+                # across subjects; for scaling).
+                varSum = np.sum(vecNumInc)
 
-            # Multiply depth profiles by weights (weights are broadcasted over
-            # depth levels):
-            aryDiff = np.multiply(aryDiff, vecNumInc[:, None])
+                # Difference in cortical depth profiles between conditions:
+                aryDiff = np.subtract(aryDpth[:, lstDiff[idxDiff][0], :],
+                                      aryDpth[:, lstDiff[idxDiff][1], :])
 
-            # Sum over subjects, and scale by total number of vertices:
-            aryEmpMne[idxDiff, :] = np.divide(
-                                              np.sum(aryDiff, axis=0),
-                                              varSum
-                                              )
+                # Multiply depth profiles by weights (weights are broadcasted
+                # over depth levels):
+                aryDiff = np.multiply(aryDiff, vecNumInc[:, None])
+
+                # Sum over subjects, and scale by total number of vertices:
+                aryEmpMne[idxDiff, :] = np.divide(
+                                                  np.sum(aryDiff, axis=0),
+                                                  varSum
+                                                  )
+
+            elif strParam == 'median':
+
+                # Calculate weighted median difference between conditions in R
+                # (yes this is slow):
+                for idxDiff in range(varNumCon):
+
+                    # Difference in cortical depth profiles between conditions:
+                    aryDiff = np.subtract(aryDpth[:, lstDiff[idxDiff][0], :],
+                                          aryDpth[:, lstDiff[idxDiff][1], :])
+
+                    for idxDpth in range(varNumDpth):
+                        aryEmpMne[idxDiff, idxDpth] = \
+                            objFuncR(list(aryDiff[:, idxDpth]),
+                                     list(vecNumInc))[0]
 
         # Create condition labels for differences:
         lstDiffLbl = [None] * varNumCon

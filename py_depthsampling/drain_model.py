@@ -104,7 +104,7 @@ from py_depthsampling.drain_model.drain_model_main import drain_model
 lstMdl = [1]
 
 # Meta-condition (within or outside of retinotopic stimulus area):
-lstMetaCon = ['stimulus']  # ['stimulus', 'periphery']
+lstMetaCon = ['stimulus', 'periphery']
 
 # ROI ('v1', 'v2' or 'v3'):
 lstRoi = ['v1', 'v2', 'v3']

@@ -64,10 +64,12 @@ lstSubIds = ['20171023',  # '20171109',
 lstNstCon = [['Pd_sst', 'Ps_sst', 'Cd_sst'],
              ['Pd_min_Ps_sst'],
              ['Pd_min_Cd_sst'],
+             ['Cd_min_Ps_sst'],
              ['Pd_min_Cd_Ps_sst'],
              ['Pd_trn', 'Ps_trn', 'Cd_trn'],
              ['Pd_min_Ps_trn'],
              ['Pd_min_Cd_trn'],
+             ['Cd_min_Ps_trn'],
              ['Pd_min_Cd_Ps_sst']]
 
 # Condition labels:

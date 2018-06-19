@@ -60,7 +60,8 @@ strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/pe/{}_{}_{}'  #noqa
 # strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/z/{}_{}_{}'  #noqa
 
 # File type suffix for plot:
-strFlTp = '.svg'
+# strFlTp = '.svg'
+strFlTp = '.png'
 
 # Figure scaling factor:
 varDpi = 80.0
@@ -70,7 +71,8 @@ lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst',
           'Pd_trn', 'Cd_trn', 'Ps_trn',
           'Pd_min_Ps_sst', 'Pd_min_Cd_sst', 'Cd_min_Ps_sst',
           'Pd_min_Cd_Ps_sst',
-          'Pd_min_Cd_Ps_trn']
+          'Pd_min_Cd_Ps_trn',
+          'Pd_min_Ps_trn', 'Pd_min_Cd_trn', 'Cd_min_Ps_trn']
 # lstCon = ['polar_angle', 'x_pos', 'y_pos', 'SD', 'R2']
 
 # Path of vtk mesh with data to project into visual space (e.g. parameter

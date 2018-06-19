@@ -70,7 +70,7 @@ lstNstCon = [['Pd_sst', 'Ps_sst', 'Cd_sst'],
              ['Pd_min_Ps_trn'],
              ['Pd_min_Cd_trn'],
              ['Cd_min_Ps_trn'],
-             ['Pd_min_Cd_Ps_sst']]
+             ['Pd_min_Cd_Ps_trn']]
 
 # Condition labels:
 lstNstConLbl = lstNstCon

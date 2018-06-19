@@ -55,14 +55,14 @@ strPthPltOt = '/home/john/Dropbox/PacMan_Plots/boot_diff/{}/{}/{}_{}{}'  #noqa
 # sttPthPtlSnglOt = '/home/john/PhD/PacMan_Plots/boot_diff_sngle/{}_{}_{}{}_{}'
 
 # File type suffix for plot:
-strFlTp = '.svg'
+strFlTp = '.png'
 
 # Figure scaling factor:
 varDpi = 100.0
 
 # Label for axes:
 strXlabel = 'Cortical depth level (equivolume)'
-strYlabel = 'fMRI signal change [a.u.]'
+strYlabel = 'Signal change [%]'
 
 # Condition levels (used to complete file names):
 lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
@@ -101,35 +101,35 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
 
                     if lstMetaCon[idxMtaCn] == 'stimulus':
                         if lstMdl[idxMdl] == '':
-                            varYmin = -50.0
-                            varYmax = 50.0
+                            varYmin = -0.5
+                            varYmax = 1.0
                         if lstMdl[idxMdl] == '_deconv_model_1':
-                            varYmin = -50.0
-                            varYmax = 50.0
+                            varYmin = -0.5
+                            varYmax = 1.0
                     if lstMetaCon[idxMtaCn] == 'periphery':
                         if lstMdl[idxMdl] == '':
-                            varYmin = -50.0
-                            varYmax = 50.0
+                            varYmin = -0.5
+                            varYmax = 1.0
                         if lstMdl[idxMdl] == '_deconv_model_1':
-                            varYmin = -50.0
-                            varYmax = 50.0
+                            varYmin = -0.5
+                            varYmax = 1.0
 
                 elif (idxRoi == 1) or (idxRoi == 3):  # v2 & v3
 
                     if lstMetaCon[idxMtaCn] == 'stimulus':
                         if lstMdl[idxMdl] == '':
-                            varYmin = -50.0
-                            varYmax = 50.0
+                            varYmin = -0.5
+                            varYmax = 1.0
                         if lstMdl[idxMdl] == '_deconv_model_1':
-                            varYmin = -50.0
-                            varYmax = 50.0
+                            varYmin = -0.5
+                            varYmax = 1.0
                     if lstMetaCon[idxMtaCn] == 'periphery':
                         if lstMdl[idxMdl] == '':
-                            varYmin = -50.0
-                            varYmax = 50.0
+                            varYmin = -0.5
+                            varYmax = 1.0
                         if lstMdl[idxMdl] == '_deconv_model_1':
-                            varYmin = -50.0
-                            varYmax = 50.0
+                            varYmin = -0.5
+                            varYmax = 1.0
 
                 # Create average plots:
                 boot_plot(strPthData.format(lstMetaCon[idxMtaCn],

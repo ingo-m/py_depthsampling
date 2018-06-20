@@ -153,7 +153,7 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                                            vecNumInc=vecNumInc,
                                            varNumIt=varNumIt)
 
-
+                        # Put p-value of current ROI & comparison into array:
                         aryData[idxRoi, idxDiff] = varP
 
                         strMsg = ('---Permutation p-value \n'

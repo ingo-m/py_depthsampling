@@ -57,10 +57,10 @@ strYlabel = 'fMRI signal change [a.u.]'
 # Condition levels (used to complete file names):
 # lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst',
 #           'Pd_trn', 'Cd_trn', 'Ps_trn']
-lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
+lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst', 'Ps_sst_plus_Cd_sst']
 
 # Which conditions to compare (list of tuples with condition indices):
-lstDiff = [(0, 1), (0, 2), (1, 2)]
+lstDiff = [(0, 1), (0, 2), (1, 2), (0, 3)]
 
 # Number of resampling iterations:
 varNumIt = 100000

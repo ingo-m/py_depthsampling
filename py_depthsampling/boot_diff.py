@@ -70,6 +70,8 @@ strYlabel = 'Signal change [%]'
 
 # Condition levels (used to complete file names):
 lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
+# lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst', 'Ps_sst_plus_Cd_sst']
+# lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
 # lstCon = ['Pd_trn', 'Ps_trn', 'Cd_trn']
 
 # Condition labels:
@@ -77,6 +79,7 @@ lstConLbl = lstCon
 
 # Which conditions to compare (list of tuples with condition indices):
 lstDiff = [(0, 1), (0, 2), (2, 1)]
+# lstDiff = [(0, 1), (0, 2), (2, 1), (0, 3)]
 
 # Number of resampling iterations:
 varNumIt = 100000
@@ -86,7 +89,10 @@ varNumIt = 100000
 # plotted - or plotted confidence intervals in case of model 5:
 varCnfLw = 2.5
 varCnfUp = 97.5
-# -----------------------------------------------------------------------------
+
+# Padding around labelled values on y:
+varPadY = (0.05, 0.25)
+# ---------------------------1--------------------------------------------------
 
 
 # -----------------------------------------------------------------------------
@@ -106,34 +112,34 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                     if lstMetaCon[idxMtaCn] == 'stimulus':
                         if lstMdl[idxMdl] == '':
                             varYmin = -0.5
-                            varYmax = 1.0
+                            varYmax = 0.5
                         if lstMdl[idxMdl] == '_deconv_model_1':
                             varYmin = -0.5
-                            varYmax = 1.0
+                            varYmax = 0.5
                     if lstMetaCon[idxMtaCn] == 'periphery':
                         if lstMdl[idxMdl] == '':
                             varYmin = -0.5
-                            varYmax = 1.0
+                            varYmax = 0.5
                         if lstMdl[idxMdl] == '_deconv_model_1':
                             varYmin = -0.5
-                            varYmax = 1.0
+                            varYmax = 0.5
 
                 elif (idxRoi == 1) or (idxRoi == 3):  # v2 & v3
 
                     if lstMetaCon[idxMtaCn] == 'stimulus':
                         if lstMdl[idxMdl] == '':
                             varYmin = -0.5
-                            varYmax = 1.0
+                            varYmax = 0.5
                         if lstMdl[idxMdl] == '_deconv_model_1':
                             varYmin = -0.5
-                            varYmax = 1.0
+                            varYmax = 0.5
                     if lstMetaCon[idxMtaCn] == 'periphery':
                         if lstMdl[idxMdl] == '':
                             varYmin = -0.5
-                            varYmax = 1.0
+                            varYmax = 0.5
                         if lstMdl[idxMdl] == '_deconv_model_1':
                             varYmin = -0.5
-                            varYmax = 1.0
+                            varYmax = 0.5
 
                 # Create average plots:
                 boot_plot(strPthData.format(lstMetaCon[idxMtaCn],
@@ -155,6 +161,7 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                           strTtl='',
                           varYmin=varYmin,
                           varYmax=varYmax,
+                          varPadY=varPadY,
                           strXlabel=strXlabel,
                           strYlabel=strYlabel,
                           lgcLgnd=True,

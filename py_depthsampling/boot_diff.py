@@ -37,13 +37,14 @@ strParam = 'mean'
 lstMdl = ['', '_deconv_model_1']
 
 # Meta-condition (within or outside of retinotopic stimulus area):
-lstMetaCon = ['stimulus']  # ['stimulus', 'periphery']
+lstMetaCon = ['stimulus']
+# lstMetaCon = ['periphery']
 
 # ROI ('v1', 'v2', or 'v3'):
 lstRoi = ['v1', 'v2', 'v3']
 
 # Hemisphere ('rh' or 'lh'):
-lstHmsph = ['rh']  # ['lh', 'rh']
+lstHmsph = ['rh']
 
 # Path of corrected depth-profiles (meta-condition, ROI, hemisphere,
 # condition, and model index left open):
@@ -69,6 +70,7 @@ strYlabel = 'Signal change [%]'
 
 # Condition levels (used to complete file names):
 lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
+# lstCon = ['Pd_trn', 'Ps_trn', 'Cd_trn']
 
 # Condition labels:
 lstConLbl = lstCon
@@ -77,13 +79,13 @@ lstConLbl = lstCon
 lstDiff = [(0, 1), (0, 2), (2, 1)]
 
 # Number of resampling iterations:
-varNumIt = 1000000
+varNumIt = 100000
 
 # Lower & upper bound of percentile bootstrap (in percent), for bootstrap
 # confidence interval (models 1, 2, and 3) - this value is only printed, not
 # plotted - or plotted confidence intervals in case of model 5:
-varCnfLw = 5.0
-varCnfUp = 95.0
+varCnfLw = 2.5
+varCnfUp = 97.5
 # -----------------------------------------------------------------------------
 
 

@@ -295,6 +295,13 @@ def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,  #noqa
                 aryDiff = np.subtract(aryDpth[:, lstDiff[idxDiff][0], :],
                                       aryDpth[:, lstDiff[idxDiff][1], :])
 
+                # Un-comment this for SEM (overwrites bootstrapping results),
+                # for comparison:
+                # aryPrct[0, idxDiff, :] = np.divide(np.std(aryDiff, axis=0),
+                #                                    np.sqrt(varNumSub)) * -1
+                # aryPrct[1, idxDiff, :] = np.divide(np.std(aryDiff, axis=0),
+                #                                    np.sqrt(varNumSub)) * 1
+
                 # Multiply depth profiles by weights (weights are broadcasted
                 # over depth levels):
                 aryDiff = np.multiply(aryDiff, vecNumInc[:, None])
@@ -304,6 +311,13 @@ def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,  #noqa
                                                   np.sum(aryDiff, axis=0),
                                                   varSum
                                                   )
+
+                # Un-comment this for SEM (overwrites bootstrapping results),
+                # for comparison:
+                # aryPrct[0, idxDiff, :] = np.add(aryPrct[0, idxDiff, :],
+                #                                 aryEmpMne[idxDiff, :])
+                # aryPrct[1, idxDiff, :] = np.add(aryPrct[1, idxDiff, :],
+                #                                 aryEmpMne[idxDiff, :])
 
             elif strParam == 'median':
 

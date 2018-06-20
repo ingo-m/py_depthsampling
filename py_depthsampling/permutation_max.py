@@ -6,7 +6,7 @@ Compares cortical depth profiles from two different conditions (e.g. PacMan
 dynamic vs. PacMan statis). Tests whether the difference between the two
 conditions is significant at any cortical depth.
 
-Inputs are *.npy files containing depth profiles for each subject.
+Inputs are *.npz files containing depth profiles for each subject.
 """
 
 # Part of py_depthsampling library
@@ -58,7 +58,6 @@ strYlabel = 'fMRI signal change [a.u.]'
 # lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst',
 #           'Pd_trn', 'Cd_trn', 'Ps_trn']
 lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
-
 
 # Which conditions to compare (list of tuples with condition indices):
 lstDiff = [(0, 1), (0, 2), (1, 2)]

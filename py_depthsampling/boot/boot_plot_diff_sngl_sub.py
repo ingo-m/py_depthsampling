@@ -21,6 +21,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 # from matplotlib.colors import BoundaryNorm
+# from py_depthsampling.plot.plt_dpth_prfl import plt_dpth_prfl
 
 
 def boot_plot_sngl(objDpth, strPath, lstCon, lstConLbl, varMin=None,
@@ -85,7 +86,8 @@ def boot_plot_sngl(objDpth, strPath, lstCon, lstConLbl, varMin=None,
         aryDpth = objDpth
     elif lgcStr:
         # Load array for first condition to get dimensions:
-        aryTmpDpth = np.load(objDpth.format(lstCon[0]))
+        objNpz = np.load(objDpth.format(lstCon[0]))
+        aryTmpDpth = objNpz['arySubDpthMns']
         # Number of subjects:
         varNumSub = aryTmpDpth.shape[0]
         # Get number of depth levels from input array:
@@ -96,7 +98,8 @@ def boot_plot_sngl(objDpth, strPath, lstCon, lstConLbl, varMin=None,
         aryDpth = np.zeros((varNumSub, varNumCon, varNumDpth))
         # Load single-condition arrays from disk:
         for idxCon in range(varNumCon):
-            aryDpth[:, idxCon, :] = np.load(objDpth.format(lstCon[idxCon]))
+            objNpz = np.load(objDpth.format(lstCon[idxCon]))
+            aryDpth[:, idxCon, :] = objNpz['arySubDpthMns']
     else:
         print(('---Error in bootPlot: input needs to be numpy array or path '
                + 'to numpy array.'))
@@ -132,18 +135,6 @@ def boot_plot_sngl(objDpth, strPath, lstCon, lstConLbl, varMin=None,
         else:
 
             # Calculate difference scores:
-            # NOTE: Relative difference score leads to inconsistent results.
-            # aryPlot = \
-            #     np.divide(
-            #         np.subtract(
-            #             aryDpth[:, lstDiff[idxCon][0], :],
-            #             aryDpth[:, lstDiff[idxCon][1], :]
-            #             ),
-            #         np.add(
-            #             aryDpth[:, lstDiff[idxCon][0], :],
-            #             aryDpth[:, lstDiff[idxCon][1], :]
-            #             )
-            #         )
             aryPlot = np.subtract(aryDpth[:, lstDiff[idxCon][0], :],
                                   aryDpth[:, lstDiff[idxCon][1], :])
 
@@ -373,4 +364,21 @@ def boot_plot_sngl(objDpth, strPath, lstCon, lstConLbl, varMin=None,
 
         # Close figure:
         plt.close(fig01)
+
+        # Alernative: Plot more conventional depth profiels with separate
+        # line for each subject.
+        # plt_dpth_prfl(aryPlot,
+        #               np.zeros((aryPlot.shape)),
+        #               varNumDpth,
+        #               varNumSub,
+        #               80.0,
+        #               -1.0,
+        #               1.0,
+        #               False,
+        #               [str(x) for x in list(range(varNumSub))],
+        #               strXlabel,
+        #               strYlabel,
+        #               'Single subject',
+        #               False,
+        #               strPathTmp)
         # ---------------------------------------------------------------------

@@ -56,7 +56,7 @@ strPthPltOt = '/home/john/Dropbox/PacMan_Plots/boot_diff/{}/{}/{}_{}{}'  #noqa
 
 # Output path for single subject plot (heatmap), (ROI, metacondition,
 # hemisphere, drain model, and condition left open):
-# sttPthPtlSnglOt = '/home/john/PhD/PacMan_Plots/boot_diff_sngle/{}_{}_{}{}_{}'
+# strPthPtlSnglOt = '/home/john/Dropbox/PacMan_Plots/boot_diff_sngle/{}_{}_{}{}_{}'
 
 # File type suffix for plot:
 strFlTp = '.png'
@@ -174,7 +174,7 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
             #                                  lstHmsph[idxHmsph],
             #                                  '{}',
             #                                  lstMdl[idxMdl]),
-            #                (sttPthPtlSnglOt.format(lstRoi[idxRoi],
+            #                (strPthPtlSnglOt.format(lstRoi[idxRoi],
             #                                        lstMetaCon[idxMtaCn],
             #                                        lstHmsph[idxHmsph],
             #                                        lstMdl[idxMdl],

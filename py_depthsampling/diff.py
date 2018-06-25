@@ -70,14 +70,14 @@ strYlabel = 'Signal change [%]'
 lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
 # lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst', 'Ps_sst_plus_Cd_sst']
 # lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
-# lstCon = ['Pd_trn', 'Ps_trn', 'Cd_trn']
+# lstCon = ['Pd_trn', 'Ps_trn', 'Cd_trn', 'Ps_trn_plus_Cd_trn']
 
 # Condition labels:
 lstConLbl = lstCon
 
 # Which conditions to compare (list of tuples with condition indices):
 lstDiff = [(0, 1), (0, 2), (2, 1)]
-# lstDiff = [(0, 1), (0, 2), (2, 1), (0, 3)]
+# lstDiff = [(0, 3)]
 
 # Padding around labelled values on y:
 tplPadY = (0.05, 0.25)

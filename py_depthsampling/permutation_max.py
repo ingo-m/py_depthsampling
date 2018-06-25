@@ -58,6 +58,7 @@ strYlabel = 'fMRI signal change [a.u.]'
 # lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst',
 #           'Pd_trn', 'Cd_trn', 'Ps_trn']
 lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst', 'Ps_sst_plus_Cd_sst']
+# lstCon = ['Pd_trn', 'Ps_trn', 'Cd_trn', 'Ps_trn_plus_Cd_trn']
 
 # Which conditions to compare (list of tuples with condition indices):
 lstDiff = [(0, 1), (0, 2), (1, 2), (0, 3)]

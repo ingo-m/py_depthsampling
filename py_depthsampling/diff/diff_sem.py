@@ -261,7 +261,7 @@ def diff_sem(objDpth, strPath, lstCon, lstConLbl, strTtl='', varYmin=0.0,  #noqa
                         aryEmpMne[idxDiff, idxDpth] = \
                             objFuncR(list(aryDiff[:, idxDpth]),
                                      list(vecNumInc))[0]
-                            
+
                 # TODO: SEM
 
         # Create condition labels for differences:

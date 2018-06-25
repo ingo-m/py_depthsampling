@@ -55,10 +55,10 @@ strXlabel = 'Cortical depth level'
 strYlabel = 'fMRI signal change [a.u.]'
 
 # Condition levels (used to complete file names):
-lstCon = ['Ps_sst', 'Cd_sst']
+lstCon = ['Ps_sst', 'Cd_sst', 'Ps_trn', 'Cd_trn']
 
 # Which conditions to combine (list of tuples with condition indices):
-lstDiff = [(0, 1)]
+lstDiff = [(0, 1), (2, 3)]
 # -----------------------------------------------------------------------------
 
 

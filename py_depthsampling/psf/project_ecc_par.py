@@ -19,7 +19,7 @@
 
 
 import numpy as np
-from py_depthsampling.project.utilities import crt_gauss
+from py_depthsampling.psf.utilities import crt_gauss_1D
 
 
 def project_ecc_par(idxPrc, vecData, vecX, vecY, vecSd, vecR2, varThrR2,
@@ -39,7 +39,7 @@ def project_ecc_par(idxPrc, vecData, vecX, vecY, vecSd, vecR2, varThrR2,
 
     # Array for normalisation (parameter estimates are summed up over the
     # eccentricity vector; the array is needed to normalise the sum):
-    aryNorm = np.zeros((varNumEcc))
+    vecNorm = np.zeros((varNumEcc))
 
     # Maximum eccentricity in visual field:
     varEccMax = np.sqrt(
@@ -61,13 +61,8 @@ def project_ecc_par(idxPrc, vecData, vecX, vecY, vecSd, vecR2, varThrR2,
                             )
                      )
 
-
-
-
     # Convert eccentricities from degree of visual angle into array indices:
     vecIdxEcc = (np.abs(vecCorEcc[None, :] - vecEcc[:, None])).argmin(axis=1)
-
-
 
     # The pRF size is converted from degree visual angle to relative size with
     # respect to the size of the array representing the visual space
@@ -92,27 +87,25 @@ def project_ecc_par(idxPrc, vecData, vecX, vecY, vecSd, vecR2, varThrR2,
         if lgcInc[idxVrtx]:
 
             # Create Gaussian at current pRF position:
-            aryTmpGauss = crt_gauss(varNumX,
-                                    varNumY,
-                                    vecIdxX[idxVrtx],
-                                    vecIdxY[idxVrtx],
-                                    vecIdxSd[idxVrtx])
+            vecTmpGauss = crt_gauss_1D(varNumEcc,
+                                       vecIdxEcc[idxVrtx],
+                                       vecIdxSd[idxVrtx])
 
             # Scale Gaussian to have its maximum at one:
-            # aryTmpGauss = np.divide(aryTmpGauss, np.max(aryTmpGauss))
+            # vecTmpGauss = np.divide(vecTmpGauss, np.max(vecTmpGauss))
 
             # Add non-scaled Gaussian to normalisation array:
-            aryNorm = np.add(aryNorm, aryTmpGauss)
+            vecNorm = np.add(vecNorm, vecTmpGauss)
 
             # Multiply current data value (e.g. parameter estimate)
             # with Gaussian:
-            aryTmpGauss = np.multiply(aryTmpGauss, vecData[idxVrtx])
+            vecTmpGauss = np.multiply(vecTmpGauss, vecData[idxVrtx])
 
             # Add current pRF sample to visual space map:
-            vecVslSpc = np.add(vecVslSpc, aryTmpGauss)
+            vecVslSpc = np.add(vecVslSpc, vecTmpGauss)
 
     # Create list containing subject data, and the process ID:
-    lstOut = [idxPrc, vecVslSpc, aryNorm]
+    lstOut = [idxPrc, vecVslSpc, vecNorm]
 
     # Put output to queue:
     queOut.put(lstOut)

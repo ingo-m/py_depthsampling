@@ -23,6 +23,7 @@ import numpy as np
 import multiprocessing as mp
 from py_depthsampling.project.load_par import load_par
 from py_depthsampling.psf.project_ecc_par import project_ecc_par
+from py_depthsampling.plot.plt_psf import plt_psf
 
 
 # -----------------------------------------------------------------------------
@@ -30,7 +31,7 @@ from py_depthsampling.psf.project_ecc_par import project_ecc_par
 
 # Load/save existing projection from/to (ROI, condition, depth level label left
 # open):
-strPthNpy = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf/{}_{}_{}.npy'  #noqa
+strPthNpy = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf/{}_{}_{}.npz'  #noqa
 
 
 # List of subject identifiers:
@@ -47,15 +48,15 @@ lstSubIds = ['20171023',  # '20171109',
 # three depth levels is calculated, and on a second iteration the average over
 # the subsequent three depth levels is calculated. If 1lstDpth= [[None]]1,
 # average over all depth levels.
-lstDpth = [None, [0, 1, 2], [4, 5, 6], [8, 9, 10]]
+lstDpth = [None] #, [0, 1, 2], [4, 5, 6], [8, 9, 10]]
 # Depth level condition labels (output file will contain this label):
-lstDpthLbl = ['allGM', 'deepGM', 'midGM', 'superficialGM']
+lstDpthLbl = ['allGM'] #, 'deepGM', 'midGM', 'superficialGM']
 
 # ROI ('v1' or 'v2'):
-lstRoi = ['v1', 'v2', 'v3']
+lstRoi = ['v1'] #, 'v2', 'v3']
 
 # Output path & prefix for plots (ROI, condition, depth level label left open):
-strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/pe/{}_{}_{}'  #noqa
+strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/psf_pe/{}_{}_{}'  #noqa
 
 # File type suffix for plot:
 # strFlTp = '.svg'
@@ -71,12 +72,13 @@ varDpi = 80.0
 #           'Pd_min_Cd_Ps_sst',
 #           'Pd_min_Cd_Ps_trn',
 #           'Pd_min_Ps_trn', 'Pd_min_Cd_trn', 'Cd_min_Ps_trn']
-lstCon = ['polar_angle', 'x_pos', 'y_pos', 'SD', 'R2']
+# lstCon = ['polar_angle', 'x_pos', 'y_pos', 'SD', 'R2']
+lstCon = ['Pd_sst']
 
 # Path of vtk mesh with data to project into visual space (e.g. parameter
 # estimates; subject ID, hemisphere, and contion level left open).
-# strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/feat_level_2_{}_cope.vtk'  #noqa
-strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_{}.vtk'  #noqa
+strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/feat_level_2_{}_cope.vtk'  #noqa
+# strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_{}.vtk'  #noqa
 
 # Path of mean EPI (for scaling to percent signal change; subject ID and
 # hemisphere left open):
@@ -129,6 +131,9 @@ varThrR2 = 0.15
 
 # Number of eccentricity bins for visual space representation:
 varNumEcc = 200
+
+# Plot parameters over this eccentricity range:
+tplRngEcc = (0.0, 5.0)
 # -----------------------------------------------------------------------------
 
 
@@ -153,7 +158,9 @@ for idxDpth in range(len(lstDpth)):  #noqa
             if os.path.isfile(strPthNpyTmp):
 
                 # Load existing projection:
-                aryVslSpc = np.load(strPthNpyTmp)
+                objNpz = np.load(strPthNpyTmp)
+                vecVslSpc = objNpz['vecVslSpc']
+                vecNorm = objNpz['vecNorm']
 
             else:
 
@@ -332,8 +339,7 @@ for idxDpth in range(len(lstDpth)):  #noqa
                                                        lstSd[idxPrc],
                                                        lstR2[idxPrc],
                                                        varThrR2,
-                                                       varNumX,
-                                                       varNumY,
+                                                       varNumEcc,
                                                        varExtXmin,
                                                        varExtXmax,
                                                        varExtYmin,
@@ -374,26 +380,66 @@ for idxDpth in range(len(lstDpth)):  #noqa
 
                 # Visual space array (2D array with bins of locations in visual
                 # space):
-                aryVslSpc = np.zeros((varNumX, varNumY))
+                vecVslSpc = np.zeros((varNumEcc))
 
                 # Array for normalisation (parameter estimates are summed up
                 # over the visual field; the normalisation array is needed to
                 # normalise the sum):
-                aryNorm = np.zeros((varNumX, varNumY))
+                vecNorm = np.zeros((varNumEcc))
 
                 # Add up results from separate processes:
                 for idxPrc in range(varPar):
-                    aryVslSpc = np.add(lstVslSpc[idxPrc], aryVslSpc)
-                    aryNorm = np.add(lstNorm[idxPrc], aryNorm)
+                    vecVslSpc = np.add(lstVslSpc[idxPrc], vecVslSpc)
+                    vecNorm = np.add(lstNorm[idxPrc], vecNorm)
 
                 # Normalise:
-                aryVslSpc = np.divide(aryVslSpc, aryNorm)
+                vecVslSpc = np.divide(vecVslSpc, vecNorm)
 
                 # Save results to disk:
-                np.save(strPthNpyTmp, aryVslSpc)
+                np.savez(strPthNpyTmp,
+                         vecVslSpc=vecVslSpc,
+                         vecNorm=vecNorm)
 
             # -----------------------------------------------------------------
-            # *** Plot group results
+            # *** Plot results
+
+            # Maximum eccentricity in visual field:
+            varEccMax = np.sqrt(
+                                np.add(
+                                       np.power(varExtXmax, 2.0),
+                                       np.power(varExtYmax, 2.0)
+                                       )
+                                )
+
+            # Vector with visual space coordinates of elements in `vecVslSpc`
+            # (eccentricity in deg of visual angle):
+            vecCorEcc = np.linspace(0.0,
+                                    varEccMax,
+                                    num=varNumEcc,
+                                    endpoint=True)
+
+            # Array indices of minimum & maximum values (with respect to
+            # x-axis, i.e. eccentricity):
+            varIdxMin = (np.abs(vecCorEcc - tplRngEcc[0])).argmin()
+            varIdxMax = (np.abs(vecCorEcc - tplRngEcc[1])).argmin()
+
+            # Section of visual space to be plotted:
+            vecVslSpcTmp = np.array(vecVslSpc[varIdxMin:varIdxMax], ndmin=2)
+
+            # Section of normalisation vector to be plotted:
+            vecNormTmp = vecNorm[varIdxMin:varIdxMax]
+            # Maximum normalisation value across range of visual space:
+            varNormMax = np.max(vecNormTmp)
+            # Scale to maximum of one:
+            vecNormTmp = np.divide(vecNormTmp, varNormMax)
+            # Invert:
+            vecNormTmp = np.subtract(1.0, vecNormTmp)
+            # Array shape:
+            vecNormTmp = np.array(vecNormTmp, ndmin=2)
+
+            # x-axis values for section of visual space to be plotted:
+            vecCorEccTmp = np.around(vecCorEcc[varIdxMin:varIdxMax],
+                                     decimals=1)
 
             # Output path for plot:
             strPthPltOtTmp = (strPthPltOt.format(lstRoi[idxRoi],
@@ -409,11 +455,16 @@ for idxDpth in range(len(lstDpth)):  #noqa
                          + lstDpthLbl[idxDpth])
 
             # Create plot:
-            plot(aryVslSpc,
-                 strTmpTtl,
-                 'x-position',
-                 'y-position',
-                 strPthPltOtTmp,
-                 tpleLimX=(varExtXmin, varExtXmax, 3.0),
-                 tpleLimY=(varExtYmin, varExtYmax, 3.0))
+            plt_psf(vecVslSpcTmp,
+                    strPthPltOtTmp,
+                    vecX=vecCorEccTmp,
+                    aryError=vecNormTmp,
+                    lstConLbl=None,
+                    strXlabel='Eccentricity',
+                    strYlabel='Signal change [%]',
+                    strTitle=strTmpTtl,
+                    lgcLgnd=False,
+                    varNumLblY=5,
+                    varPadY=(0.0, 0.0),
+                    lstVrt=[(3.75 + tplRngEcc[0])])
 # -----------------------------------------------------------------------------

@@ -152,10 +152,11 @@ def get_data(strData, strPthMneEpi, strPthR2, strPthSd, strPthX, strPthY,
         # Average over selected depth levels:
         vecData = np.mean(aryData[:, lstDpth], axis=1)
         vecMneEpi = np.mean(aryMneEpi[:, lstDpth], axis=1)
-        vecR2 = np.mean(aryR2[:, lstDpth], axis=1)
-        vecSd = np.mean(arySd[:, lstDpth], axis=1)
-        vecX = np.mean(aryX[:, lstDpth], axis=1)
-        vecY = np.mean(aryY[:, lstDpth], axis=1)
+        # Average pRF parameters across cortical depth:
+        vecR2 = np.mean(aryR2, axis=1)
+        vecSd = np.mean(arySd, axis=1)
+        vecX = np.mean(aryX, axis=1)
+        vecY = np.mean(aryY, axis=1)
 
     return vecData, vecMneEpi, vecR2, vecSd, vecX, vecY
 

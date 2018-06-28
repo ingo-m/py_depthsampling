@@ -97,17 +97,70 @@ def fitGauss(vecX, vecY):
     """
     # Fit function to data. (p0 are initial values for parameters, and bounds
     # are chosen to achieve solutions within plausible range.)
-    vecGaussMdlPar, vecExpMdlCov = curve_fit(funcGauss, vecX, vecY,
-                                             p0=(3.75, 1.0, -3.0),
-                                             bounds=([2.0, 0.0, -20.0],
-                                                     [5.5, 100.0, 10.0])
-                                             )
+    vecGaussMdlPar, vecGaussMdlCov = curve_fit(funcGauss, vecX, vecY,
+                                               p0=(3.75, 1.0, -3.0),
+                                               bounds=([2.0, 0.0, -20.0],
+                                                       [5.5, 100.0, 10.0])
+                                               )
 
     varMu = vecGaussMdlPar[0]
     varSd = vecGaussMdlPar[1]
     varInt = vecGaussMdlPar[2]
 
     return varMu, varSd, varInt
+
+
+def funcLin(varX, varSlp, varInt):
+    """
+    Linear function to be fitted to the data.
+
+    Parameters
+    ----------
+    varX : float
+        Input value for function.
+    varSlp : float
+        Function slope.
+    varInt : float
+        Intercept.
+
+    Returns
+    -------
+    varOut : float
+        Output value of linear function (f(x)).
+
+    """
+    varOut = np.add(np.multiply(varX, varSlp), varInt)
+    return varOut
+
+
+def fitLin(vecX, vecY):
+    """
+    Fit linear function.
+
+    Parameters
+    ----------
+    vecX : np.array
+        1D numpy array with dependent data.
+    vecY : np.array
+        1D numpy array with independet data.
+
+    Returns
+    -------
+    varSlp : float
+        Function slope.
+    varInt : float
+        Intercept.
+
+    """
+    # Fit function to data. (p0 are initial values for parameters.)
+    vecLinMdlPar, vecLinMdlCov = curve_fit(funcLin, vecX, vecY,
+                                           p0=(1.0, -2.0))
+
+    varSlp = vecLinMdlPar[0]
+    varInt = vecLinMdlPar[1]
+
+    return varSlp, varInt
+
 
 # def funcExp(varX, varA, varB, varC):
 #     """Exponential function to be fitted to the data."""

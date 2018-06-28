@@ -25,7 +25,9 @@ from py_depthsampling.project.load_par import load_par
 from py_depthsampling.psf.project_ecc_par import project_ecc_par
 from py_depthsampling.plot.plt_psf import plt_psf
 from py_depthsampling.psf.fit_model import fitGauss
+from py_depthsampling.psf.fit_model import fitLin
 from py_depthsampling.psf.fit_model import funcGauss
+from py_depthsampling.psf.fit_model import funcLin
 
 
 # -----------------------------------------------------------------------------
@@ -141,8 +143,8 @@ tplRngEcc = (2.0, 5.5)
 # one.)
 lgcNorm = False
 
-# Fit Gaussian?
-lgcFit = True
+# Fit function (None, 'gaussian', or 'linear')?
+strFit = 'linear'
 
 # Restrict model fitting to this range (to use same range as `tplRngEcc`, set
 # `tplFitRng = None`).
@@ -454,8 +456,11 @@ for idxDpth in range(len(lstDpth)):  #noqa
             # -----------------------------------------------------------------
             # * Fit Gaussian
 
-            if lgcFit:
+            # Fit any function?
+            if not (strFit is None):
 
+                # If no range for function fitting is provided, set to same
+                # range as used for plot:
                 if tplFitRng is None:
                     tplFitRng = tplRngEcc
 
@@ -464,14 +469,28 @@ for idxDpth in range(len(lstDpth)):  #noqa
                 varIdxFitMin = (np.abs(vecCorEcc - tplFitRng[0])).argmin()
                 varIdxFitMax = (np.abs(vecCorEcc - tplFitRng[1])).argmin()
 
-                # Fit Gaussian function to relevant section of visual space:
-                varMu, varSd, varInt = \
-                    fitGauss(vecCorEcc[varIdxFitMin:varIdxFitMax],
-                             vecVslSpc[varIdxFitMin:varIdxFitMax])
+                if strFit == 'gaussian':
 
-                # Predicted values:
-                vecGauss = funcGauss(vecCorEcc[varIdxMin:varIdxMax], varMu,
-                                     varSd, varInt)
+                    # Fit Gaussian function to relevant section of visual
+                    # space:
+                    varMu, varSd, varInt = \
+                        fitGauss(vecCorEcc[varIdxFitMin:varIdxFitMax],
+                                 vecVslSpc[varIdxFitMin:varIdxFitMax])
+
+                    # Predicted values:
+                    vecMdl = funcGauss(vecCorEcc[varIdxMin:varIdxMax], varMu,
+                                       varSd, varInt)
+
+                elif strFit == 'linear':
+
+                    # Fit linear function to relevant section of visual space:
+                    varSlp, varInt = \
+                        fitLin(vecCorEcc[varIdxFitMin:varIdxFitMax],
+                               vecVslSpc[varIdxFitMin:varIdxFitMax])
+
+                    # Predicted values:
+                    vecMdl = funcLin(vecCorEcc[varIdxMin:varIdxMax], varSlp,
+                                     varInt)
 
             # Section of visual space to be plotted:
             vecVslSpcTmp = np.array(vecVslSpc[varIdxMin:varIdxMax], ndmin=2)
@@ -487,10 +506,10 @@ for idxDpth in range(len(lstDpth)):  #noqa
             # Array shape:
             vecNormTmp = np.array(vecNormTmp, ndmin=2)
 
-            if lgcFit:
+            if strFit:
 
                 # Add predicted values to array to be plotted:
-                vecVslSpcTmp = np.stack((vecGauss,
+                vecVslSpcTmp = np.stack((vecMdl,
                                          vecVslSpcTmp.flatten()))
 
                 # Add dummy vector to normalisation vector:

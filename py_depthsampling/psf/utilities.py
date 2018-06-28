@@ -50,6 +50,12 @@ def crt_gauss_1D(varSize, varPosEcc, varSd):
         (2.0 * np.square(varSd))
         )
 
+    # vecGauss = (
+    #     np.square(((vecEcc - varPosEcc) / varSd)) / 2.0
+    #     )
+
     vecGauss = np.exp(-vecGauss) / (2.0 * np.pi * np.square(varSd))
+
+    # vecGauss = np.exp(-vecGauss) / (np.sqrt(2.0 * np.pi) * varSd)
 
     return vecGauss

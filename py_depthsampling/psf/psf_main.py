@@ -51,9 +51,13 @@ lstSubIds = ['20171023',  # '20171109',
 # three depth levels is calculated, and on a second iteration the average over
 # the subsequent three depth levels is calculated. If 1lstDpth= [[None]]1,
 # average over all depth levels.
-lstDpth = [None] #, [0, 1, 2], [4, 5, 6], [8, 9, 10]]
+lstDpth = [None, [0, 1, 2], [4, 5, 6], [8, 9, 10],
+           [0, 0], [1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7],
+           [8, 8], [9, 9], [10, 10]]
+
 # Depth level condition labels (output file will contain this label):
-lstDpthLbl = ['allGM'] #, 'deepGM', 'midGM', 'superficialGM']
+lstDpthLbl = ['allGM', 'deepGM', 'midGM', 'superficialGM',
+              '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
 
 # ROI ('v1' or 'v2'):
 lstRoi = ['v1', 'v2', 'v3']
@@ -76,8 +80,7 @@ varDpi = 80.0
 #           'Pd_min_Cd_Ps_trn',
 #           'Pd_min_Ps_trn', 'Pd_min_Cd_trn', 'Cd_min_Ps_trn']
 # lstCon = ['polar_angle', 'x_pos', 'y_pos', 'SD', 'R2']
-# lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
-lstCon = ['Pd_sst']
+lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
 
 # Path of vtk mesh with data to project into visual space (e.g. parameter
 # estimates; subject ID, hemisphere, and contion level left open).
@@ -134,7 +137,7 @@ varExtYmax = 5.19
 varThrR2 = 0.15
 
 # Number of eccentricity bins for visual space representation:
-varNumEcc = 300
+varNumEcc = 1000
 
 # Plot parameters over this eccentricity range:
 tplRngEcc = (2.0, 5.5)
@@ -545,8 +548,7 @@ for idxDpth in range(len(lstDpth)):  #noqa
                                        vecNormTmp.flatten()))
 
             # x-axis values for section of visual space to be plotted:
-            vecCorEccTmp = np.around(vecCorEcc[varIdxMin:varIdxMax],
-                                     decimals=1)
+            vecCorEccTmp = vecCorEcc[varIdxMin:varIdxMax]
 
             # Output path for plot:
             strPthPltOtTmp = (strPthPltOt.format(lstRoi[idxRoi],

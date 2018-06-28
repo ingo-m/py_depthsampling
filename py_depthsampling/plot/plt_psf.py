@@ -24,31 +24,43 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 
 
-def plt_dpth_prfl(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
-                  varYmax, lgcCnvPrct, lstConLbl, strXlabel, strYlabel,
-                  strTitle, lgcLgnd, strPath, vecX=None, varXmin=None,
-                  varXmax=None, varSizeX=1800.0, varSizeY=1600.0,
-                  varNumLblY=5, varPadY=(0.0, 0.0), aryClr=None,
-                  aryCnfLw=None, aryCnfUp=None, lstVrt=None, varRound=2):
+def plt_psf(aryData,
+            strPath,
+            vecX=None,
+            aryError=None,
+            aryCnfLw=None,
+            aryCnfUp=None,
+            varDpi=80.0,
+            varYmin=None,
+            varYmax=None,
+            lstConLbl=None,
+            strXlabel='',
+            strYlabel='',
+            strTitle='',
+            lgcLgnd=True,
+            varXmin=None,
+            varXmax=None,
+            varSizeX=1800.0,
+            varSizeY=1600.0,
+            varNumLblY=5,
+            varPadY=(0.0, 0.0),
+            lstVrt=None,
+            aryClr=None):
     """
     Plot data across depth level for variable number of conditions.
 
     Parameters
     ----------
     aryData : np.array
-        Data to be plotted. Numpy array of the form aryData[Condition, Depth].
+        Data to be plotted. Numpy array of the form aryData[Condition, x-axis].
     aryError : np.array or None
         Error in the data to be plotted (e.g. SEM). Numpy array of the form
-        aryError[Condition, Depth]. The values will be added & subtracted from
+        aryError[Condition, x-axis]. The values will be added & subtracted from
         the values in aryData, and the region in between will be shaded.
         Alternatively, (possibly assymetric) confidence intervals can be
         provided (see below); in that case aryError is ignored.
-    varNumDpth : int
-        Number of depth levels (depth levels will be represented on the
-        x-axis).
-    varNumCon : int
-        Number of conditions (conditions will be represented as separate lines
-        in the plot).
+
+
     varDpi : float
         Resolution of the output figure.
     varYmin : float
@@ -105,9 +117,6 @@ def plt_dpth_prfl(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
         cortical depth. If lstVrt and aryClr are provided, they need to contain
         the same number of conditions (i.e. lstVrt needs to contain the same
         number of values as the size of the first dimension of aryClr).
-    varRound : int
-        Number of digits after decimal point for labels on y-axis (e.g. if
-        `varRound=1`, labels may be '0.0, 1.0, ...').
 
     Returns
     -------
@@ -119,6 +128,12 @@ def plt_dpth_prfl(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
     cortical depth levels (represented on the x-axis), separately for
     conditions (separate lines).
     """
+    # Number of conditions in input data:
+    varNumCon = aryData.shape[0]
+
+    # Number of x-values:
+    varNumX = aryData.shape[1]
+
     # Create figure:
     fgr01 = plt.figure(figsize=((varSizeX * 0.5) / varDpi,
                                 (varSizeY * 0.5) / varDpi),
@@ -129,7 +144,7 @@ def plt_dpth_prfl(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
 
     # Vector for x-data:
     if vecX is None:
-        vecX = np.linspace(0.0, 1.0, num=varNumDpth, endpoint=True)
+        vecX = np.linspace(0.0, 1.0, num=varNumX, endpoint=True)
 
     if aryClr is None:
         # Prepare colour map:
@@ -137,6 +152,10 @@ def plt_dpth_prfl(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
         # objCmap = plt.cm.winter
         objClrNorm = colors.Normalize(vmin=0, vmax=9)
         objCmap = plt.cm.tab10
+
+    # Create empty labels if none are provided:
+    if lstConLbl is None:
+        lstConLbl = [' '] * varNumCon
 
     # Loop through conditions:
     for idxCon in range(0, varNumCon):
@@ -180,41 +199,38 @@ def plt_dpth_prfl(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
                                         linewidth=0,
                                         antialiased=True)
 
-    # Determine minimum and maximum of x-axis:
+    # Determine minima and maxima of axes:
     if varXmin is None:
         varXmin = np.min(vecX)
     if varXmax is None:
         varXmax = np.max(vecX)
+    if varYmin is None:
+        # varYmin = np.min(aryData)
+        # varYmin = (np.floor(varYmin * 10.0) / 10.0)
+        varYmin = np.floor(np.min(aryData))
+    if varYmax is None:
+        # varYmax = np.max(aryData)
+        # varYmax = (np.ceil(varYmax * 10.0) / 10.0)
+        varYmax = np.ceil(np.max(aryData))
 
     # Plot vertical lines (e.g. representing peak position):
     if lstVrt is not None:
-
-        # Use same colours as for lines:
-        if aryClr is None:
-            # Prepare colour map:
-            objClrNorm = colors.Normalize(vmin=0, vmax=(varNumCon - 1))
-            objCmap = plt.cm.winter
 
         # Loop through list with line positions:
         varNumVrt = len(lstVrt)
         for idxVrt in range(0, varNumVrt):
 
-            # Adjust colour of current vertical line:
-            if aryClr is None:
-                # Adjust the colour of current line:
-                vecClrTmp = objCmap(objClrNorm(varNumVrt - 1 - idxVrt))
-            else:
-                vecClrTmp = aryClr[idxVrt, :]
-
             # Apsolute Position of vertical line (input values refer to
             # relative position):
-            varVrtTmp = lstVrt[idxVrt] / (float(varXmax)) + float(varXmin)
+            # varVrtTmp = lstVrt[idxVrt] / (float(varXmax)) + float(varXmin)
+            varVrtTmp = lstVrt[idxVrt]
 
             # Plot vertical line:
             axs01.axvline(varVrtTmp,
-                          color=vecClrTmp,
-                          linewidth=8.0,
-                          linestyle='--',
+                          color=[0.3, 0.3, 0.3],
+                          linewidth=3.0,
+                          alpha=0.5,
+                          linestyle=':',
                           antialiased=True)
 
     # Set x-axis range:
@@ -228,11 +244,11 @@ def plt_dpth_prfl(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
 
     # Which x values to label with ticks (WM & CSF boundary):
     # axs01.set_xticks([-0.1, (varNumDpth - 0.9)])
-    axs01.set_xticks([(varXmin - 0.04),
-                      (varXmax + 0.04)])
+    # axs01.set_xticks([(varXmin - 0.04),
+    #                   (varXmax + 0.04)])
 
     # Set tick labels for x ticks:
-    axs01.set_xticklabels(['WM', 'CSF'])
+    # axs01.set_xticklabels(['WM', 'CSF'])
 
     # Which y values to label with ticks:
     vecYlbl = np.linspace(varYmin, varYmax, num=varNumLblY, endpoint=True)
@@ -242,28 +258,8 @@ def plt_dpth_prfl(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
     # Set ticks:
     axs01.set_yticks(vecYlbl)
 
-    # Convert labels to percent?
-    if lgcCnvPrct:
-        # Multiply by 100 to convert to percent:
-        vecYlbl = np.multiply(vecYlbl, 100.0)
-        # Convert labels from float to a list of strings, with well-defined
-        # number of decimals (including trailing zeros):
-        lstYlbl = [None] * vecYlbl.shape[0]
-        for idxLbl in range(vecYlbl.shape[0]):
-            lstYlbl[idxLbl] = ('{:0.'
-                               + str(varRound)
-                               + 'f}').format(vecYlbl[idxLbl])
-    else:
-        # Convert labels from float to a list of strings, with well-defined
-        # number of decimals (including trailing zeros):
-        lstYlbl = [None] * vecYlbl.shape[0]
-        for idxLbl in range(vecYlbl.shape[0]):
-            lstYlbl[idxLbl] = ('{:0.'
-                               + str(varRound)
-                               + 'f}').format(vecYlbl[idxLbl])
-
     # Set tick labels for y ticks:
-    axs01.set_yticklabels(lstYlbl)
+    # axs01.set_yticklabels(lstYlbl)
 
     # Set x & y tick font size:
     axs01.tick_params(labelsize=36,

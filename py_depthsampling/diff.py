@@ -2,8 +2,7 @@
 """
 Plot difference between conditions.
 
-Plot mean of between stimulus conditions difference, with bootstrapped
-confidence intervals (percentile bootstrap).
+Plot mean of between stimulus conditions difference, with SEM.
 """
 
 # Part of py_depthsampling library
@@ -23,8 +22,7 @@ confidence intervals (percentile bootstrap).
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from py_depthsampling.boot.boot_plot_diff import boot_plot
-# from py_depthsampling.boot.boot_plot_diff_sngl_sub import boot_plot_sngl
+from py_depthsampling.diff.diff_sem import diff_sem
 
 
 # -----------------------------------------------------------------------------
@@ -52,11 +50,11 @@ strPthData = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{
 
 # Output path & prefix for plots (meta-condition, ROI, ROI, hemisphere, and
 # model index left open):
-strPthPltOt = '/home/john/Dropbox/PacMan_Plots/boot_diff/{}/{}/{}_{}{}'  #noqa
+strPthPltOt = '/home/john/Dropbox/PacMan_Plots/diff/{}/{}/{}_{}{}'  #noqa
 
-# Output path for single subject plot (heatmap), (ROI, metacondition,
-# hemisphere, drain model, and condition left open):
-# strPthPtlSnglOt = '/home/john/Dropbox/PacMan_Plots/boot_diff_sngle/{}_{}_{}{}_{}'
+# Output path for single subject plot, (ROI, metacondition, hemisphere, drain
+# model, and condition left open):
+# strPthPtlSnglOt = '/home/john/Dropbox/PacMan_Plots/diff_sngle/{}_{}_{}{}_{}'
 
 # File type suffix for plot:
 strFlTp = '.png'
@@ -72,27 +70,18 @@ strYlabel = 'Signal change [%]'
 lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
 # lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst', 'Ps_sst_plus_Cd_sst']
 # lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
-# lstCon = ['Pd_trn', 'Ps_trn', 'Cd_trn']
+# lstCon = ['Pd_trn', 'Ps_trn', 'Cd_trn', 'Ps_trn_plus_Cd_trn']
 
 # Condition labels:
 lstConLbl = lstCon
 
 # Which conditions to compare (list of tuples with condition indices):
 lstDiff = [(0, 1), (0, 2), (2, 1)]
-# lstDiff = [(0, 1), (0, 2), (2, 1), (0, 3)]
-
-# Number of resampling iterations:
-varNumIt = 100000
-
-# Lower & upper bound of percentile bootstrap (in percent), for bootstrap
-# confidence interval (models 1, 2, and 3) - this value is only printed, not
-# plotted - or plotted confidence intervals in case of model 5:
-varCnfLw = 2.5
-varCnfUp = 97.5
+# lstDiff = [(0, 3)]
 
 # Padding around labelled values on y:
-varPadY = (0.05, 0.25)
-# ---------------------------1--------------------------------------------------
+tplPadY = (0.05, 0.25)
+# -----------------------------------------------------------------------------
 
 
 # -----------------------------------------------------------------------------
@@ -142,31 +131,27 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                             varYmax = 0.5
 
                 # Create average plots:
-                boot_plot(strPthData.format(lstMetaCon[idxMtaCn],
-                                            lstRoi[idxRoi],
-                                            lstHmsph[idxHmsph],
-                                            '{}',
-                                            lstMdl[idxMdl]),
-                          (strPthPltOt.format(lstMetaCon[idxMtaCn],
-                                              lstRoi[idxRoi],
-                                              lstRoi[idxRoi],
-                                              lstHmsph[idxHmsph],
-                                              lstMdl[idxMdl])
-                           + strFlTp),
-                          lstCon,
-                          lstConLbl,
-                          varNumIt=varNumIt,
-                          varConLw=varCnfLw,
-                          varConUp=varCnfUp,
-                          strTtl='',
-                          varYmin=varYmin,
-                          varYmax=varYmax,
-                          varPadY=varPadY,
-                          strXlabel=strXlabel,
-                          strYlabel=strYlabel,
-                          lgcLgnd=True,
-                          lstDiff=lstDiff,
-                          strParam=strParam)
+                diff_sem(strPthData.format(lstMetaCon[idxMtaCn],
+                                           lstRoi[idxRoi],
+                                           lstHmsph[idxHmsph],
+                                           '{}',
+                                           lstMdl[idxMdl]),
+                         (strPthPltOt.format(lstMetaCon[idxMtaCn],
+                                             lstRoi[idxRoi],
+                                             lstRoi[idxRoi],
+                                             lstHmsph[idxHmsph],
+                                             lstMdl[idxMdl])
+                          + strFlTp),
+                         lstCon,
+                         lstConLbl,
+                         varYmin=varYmin,
+                         varYmax=varYmax,
+                         tplPadY=tplPadY,
+                         strXlabel=strXlabel,
+                         strYlabel=strYlabel,
+                         lgcLgnd=True,
+                         lstDiff=lstDiff,
+                         strParam=strParam)
 
             # Create single subject plot(s):
             # boot_plot_sngl(strPthData.format(lstMetaCon[idxMtaCn],

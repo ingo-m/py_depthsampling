@@ -2,7 +2,7 @@
 """Function of the depth sampling pipeline."""
 
 # Part of py_depthsampling library
-# Copyright (C) 2017  Ingo Marquardt
+# Copyright (C) 2018  Ingo Marquardt
 #
 # This program is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
@@ -23,14 +23,13 @@ import rpy2.robjects as robjects
 from py_depthsampling.plot.plt_dpth_prfl import plt_dpth_prfl
 
 
-def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,  #noqa
-              varConLw=2.5, varConUp=97.5, strTtl='', varYmin=0.0, varYmax=2.0,
-              varPadY=(0.0, 0.0),
-              strXlabel='Cortical depth level (equivolume)',
-              strYlabel='fMRI signal change [arbitrary units]',
-              lgcLgnd=False, lstDiff=None, vecNumInc=None, strParam='mean'):
+def diff_sem(objDpth, strPath, lstCon, lstConLbl, strTtl='', varYmin=0.0,  #noqa
+             varYmax=2.0, tplPadY=(0.0, 0.0),
+             strXlabel='Cortical depth level (equivolume)',
+             strYlabel='fMRI signal change [arbitrary units]',
+             lgcLgnd=False, lstDiff=None, vecNumInc=None, strParam='mean'):
     """
-    Plot across-subject cortical depth profiles with confidence intervals.
+    Plot across-subject cortical depth profiles with SEM.
 
     Parameters
     ----------
@@ -45,21 +44,13 @@ def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,  #noqa
     lstConLbl : list
         List containing condition labels (strings). Number of condition labels
         has to be the same as number of conditions in `lstCon`.
-    varNumIt : int
-        Number of bootstrap iterations.
-    varConLw : float
-        Lower bound of the percentile bootstrap confidence interval in
-        percent (i.e. in range of [0, 100]).
-    varConUp : float
-        Upper bound of the percentile bootstrap confidence interval in
-        percent (i.e. in range of [0, 100]).
     strTtl : str
         Plot title.
     varYmin : float
         Minimum of Y axis.
     varYmax : float
         Maximum of Y axis.
-    varPadY : tuple
+    tplPadY : tuple
         Padding around labelled values on y.
     strXlabel : str
         Label for x axis.
@@ -69,11 +60,10 @@ def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,  #noqa
         Whether to show a legend.
     lstDiff : list or None
         If None, the depth profiles are plotted separately for each condition.
-        If a list of tuples of condition indices is provided, on each
-        bootstrapping iteration the difference between the two conditions is
-        calculated, and is plotted. The the second condition from the tuple is
-        subtracted from the first (e.g. if lstDiff = [(0, 1)], then condition 1
-        is subtracted from condition 0).
+        If a list of tuples of condition indices is provided, the difference
+        between the two conditions is calculated, and is plotted. The the
+        second condition from the tuple is subtracted from the first (e.g. if
+        lstDiff = [(0, 1)], then condition 1 is subtracted from condition 0).
     vecNumInc : np.array
         1D array with weights for weighted averaging over subjects (e.g. number
         of vertices per subject). If the array is loaded from disk (i.e. if
@@ -93,12 +83,7 @@ def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,  #noqa
 
     Notes
     -----
-    Plot across-subject mean or median cortical depth profiles with percentile
-    bootstrap confidence intervals. This function bootstraps (i.e. resamples
-    with replacement) from an array of single-subject depth profiles,
-    calculates a confidence interval of the mean/median across bootstrap
-    iterations and plots the empirical mean/median & bootstrap confidence
-    intervals along the cortical depth.
+    Plot across-subject mean or median cortical depth profiles with SEM.
 
     Function of the depth sampling pipeline.
     """
@@ -149,104 +134,25 @@ def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,  #noqa
     # Get number of depth levels from input array:
     varNumDpth = aryDpth.shape[2]
 
-    # We will sample subjects with replacement. How many subjects to sample on
-    # each iteration:
-    varNumSmp = varNumSub
+    # Define R function for calculation of weighted median:
+    strFuncR = """
+     funcR <- function(lstData, lstWght){
+     library(spatstat)
+     varWm <- weighted.median(lstData, lstWght)
+     return(varWm)
+     }
+    """
+    objFuncR = robjects.r(strFuncR)
 
-    # Random array with subject indicies for bootstrapping of the form
-    # aryRnd[varNumIt, varNumSmp]. Each row includes the indicies of the
-    # subjects to the sampled on that iteration.
-    aryRnd = np.random.randint(0,
-                               high=varNumSub,
-                               size=(varNumIt, varNumSmp))
-
-    if lstDiff is None:
-        # Array for bootstrap samples, of the form
-        # aryBoo[idxIteration, idxSubject, idxCondition, idxDpth]):
-        aryBoo = np.zeros((varNumIt, varNumSub, varNumCon, varNumDpth))
-    else:
+    if not(lstDiff is None):
         # Set number of comparisons:
         varNumCon = len(lstDiff)
-        # Array for bootstrap samples:
-        aryBoo = np.zeros((varNumIt, varNumSub, varNumCon, varNumDpth))
 
-    # Array with number of vertices per subject for each bootstrapping sample
-    # (needed for weighted averaging), shape: aryWght[iterations, subjects]
-    aryWght = np.zeros((varNumIt, varNumSub))
+    # Array for SEM:
+    arySem = np.zeros((varNumCon, varNumDpth))
 
     # ------------------------------------------------------------------------
-    # *** Bootstrap
-
-    # Loop through bootstrap iterations:
-    for idxIt in range(varNumIt):
-        # Indices of current bootstrap sample:
-        vecRnd = aryRnd[idxIt, :]
-        if lstDiff is None:
-            # Put current bootstrap sample into array:
-            aryBoo[idxIt, :, :, :] = aryDpth[vecRnd, :, :]
-        else:
-            # Calculate difference between conditions:
-            for idxDiff in range(varNumCon):
-                aryBoo[idxIt, :, idxDiff, :] = \
-                    np.subtract(aryDpth[vecRnd, lstDiff[idxDiff][0], :],
-                                aryDpth[vecRnd, lstDiff[idxDiff][1], :])
-
-        # Put number of vertices per subject into respective array (for
-        # weighted averaging):
-        aryWght[idxIt, :] = vecNumInc[vecRnd]
-
-    if strParam == 'mean':
-
-        # Mean for each bootstrap sample (across subjects within the bootstrap
-        # sample):
-
-        # Sum of weights over subjects (i.e. total number of vertices across
-        # subjects, one value per iteration; for scaling).
-        vecSum = np.sum(aryWght, axis=1)
-
-        # Multiply depth profiles by weights (weights are broadcasted over
-        # conditions and depth levels):
-        aryTmp = np.multiply(aryBoo, aryWght[:, :, None, None])
-
-        # Sum over subjects, and scale by number of vertices (sum of vertices
-        # is broadcasted over conditions and depth levels):
-        aryBooMne = np.divide(
-                              np.sum(aryTmp, axis=1),
-                              vecSum[:, None, None]
-                              )
-
-    elif strParam == 'median':
-
-        # Define R function for calculation of weighted median:
-        strFuncR = """
-         funcR <- function(lstData, lstWght){
-         library(spatstat)
-         varWm <- weighted.median(lstData, lstWght)
-         return(varWm)
-         }
-        """
-        objFuncR = robjects.r(strFuncR)
-
-        # Array for weighted median difference between conditions:
-        aryBooMne = np.zeros((varNumIt, varNumCon, varNumDpth))
-
-        # Calculate weighted median difference between conditions in R (yes
-        # this is slow):
-        for idxIt in range(varNumIt):
-            for idxCon in range(varNumCon):
-                for idxDpth in range(varNumDpth):
-                    aryBooMne[idxIt, idxCon, idxDpth] = \
-                        objFuncR(list(aryBoo[idxIt, :, idxCon, idxDpth]),
-                                 list(aryWght[idxIt, :]))[0]
-
-    # Delete large bootstrap array:
-    del(aryBoo)
-
-    # Percentile bootstrap for mean:
-    aryPrct = np.percentile(aryBooMne, (varConLw, varConUp), axis=0)
-
-    # ------------------------------------------------------------------------
-    # *** Plot result
+    # *** Calculate parameters
 
     if lstDiff is None:
 
@@ -295,13 +201,6 @@ def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,  #noqa
                 aryDiff = np.subtract(aryDpth[:, lstDiff[idxDiff][0], :],
                                       aryDpth[:, lstDiff[idxDiff][1], :])
 
-                # Un-comment this for SEM (overwrites bootstrapping results),
-                # for comparison:
-                # aryPrct[0, idxDiff, :] = np.divide(np.std(aryDiff, axis=0),
-                #                                    np.sqrt(varNumSub)) * -1
-                # aryPrct[1, idxDiff, :] = np.divide(np.std(aryDiff, axis=0),
-                #                                    np.sqrt(varNumSub)) * 1
-
                 # Multiply depth profiles by weights (weights are broadcasted
                 # over depth levels):
                 aryDiff = np.multiply(aryDiff, vecNumInc[:, None])
@@ -312,12 +211,41 @@ def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,  #noqa
                                                   varSum
                                                   )
 
-                # Un-comment this for SEM (overwrites bootstrapping results),
-                # for comparison:
-                # aryPrct[0, idxDiff, :] = np.add(aryPrct[0, idxDiff, :],
-                #                                 aryEmpMne[idxDiff, :])
-                # aryPrct[1, idxDiff, :] = np.add(aryPrct[1, idxDiff, :],
-                #                                 aryEmpMne[idxDiff, :])
+                # Formular for SEM according to Franz & Loftus (2012). Standard
+                # errors and confidence intervals in within-subjects designs:
+                # generalizing Loftus and Masson (1994) and avoiding the biases
+                # of alternative accounts. Psychonomic Bulletin & Review,
+                # 19(3), p. 398.
+                arySem[idxDiff, :] = \
+                    np.sqrt(
+                            np.multiply(
+                                        np.divide(
+                                                  1.0,
+                                                  np.multiply(
+                                                              float(varNumSub),
+                                                              (float(varNumSub) - 1.0)
+                                                              )
+                                                  ),
+                                        np.sum(
+                                               np.power(
+                                                        np.subtract(
+                                                                    np.subtract(
+                                                                                aryDpth[:, lstDiff[idxDiff][0], :],
+                                                                                aryDpth[:, lstDiff[idxDiff][1], :]
+                                                                                ),
+                                                                    np.mean(
+                                                                            np.subtract(
+                                                                                        aryDpth[:, lstDiff[idxDiff][0], :],
+                                                                                        aryDpth[:, lstDiff[idxDiff][1], :]),
+                                                                            axis=0
+                                                                            ),
+                                                                    ),
+                                                        2.0
+                                                        ),
+                                               axis=0
+                                               )
+                                        )
+                             )
 
             elif strParam == 'median':
 
@@ -334,6 +262,8 @@ def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,  #noqa
                             objFuncR(list(aryDiff[:, idxDpth]),
                                      list(vecNumInc))[0]
 
+                # TODO: SEM
+
         # Create condition labels for differences:
         lstDiffLbl = [None] * varNumCon
         for idxDiff in range(varNumCon):
@@ -342,9 +272,11 @@ def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,  #noqa
                                    + (lstConLbl[lstDiff[idxDiff][1]]))
         lstConLbl = lstDiffLbl
 
-    plt_dpth_prfl(aryEmpMne, None, varNumDpth, varNumCon, 80.0, varYmin,
+    # ------------------------------------------------------------------------
+    # *** Plot results
+
+    plt_dpth_prfl(aryEmpMne, arySem, varNumDpth, varNumCon, 80.0, varYmin,
                   varYmax, False, lstConLbl, strXlabel, strYlabel, strTtl,
                   lgcLgnd, strPath, varSizeX=1800.0, varSizeY=1600.0,
-                  varNumLblY=5, varPadY=varPadY, aryCnfLw=aryPrct[0, :, :],
-                  aryCnfUp=aryPrct[1, :, :])
+                  varNumLblY=5, varPadY=tplPadY)
     # ------------------------------------------------------------------------

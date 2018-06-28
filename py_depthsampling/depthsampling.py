@@ -64,11 +64,13 @@ lstSubIds = ['20171023',  # '20171109',
 lstNstCon = [['Pd_sst', 'Ps_sst', 'Cd_sst'],
              ['Pd_min_Ps_sst'],
              ['Pd_min_Cd_sst'],
+             ['Cd_min_Ps_sst'],
              ['Pd_min_Cd_Ps_sst'],
              ['Pd_trn', 'Ps_trn', 'Cd_trn'],
              ['Pd_min_Ps_trn'],
              ['Pd_min_Cd_trn'],
-             ['Pd_min_Cd_Ps_sst']]
+             ['Cd_min_Ps_trn'],
+             ['Pd_min_Cd_Ps_trn']]
 
 # Condition labels:
 lstNstConLbl = lstNstCon
@@ -139,11 +141,11 @@ varNumLne = 2
 # Label for axes:
 strXlabel = 'Cortical depth level'
 # strYlabel = 'z-value'
-strYlabel = 'fMRI signal [a.u.]'
+strYlabel = 'Signal change [%]'
 
 # Output path for plots - prefix:
-# strPltOtPre = '/home/john/PhD/PacMan_Plots/z/{}/plots_{}/'
-strPltOtPre = '/home/john/PhD/PacMan_Plots/pe/{}/plots_{}/'
+# strPltOtPre = '/home/john/Dropbox/PacMan_Plots/z/{}/plots_{}/'
+strPltOtPre = '/home/john/Dropbox/PacMan_Plots/pe/{}/plots_{}/'
 
 # Output path for plots - suffix:
 strPltOtSuf = '_{}_{}_{}.png'
@@ -186,46 +188,42 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                 # [(Ymin, Ymax)]):
 
                 if idxRoi == 0:  # v1
-                    if idxCon == 0:  # v1 simple contrasts
-                        lstLimY = [(-400.0, 200.0)] * len(lstSubIds)
-                    elif idxCon == 1:  # v1 Pd_min_Ps
-                        lstLimY = [(-50.0, 50.0)] * len(lstSubIds)
-                    elif idxCon == 2:  # v1 Pd_min_Cd
-                        lstLimY = [(-50.0, 50.0)] * len(lstSubIds)
+                    if (idxCon == 0) or (idxCon == 4):  # Simple contrasts
+                        lstLimY = [(-4.0, 2.0)] * len(lstSubIds)
+                    else:  # Differential contrasts
+                        lstLimY = [(-1.0, 1.0)] * len(lstSubIds)
 
                 elif (idxRoi == 1) or (idxRoi == 2):  # v2 & v3
-                    if idxCon == 0:  # v2 simple contrasts
-                        lstLimY = [(-500.0, 20.0)] * len(lstSubIds)
-                    elif idxCon == 1:  # v2 Pd_min_Ps
-                        lstLimY = [(-50.0, 50.0)] * len(lstSubIds)
-                    elif idxCon == 2:  # v2 Pd_min_Cd
-                        lstLimY = [(-50.0, 50.0)] * len(lstSubIds)
+                    if (idxCon == 0) or (idxCon == 4):  # Simple contrasts
+                        lstLimY = [(-4.0, 2.0)] * len(lstSubIds)
+                    else:  # Differential contrasts
+                        lstLimY = [(-1.0, 1.0)] * len(lstSubIds)
 
                 # Limits of y-axis for ACROSS SUBJECT PLOTS:
 
                 # Stimulus:
                 if lstMetaCon[idxMtaCn] == 'stimulus':
 
-                    if (idxCon == 0) or (idxCon == 4):  # v1 simple contrasts
+                    if (idxCon == 0) or (idxCon == 4):  # Simple contrasts
                         # Limits of y-axis for across subject plot:
-                        varAcrSubsYmin = -500.0
-                        varAcrSubsYmax = 200.0
-                    else:  # differential contrasts
+                        varAcrSubsYmin = -5.0
+                        varAcrSubsYmax = 1.0
+                    else:  # Differential contrasts
                         # Limits of y-axis for across subject plot:
-                        varAcrSubsYmin = -100.0
-                        varAcrSubsYmax = 100.0
+                        varAcrSubsYmin = -1.0
+                        varAcrSubsYmax = 1.0
 
                 # Periphery:
                 if lstMetaCon[idxMtaCn] == 'periphery':
 
-                    if (idxCon == 0) or (idxCon == 4):  # v1 simple contrasts
+                    if (idxCon == 0) or (idxCon == 4):  # Simple contrasts
                         # Limits of y-axis for across subject plot:
                         varAcrSubsYmin = 0.0
-                        varAcrSubsYmax = 750.0
-                    else:  # differential contrasts
+                        varAcrSubsYmax = 2.0
+                    else:  # Differential contrasts
                         # Limits of y-axis for across subject plot:
-                        varAcrSubsYmin = -150.0
-                        varAcrSubsYmax = 150.0
+                        varAcrSubsYmin = -1.0
+                        varAcrSubsYmax = 1.0
 
                 # Title for mean plot:
                 strTitle = lstRoi[idxRoi].upper()

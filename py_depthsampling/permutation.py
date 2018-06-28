@@ -171,7 +171,7 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                         # Run permutation test:
                         aryNull, vecP, aryEmpDiffMdn = permute(
                             aryDpth01, aryDpth02, vecNumInc=vecNumInc,
-                            varNumIt=10000, varLow=varLow, varUp=varUp)
+                            varNumIt=varNumIt, varLow=varLow, varUp=varUp)
 
                         # Data array to be passed into plotting function,
                         # containing the empirical condition difference and the

@@ -6,7 +6,7 @@ Function of the depth sampling pipeline.
 """
 
 # Part of py_depthsampling library
-# Copyright (C) 2017  Ingo Marquardt
+# Copyright (C) 2018 Ingo Marquardt
 #
 # This program is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
@@ -25,8 +25,7 @@ Function of the depth sampling pipeline.
 import numpy as np
 
 
-def permute(aryDpth01, aryDpth02, vecNumInc=None, varNumIt=10000, varLow=2.5,
-            varUp=97.5):
+def permute_max(aryDpth01, aryDpth02, vecNumInc=None, varNumIt=10000):
     """
     Permutation test for difference between conditions in depth profiles.
 
@@ -44,33 +43,22 @@ def permute(aryDpth01, aryDpth02, vecNumInc=None, varNumIt=10000, varLow=2.5,
         be equal across subjects.
     varNumIt : int
         Number of resampling iterations.
-    varLow : float
-        Lower bound of null distribution.
-    varUp : float
-        Upper bound of null distribution.
 
     Returns
     -------
-    aryNull : np.array
-        Array with parameters of permutation null distribution, shape
-        aryNull[3, varNumDpth]. First dimension corresponds to lower bound,
-        mean, and upper bound of the permutation null distribution. For
-        instance, if `varLow = 2.5` and `varUp = 97.5`, the bounds of the 95%
-        confidence interval of the null distribution are returned.
-    vecP : np.array
-        Array with one p-value for each depth level (shape vecP[depth]),
-        pertaining to the probability of obtaining a difference between
-        conditions as equal to or greater than the empirically observed
-        condition difference.
-    aryEmpDiffMdn : np.array
-        Empirical difference between conditions (mean across subjects).
+    varP : float
+        Permutation p-value.
 
     Notes
     -----
     Compares cortical depth profiles from two different conditions (e.g. PacMan
     dynamic vs. PacMan statis). Tests whether the difference between the two
-    conditions is significant, seperately for each cortical depth. See also
-    `permute_max`.
+    conditions is significant at *any* cortical depth. This is in contrast to
+    `perm_main.py`, where the permutation test is conducted separately for each
+    depth level. The problem with a separate test at each depth level is that
+    this leads to a massive multiple comparisons problem. Here, we the
+    amplitude of the maximum across depth is different between conditions,
+    irrespective of where the amplitude is.
 
     The procedure is as follow:
     - Condition labels (i.e. 'PacMan Dynamic' and 'PacMan Static') are permuted
@@ -81,11 +69,10 @@ def permute(aryDpth01, aryDpth02, vecNumInc=None, varNumIt=10000, varLow=2.5,
       one depth profile per subject (with the difference between randomly
       assigned conditions).
     - The average difference across subejcts is calculated.
-    - The resulte is a distribution of condition differences for each depth
-      level (dimensions are `number of resampling iterations` * `number of
-      depth level`. This distribution is the null distribution.
-    - The empirical difference between conditions can be compared agains this
-      null distribution.
+    - We take the maximum of the difference across cortical depth. The
+      distribution of maxima is the null distribution.
+    - The empirical maximum of the difference between conditions can be
+      compared agains this null distribution.
     """
     # -------------------------------------------------------------------------
     # *** Preparations
@@ -158,59 +145,41 @@ def permute(aryDpth01, aryDpth02, vecNumInc=None, varNumIt=10000, varLow=2.5,
     # aryPermDiff = np.mean(aryPermDiff, axis=1)
     aryPermDiff = np.average(aryPermDiff, weights=vecNumInc, axis=1)
 
-    # Mean of permutation distribution - i.e. the mean difference between
-    # randomly permuted conditions - the mean difference expected by chance.
-    aryPermDiffMne = np.mean(aryPermDiff, axis=0)
-
-    # Lower and upper bound of the permutation null distribution. For instance,
-    # if `varLow = 2.5` and `varUp = 97.5`, this corresponds to the bounds of
-    # the 95% confidence interval of the null distribution.
-    aryPermDiffPrcnt = np.percentile(aryPermDiff, (varLow, varUp), axis=0).T
-
-    # Create output array of shape aryNull[3, varNumDpth]. First dimension
-    # corresponds to lower bound, mean, and upper bound of the permutation
-    # null distribution.
-    aryNull = np.array([aryPermDiffPrcnt[:, 0],
-                        aryPermDiffMne,
-                        aryPermDiffPrcnt[:, 1]])
+    # Maximum difference across cortical depth:
+    vecPermDiffMax = np.max(np.absolute(aryPermDiff), axis=1)
 
     # -------------------------------------------------------------------------
     # *** Calculate empirical difference
 
-    print('---Calculate empirical difference')
+    print('---Calculate empirical parameter value')
 
     # Empirical difference between conditions. First, calculate within-subject
     # difference:
     aryEmpDiff = np.subtract(aryDpth01, aryDpth02)
 
     # Mean difference across subjects:
-    aryEmpDiffMdn = np.average(aryEmpDiff, weights=vecNumInc, axis=0)
+    aryEmpDiffMne = np.average(aryEmpDiff, weights=vecNumInc, axis=0)
+
+    # Maximum difference across cortical depth:
+    # varEmpDiffMneMax = np.max(aryEmpDiffMne)
+    varEmpDiffMneMax = np.max(np.absolute(aryEmpDiffMne))
 
     # -------------------------------------------------------------------------
     # *** Calculate p-value
 
     print('---Calculate p-value')
 
-    # Array for p-value at each depth level:
-    vecP = np.zeros((varNumDpt))
-
-    # Take absolute difference?
-    # aryPermDiff = np.absolute(aryPermDiff)
-    # aryEmpDiffMne = np.absolute(aryEmpDiffMne)
-
-    for idxDpt in range(varNumDpt):
-
-        # Number of resampling cases with a condition difference greater or
-        # equal to the 'actual', empricial difference between conditions:
-        vecP[idxDpt] = np.sum(
-                              np.greater_equal(
-                                               aryPermDiff[:, idxDpt],
-                                               aryEmpDiffMdn[idxDpt]
-                                               )
-                              ).astype(np.float64)
+    # Number of resampling cases with a condition difference greater or
+    # equal to the 'actual', empricial difference between conditions:
+    varP = np.sum(
+                  np.greater_equal(
+                                   vecPermDiffMax,
+                                   varEmpDiffMneMax
+                                   )
+                  ).astype(np.float64)
 
     # Convert count of cases into p-value:
-    vecP = np.divide(vecP, float(varNumIt))
+    varP = np.divide(varP, float(varNumIt))
 
-    return aryNull, vecP, aryEmpDiffMdn
+    return varP
     # -------------------------------------------------------------------------

@@ -22,8 +22,9 @@ import numpy as np
 from py_depthsampling.project.utilities import get_data
 
 
-def load_par(strSub, strCon, strRoi, strPthData, strPthR2, strPthX, strPthY,
-             strPthSd, strCsvRoi, varNumDpth, lstDpth, idxPrc, queOut):
+def load_par(strSub, strCon, strRoi, strPthData, strPthMneEpi, strPthR2,
+             strPthX, strPthY, strPthSd, strCsvRoi, varNumDpth, lstDpth,
+             idxPrc, queOut):
     """
     Load single subject vtk meshes in parallel.
 
@@ -34,6 +35,7 @@ def load_par(strSub, strCon, strRoi, strPthData, strPthR2, strPthX, strPthY,
     """
     # Temporary input paths for left hemisphere:
     strPthLhData = strPthData.format(strSub, 'lh', strCon)
+    strPthLhMneEpi = strPthMneEpi.format(strSub, 'lh')
     strPthLhR2 = strPthR2.format(strSub, 'lh')
     strPthLhSd = strPthSd.format(strSub, 'lh')
     strPthLhX = strPthX.format(strSub, 'lh')
@@ -41,12 +43,13 @@ def load_par(strSub, strCon, strRoi, strPthData, strPthR2, strPthX, strPthY,
     strCsvLhRoi = strCsvRoi.format(strSub, 'lh', strRoi)
 
     # Load single subject data for left hemisphere:
-    vecLhData, vecLhR2, vecLhSd, vecLhX, vecLhY = get_data(
-        strPthLhData, strPthLhR2, strPthLhSd, strPthLhX, strPthLhY,
-        strCsvLhRoi, varNumDpth=varNumDpth, lstDpth=lstDpth)
+    vecLhData, vecLhMneEpi, vecLhR2, vecLhSd, vecLhX, vecLhY = get_data(
+        strPthLhData, strPthLhMneEpi, strPthLhR2, strPthLhSd, strPthLhX,
+        strPthLhY, strCsvLhRoi, varNumDpth=varNumDpth, lstDpth=lstDpth)
 
     # Temporary input paths for right hemisphere:
     strPthRhData = strPthData.format(strSub, 'rh', strCon)
+    strPthRhMneEpi = strPthMneEpi.format(strSub, 'rh')
     strPthRhR2 = strPthR2.format(strSub, 'rh')
     strPthRhSd = strPthSd.format(strSub, 'rh')
     strPthRhX = strPthX.format(strSub, 'rh')
@@ -54,19 +57,20 @@ def load_par(strSub, strCon, strRoi, strPthData, strPthR2, strPthX, strPthY,
     strCsvRhRoi = strCsvRoi.format(strSub, 'rh', strRoi)
 
     # Load single subject data for right hemisphere:
-    vecRhData, vecRhR2, vecRhSd, vecRhX, vecRhY = get_data(
-        strPthRhData, strPthRhR2, strPthRhSd, strPthRhX, strPthRhY,
-        strCsvRhRoi, varNumDpth=varNumDpth, lstDpth=lstDpth)
+    vecRhData, vecRhMneEpi, vecRhR2, vecRhSd, vecRhX, vecRhY = get_data(
+        strPthRhData, strPthRhMneEpi, strPthRhR2, strPthRhSd, strPthRhX,
+        strPthRhY, strCsvRhRoi, varNumDpth=varNumDpth, lstDpth=lstDpth)
 
     # Concatenate LH and RH data:
     vecData = np.concatenate([vecLhData, vecRhData])
+    vecMneEpi = np.concatenate([vecLhMneEpi, vecRhMneEpi])
     vecR2 = np.concatenate([vecLhR2, vecRhR2])
     vecSd = np.concatenate([vecLhSd, vecRhSd])
     vecX = np.concatenate([vecLhX, vecRhX])
     vecY = np.concatenate([vecLhY, vecRhY])
 
     # Create list containing subject data, and the process ID:
-    lstOut = [idxPrc, vecData, vecR2, vecSd, vecX, vecY]
+    lstOut = [idxPrc, vecData, vecMneEpi, vecR2, vecSd, vecX, vecY]
 
     # Put output to queue:
     queOut.put(lstOut)

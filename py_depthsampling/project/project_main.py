@@ -60,7 +60,8 @@ strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/pe/{}_{}_{}'  #noqa
 # strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/z/{}_{}_{}'  #noqa
 
 # File type suffix for plot:
-strFlTp = '.svg'
+# strFlTp = '.svg'
+strFlTp = '.png'
 
 # Figure scaling factor:
 varDpi = 80.0
@@ -70,7 +71,8 @@ lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst',
           'Pd_trn', 'Cd_trn', 'Ps_trn',
           'Pd_min_Ps_sst', 'Pd_min_Cd_sst', 'Cd_min_Ps_sst',
           'Pd_min_Cd_Ps_sst',
-          'Pd_min_Cd_Ps_trn']
+          'Pd_min_Cd_Ps_trn',
+          'Pd_min_Ps_trn', 'Pd_min_Cd_trn', 'Cd_min_Ps_trn']
 # lstCon = ['polar_angle', 'x_pos', 'y_pos', 'SD', 'R2']
 
 # Path of vtk mesh with data to project into visual space (e.g. parameter
@@ -78,6 +80,10 @@ lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst',
 strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/feat_level_2_{}_cope.vtk'  #noqa
 # strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/feat_level_2_{}_zstat.vtk'  #noqa
 # strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_{}.vtk'  #noqa
+
+# Path of mean EPI (for scaling to percent signal change; subject ID and
+# hemisphere left open):
+strPthMneEpi = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/combined_mean.vtk'  #noqa
 
 # Path of vtk mesh with R2 values from pRF mapping (at multiple depth levels;
 # subject ID and hemisphere left open).
@@ -152,6 +158,8 @@ for idxDpth in range(len(lstDpth)):  #noqa
 
             if os.path.isfile(strPthNpyTmp):
 
+                print('--Load existing visual field projection')
+
                 # Load existing projection:
                 aryVslSpc = np.load(strPthNpyTmp)
 
@@ -160,7 +168,7 @@ for idxDpth in range(len(lstDpth)):  #noqa
                 # -------------------------------------------------------------
                 # *** Load data
 
-                print('--Load data')
+                print('--Load data from vtk meshes')
 
                 # Number of processes to run in parallel:
                 varPar = varNumSub
@@ -181,6 +189,7 @@ for idxDpth in range(len(lstDpth)):  #noqa
                                                        lstCon[idxCon],
                                                        lstRoi[idxRoi],
                                                        strPthData,
+                                                       strPthMneEpi,
                                                        strPthR2,
                                                        strPthX,
                                                        strPthY,
@@ -213,6 +222,9 @@ for idxDpth in range(len(lstDpth)):  #noqa
                 # List for single-subject data vectors:
                 lstData = [None] * varPar
 
+                # List for single-subject mean EPI vectors:
+                lstMneEpi = [None] * varPar
+
                 # List of single subject R2 vectors:
                 lstR2 = [None] * varPar
 
@@ -234,13 +246,15 @@ for idxDpth in range(len(lstDpth)):  #noqa
 
                     # Put fitting results into list, in correct order:
                     lstData[varTmpIdx] = lstRes[idxRes][1]
-                    lstR2[varTmpIdx] = lstRes[idxRes][2]
-                    lstSd[varTmpIdx] = lstRes[idxRes][3]
-                    lstX[varTmpIdx] = lstRes[idxRes][4]
-                    lstY[varTmpIdx] = lstRes[idxRes][5]
+                    lstMneEpi[varTmpIdx] = lstRes[idxRes][2]
+                    lstR2[varTmpIdx] = lstRes[idxRes][3]
+                    lstSd[varTmpIdx] = lstRes[idxRes][4]
+                    lstX[varTmpIdx] = lstRes[idxRes][5]
+                    lstY[varTmpIdx] = lstRes[idxRes][6]
 
                 # Concatenate arrays from all subjects:
                 vecData = np.concatenate(lstData[:])
+                vecMneEpi = np.concatenate(lstMneEpi[:])
                 vecR2 = np.concatenate(lstR2[:])
                 vecSd = np.concatenate(lstSd[:])
                 vecX = np.concatenate(lstX[:])
@@ -248,10 +262,49 @@ for idxDpth in range(len(lstDpth)):  #noqa
 
                 # Delete original lists:
                 del(lstData)
+                del(lstMneEpi)
                 del(lstR2)
                 del(lstSd)
                 del(lstX)
                 del(lstY)
+
+                # -------------------------------------------------------------
+                # *** Convert cope to percent signal change
+
+                # According to the FSL documentation
+                # (https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FEAT/UserGuide), the
+                # PEs can be scaled to signal change with respect to the mean
+                # (over time within voxel): "This is achieved by scaling the PE
+                # or COPE values by (100*) the peak-peak height of the
+                # regressor (or effective regressor in the case of COPEs) and
+                # then by dividing by mean_func (the mean over time of
+                # filtered_func_data)."
+
+                # Only perform scaling if the data is from an FSL cope file:
+                if 'cope' in strPthData:
+                    print('--Convert cope to percent signal change.')
+
+                    # The peak-peak height depends on the predictor (i.e.
+                    # condition).
+                    if 'sst' in lstCon[idxCon]:
+                        varPpheight = 1.268049
+                    elif 'trn' in lstCon[idxCon]:
+                        varPpheight = 0.2269044
+
+                    # In order to avoid division by zero, avoid zero-voxels:
+                    lgcTmp = np.not_equal(vecData, 0.0)
+
+                    # Apply PSC scaling, as described above:
+                    vecData[lgcTmp] = \
+                        np.multiply(
+                                    np.divide(
+                                              np.multiply(
+                                                          vecData[lgcTmp],
+                                                          (100.0 * varPpheight)
+                                                          ),
+                                              vecMneEpi[lgcTmp]),
+                                    1.0  # 1.4
+                                    )
 
                 # -------------------------------------------------------------
                 # *** Project data into visual space
@@ -348,7 +401,9 @@ for idxDpth in range(len(lstDpth)):  #noqa
                 np.save(strPthNpyTmp, aryVslSpc)
 
             # -----------------------------------------------------------------
-            # *** Plot group results
+            # *** Plot results
+
+            print('--Plot results')
 
             # Output path for plot:
             strPthPltOtTmp = (strPthPltOt.format(lstRoi[idxRoi],

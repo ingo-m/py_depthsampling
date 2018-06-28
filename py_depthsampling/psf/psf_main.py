@@ -53,7 +53,7 @@ lstSubIds = ['20171023',  # '20171109',
 # average over all depth levels.
 lstDpth = [None] #, [0, 1, 2], [4, 5, 6], [8, 9, 10]]
 # Depth level condition labels (output file will contain this label):
-lstDpthLbl = ['allGM'] # , 'deepGM', 'midGM', 'superficialGM']
+lstDpthLbl = ['allGM'] #, 'deepGM', 'midGM', 'superficialGM']
 
 # ROI ('v1' or 'v2'):
 lstRoi = ['v1', 'v2', 'v3']
@@ -76,7 +76,8 @@ varDpi = 80.0
 #           'Pd_min_Cd_Ps_trn',
 #           'Pd_min_Ps_trn', 'Pd_min_Cd_trn', 'Cd_min_Ps_trn']
 # lstCon = ['polar_angle', 'x_pos', 'y_pos', 'SD', 'R2']
-lstCon = ['Pd_sst'] #, 'Cd_sst', 'Ps_sst']
+# lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
+lstCon = ['Pd_sst']
 
 # Path of vtk mesh with data to project into visual space (e.g. parameter
 # estimates; subject ID, hemisphere, and contion level left open).
@@ -148,7 +149,7 @@ strFit = 'linear'
 
 # Restrict model fitting to this range (to use same range as `tplRngEcc`, set
 # `tplFitRng = None`).
-tplFitRng = (2.75, 3.75)
+tplFitRng = (2.5, 3.75)
 # -----------------------------------------------------------------------------
 
 
@@ -457,7 +458,15 @@ for idxDpth in range(len(lstDpth)):  #noqa
             # * Fit Gaussian
 
             # Fit any function?
-            if not (strFit is None):
+            if strFit is None:
+
+                # If no function is fitted, don't plot legend:
+                lgcLgnd = False
+                lstConLbl = None
+
+            else:
+
+                lgcLgnd = True
 
                 # If no range for function fitting is provided, set to same
                 # range as used for plot:
@@ -469,6 +478,9 @@ for idxDpth in range(len(lstDpth)):  #noqa
                 varIdxFitMin = (np.abs(vecCorEcc - tplFitRng[0])).argmin()
                 varIdxFitMax = (np.abs(vecCorEcc - tplFitRng[1])).argmin()
 
+                # Predicted values (NaNs in same shape as visual space):
+                vecMdl = np.full(vecCorEcc.shape, np.nan)
+
                 if strFit == 'gaussian':
 
                     # Fit Gaussian function to relevant section of visual
@@ -477,9 +489,15 @@ for idxDpth in range(len(lstDpth)):  #noqa
                         fitGauss(vecCorEcc[varIdxFitMin:varIdxFitMax],
                                  vecVslSpc[varIdxFitMin:varIdxFitMax])
 
-                    # Predicted values:
-                    vecMdl = funcGauss(vecCorEcc[varIdxMin:varIdxMax], varMu,
-                                       varSd, varInt)
+                    # Only produce predicted values for specified range:
+                    vecMdl[varIdxFitMin:varIdxFitMax] = \
+                        funcGauss(vecCorEcc[varIdxFitMin:varIdxFitMax], varMu,
+                                  varSd, varInt)
+
+                    # Use list of condition labels to show model parameters.
+                    lstConLbl = ['Empirical',
+                                 ('Model, SD = ' + str(np.around(varSd,
+                                  decimals=2)))]
 
                 elif strFit == 'linear':
 
@@ -488,9 +506,19 @@ for idxDpth in range(len(lstDpth)):  #noqa
                         fitLin(vecCorEcc[varIdxFitMin:varIdxFitMax],
                                vecVslSpc[varIdxFitMin:varIdxFitMax])
 
-                    # Predicted values:
-                    vecMdl = funcLin(vecCorEcc[varIdxMin:varIdxMax], varSlp,
-                                     varInt)
+                    # Only produce predicted values for specified range:
+                    vecMdl[varIdxFitMin:varIdxFitMax] = \
+                        funcLin(vecCorEcc[varIdxFitMin:varIdxFitMax], varSlp,
+                                varInt)
+
+                    # Use list of condition labels to show model parameters.
+                    lstConLbl = ['Empirical',
+                                 ('Model, slope = ' + str(np.around(varSlp,
+                                  decimals=2)))]
+
+                # Bring predicted values into shape of visual space to be
+                # plotted:
+                vecMdl = vecMdl[varIdxMin:varIdxMax]
 
             # Section of visual space to be plotted:
             vecVslSpcTmp = np.array(vecVslSpc[varIdxMin:varIdxMax], ndmin=2)
@@ -540,11 +568,11 @@ for idxDpth in range(len(lstDpth)):  #noqa
                     varYmax=1.0,
                     vecX=vecCorEccTmp,
                     aryError=vecNormTmp,
-                    lstConLbl=None,
+                    lgcLgnd=lgcLgnd,
+                    lstConLbl=lstConLbl,
                     strXlabel='Eccentricity',
                     strYlabel='Signal change [%]',
                     strTitle=strTmpTtl,
-                    lgcLgnd=False,
                     varNumLblY=5,
                     varPadY=(0.0, 0.0),
                     lstVrt=[3.75])

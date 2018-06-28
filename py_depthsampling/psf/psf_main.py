@@ -33,7 +33,6 @@ from py_depthsampling.plot.plt_psf import plt_psf
 # open):
 strPthNpy = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf/{}_{}_{}.npz'  #noqa
 
-
 # List of subject identifiers:
 lstSubIds = ['20171023',  # '20171109',
              '20171204_01',
@@ -48,11 +47,9 @@ lstSubIds = ['20171023',  # '20171109',
 # three depth levels is calculated, and on a second iteration the average over
 # the subsequent three depth levels is calculated. If 1lstDpth= [[None]]1,
 # average over all depth levels.
-lstDpth = [None, [0, 1, 2], [4, 5, 6], [8, 9, 10],
-           0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+lstDpth = [None, [0, 1, 2], [4, 5, 6], [8, 9, 10]]
 # Depth level condition labels (output file will contain this label):
-lstDpthLbl = ['allGM', 'deepGM', 'midGM', 'superficialGM',
-              '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+lstDpthLbl = ['allGM', 'deepGM', 'midGM', 'superficialGM']
 
 # ROI ('v1' or 'v2'):
 lstRoi = ['v1', 'v2', 'v3']
@@ -68,14 +65,14 @@ strFlTp = '.png'
 varDpi = 80.0
 
 # Condition levels (used to complete file names):
-lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst',
-          'Pd_trn', 'Cd_trn', 'Ps_trn',
-          'Pd_min_Ps_sst', 'Pd_min_Cd_sst', 'Cd_min_Ps_sst',
-          'Pd_min_Cd_Ps_sst',
-          'Pd_min_Cd_Ps_trn',
-          'Pd_min_Ps_trn', 'Pd_min_Cd_trn', 'Cd_min_Ps_trn']
+# lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst',
+#           'Pd_trn', 'Cd_trn', 'Ps_trn',
+#           'Pd_min_Ps_sst', 'Pd_min_Cd_sst', 'Cd_min_Ps_sst',
+#           'Pd_min_Cd_Ps_sst',
+#           'Pd_min_Cd_Ps_trn',
+#           'Pd_min_Ps_trn', 'Pd_min_Cd_trn', 'Cd_min_Ps_trn']
 # lstCon = ['polar_angle', 'x_pos', 'y_pos', 'SD', 'R2']
-# lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
+lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
 
 # Path of vtk mesh with data to project into visual space (e.g. parameter
 # estimates; subject ID, hemisphere, and contion level left open).
@@ -135,14 +132,14 @@ varThrR2 = 0.15
 varNumEcc = 300
 
 # Plot parameters over this eccentricity range:
-tplRngEcc = (0.0, 5.0)
+tplRngEcc = (2.0, 5.0)
 # -----------------------------------------------------------------------------
 
 
 # -----------------------------------------------------------------------------
 # *** Parent loop
 
-print('-Project parametric map into visual space')
+print('-Plot parameter estimates by eccentricity')
 
 # Number of subjects:
 varNumSub = len(lstSubIds)
@@ -159,6 +156,8 @@ for idxDpth in range(len(lstDpth)):  #noqa
 
             if os.path.isfile(strPthNpyTmp):
 
+                print('--Load existing visual field projection')
+
                 # Load existing projection:
                 objNpz = np.load(strPthNpyTmp)
                 vecVslSpc = objNpz['vecVslSpc']
@@ -169,7 +168,7 @@ for idxDpth in range(len(lstDpth)):  #noqa
                 # -------------------------------------------------------------
                 # *** Load data
 
-                print('--Load data')
+                print('--Load data from vtk meshes')
 
                 # Number of processes to run in parallel:
                 varPar = varNumSub
@@ -405,6 +404,8 @@ for idxDpth in range(len(lstDpth)):  #noqa
             # -----------------------------------------------------------------
             # *** Plot results
 
+            print('--Plot results')
+
             # Maximum eccentricity in visual field:
             varEccMax = np.sqrt(
                                 np.add(
@@ -459,6 +460,8 @@ for idxDpth in range(len(lstDpth)):  #noqa
             # Create plot:
             plt_psf(vecVslSpcTmp,
                     strPthPltOtTmp,
+                    varYmin=-3.0,
+                    varYmax=1.0,
                     vecX=vecCorEccTmp,
                     aryError=vecNormTmp,
                     lstConLbl=None,
@@ -468,5 +471,5 @@ for idxDpth in range(len(lstDpth)):  #noqa
                     lgcLgnd=False,
                     varNumLblY=5,
                     varPadY=(0.0, 0.0),
-                    lstVrt=[(3.75 + tplRngEcc[0])])
+                    lstVrt=[3.75])
 # -----------------------------------------------------------------------------

@@ -24,6 +24,8 @@ import multiprocessing as mp
 from py_depthsampling.project.load_par import load_par
 from py_depthsampling.psf.project_ecc_par import project_ecc_par
 from py_depthsampling.plot.plt_psf import plt_psf
+from py_depthsampling.psf.fit_model import fitGauss
+from py_depthsampling.psf.fit_model import funcGauss
 
 
 # -----------------------------------------------------------------------------
@@ -47,9 +49,9 @@ lstSubIds = ['20171023',  # '20171109',
 # three depth levels is calculated, and on a second iteration the average over
 # the subsequent three depth levels is calculated. If 1lstDpth= [[None]]1,
 # average over all depth levels.
-lstDpth = [None, [0, 1, 2], [4, 5, 6], [8, 9, 10]]
+lstDpth = [None] #, [0, 1, 2], [4, 5, 6], [8, 9, 10]]
 # Depth level condition labels (output file will contain this label):
-lstDpthLbl = ['allGM', 'deepGM', 'midGM', 'superficialGM']
+lstDpthLbl = ['allGM'] # , 'deepGM', 'midGM', 'superficialGM']
 
 # ROI ('v1' or 'v2'):
 lstRoi = ['v1', 'v2', 'v3']
@@ -72,7 +74,7 @@ varDpi = 80.0
 #           'Pd_min_Cd_Ps_trn',
 #           'Pd_min_Ps_trn', 'Pd_min_Cd_trn', 'Cd_min_Ps_trn']
 # lstCon = ['polar_angle', 'x_pos', 'y_pos', 'SD', 'R2']
-lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
+lstCon = ['Pd_sst'] #, 'Cd_sst', 'Ps_sst']
 
 # Path of vtk mesh with data to project into visual space (e.g. parameter
 # estimates; subject ID, hemisphere, and contion level left open).
@@ -132,7 +134,19 @@ varThrR2 = 0.15
 varNumEcc = 300
 
 # Plot parameters over this eccentricity range:
-tplRngEcc = (2.0, 5.0)
+tplRngEcc = (2.0, 5.5)
+
+# Normalise data for plots? (In order to make compairson of width/shape of
+# profiles more easy, plots can be scaled to a common range between zero and
+# one.)
+lgcNorm = False
+
+# Fit Gaussian?
+lgcFit = True
+
+# Restrict model fitting to this range (to use same range as `tplRngEcc`, set
+# `tplFitRng = None`).
+tplFitRng = (2.75, 3.75)
 # -----------------------------------------------------------------------------
 
 
@@ -426,6 +440,39 @@ for idxDpth in range(len(lstDpth)):  #noqa
             varIdxMin = (np.abs(vecCorEcc - tplRngEcc[0])).argmin()
             varIdxMax = (np.abs(vecCorEcc - tplRngEcc[1])).argmin()
 
+            # -----------------------------------------------------------------
+            # * Normalise
+
+            # Normalise plots (to common range on y-axis, from zero to one):
+            if lgcNorm:
+
+                varMin = np.min(vecVslSpc[varIdxMin:varIdxMax])
+                vecVslSpc = np.subtract(vecVslSpc, varMin)
+                varMax = np.max(vecVslSpc[varIdxMin:varIdxMax])
+                vecVslSpc = np.divide(vecVslSpc, varMax)
+
+            # -----------------------------------------------------------------
+            # * Fit Gaussian
+
+            if lgcFit:
+
+                if tplFitRng is None:
+                    tplFitRng = tplRngEcc
+
+                # Array indices of minimum & maximum values (with respect to
+                # x-axis, i.e. eccentricity):
+                varIdxFitMin = (np.abs(vecCorEcc - tplFitRng[0])).argmin()
+                varIdxFitMax = (np.abs(vecCorEcc - tplFitRng[1])).argmin()
+
+                # Fit Gaussian function to relevant section of visual space:
+                varMu, varSd, varInt = \
+                    fitGauss(vecCorEcc[varIdxFitMin:varIdxFitMax],
+                             vecVslSpc[varIdxFitMin:varIdxFitMax])
+
+                # Predicted values:
+                vecGauss = funcGauss(vecCorEcc[varIdxMin:varIdxMax], varMu,
+                                     varSd, varInt)
+
             # Section of visual space to be plotted:
             vecVslSpcTmp = np.array(vecVslSpc[varIdxMin:varIdxMax], ndmin=2)
 
@@ -439,6 +486,16 @@ for idxDpth in range(len(lstDpth)):  #noqa
             vecNormTmp = np.subtract(1.0, vecNormTmp)
             # Array shape:
             vecNormTmp = np.array(vecNormTmp, ndmin=2)
+
+            if lgcFit:
+
+                # Add predicted values to array to be plotted:
+                vecVslSpcTmp = np.stack((vecGauss,
+                                         vecVslSpcTmp.flatten()))
+
+                # Add dummy vector to normalisation vector:
+                vecNormTmp = np.stack((np.zeros((vecNormTmp.shape[1])),
+                                       vecNormTmp.flatten()))
 
             # x-axis values for section of visual space to be plotted:
             vecCorEccTmp = np.around(vecCorEcc[varIdxMin:varIdxMax],

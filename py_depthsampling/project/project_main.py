@@ -158,6 +158,8 @@ for idxDpth in range(len(lstDpth)):  #noqa
 
             if os.path.isfile(strPthNpyTmp):
 
+                print('--Load existing visual field projection')
+
                 # Load existing projection:
                 aryVslSpc = np.load(strPthNpyTmp)
 
@@ -166,7 +168,7 @@ for idxDpth in range(len(lstDpth)):  #noqa
                 # -------------------------------------------------------------
                 # *** Load data
 
-                print('--Load data')
+                print('--Load data from vtk meshes')
 
                 # Number of processes to run in parallel:
                 varPar = varNumSub
@@ -399,7 +401,9 @@ for idxDpth in range(len(lstDpth)):  #noqa
                 np.save(strPthNpyTmp, aryVslSpc)
 
             # -----------------------------------------------------------------
-            # *** Plot group results
+            # *** Plot results
+
+            print('--Plot results')
 
             # Output path for plot:
             strPthPltOtTmp = (strPthPltOt.format(lstRoi[idxRoi],

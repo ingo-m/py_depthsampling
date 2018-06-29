@@ -20,6 +20,8 @@
 
 import os
 import numpy as np
+import pandas as pd
+import seaborn as sns
 import multiprocessing as mp
 from py_depthsampling.project.load_par import load_par
 from py_depthsampling.psf.project_ecc_par import project_ecc_par
@@ -54,12 +56,13 @@ lstSubIds = ['20171023',  # '20171109',
 lstDpth = [None, [0, 1, 2], [4, 5, 6], [8, 9, 10],
            [0, 0], [1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7],
            [8, 8], [9, 9], [10, 10]]
-lstDpth = [None]
+lstDpth = [[0, 0], [1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7],
+           [8, 8], [9, 9], [10, 10]]
 
 # Depth level condition labels (output file will contain this label):
 lstDpthLbl = ['allGM', 'deepGM', 'midGM', 'superficialGM',
               '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
-lstDpthLbl = ['allGM']
+lstDpthLbl = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
 
 # ROI ('v1' or 'v2'):
 lstRoi = ['v1', 'v2', 'v3']
@@ -82,7 +85,7 @@ varDpi = 80.0
 #           'Pd_min_Cd_Ps_trn',
 #           'Pd_min_Ps_trn', 'Pd_min_Cd_trn', 'Cd_min_Ps_trn']
 # lstCon = ['polar_angle', 'x_pos', 'y_pos', 'SD', 'R2']
-lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst', 'Pd_trn', 'Cd_trn', 'Ps_trn']
+lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
 
 # Path of vtk mesh with data to project into visual space (e.g. parameter
 # estimates; subject ID, hemisphere, and contion level left open).
@@ -155,6 +158,11 @@ strFit = 'linear'
 # Restrict model fitting to this range (to use same range as `tplRngEcc`, set
 # `tplFitRng = None`).
 tplFitRng = (2.2, 3.75)
+
+# Save result from model fitting (i.e. slope or width of function) to disk
+# (pandas data frame saved as JSON for import in R). If `None`, data frame is
+# not created.
+strPthJson = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf/dataframe.json'  #noqa
 # -----------------------------------------------------------------------------
 
 
@@ -163,8 +171,27 @@ tplFitRng = (2.2, 3.75)
 
 print('-Plot parameter estimates by eccentricity')
 
-# Number of subjects:
+# Number of subjects/ROIs/conditions:
 varNumSub = len(lstSubIds)
+varNumRoi = len(lstRoi)
+varNumCon = len(lstCon)
+
+# Create dataframe & save JSON?
+if (not (strPthJson is None)) and (not (strFit is None)):
+
+    print('--Creatdataframe for model width/slope.')
+
+    # Total number of samples for dataframe:
+    varNumSmpl = (varNumDpth * varNumRoi * varNumCon)
+
+    # Feature list (column names for dataframe):
+    lstFtr = ['ROI', 'Condition', 'Depth', 'Slope']
+
+    # Dataframe:
+    objDf = pd.DataFrame(0.0, index=np.arange(varNumSmpl), columns=lstFtr)
+
+    # Coutner:
+    idxSmpl = 0
 
 # Loop through depth levels, ROIs, and conditions:
 for idxDpth in range(len(lstDpth)):  #noqa
@@ -542,6 +569,29 @@ for idxDpth in range(len(lstDpth)):  #noqa
                 # plotted:
                 vecMdl = vecMdl[varIdxMin:varIdxMax]
 
+                # We only save slopes for single depth levels (i.e. not for
+                # 'allGM', 'deepGM', etc.). List with labels used for single
+                # depth levels for check:
+                lstSnglDpthLbl = [str(x) for x in range(varNumDpth)]
+
+                # Create dataframe & save JSON?
+                lgcTmp = ((not (strPthJson is None))
+                          and (lstDpthLbl[idxDpth] in lstSnglDpthLbl))
+                if lgcTmp:
+
+                    # Features to dataframe:
+                    objDf.at[idxSmpl, 'ROI'] = idxRoi
+                    objDf.at[idxSmpl, 'Condition'] = idxCon
+                    objDf.at[idxSmpl, 'Depth'] = lstDpth[idxDpth][0]
+
+                    # Width or slope to dataframe:
+                    if strFit == 'gaussian':
+                        objDf.at[idxSmpl, 'Slope'] = varSd
+                    elif strFit == 'linear':
+                        objDf.at[idxSmpl, 'Slope'] = varSlp
+
+                    idxSmpl += 1
+
             # Section of visual space to be plotted:
             vecVslSpcTmp = np.array(vecVslSpc[varIdxMin:varIdxMax], ndmin=2)
 
@@ -597,4 +647,34 @@ for idxDpth in range(len(lstDpth)):  #noqa
                     varNumLblY=5,
                     varPadY=(0.1, 0.1),
                     lstVrt=[3.75])
+
+# Create dataframe & save JSON?
+if (not (strPthJson is None)) and (not (strFit is None)):
+
+    print('--Saving dataframe to json.')
+
+    # Save dataframe to json:
+    objDf.to_json(strPthJson)
+
+    # Output path & prefix for plots (ROI, condition, depth level label left
+    # open):
+    strPthTmp = (strPthPltOt.format(strFit, 'model', 'fit_by_ROI') + strFlTp)
+
+    # Draw nested barplot:
+    fgr01 = sns.factorplot(x="ROI", y="Slope", hue="Condition", data=objDf, size=6,
+                           kind="bar", palette="muted")
+
+    # Save figure:
+    fgr01.savefig(strPthTmp)
+
+    # Output path & prefix for plots (ROI, condition, depth level label left
+    # open):
+    strPthTmp = (strPthPltOt.format(strFit, 'model', 'fit_by_Depth') + strFlTp)
+
+    # Draw nested barplot:
+    fgr02 = sns.factorplot(x="ROI", y="Slope", hue="Depth", data=objDf, size=6,
+                           kind="bar", palette="muted")
+
+    # Save figure:
+    fgr02.savefig(strPthTmp)
 # -----------------------------------------------------------------------------

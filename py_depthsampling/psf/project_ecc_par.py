@@ -77,6 +77,10 @@ def project_ecc_par(idxPrc, vecData, vecX, vecY, vecSd, vecR2, varThrR2,
     lgcInc = np.multiply(np.greater(vecSd, 0.0),
                          np.greater(vecR2, varThrR2))
 
+    # Only include left visual field:
+    lgcInc = np.multiply(lgcInc,
+                         np.less_equal(vecX, 0.0))
+
     # Number of vertices:
     varNumVrtc = vecData.shape[0]
 

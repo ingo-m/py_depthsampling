@@ -54,10 +54,12 @@ lstSubIds = ['20171023',  # '20171109',
 lstDpth = [None, [0, 1, 2], [4, 5, 6], [8, 9, 10],
            [0, 0], [1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7],
            [8, 8], [9, 9], [10, 10]]
+lstDpth = [None]
 
 # Depth level condition labels (output file will contain this label):
 lstDpthLbl = ['allGM', 'deepGM', 'midGM', 'superficialGM',
               '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+lstDpthLbl = ['allGM']
 
 # ROI ('v1' or 'v2'):
 lstRoi = ['v1', 'v2', 'v3']
@@ -80,7 +82,7 @@ varDpi = 80.0
 #           'Pd_min_Cd_Ps_trn',
 #           'Pd_min_Ps_trn', 'Pd_min_Cd_trn', 'Cd_min_Ps_trn']
 # lstCon = ['polar_angle', 'x_pos', 'y_pos', 'SD', 'R2']
-lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
+lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst', 'Pd_trn', 'Cd_trn', 'Ps_trn']
 
 # Path of vtk mesh with data to project into visual space (e.g. parameter
 # estimates; subject ID, hemisphere, and contion level left open).
@@ -152,7 +154,7 @@ strFit = 'linear'
 
 # Restrict model fitting to this range (to use same range as `tplRngEcc`, set
 # `tplFitRng = None`).
-tplFitRng = (2.5, 3.75)
+tplFitRng = (2.2, 3.75)
 # -----------------------------------------------------------------------------
 
 
@@ -452,10 +454,27 @@ for idxDpth in range(len(lstDpth)):  #noqa
             # Normalise plots (to common range on y-axis, from zero to one):
             if lgcNorm:
 
-                varMin = np.min(vecVslSpc[varIdxMin:varIdxMax])
-                vecVslSpc = np.subtract(vecVslSpc, varMin)
-                varMax = np.max(vecVslSpc[varIdxMin:varIdxMax])
-                vecVslSpc = np.divide(vecVslSpc, varMax)
+                # If function is fitted, use range over which function is
+                # fitted for normalisation:
+                if not (strFit is None):
+
+                    # Array indices of minimum & maximum values (with respect
+                    # to x-axis, i.e. eccentricity):
+                    varIdxFitMin = (np.abs(vecCorEcc - tplFitRng[0])).argmin()
+                    varIdxFitMax = (np.abs(vecCorEcc - tplFitRng[1])).argmin()
+
+                    varMin = np.min(vecVslSpc[varIdxFitMin:varIdxFitMax])
+                    vecVslSpc = np.subtract(vecVslSpc, varMin)
+                    varMax = np.max(vecVslSpc[varIdxFitMin:varIdxFitMax])
+                    vecVslSpc = np.divide(vecVslSpc, varMax)
+
+                # Otherwise, use plot x-range for normalisation.
+                else:
+
+                    varMin = np.min(vecVslSpc[varIdxMin:varIdxMax])
+                    vecVslSpc = np.subtract(vecVslSpc, varMin)
+                    varMax = np.max(vecVslSpc[varIdxMin:varIdxMax])
+                    vecVslSpc = np.divide(vecVslSpc, varMax)
 
             # -----------------------------------------------------------------
             # * Fit Gaussian
@@ -498,9 +517,9 @@ for idxDpth in range(len(lstDpth)):  #noqa
                                   varSd, varInt)
 
                     # Use list of condition labels to show model parameters.
-                    lstConLbl = ['Empirical',
-                                 ('Model, SD = ' + str(np.around(varSd,
-                                  decimals=2)))]
+                    lstConLbl = [('Model, SD = ' + str(np.around(varSd,
+                                  decimals=2))),
+                                 'Empirical']
 
                 elif strFit == 'linear':
 
@@ -515,9 +534,9 @@ for idxDpth in range(len(lstDpth)):  #noqa
                                 varInt)
 
                     # Use list of condition labels to show model parameters.
-                    lstConLbl = ['Empirical',
-                                 ('Model, slope = ' + str(np.around(varSlp,
-                                  decimals=2)))]
+                    lstConLbl = [('Model, slope = ' + str(np.around(varSlp,
+                                  decimals=2))),
+                                 'Empirical']
 
                 # Bring predicted values into shape of visual space to be
                 # plotted:
@@ -566,7 +585,7 @@ for idxDpth in range(len(lstDpth)):  #noqa
             # Create plot:
             plt_psf(vecVslSpcTmp,
                     strPthPltOtTmp,
-                    varYmin=-3.0,
+                    varYmin=-5.0,
                     varYmax=1.0,
                     vecX=vecCorEccTmp,
                     aryError=vecNormTmp,
@@ -576,6 +595,6 @@ for idxDpth in range(len(lstDpth)):  #noqa
                     strYlabel='Signal change [%]',
                     strTitle=strTmpTtl,
                     varNumLblY=5,
-                    varPadY=(0.0, 0.0),
+                    varPadY=(0.1, 0.1),
                     lstVrt=[3.75])
 # -----------------------------------------------------------------------------

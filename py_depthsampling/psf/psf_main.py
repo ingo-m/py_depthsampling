@@ -145,7 +145,7 @@ varThrR2 = 0.15
 varNumEcc = 1000
 
 # Plot parameters over this eccentricity range:
-tplRngEcc = (2.0, 5.5)
+tplRngEcc = (0.0, 6.0) #(2.0, 5.5)
 
 # Normalise data for plots? (In order to make compairson of width/shape of
 # profiles more easy, plots can be scaled to a common range between zero and
@@ -577,6 +577,7 @@ for idxDpth in range(len(lstDpth)):  #noqa
                 # Create dataframe & save JSON?
                 lgcTmp = ((not (strPthJson is None))
                           and (lstDpthLbl[idxDpth] in lstSnglDpthLbl))
+
                 if lgcTmp:
 
                     # Features to dataframe:

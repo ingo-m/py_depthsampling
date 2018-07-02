@@ -37,7 +37,7 @@ from py_depthsampling.psf.fit_model import funcLin
 
 # Load/save existing projection from/to (ROI, condition, depth level label left
 # open):
-strPthNpy = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf/{}_{}_{}.npz'  #noqa
+strPthNpy = '/Users/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf/{}_{}_{}.npz'  #noqa
 
 # List of subject identifiers:
 lstSubIds = ['20171023',  # '20171109',
@@ -68,7 +68,7 @@ lstDpthLbl = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
 lstRoi = ['v1', 'v2', 'v3']
 
 # Output path & prefix for plots (ROI, condition, depth level label left open):
-strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/psf_pe/{}_{}_{}'  #noqa
+strPthPltOt = '/Users/john/Dropbox/PacMan_Plots/project/psf_pe/{}_{}_{}'  #noqa
 
 # File type suffix for plot:
 # strFlTp = '.svg'
@@ -145,7 +145,7 @@ varThrR2 = 0.15
 varNumEcc = 1000
 
 # Plot parameters over this eccentricity range:
-tplRngEcc = (2.0, 5.5)
+tplRngEcc = (0.0, 6.0) #(2.0, 5.5)
 
 # Normalise data for plots? (In order to make compairson of width/shape of
 # profiles more easy, plots can be scaled to a common range between zero and
@@ -162,7 +162,7 @@ tplFitRng = (2.2, 3.75)
 # Save result from model fitting (i.e. slope or width of function) to disk
 # (pandas data frame saved as JSON for import in R). If `None`, data frame is
 # not created.
-strPthJson = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf/dataframe.json'  #noqa
+strPthJson = '/Users/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf/dataframe.json'  #noqa
 # -----------------------------------------------------------------------------
 
 
@@ -577,6 +577,7 @@ for idxDpth in range(len(lstDpth)):  #noqa
                 # Create dataframe & save JSON?
                 lgcTmp = ((not (strPthJson is None))
                           and (lstDpthLbl[idxDpth] in lstSnglDpthLbl))
+
                 if lgcTmp:
 
                     # Features to dataframe:
@@ -660,9 +661,21 @@ if (not (strPthJson is None)) and (not (strFit is None)):
     # open):
     strPthTmp = (strPthPltOt.format(strFit, 'model', 'fit_by_ROI') + strFlTp)
 
+    # Create seaborn colour palette:
+    colors = ["amber", "greyish", "faded green"]
+    objClr = sns.xkcd_palette(colors)
+
     # Draw nested barplot:
-    fgr01 = sns.factorplot(x="ROI", y="Slope", hue="Condition", data=objDf, size=6,
-                           kind="bar", palette="muted")
+    fgr01 = sns.factorplot(x="ROI", y="Slope", hue="Condition", data=objDf,
+                           size=6, kind="bar", palette=objClr)
+
+    # Set x-axis labels to upper case ROI labels:
+    lstRoiUp = [x.upper() for x in lstRoi]
+    fgr01.set_xticklabels(lstRoiUp)
+
+    # Set hue labels (i.e. condition labels in legend):
+    for objTxt, strLbl in zip(fgr01._legend.texts, lstCon):
+        objTxt.set_text(strLbl)
 
     # Save figure:
     fgr01.savefig(strPthTmp)
@@ -671,9 +684,15 @@ if (not (strPthJson is None)) and (not (strFit is None)):
     # open):
     strPthTmp = (strPthPltOt.format(strFit, 'model', 'fit_by_Depth') + strFlTp)
 
+    # Create seaborn colour palette:
+    objClr = sns.light_palette((210, 90, 60), input="husl",
+                               n_colors=varNumDpth)
+
     # Draw nested barplot:
     fgr02 = sns.factorplot(x="ROI", y="Slope", hue="Depth", data=objDf, size=6,
-                           kind="bar", palette="muted")
+                           kind="bar", legend=True, palette=objClr)
+
+    fgr02.set_xticklabels(lstRoiUp)
 
     # Save figure:
     fgr02.savefig(strPthTmp)

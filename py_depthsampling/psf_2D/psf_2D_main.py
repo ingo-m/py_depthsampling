@@ -32,7 +32,7 @@ and the reference visual field projection.
 
 import numpy as np
 import pandas as pd
-import seaborn as sns
+# import seaborn as sns
 from scipy.optimize import minimize
 from py_depthsampling.psf_2D.utilities import psf
 from py_depthsampling.psf_2D.utilities import psf_diff
@@ -46,7 +46,7 @@ strPthNpy = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project/
 
 # Depth level labels (to complete input file names). First depth level in list
 # is used as reference for estimation of point spread function.
-lstDpthLbl = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+lstDpthLbl = [str(x) for x in range(11)]
 
 # ROI ('v1','v2', or 'v3'):
 lstRoi = ['v1', 'v2', 'v3']
@@ -64,22 +64,56 @@ varDpi = 80.0
 # Condition levels (used to complete file names):
 lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
 
-# Extent of visual space from centre of the screen in negative x-direction
-# (i.e. from the fixation point to the left end of the screen) in degrees of
-# visual angle.
-varExtXmin = -5.19
-# Extent of visual space from centre of the screen in positive x-direction
-# (i.e. from the fixation point to the right end of the screen) in degrees of
-# visual angle.
-varExtXmax = 5.19
-# Extent of visual space from centre of the screen in negative y-direction
-# (i.e. from the fixation point to the lower end of the screen) in degrees of
-# visual angle.
-varExtYmin = -5.19
-# Extent of visual space from centre of the screen in positive y-direction
-# (i.e. from the fixation point to the upper end of the screen) in degrees of
-# visual angle.
-varExtYmax = 5.19
+# Initial guess for PSF parameters (width and scaling factor; SD in degree of
+# visual angle):
+varInitSd = 5.0
+varInitFct = 2.5
+
+# Limits for PSF parameters [SD in degrees of visual angle]:
+tplBndSd = (0.0, 10.0)
+tplBndFct = (0.0, 10.0)
+
+# Extent of visual space from centre of the screen (assumed to be the same in
+# positive/negative x/y direction:
+varExtmax = 2.0 * 5.19
+# -----------------------------------------------------------------------------
+
+
+# -----------------------------------------------------------------------------
+# *** Preparations
+
+# Get dimension of visual space model (assumed to be the same for x and y
+# directions, and for all ROIs/conditions/depth levels):
+aryTmp = np.load(strPthNpy.format(lstRoi[0], lstCon[0], lstDpthLbl[0]))
+varSzeVsm = aryTmp.shape[0]
+
+# Scaling factor from degrees of visual angle to array dimensions:
+varScl = (float(varSzeVsm) / float(varExtmax))
+
+# Scale Gaussian SD from degree of visual angle to array dimensions:
+varInitSd = (varInitSd * varScl)
+tplBndSd = ((tplBndSd[0] * varScl), (tplBndSd[1] * varScl))
+
+# Bring initial values and bounds into shape expected by scipy optimize:
+vecInit = np.array([varInitSd, varInitFct])
+lstBnds = [tplBndSd, tplBndFct]
+
+# Number of ROIs/conditions/depths:
+varNumDpth = len(lstDpthLbl)
+varNumRoi = len(lstRoi)
+varNumCon = len(lstCon)
+
+# Total number of samples for dataframe:
+varNumSmpl = (varNumRoi * varNumCon * varNumDpth * 2)
+
+# Feature list (column names for dataframe):
+lstFtr = ['ROI', 'Condition', 'Depth', 'Width', 'Scaling']
+
+# Dataframe for PSF model parameters:
+objDf = pd.DataFrame(0.0, index=np.arange(varNumSmpl), columns=lstFtr)
+
+# Coutner for dataframe samples:
+idxSmpl = 0
 # -----------------------------------------------------------------------------
 
 
@@ -87,11 +121,6 @@ varExtYmax = 5.19
 # *** Parent loop
 
 print('-Estimate cortical depth point spread function')
-
-# Number of ROIs/conditions/depths:
-varNumDpth = len(lstDpthLbl)
-varNumRoi = len(lstRoi)
-varNumCon = len(lstCon)
 
 # Loop through ROIs, conditions, depth levels:
 for idxRoi in range(varNumRoi):
@@ -119,63 +148,44 @@ for idxRoi in range(varNumRoi):
                                                 lstDpthLbl[idxDpth])
 
                 # Load visual field projection:
-                aryVfp = np.load(strPthNpyTmp)
+                aryTrgt = np.load(strPthNpyTmp)
 
+                # Fit point spread function:
+                dicOptm = minimize(psf_diff,
+                                   vecInit,
+                                   args=(aryDeep, aryTrgt),
+                                   bounds=lstBnds)
 
+                # Features to dataframe:
+                objDf.at[idxSmpl, 'ROI'] = idxRoi
+                objDf.at[idxSmpl, 'Condition'] = idxCon
+                objDf.at[idxSmpl, 'Depth'] = idxDpth
+                objDf.at[idxSmpl, 'Width'] = dicOptm.x[0]
+                objDf.at[idxSmpl, 'Scaling'] = dicOptm.x[1]
 
+                idxSmpl += 1
 
+                # aryFit = psf(aryDeep, dicOptm.x[0], dicOptm.x[1])
 
+print(objDf)
 
-
-
-strTmp01 = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project/v1_Pd_sst_deepGM.npy'
-strTmp02 = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project/v1_Pd_sst_superficialGM.npy'
-
-
-ary01 = np.load(strTmp01)
-ary02 = np.load(strTmp02)
-
-
-
-
-
-
-
-varNum = 100
-
-vecSd = np.linspace(0.0, 50.0, num=varNum)
-vecFct = np.linspace(0.0, 5.0, num=varNum)
-
-aryRes = np.zeros((varNum, varNum))
-
-for idxSd in range(varNum):
-    print(idxSd)
-    for idxFct in range(varNum):
-        aryRes[idxSd, idxFct] = psf_diff_02(vecSd[idxSd],
-                                            vecFct[idxFct],
-                                            ary01,
-                                            ary02)
-
-# aryRatio = np.divide(aryResSum, aryRes)
-# aryResSum = np.copy(aryRes)
-
-
-
-tplIdxMin = np.unravel_index(aryRes.argmin(), aryRes.shape)
-varFitSd = vecSd[tplIdxMin[0]]
-varFitFct = vecFct[tplIdxMin[1]]
-
-
-
-varInitSd = 25.0
-varInitFct = 2.5
-vecInit = np.array([varInitSd, varInitFct])
-# Sequence of (min, max) pairs:
-lstBnds = [(0.0, 50.0), (0.0, 5.0)]
-
-dicOptm = minimize(psf_diff_01, vecInit, args=(ary01, ary02), bounds=lstBnds)
-
-print(dicOptm.x[0])
-print(dicOptm.x[1])
-
-aryFit01 = psf(ary01, dicOptm.x[0], dicOptm.x[1])
+# # Alternative grid search implementation:
+#
+# varNum = 100
+#
+# vecSd = np.linspace(0.0, 50.0, num=varNum)
+# vecFct = np.linspace(0.0, 5.0, num=varNum)
+#
+# aryRes = np.zeros((varNum, varNum))
+#
+# for idxSd in range(varNum):
+#     print(idxSd)
+#     for idxFct in range(varNum):
+#         aryRes[idxSd, idxFct] = psf_diff_02(vecSd[idxSd],
+#                                             vecFct[idxFct],
+#                                             ary01,
+#                                             ary02)
+#
+# tplIdxMin = np.unravel_index(aryRes.argmin(), aryRes.shape)
+# varFitSd = vecSd[tplIdxMin[0]]
+# varFitFct = vecFct[tplIdxMin[1]]

@@ -37,7 +37,7 @@ from py_depthsampling.psf_1D.fit_model import funcLin
 
 # Load/save existing projection from/to (ROI, condition, depth level label left
 # open):
-strPthNpy = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf/{}_{}_{}.npz'  #noqa
+strPthNpy = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf_1D/{}_{}_{}.npz'  #noqa
 
 # List of subject identifiers:
 lstSubIds = ['20171023',  # '20171109',
@@ -68,7 +68,7 @@ lstDpthLbl = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
 lstRoi = ['v1', 'v2', 'v3']
 
 # Output path & prefix for plots (ROI, condition, depth level label left open):
-strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/psf_pe/{}_{}_{}'  #noqa
+strPthPltOt = '/home/john/Dropbox/PacMan_Plots/psf_1D_pe/{}_{}_{}'  #noqa
 
 # File type suffix for plot:
 # strFlTp = '.svg'
@@ -162,7 +162,7 @@ tplFitRng = (2.2, 3.75)
 # Save result from model fitting (i.e. slope or width of function) to disk
 # (pandas data frame saved as csv for import in R). If `None`, data frame is
 # not created.
-strPthCsv = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf/dataframe.csv'  #noqa
+strPthCsv = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf_1D/dataframe.csv'  #noqa
 # -----------------------------------------------------------------------------
 
 

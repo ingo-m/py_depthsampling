@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Project parameter estimates into a visual space representation."""
+"""Project parameter estimates into 1D visual space representation."""
 
 # Part of py_depthsampling library
 # Copyright (C) 2018  Ingo Marquardt

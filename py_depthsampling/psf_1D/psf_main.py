@@ -24,12 +24,12 @@ import pandas as pd
 import seaborn as sns
 import multiprocessing as mp
 from py_depthsampling.project.load_par import load_par
-from py_depthsampling.psf.project_ecc_par import project_ecc_par
+from py_depthsampling.psf_1D.project_ecc_par import project_ecc_par
 from py_depthsampling.plot.plt_psf import plt_psf
-from py_depthsampling.psf.fit_model import fitGauss
-from py_depthsampling.psf.fit_model import fitLin
-from py_depthsampling.psf.fit_model import funcGauss
-from py_depthsampling.psf.fit_model import funcLin
+from py_depthsampling.psf_1D.fit_model import fitGauss
+from py_depthsampling.psf_1D.fit_model import fitLin
+from py_depthsampling.psf_1D.fit_model import funcGauss
+from py_depthsampling.psf_1D.fit_model import funcLin
 
 
 # -----------------------------------------------------------------------------
@@ -153,7 +153,7 @@ tplRngEcc = (0.0, 6.0)  # (2.0, 5.5)
 lgcNorm = False
 
 # Fit function (None, 'gaussian', or 'linear')?
-strFit = 'linear'
+strFit = None
 
 # Restrict model fitting to this range (to use same range as `tplRngEcc`, set
 # `tplFitRng = None`).

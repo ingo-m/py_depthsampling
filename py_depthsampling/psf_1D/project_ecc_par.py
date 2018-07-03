@@ -19,7 +19,7 @@
 
 
 import numpy as np
-from py_depthsampling.psf.utilities import crt_gauss_1D
+from py_depthsampling.psf_1D.utilities import crt_gauss_1D
 
 
 def project_ecc_par(idxPrc, vecData, vecX, vecY, vecSd, vecR2, varThrR2,

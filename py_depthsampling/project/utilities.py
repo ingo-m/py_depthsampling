@@ -147,6 +147,17 @@ def get_data(strData, strPthMneEpi, strPthR2, strPthSd, strPthX, strPthY,
         vecX = np.mean(aryX, axis=1)
         vecY = np.mean(aryY, axis=1)
 
+    elif len(lstDpth) == 1:
+
+        # If there is only one depth level, averaging over depth levels
+        # does not make sense.
+        vecData = aryData.flatten()
+        vecMneEpi = aryMneEpi.flatten()
+        vecR2 = aryR2.flatten()
+        vecSd = arySd.flatten()
+        vecX = aryX.flatten()
+        vecY = aryY.flatten()
+
     else:
 
         # Average over selected depth levels:

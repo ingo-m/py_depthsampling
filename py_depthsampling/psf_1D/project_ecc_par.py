@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Project parameter estimates into a visual space representation."""
+"""Project parameter estimates into 1D visual space representation."""
 
 # Part of py_depthsampling library
 # Copyright (C) 2018  Ingo Marquardt
@@ -19,7 +19,7 @@
 
 
 import numpy as np
-from py_depthsampling.psf.utilities import crt_gauss_1D
+from py_depthsampling.psf_1D.utilities import crt_gauss_1D
 
 
 def project_ecc_par(idxPrc, vecData, vecX, vecY, vecSd, vecR2, varThrR2,
@@ -76,6 +76,10 @@ def project_ecc_par(idxPrc, vecData, vecX, vecY, vecSd, vecR2, varThrR2,
     # threshold:
     lgcInc = np.multiply(np.greater(vecSd, 0.0),
                          np.greater(vecR2, varThrR2))
+
+    # Only include left visual field:
+    lgcInc = np.multiply(lgcInc,
+                         np.less_equal(vecX, 0.0))
 
     # Number of vertices:
     varNumVrtc = vecData.shape[0]

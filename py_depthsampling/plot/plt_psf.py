@@ -20,11 +20,11 @@
 import numpy as np  # noqa
 import matplotlib
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import matplotlib.colors as colors
+import matplotlib.pyplot as plt  #noqa
+import matplotlib.colors as colors  #noqa
 
 
-def plt_psf(aryData,
+def plt_psf(aryData,  #noqa
             strPath,
             vecX=None,
             aryError=None,
@@ -53,22 +53,31 @@ def plt_psf(aryData,
     ----------
     aryData : np.array
         Data to be plotted. Numpy array of the form aryData[Condition, x-axis].
+    strPath : str
+        Output path for the figure
+    vecX : np.array
+        1D array with x-position of data points. If not provided, data points
+        are equally spaced in the range ```range(0, aryData.shape[1])```.
     aryError : np.array or None
         Error in the data to be plotted (e.g. SEM). Numpy array of the form
         aryError[Condition, x-axis]. The values will be added & subtracted from
         the values in aryData, and the region in between will be shaded.
         Alternatively, (possibly assymetric) confidence intervals can be
         provided (see below); in that case aryError is ignored.
-
-
+    aryCnfLw : np.array
+        Lower bound of confidence interval. Numpy array of form
+        aryCnfLw[idxCondition, x-axis]. If both aryCnfLw and aryCnfUp are
+        provided, confidence intervals are plotted and aryError is ignored.
+    aryCnfUp : np.array
+        Upper bound of confidence interval. Numpy array of form
+        aryCnfUp[idxCondition, x-axis]. If both aryCnfLw and aryCnfUp are
+        provided, confidence intervals are plotted and aryError is ignored.
     varDpi : float
         Resolution of the output figure.
     varYmin : float
         Minimum of Y axis.
     varYmax : float
         Maximum of Y axis.
-    lgcCnvPrct : bool
-        Whether to convert y axis to percent.
     lstConLbl : list
         List of strings with labels for conditions.
     strXlabel : str
@@ -79,17 +88,10 @@ def plt_psf(aryData,
         Figure title
     lgcLgnd : bool
         Whether to plot a legend.
-    strPath : str
-        Output path for the figure
-    vecX : np.array
-        1D array with x-position of data points. If not provided, data points
-        are equally spaced in the range ```range(0, varNumDpth)```.
     varXmin : float
-        Minimum of X axis. If None (default), maximum is determined from vecX
-        or varNumDpth.
+        Minimum of X axis. If None (default), maximum is determined from data.
     varXmax : float
-        Maximum of X axis. If None (default), maximum is determined from vecX
-        or varNumDpth.
+        Maximum of X axis. If None (default), maximum is determined from data.
     varSizeX : float
         Width of output figure.
     varSizeY : float
@@ -98,31 +100,21 @@ def plt_psf(aryData,
         Number of labels on y axis.
     varPadY : tuple
         Padding around labelled values on y.
+    lstVrt : list
+        If a list of values is provided, vertical lines are plotted at the
+        respective position on the x-axis. If lstVrt and aryClr are provided,
+        they need to contain the same number of conditions (i.e. lstVrt needs
+        to contain the same number of values as the size of the first dimension
+        of aryClr).
     aryClr : np.array
         Line colours. Numpy array of form aryClr[idxCon, 3]; where the first
         dimension corresponds to the number of conditions, and the second
         dimension corresponds to the three RGB values for each condition.
-    aryCnfLw : np.array
-        Lower bound of confidence interval. Numpy array of form
-        aryCnfLw[idxCondition, idxDepth]. If both aryCnfLw and aryCnfUp are
-        provided, confidence intervals are plotted and aryError is ignored.
-    aryCnfUp : np.array
-        Upper bound of confidence interval. Numpy array of form
-        aryCnfUp[idxCondition, idxDepth]. If both aryCnfLw and aryCnfUp are
-        provided, confidence intervals are plotted and aryError is ignored.
-    lstVrt : None or list
-        If a list of values is provided, vertical lines are plotted at the
-        respective relative positions along the cortical depth. For instance,
-        if the value 0.3 is provided, a vertical line is plotted at 30% of the
-        cortical depth. If lstVrt and aryClr are provided, they need to contain
-        the same number of conditions (i.e. lstVrt needs to contain the same
-        number of values as the size of the first dimension of aryClr).
 
     Returns
     -------
     None : None
         This function has no return value.
-
 
     The purpose of this function is to plot data & error intervals across
     cortical depth levels (represented on the x-axis), separately for

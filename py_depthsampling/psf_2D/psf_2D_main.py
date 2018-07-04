@@ -37,6 +37,8 @@ from scipy.optimize import minimize
 from py_depthsampling.psf_2D.utilities import psf
 from py_depthsampling.psf_2D.utilities import psf_diff
 from py_depthsampling.project.plot import plot
+import rpy2.robjects as robjects
+from rpy2.robjects import pandas2ri
 
 
 # -----------------------------------------------------------------------------
@@ -83,6 +85,10 @@ tplBndFct = (0.0, 10.0)
 # Extent of visual space from centre of the screen (assumed to be the same in
 # positive/negative x/y direction:
 varExtmax = 2.0 * 5.19
+
+# Save result from model fitting (i.e. parameters of PSF) to disk (pandas data
+# frame saved as csv for import in R). If `None`, data frame is not created.
+strPthCsv = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf_2D/dataframe.csv'  #noqa
 # -----------------------------------------------------------------------------
 
 
@@ -382,6 +388,25 @@ if not (strPthPltOt is None):
 
     # Save figure:
     fgr02.savefig(strPthTmp)
+
+
+# -----------------------------------------------------------------------------
+# *** Save PSF parameters to CSV file
+
+# Create dataframe & save csv?
+if (not (strPthCsv is None)):
+
+    print('--Saving dataframe to csv.')
+
+    # Activate the pandas conversion), for conversions of pandas to R objects:
+    pandas2ri.activate()
+
+    # We use an R function from python to write the dataframe to a csv file.
+    # Get reference to R function:
+    fncR = robjects.r('write.csv')
+
+    # Save csv to disk (using R function):
+    fncR(objDf, strPthCsv)
 
 # # Alternative grid search implementation:
 #

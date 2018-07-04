@@ -32,7 +32,7 @@ and the reference visual field projection.
 
 import numpy as np
 import pandas as pd
-# import seaborn as sns
+import seaborn as sns
 from scipy.optimize import minimize
 from py_depthsampling.psf_2D.utilities import psf
 from py_depthsampling.psf_2D.utilities import psf_diff
@@ -51,8 +51,9 @@ lstDpthLbl = [str(x) for x in range(11)]
 # ROI ('v1','v2', or 'v3'):
 lstRoi = ['v1', 'v2', 'v3']
 
-# Output path & prefix for plots (ROI, condition, depth level label left open):
-strPthPltOt = '/home/john/Dropbox/PacMan_Plots/psf_2D_pe/{}_{}_{}'  #noqa
+# Output path & prefix for plots (file name left open). Set to `None` if plot
+# should not be created.
+strPthPltOt = '/home/john/Dropbox/PacMan_Plots/psf_2D_pe/{}'  #noqa
 
 # File type suffix for plot:
 # strFlTp = '.svg'
@@ -168,6 +169,99 @@ for idxRoi in range(varNumRoi):
                 # aryFit = psf(aryDeep, dicOptm.x[0], dicOptm.x[1])
 
 print(objDf)
+
+# -----------------------------------------------------------------------------
+# *** Parent loop
+
+if not (strPthPltOt is None):
+
+    # -------------------------------------------------------------------------
+    # ** PSF width by condition
+
+    # Output path:
+    strPthTmp = (strPthPltOt.format('PSF_width_by_condition') + strFlTp)
+
+    # Create seaborn colour palette:
+    colors = ["amber", "greyish", "faded green"]
+    objClr = sns.xkcd_palette(colors)
+
+    # Draw nested barplot:
+    fgr01 = sns.factorplot(x="ROI", y="Width", hue="Condition", data=objDf,
+                           size=6, kind="bar", palette=objClr)
+
+    # Set x-axis labels to upper case ROI labels:
+    lstRoiUp = [x.upper() for x in lstRoi]
+    fgr01.set_xticklabels(lstRoiUp)
+
+    # Set hue labels (i.e. condition labels in legend):
+    for objTxt, strLbl in zip(fgr01._legend.texts, lstCon):
+        objTxt.set_text(strLbl)
+
+    # Save figure:
+    fgr01.savefig(strPthTmp)
+
+    # -------------------------------------------------------------------------
+    # ** PSF width by depth
+
+    # Output path:
+    strPthTmp = (strPthPltOt.format('PSF_width_by_depth') + strFlTp)
+
+    # Create seaborn colour palette:
+    objClr = sns.light_palette((210, 90, 60), input="husl",
+                               n_colors=varNumDpth)
+
+    # Draw nested barplot:
+    fgr02 = sns.factorplot(x="ROI", y="Width", hue="Depth", data=objDf, size=6,
+                           kind="bar", legend=True, palette=objClr)
+
+    fgr02.set_xticklabels(lstRoiUp)
+
+    # Save figure:
+    fgr02.savefig(strPthTmp)
+
+    # -------------------------------------------------------------------------
+    # ** PSF factor by condition
+
+    # Output path:
+    strPthTmp = (strPthPltOt.format('PSF_factor_by_condition') + strFlTp)
+
+    # Create seaborn colour palette:
+    colors = ["amber", "greyish", "faded green"]
+    objClr = sns.xkcd_palette(colors)
+
+    # Draw nested barplot:
+    fgr01 = sns.factorplot(x="ROI", y="Scaling", hue="Condition", data=objDf,
+                           size=6, kind="bar", palette=objClr)
+
+    # Set x-axis labels to upper case ROI labels:
+    lstRoiUp = [x.upper() for x in lstRoi]
+    fgr01.set_xticklabels(lstRoiUp)
+
+    # Set hue labels (i.e. condition labels in legend):
+    for objTxt, strLbl in zip(fgr01._legend.texts, lstCon):
+        objTxt.set_text(strLbl)
+
+    # Save figure:
+    fgr01.savefig(strPthTmp)
+
+    # -------------------------------------------------------------------------
+    # ** PSF factor by depth
+
+    # Output path:
+    strPthTmp = (strPthPltOt.format('PSF_factor_by_depth') + strFlTp)
+
+    # Create seaborn colour palette:
+    objClr = sns.light_palette((210, 90, 60), input="husl",
+                               n_colors=varNumDpth)
+
+    # Draw nested barplot:
+    fgr02 = sns.factorplot(x="ROI", y="Scaling", hue="Depth", data=objDf,
+                           size=6, kind="bar", legend=True, palette=objClr)
+
+    fgr02.set_xticklabels(lstRoiUp)
+
+    # Save figure:
+    fgr02.savefig(strPthTmp)
 
 # # Alternative grid search implementation:
 #

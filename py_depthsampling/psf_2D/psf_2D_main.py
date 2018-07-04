@@ -34,7 +34,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from scipy.optimize import minimize
-from py_depthsampling.psf_2D.utilities import psf
+# from py_depthsampling.psf_2D.utilities import psf
 from py_depthsampling.psf_2D.utilities import psf_diff
 
 
@@ -67,11 +67,11 @@ lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
 
 # Initial guess for PSF parameters (width and scaling factor; SD in degree of
 # visual angle):
-varInitSd = 5.0
-varInitFct = 2.5
+varInitSd = 1.0
+varInitFct = 5.0
 
-# Limits for PSF parameters [SD in degrees of visual angle]:
-tplBndSd = (0.0, 10.0)
+# Limits for PSF parameters [SD is in degrees of visual angle]:
+tplBndSd = (0.0, 2.0)
 tplBndFct = (0.0, 10.0)
 
 # Extent of visual space from centre of the screen (assumed to be the same in
@@ -104,11 +104,12 @@ varNumDpth = len(lstDpthLbl)
 varNumRoi = len(lstRoi)
 varNumCon = len(lstCon)
 
-# Total number of samples for dataframe:
-varNumSmpl = (varNumRoi * varNumCon * varNumDpth * 2)
+# Total number of samples for dataframe (`(varNumDpth - 1)` because there are
+# no PSF parameters for the reference depth level):
+varNumSmpl = (varNumRoi * varNumCon * (varNumDpth - 1))
 
 # Feature list (column names for dataframe):
-lstFtr = ['ROI', 'Condition', 'Depth', 'Width', 'Scaling']
+lstFtr = ['ROI', 'Condition', 'Depth', 'Width', 'Scaling', 'Residuals']
 
 # Dataframe for PSF model parameters:
 objDf = pd.DataFrame(0.0, index=np.arange(varNumSmpl), columns=lstFtr)
@@ -157,12 +158,21 @@ for idxRoi in range(varNumRoi):
                                    args=(aryDeep, aryTrgt),
                                    bounds=lstBnds)
 
+                # Calculate sum of model residuals:
+                varTmpRes = psf_diff((dicOptm.x[0], dicOptm.x[1]),
+                                     aryDeep,
+                                     aryTrgt)
+
+                # Convert width from array indices to degrees of visual angle:
+                varTmpSd = (dicOptm.x[0] / varScl)
+
                 # Features to dataframe:
                 objDf.at[idxSmpl, 'ROI'] = idxRoi
                 objDf.at[idxSmpl, 'Condition'] = idxCon
                 objDf.at[idxSmpl, 'Depth'] = idxDpth
-                objDf.at[idxSmpl, 'Width'] = dicOptm.x[0]
+                objDf.at[idxSmpl, 'Width'] = varTmpSd
                 objDf.at[idxSmpl, 'Scaling'] = dicOptm.x[1]
+                objDf.at[idxSmpl, 'Residuals'] = varTmpRes
 
                 idxSmpl += 1
 
@@ -256,6 +266,50 @@ if not (strPthPltOt is None):
 
     # Draw nested barplot:
     fgr02 = sns.factorplot(x="ROI", y="Scaling", hue="Depth", data=objDf,
+                           size=6, kind="bar", legend=True, palette=objClr)
+
+    fgr02.set_xticklabels(lstRoiUp)
+
+    # Save figure:
+    fgr02.savefig(strPthTmp)
+
+    # -------------------------------------------------------------------------
+    # ** Residuals by condition
+
+    # Output path:
+    strPthTmp = (strPthPltOt.format('Residuals_by_condition') + strFlTp)
+
+    # Create seaborn colour palette:
+    colors = ["amber", "greyish", "faded green"]
+    objClr = sns.xkcd_palette(colors)
+
+    # Draw nested barplot:
+    fgr01 = sns.factorplot(x="ROI", y="Residuals", hue="Condition", data=objDf,
+                           size=6, kind="bar", palette=objClr)
+
+    # Set x-axis labels to upper case ROI labels:
+    lstRoiUp = [x.upper() for x in lstRoi]
+    fgr01.set_xticklabels(lstRoiUp)
+
+    # Set hue labels (i.e. condition labels in legend):
+    for objTxt, strLbl in zip(fgr01._legend.texts, lstCon):
+        objTxt.set_text(strLbl)
+
+    # Save figure:
+    fgr01.savefig(strPthTmp)
+
+    # -------------------------------------------------------------------------
+    # ** Residuals by depth
+
+    # Output path:
+    strPthTmp = (strPthPltOt.format('Residuals_by_depth') + strFlTp)
+
+    # Create seaborn colour palette:
+    objClr = sns.light_palette((210, 90, 60), input="husl",
+                               n_colors=varNumDpth)
+
+    # Draw nested barplot:
+    fgr02 = sns.factorplot(x="ROI", y="Residuals", hue="Depth", data=objDf,
                            size=6, kind="bar", legend=True, palette=objClr)
 
     fgr02.set_xticklabels(lstRoiUp)

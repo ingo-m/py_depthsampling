@@ -107,6 +107,6 @@ def psf_diff(vecParams, aryDeep, aryTrgt):
 
     # Calculate difference between filtered reference and target visual field
     # projections:
-    varDiff = np.sum(np.absolute(np.subtract(aryTrgt, aryDeep_fltr)))
+    varDiff = np.mean(np.absolute(np.subtract(aryTrgt, aryDeep_fltr)))
 
     return varDiff

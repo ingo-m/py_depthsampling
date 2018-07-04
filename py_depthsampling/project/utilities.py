@@ -151,12 +151,12 @@ def get_data(strData, strPthMneEpi, strPthR2, strPthSd, strPthX, strPthY,
 
         # If there is only one depth level, averaging over depth levels
         # does not make sense.
-        vecData = aryData.flatten()
-        vecMneEpi = aryMneEpi.flatten()
-        vecR2 = aryR2.flatten()
-        vecSd = arySd.flatten()
-        vecX = aryX.flatten()
-        vecY = aryY.flatten()
+        vecData = aryData[:, lstDpth[0]]
+        vecMneEpi = aryMneEpi[:, lstDpth[0]]
+        vecR2 = aryR2[:, lstDpth[0]]
+        vecSd = arySd[:, lstDpth[0]]
+        vecX = aryX[:, lstDpth[0]]
+        vecY = aryY[:, lstDpth[0]]
 
     else:
 

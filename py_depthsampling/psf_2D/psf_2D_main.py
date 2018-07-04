@@ -181,7 +181,10 @@ for idxRoi in range(varNumRoi):
 print(objDf)
 
 # -----------------------------------------------------------------------------
-# *** Parent loop
+# *** Plot results
+
+# Size of confidence intervals:
+varCi = 90
 
 if not (strPthPltOt is None):
 
@@ -197,7 +200,7 @@ if not (strPthPltOt is None):
 
     # Draw nested barplot:
     fgr01 = sns.factorplot(x="ROI", y="Width", hue="Condition", data=objDf,
-                           size=6, kind="bar", palette=objClr)
+                           size=6, kind="bar", palette=objClr, ci=varCi)
 
     # Set x-axis labels to upper case ROI labels:
     lstRoiUp = [x.upper() for x in lstRoi]
@@ -222,7 +225,7 @@ if not (strPthPltOt is None):
 
     # Draw nested barplot:
     fgr02 = sns.factorplot(x="ROI", y="Width", hue="Depth", data=objDf, size=6,
-                           kind="bar", legend=True, palette=objClr)
+                           kind="bar", legend=True, palette=objClr, ci=varCi)
 
     fgr02.set_xticklabels(lstRoiUp)
 
@@ -241,7 +244,7 @@ if not (strPthPltOt is None):
 
     # Draw nested barplot:
     fgr01 = sns.factorplot(x="ROI", y="Scaling", hue="Condition", data=objDf,
-                           size=6, kind="bar", palette=objClr)
+                           size=6, kind="bar", palette=objClr, ci=varCi)
 
     # Set x-axis labels to upper case ROI labels:
     lstRoiUp = [x.upper() for x in lstRoi]
@@ -266,7 +269,8 @@ if not (strPthPltOt is None):
 
     # Draw nested barplot:
     fgr02 = sns.factorplot(x="ROI", y="Scaling", hue="Depth", data=objDf,
-                           size=6, kind="bar", legend=True, palette=objClr)
+                           size=6, kind="bar", legend=True, palette=objClr,
+                           ci=varCi)
 
     fgr02.set_xticklabels(lstRoiUp)
 
@@ -285,7 +289,7 @@ if not (strPthPltOt is None):
 
     # Draw nested barplot:
     fgr01 = sns.factorplot(x="ROI", y="Residuals", hue="Condition", data=objDf,
-                           size=6, kind="bar", palette=objClr)
+                           size=6, kind="bar", palette=objClr, ci=varCi)
 
     # Set x-axis labels to upper case ROI labels:
     lstRoiUp = [x.upper() for x in lstRoi]
@@ -310,7 +314,8 @@ if not (strPthPltOt is None):
 
     # Draw nested barplot:
     fgr02 = sns.factorplot(x="ROI", y="Residuals", hue="Depth", data=objDf,
-                           size=6, kind="bar", legend=True, palette=objClr)
+                           size=6, kind="bar", legend=True, palette=objClr,
+                           ci=varCi)
 
     fgr02.set_xticklabels(lstRoiUp)
 

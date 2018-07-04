@@ -34,8 +34,9 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from scipy.optimize import minimize
-# from py_depthsampling.psf_2D.utilities import psf
+from py_depthsampling.psf_2D.utilities import psf
 from py_depthsampling.psf_2D.utilities import psf_diff
+from py_depthsampling.project.plot import plot
 
 
 # -----------------------------------------------------------------------------
@@ -51,9 +52,14 @@ lstDpthLbl = [str(x) for x in range(11)]
 # ROI ('v1','v2', or 'v3'):
 lstRoi = ['v1', 'v2', 'v3']
 
-# Output path & prefix for plots (file name left open). Set to `None` if plot
-# should not be created.
+# Output path & prefix for summary plots (file name left open). Set to `None`
+# if plot should not be created.
 strPthPltOt = '/home/john/Dropbox/PacMan_Plots/psf_2D_pe/{}'  #noqa
+
+# Output path & prefix for plots of visual field projections after application
+# of fitted PSF (file name left open). Set to `None` if plot should not be
+# created.
+strPthPltVfp = '/home/john/Dropbox/PacMan_Plots/psf_2D_pe/{}'
 
 # File type suffix for plot:
 # strFlTp = '.svg'
@@ -176,9 +182,64 @@ for idxRoi in range(varNumRoi):
 
                 idxSmpl += 1
 
-                # aryFit = psf(aryDeep, dicOptm.x[0], dicOptm.x[1])
+            # Plot visual field projection after applying PSF:
+            if not(strPthPltVfp is None) and not(idxDpth == 0):
 
-print(objDf)
+                # Apply fitted parameters to reference visual field projection:
+                aryFit = psf(aryDeep, dicOptm.x[0], dicOptm.x[1])
+
+                # Output path for plot:
+                strPthPltOtTmp = (strPthPltVfp.format((lstRoi[idxRoi]
+                                                       + '_'
+                                                       + lstCon[idxCon]
+                                                       + '_'
+                                                       + lstDpthLbl[idxDpth]))
+                                  + strFlTp)
+
+                # Plot title:
+                strTmpTtl = (lstRoi[idxRoi]
+                             + ' '
+                             + lstCon[idxCon]
+                             + ' '
+                             + lstDpthLbl[idxDpth])
+
+                # Create plot:
+                plot(aryFit,
+                     strTmpTtl,
+                     'x-position',
+                     'y-position',
+                     strPthPltOtTmp,
+                     tpleLimX=(-5.19, 5.19, 3.0),
+                     tpleLimY=(-5.19, 5.19, 3.0))
+
+                # # Calculate residuals:
+                # aryRes = np.subtract(aryDeep, aryFit)
+
+                # # Output path for plot:
+                # strPthPltOtTmp = (strPthPltVfp.format((lstRoi[idxRoi]
+                #                                        + '_'
+                #                                        + lstCon[idxCon]
+                #                                        + '_'
+                #                                        + lstDpthLbl[idxDpth]
+                #                                        + '_residuals'))
+                #                   + strFlTp)
+
+                # # Plot title:
+                # strTmpTtl = (lstRoi[idxRoi]
+                #              + ' '
+                #              + lstCon[idxCon]
+                #              + ' '
+                #              + lstDpthLbl[idxDpth])
+
+                # # Create plot:
+                # plot(aryRes,
+                #      strTmpTtl,
+                #      'x-position',
+                #      'y-position',
+                #      strPthPltOtTmp,
+                #      tpleLimX=(-5.19, 5.19, 3.0),
+                #      tpleLimY=(-5.19, 5.19, 3.0))
+
 
 # -----------------------------------------------------------------------------
 # *** Plot results

@@ -94,7 +94,7 @@ def psf_diff(vecParams, aryDeep, aryTrgt):
     Returns
     -------
     varDiff : float
-        Sum of absolute difference between reference (`aryDeep`) and taregt
+        Mean absolute difference between reference (`aryDeep`) and taregt
         (`aryTrgt`) visual field projections.
 
     """

@@ -35,7 +35,6 @@ colnames(dfPsf)
 # objModel <- lmer(Width ~ ROI + Condition + (1|Depth), data=dfPsf)
 
 objModel <- lm(Width ~ ROI + Condition + Depth, data=dfPsf)
-
 # objModel <- aov(Width ~ ROI + Condition + Depth, data=dfPsf)
 
 summary(objModel)

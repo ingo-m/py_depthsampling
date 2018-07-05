@@ -183,8 +183,13 @@ aryPeri = np.less(np.add(aryPacMan, aryEdge), 0.1).astype(np.float64)
 # mutually exclusive):
 aryPacMan = np.greater(np.subtract(aryPacMan, aryEdge),
                        0.0).astype(np.float64)
-# -----------------------------------------------------------------------------
 
+# At this point, the reference frame of the masks does not fit that of the
+# empirical visual field projections. Rotate the masks to fit empirical data:
+aryPacMan = np.rot90(aryPacMan, k=3)
+aryEdge = np.rot90(aryEdge, k=3)
+aryPeri = np.rot90(aryPeri, k=3)
+# -----------------------------------------------------------------------------
 
 
 # -----------------------------------------------------------------------------

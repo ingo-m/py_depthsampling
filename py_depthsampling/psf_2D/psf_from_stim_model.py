@@ -63,7 +63,11 @@ strFlTp = '.png'
 varDpi = 80.0
 
 # Condition levels (used to complete file names):
-lstCon = ['Ps_sst']
+# lstCon = ['Ps_sst']
+lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
+
+# Only fit in left side of visual field?
+lgcLftOnly = True
 
 # Initial guess for PSF parameters (width and scaling factor for stimulus centre, stimulus edge, and periphery; SD in degree of
 # visual angle):
@@ -189,6 +193,12 @@ aryPacMan = np.greater(np.subtract(aryPacMan, aryEdge),
 aryPacMan = np.rot90(aryPacMan, k=3)
 aryEdge = np.rot90(aryEdge, k=3)
 aryPeri = np.rot90(aryPeri, k=3)
+
+# Set right side of visual field to zero:
+if lgcLftOnly:
+    aryPacMan[np.greater_equal(vecVslX, 0.0), :] = 0.0
+    aryEdge[np.greater_equal(vecVslX, 0.0), :] = 0.0
+    aryPeri[np.greater_equal(vecVslX, 0.0), :] = 0.0
 # -----------------------------------------------------------------------------
 
 
@@ -210,10 +220,15 @@ for idxRoi in range(varNumRoi):
             # Load visual field projection:
             aryTrgt = np.load(strPthNpyTmp)
 
+            # Set right side of visual field to zero:
+            if lgcLftOnly:
+                aryTrgt[np.greater_equal(vecVslX, 0.0), :] = 0.0
+
             # Fit point spread function:
             dicOptm = minimize(psf_diff_stim_mdl,
                                vecInit,
-                               args=(aryPacMan, aryEdge, aryPeri, aryTrgt),
+                               args=(aryPacMan, aryEdge, aryPeri, aryTrgt,
+                                     lgcLftOnly, vecVslX),
                                bounds=lstBnds)
 
             # Fitted model parameters:
@@ -224,7 +239,9 @@ for idxRoi in range(varNumRoi):
                                           aryPacMan,
                                           aryEdge,
                                           aryPeri,
-                                          aryTrgt)
+                                          aryTrgt,
+                                          lgcLftOnly,
+                                          vecVslX)
 
             # Convert width from array indices to degrees of visual angle:
             varTmpSd = (dicOptm.x[0] / varScl)
@@ -248,6 +265,10 @@ for idxRoi in range(varNumRoi):
                 aryFit = psf_stim_mdl(aryPacMan, aryEdge, aryPeri,
                                       dicOptm.x[0], dicOptm.x[1], dicOptm.x[2],
                                       dicOptm.x[3])
+
+                # Set right side of visual field to zero:
+                if lgcLftOnly:
+                    aryFit[np.greater_equal(vecVslX, 0.0), :] = 0.0
 
                 # Output path for plot:
                 strPthPltOtTmp = (strPthPltVfp.format((lstRoi[idxRoi]
@@ -291,7 +312,26 @@ lstHue = ['Depth'] * 5
 for idxPlt in range(len(lstX)):
 
     # Plot results:
-    plot_psf_params((strPthPltOt.format(lstY[idxPlt], lstX[idxPlt]) + strFlTp),
+    plot_psf_params((strPthPltOt.format(lstY[idxPlt],
+                                        lstHue[idxPlt]) + strFlTp),
+                    lstX[idxPlt],
+                    lstY[idxPlt],
+                    lstHue[idxPlt],
+                    objDf,
+                    lstRoi,
+                    varNumDpth,
+                    varCi=varCi)
+
+# List of x and y variables for plot:
+lstX = ['ROI'] * 5
+lstY = ['Width', 'PSC centre', 'PSC edge', 'PSC periphery', 'Residuals']
+lstHue = ['Condition'] * 5
+
+for idxPlt in range(len(lstX)):
+
+    # Plot results:
+    plot_psf_params((strPthPltOt.format(lstY[idxPlt],
+                                        lstHue[idxPlt]) + strFlTp),
                     lstX[idxPlt],
                     lstY[idxPlt],
                     lstHue[idxPlt],

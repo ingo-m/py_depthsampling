@@ -260,6 +260,7 @@ for idxPlt in range(len(lstX)):
                     lstHue[idxPlt],
                     objDf,
                     lstRoi,
+                    varNumDpth,
                     varCi=varCi)
 # -----------------------------------------------------------------------------
 

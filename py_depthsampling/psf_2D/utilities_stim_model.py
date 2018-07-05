@@ -66,8 +66,8 @@ def psf_stim_mdl(aryPacMan, aryEdge, aryPeri, varSd, varFctCntr, varFctEdge,
     """
     # Apply scaling:
     aryPacMan = np.multiply(aryPacMan, varFctCntr)
-    aryEdge = np.multiply(aryPacMan, varFctEdge)
-    aryPeri = np.multiply(aryPacMan, varFctPeri)
+    aryEdge = np.multiply(aryEdge, varFctEdge)
+    aryPeri = np.multiply(aryPeri, varFctPeri)
 
     aryOut = (aryPacMan + aryEdge + aryPeri)
 
@@ -148,11 +148,11 @@ def psf_diff_stim_mdl(vecParams, aryPacMan, aryEdge, aryPeri, aryTrgt):
 
 
 def plot_psf_params(strPathOut, strX, strY, strHue, objData, lstRoi,
-                    varCi=90.0):
+                    varNumDpth, varCi=90.0):
     """Plot parameters of point spread function."""
     # Create seaborn colour palette:
-    colors = ["amber", "greyish", "faded green"]
-    objClr = sns.xkcd_palette(colors)
+    objClr = sns.light_palette((210, 90, 60), input="husl",
+                               n_colors=varNumDpth)
 
     # Draw nested barplot:
     fgr01 = sns.factorplot(x=strX, y=strY, hue=strHue, data=objData, size=6,

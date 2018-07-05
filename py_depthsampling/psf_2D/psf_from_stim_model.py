@@ -27,11 +27,12 @@ import numpy as np
 from scipy.ndimage.filters import gaussian_filter
 import pandas as pd
 from scipy.optimize import minimize
-# from py_depthsampling.psf_2D.utilities_stim_model import psf_stim_mdl
+from py_depthsampling.psf_2D.utilities_stim_model import psf_stim_mdl
 from py_depthsampling.psf_2D.utilities_stim_model import psf_diff_stim_mdl
 from py_depthsampling.psf_2D.utilities_stim_model import plot_psf_params
 import rpy2.robjects as robjects
 from rpy2.robjects import pandas2ri
+from py_depthsampling.project.plot import plot as plot_vfp
 
 
 # -----------------------------------------------------------------------------
@@ -50,10 +51,9 @@ lstRoi = ['v1', 'v2', 'v3']
 # left open). Set to `None` if plot should not be created.
 strPthPltOt = '/home/john/Dropbox/PacMan_Plots/psf_2D_pe_stim_model/PSF_{}_by_{}'  #noqa
 
-# Output path & prefix for plots of visual field projections after application
-# of fitted PSF (file name left open). Set to `None` if plot should not be
+# Output path & prefix for plots of modelled visual field projections. Set to `None` if plot should not be
 # created.
-strPthPltVfp = None
+strPthPltVfp = '/home/john/Dropbox/PacMan_Plots/psf_2D_pe_stim_model/{}'
 
 # File type suffix for plot:
 # strFlTp = '.svg'
@@ -74,9 +74,9 @@ varInitFctPeri = 1.0
 
 # Limits for PSF parameters [SD is in degrees of visual angle]:
 tplBndSd = (0.0, 5.0)
-tplBndCntr = (-10.0, 10.0)
-tplBndEdge = (-10.0, 10.0)
-tplBndPeri = (-10.0, 10.0)
+tplBndCntr = (-50.0, 50.0)
+tplBndEdge = (-50.0, 50.0)
+tplBndPeri = (-50.0, 50.0)
 
 # Save result from model fitting (i.e. parameters of PSF) to disk (pandas data
 # frame saved as csv for import in R). If `None`, data frame is not created.
@@ -235,6 +235,38 @@ for idxRoi in range(varNumRoi):
             objDf.at[idxSmpl, 'Residuals'] = varTmpRes
 
             idxSmpl += 1
+
+            # Plot visual field projection after applying PSF:
+            if not(strPthPltVfp is None):
+
+                # Apply fitted parameters to reference visual field projection:
+                aryFit = psf_stim_mdl(aryPacMan, aryEdge, aryPeri,
+                                      dicOptm.x[0], dicOptm.x[1], dicOptm.x[2],
+                                      dicOptm.x[3])
+
+                # Output path for plot:
+                strPthPltOtTmp = (strPthPltVfp.format((lstRoi[idxRoi]
+                                                       + '_'
+                                                       + lstCon[idxCon]
+                                                       + '_'
+                                                       + lstDpthLbl[idxDpth]))
+                                  + strFlTp)
+
+                # Plot title:
+                strTmpTtl = (lstRoi[idxRoi]
+                             + ' '
+                             + lstCon[idxCon]
+                             + ' '
+                             + lstDpthLbl[idxDpth])
+
+                # Create plot:
+                plot_vfp(aryFit,
+                         strTmpTtl,
+                         'x-position',
+                         'y-position',
+                         strPthPltOtTmp,
+                         tpleLimX=(-5.19, 5.19, 3.0),
+                         tpleLimY=(-5.19, 5.19, 3.0))
 # -----------------------------------------------------------------------------
 
 

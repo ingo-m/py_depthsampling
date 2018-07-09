@@ -33,7 +33,6 @@ def psf_stim_mdl(aryPacMan, aryEdge, aryPeri, varSd, varFctCntr, varFctEdge,
     aryPacMan : np.array
         2D numpy array containing binary mask of stimulus centre. Created from
         `py_depthsampling.psf_2D.psf_from_stim_model.py`.
-
     aryEdge : np.array
         2D numpy array containing binary mask of stimulus edge. Created from
         `py_depthsampling.psf_2D.psf_from_stim_model.py`.
@@ -115,8 +114,8 @@ def psf_diff_stim_mdl(vecParams, aryPacMan, aryEdge, aryPeri, aryTrgt,
         `py_depthsampling.psf_2D.psf_from_stim_model.py`.
     aryTrgt : np.array
         2D numpy array containing (empirical) target visual field projection.
-        The point spread function is applied to the visual field projections
-        models (`aryPacMan`, `aryEdge`, `aryPeri`) in order to become more
+        The point spread function is applied to the visual field projection
+        models (`aryPacMan`, `aryEdge`, `aryPeri`) so that they become more
         similar to the target visual field projection.
     lgcLftOnly : bool
         Only perform fitting in left side of visual field?

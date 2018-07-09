@@ -112,7 +112,7 @@ tplBndSd = ((tplBndSd[0] * varScl), (tplBndSd[1] * varScl))
 vecInit = np.array([varInitSd, varInitFctCntr, varInitFctEdge, varInitFctPeri])
 lstBnds = [tplBndSd, tplBndCntr, tplBndEdge, tplBndPeri]
 
-# Number of ROIs/conditions/depths:
+# Number of depths, ROIs, and conditions:
 varNumDpth = len(lstDpthLbl)
 varNumRoi = len(lstRoi)
 varNumCon = len(lstCon)

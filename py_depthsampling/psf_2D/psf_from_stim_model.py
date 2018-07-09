@@ -3,7 +3,8 @@
 Calculate similarity between visual field projections and stimulus model.
 
 Fit an explicit model of a the spatial extent of stimulus-evoked activation (in
-visual space) to empirically observed activation patterns.
+visual space) to empirically observed activation patterns. The empirical visual
+field can be created using `py_depthsampling.project.project_main`.
 """
 
 # Part of py_depthsampling library

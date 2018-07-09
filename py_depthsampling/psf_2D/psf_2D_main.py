@@ -3,14 +3,14 @@
 Estimate cortical depth point spread function.
 
 The cortical depth point spread function is estimated from visual field
-projections of percent signal change (which can to be created using
-`py_depthsampling.project.project_main.py`). The point spread function is
-modelled as a Gaussian. In addition to the Gaussian filter, the visual field
-projections are scaled (in order to account for increasing signal towards the
-cortical surface). The lowest cortical depth level (i.e. closest to white
-matter) is taken as a reference, and the point spread function is estimated by
-reducing the residuals between the visual field projection of each depth level
-and the reference visual field projection.
+projections of percent signal change (which can be created using
+`py_depthsampling.project.project_main`). The point spread function is modelled
+as a Gaussian. In addition to the Gaussian filter, the visual field projections
+are scaled (in order to account for increasing signal towards the cortical
+surface). The lowest cortical depth level (i.e. closest to white matter) is
+taken as a reference, and the point spread function is estimated by reducing
+the residuals between the visual field projection of each depth level and the
+reference visual field projection.
 """
 
 # Part of py_depthsampling library

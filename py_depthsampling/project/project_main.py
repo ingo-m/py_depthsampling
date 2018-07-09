@@ -76,7 +76,9 @@ varDpi = 80.0
 #           'Pd_min_Cd_Ps_trn',
 #           'Pd_min_Ps_trn', 'Pd_min_Cd_trn', 'Cd_min_Ps_trn']
 # lstCon = ['polar_angle', 'x_pos', 'y_pos', 'SD', 'R2']
-lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
+# lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
+lstCon = ['Pd_min_Ps_sst', 'Pd_min_Cd_sst', 'Cd_min_Ps_sst',
+          'Pd_min_Cd_Ps_sst']
 
 # Path of vtk mesh with data to project into visual space (e.g. parameter
 # estimates; subject ID, hemisphere, and contion level left open).

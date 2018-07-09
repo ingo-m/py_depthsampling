@@ -64,11 +64,15 @@ strFlTp = '.png'
 varDpi = 80.0
 
 # Condition levels (used to complete file names):
-lstCon = ['Ps_sst']
-# lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
+# lstCon = ['Ps_sst']
+lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
+# lstCon = ['Pd_min_Ps_sst']
+# lstCon = ['Pd_min_Cd_sst']
+# lstCon = ['Cd_min_Ps_sst']
+# lstCon = ['Pd_min_Cd_Ps_sst']
 
 # Only fit in left side of visual field?
-lgcLftOnly = False
+lgcLftOnly = True
 
 # Initial guess for PSF parameters (width and scaling factor for stimulus
 # centre, stimulus edge, and periphery; SD in degree of visual angle):
@@ -163,6 +167,14 @@ aryPacMan = np.multiply(
                                       np.greater(aryPol, np.deg2rad(35.0))
                                       )
                         ).astype(np.float64)
+
+# Account for shape of PacMan centre (small filled square region around
+# fixation):
+aryBox = np.multiply(
+                     np.less_equal(np.absolute(vecVslY), 0.5)[:, None],
+                     np.less_equal(np.absolute(vecVslY), 0.5)[None, :]
+                     )
+aryPacMan[aryBox] = 1.0
 
 # Get binary mask of PacMan edge using gradient of PacMan:
 lstGrd = np.gradient(aryPacMan.astype(np.float64))

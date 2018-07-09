@@ -64,11 +64,11 @@ strFlTp = '.png'
 varDpi = 80.0
 
 # Condition levels (used to complete file names):
-# lstCon = ['Ps_sst']
-lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
+lstCon = ['Ps_sst']
+# lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
 
 # Only fit in left side of visual field?
-lgcLftOnly = True
+lgcLftOnly = False
 
 # Initial guess for PSF parameters (width and scaling factor for stimulus
 # centre, stimulus edge, and periphery; SD in degree of visual angle):
@@ -195,11 +195,16 @@ aryPacMan = np.rot90(aryPacMan, k=3)
 aryEdge = np.rot90(aryEdge, k=3)
 aryPeri = np.rot90(aryPeri, k=3)
 
-# Set right side of visual field to zero:
+# Crop visual field (only keep left hemifield):
 if lgcLftOnly:
-    aryPacMan[np.greater_equal(vecVslX, 0.0), :] = 0.0
-    aryEdge[np.greater_equal(vecVslX, 0.0), :] = 0.0
-    aryPeri[np.greater_equal(vecVslX, 0.0), :] = 0.0
+    # Remember original dimensions:
+    tplDim = aryPacMan.shape
+    # Index of vertical meridian:
+    varMrdnV = int(np.around(float(tplDim[0] * 0.5)))
+    # Crop visual field model:
+    aryPacMan = aryPacMan[0:varMrdnV, :]
+    aryEdge = aryEdge[0:varMrdnV, :]
+    aryPeri = aryPeri[0:varMrdnV, :]
 # -----------------------------------------------------------------------------
 
 
@@ -221,15 +226,15 @@ for idxRoi in range(varNumRoi):
             # Load visual field projection:
             aryTrgt = np.load(strPthNpyTmp)
 
-            # Set right side of visual field to zero:
+            # Crop visual field (only keep left hemifield):
             if lgcLftOnly:
-                aryTrgt[np.greater_equal(vecVslX, 0.0), :] = 0.0
+                aryTrgt = aryTrgt[0:varMrdnV, :]
 
             # Fit point spread function:
             dicOptm = minimize(psf_diff_stim_mdl,
                                vecInit,
                                args=(aryPacMan, aryEdge, aryPeri, aryTrgt,
-                                     lgcLftOnly, vecVslX),
+                                     vecVslX),
                                bounds=lstBnds)
 
             # Fitted model parameters:
@@ -241,7 +246,6 @@ for idxRoi in range(varNumRoi):
                                           aryEdge,
                                           aryPeri,
                                           aryTrgt,
-                                          lgcLftOnly,
                                           vecVslX)
 
             # Convert width from array indices to degrees of visual angle:
@@ -269,7 +273,9 @@ for idxRoi in range(varNumRoi):
 
                 # Set right side of visual field to zero:
                 if lgcLftOnly:
-                    aryFit[np.greater_equal(vecVslX, 0.0), :] = 0.0
+                    aryTmp = np.zeros(tplDim)
+                    aryTmp[0:varMrdnV, :] = aryFit
+                    aryFit = aryTmp
 
                 # Output path for plot:
                 strPthPltOtTmp = (strPthPltVfp.format((lstRoi[idxRoi]

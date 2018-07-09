@@ -81,7 +81,7 @@ def psf_stim_mdl(aryPacMan, aryEdge, aryPeri, varSd, varFctCntr, varFctEdge,
 
 
 def psf_diff_stim_mdl(vecParams, aryPacMan, aryEdge, aryPeri, aryTrgt,
-                      lgcLftOnly, vecVslX):
+                      vecVslX):
     """
     Calculate difference btwn. visual field projections, given PSF parameters.
 
@@ -117,8 +117,6 @@ def psf_diff_stim_mdl(vecParams, aryPacMan, aryEdge, aryPeri, aryTrgt,
         The point spread function is applied to the visual field projection
         models (`aryPacMan`, `aryEdge`, `aryPeri`) so that they become more
         similar to the target visual field projection.
-    lgcLftOnly : bool
-        Only perform fitting in left side of visual field?
     vecVslX : np.array
         Vector with visual space x-coordinates.
 
@@ -144,10 +142,6 @@ def psf_diff_stim_mdl(vecParams, aryPacMan, aryEdge, aryPeri, aryTrgt,
     # Apply point spread function to reference visual field projection:
     aryFit = psf_stim_mdl(aryPacMan, aryEdge, aryPeri, varSd, varFctCntr,
                           varFctEdge, varFctPeri)
-
-    # Set right side of visual field to zero:
-    if lgcLftOnly:
-        aryFit[np.greater_equal(vecVslX, 0.0), :] = 0.0
 
     # Calculate difference between filtered reference and target visual field
     # projections:

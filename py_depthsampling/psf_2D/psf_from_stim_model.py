@@ -51,8 +51,8 @@ lstRoi = ['v1', 'v2', 'v3']
 # left open). Set to `None` if plot should not be created.
 strPthPltOt = '/home/john/Dropbox/PacMan_Plots/psf_2D_pe_stim_model/PSF_{}_by_{}'  #noqa
 
-# Output path & prefix for plots of modelled visual field projections. Set to `None` if plot should not be
-# created.
+# Output path & prefix for plots of modelled visual field projections. Set to
+# `None` if plot should not be created.
 strPthPltVfp = '/home/john/Dropbox/PacMan_Plots/psf_2D_pe_stim_model/{}'
 
 # File type suffix for plot:
@@ -69,8 +69,8 @@ lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
 # Only fit in left side of visual field?
 lgcLftOnly = True
 
-# Initial guess for PSF parameters (width and scaling factor for stimulus centre, stimulus edge, and periphery; SD in degree of
-# visual angle):
+# Initial guess for PSF parameters (width and scaling factor for stimulus
+# centre, stimulus edge, and periphery; SD in degree of visual angle):
 varInitSd = 1.0
 varInitFctCntr = 1.0
 varInitFctEdge = 1.0
@@ -359,3 +359,4 @@ if (not (strPthCsv is None)):
 
     # Save csv to disk (using R function):
     fncR(objDf, strPthCsv)
+# -----------------------------------------------------------------------------

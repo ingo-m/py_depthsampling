@@ -413,7 +413,7 @@ if not (strPthPltOt is None):
     fgr02.savefig(strPthTmp)
 
     # -------------------------------------------------------------------------
-    # ** Residuals width by depth & condition
+    # ** Residuals by depth & condition
 
     # Output path:
     strPthTmp = (strPthPltOt.format('Residuals_by_depth_and_cond') + strFlTp)

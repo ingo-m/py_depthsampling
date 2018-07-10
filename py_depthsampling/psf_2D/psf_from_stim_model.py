@@ -336,7 +336,8 @@ for idxPlt in range(len(lstX)):
                     objDf,
                     lstRoi,
                     varNumCon,
-                    varCi=varCi)
+                    varCi=varCi,
+                    lstConLbls=lstCon)
 # -----------------------------------------------------------------------------
 
 

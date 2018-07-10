@@ -151,7 +151,7 @@ def psf_diff_stim_mdl(vecParams, aryPacMan, aryEdge, aryPeri, aryTrgt,
 
 
 def plot_psf_params(strPathOut, strX, strY, strHue, objData, lstRoi,
-                    varNumClr, varCi=90.0):
+                    varNumClr, varCi=90.0, lstConLbls=None):
     """Plot parameters of point spread function."""
     # Create seaborn colour palette:
     # objClr = sns.light_palette((210, 90, 60), input="husl",
@@ -166,6 +166,11 @@ def plot_psf_params(strPathOut, strX, strY, strHue, objData, lstRoi,
     # Set x-axis labels to upper case ROI labels:
     lstRoiUp = [x.upper() for x in lstRoi]
     fgr01.set_xticklabels(lstRoiUp)
+
+    # Set hue labels (i.e. condition labels in legend):
+    if not(lstConLbls is None):
+        for objTxt, strLbl in zip(fgr01._legend.texts, lstConLbls):
+            objTxt.set_text(strLbl)
 
     # Save figure:
     fgr01.savefig(strPathOut)

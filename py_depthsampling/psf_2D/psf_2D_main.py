@@ -216,36 +216,39 @@ for idxRoi in range(varNumRoi):
                      'y-position',
                      strPthPltOtTmp,
                      tpleLimX=(-5.19, 5.19, 3.0),
-                     tpleLimY=(-5.19, 5.19, 3.0))
+                     tpleLimY=(-5.19, 5.19, 3.0),
+                     varMin=-2.5,
+                     varMax=2.5)
 
-                # # Calculate residuals:
-                # aryRes = np.subtract(aryDeep, aryFit)
+                # Calculate residuals:
+                aryRes = np.subtract(aryDeep, aryFit)
 
-                # # Output path for plot:
-                # strPthPltOtTmp = (strPthPltVfp.format((lstRoi[idxRoi]
-                #                                        + '_'
-                #                                        + lstCon[idxCon]
-                #                                        + '_'
-                #                                        + lstDpthLbl[idxDpth]
-                #                                        + '_residuals'))
-                #                   + strFlTp)
+                # Output path for plot:
+                strPthPltOtTmp = (strPthPltVfp.format((lstRoi[idxRoi]
+                                                       + '_'
+                                                       + lstCon[idxCon]
+                                                       + '_'
+                                                       + lstDpthLbl[idxDpth]
+                                                       + '_residuals'))
+                                  + strFlTp)
 
-                # # Plot title:
-                # strTmpTtl = (lstRoi[idxRoi]
-                #              + ' '
-                #              + lstCon[idxCon]
-                #              + ' '
-                #              + lstDpthLbl[idxDpth])
+                # Plot title:
+                strTmpTtl = (lstRoi[idxRoi]
+                             + ' '
+                             + lstCon[idxCon]
+                             + ' '
+                             + lstDpthLbl[idxDpth])
 
-                # # Create plot:
-                # plot(aryRes,
-                #      strTmpTtl,
-                #      'x-position',
-                #      'y-position',
-                #      strPthPltOtTmp,
-                #      tpleLimX=(-5.19, 5.19, 3.0),
-                #      tpleLimY=(-5.19, 5.19, 3.0))
-
+                # Create plot:
+                plot(aryRes,
+                     strTmpTtl,
+                     'x-position',
+                     'y-position',
+                     strPthPltOtTmp,
+                     tpleLimX=(-5.19, 5.19, 3.0),
+                     tpleLimY=(-5.19, 5.19, 3.0),
+                     varMin=None,
+                     varMax=None)
 
 # -----------------------------------------------------------------------------
 # *** Plot results
@@ -293,6 +296,26 @@ if not (strPthPltOt is None):
     # Draw nested barplot:
     fgr02 = sns.factorplot(x="ROI", y="Width", hue="Depth", data=objDf, size=6,
                            kind="bar", legend=True, palette=objClr, ci=varCi)
+
+    fgr02.set_xticklabels(lstRoiUp)
+
+    # Save figure:
+    fgr02.savefig(strPthTmp)
+
+    # -------------------------------------------------------------------------
+    # ** PSF width by depth & condition
+
+    # Output path:
+    strPthTmp = (strPthPltOt.format('PSF_width_by_depth_and_cond') + strFlTp)
+
+    # Create seaborn colour palette:
+    objClr = sns.light_palette((210, 90, 60), input="husl",
+                               n_colors=varNumDpth)
+
+    # Draw nested barplot:
+    fgr02 = sns.factorplot(x="ROI", y="Width", hue="Depth", data=objDf, size=6,
+                           kind="bar", legend=True, palette=objClr, ci=varCi,
+                           col="Condition")
 
     fgr02.set_xticklabels(lstRoiUp)
 

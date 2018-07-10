@@ -25,7 +25,7 @@ import matplotlib.colors as colors
 
 
 def plot(aryVslSpc, strTtl, strXlabel, strYlabel, strPathOut, tpleLimX=None,
-         tpleLimY=None):
+         tpleLimY=None, varMin=None, varMax=None):
     """Plot visual space projection of parameter estimates."""
     # Font type:
     strFont = 'Liberation Sans'
@@ -33,17 +33,19 @@ def plot(aryVslSpc, strTtl, strXlabel, strYlabel, strPathOut, tpleLimX=None,
     # Font colour:
     vecFontClr = np.array([17.0/255.0, 85.0/255.0, 124.0/255.0])
 
-    # Find minimum and maximum correlation values:
-    varMin = np.percentile(aryVslSpc, 1.0)
-    varMax = np.percentile(aryVslSpc, 99.0)
+    # Colour scale minimum:
+    if varMin is None:
+        varMin = np.percentile(aryVslSpc, 1.0)
+        varMin = (np.floor(varMin * 10.0) / 10.0)
+        # varMin = (np.floor(varMin * 0.1) / 0.1)
+        # varMin = np.floor(varMin)
 
-    # Round:
-    # varMin = (np.floor(varMin * 10.0) / 10.0)
-    # varMax = (np.ceil(varMax * 10.0) / 10.0)
-    # varMin = (np.floor(varMin * 0.1) / 0.1)
-    # varMax = (np.ceil(varMax * 0.1) / 0.1)
-    varMin = np.floor(varMin)
-    varMax = np.ceil(varMax)
+    # Colour scale maximum:
+    if varMax is None:
+        varMax = np.percentile(aryVslSpc, 99.0)
+        varMax = (np.ceil(varMax * 10.0) / 10.0)
+        # varMax = (np.ceil(varMax * 0.1) / 0.1)
+        # varMax = np.ceil(varMax)
 
     # Saveguard to avoid division by zero in case of no negative values:
     # if np.less_equal(0.0, varMin):
@@ -54,12 +56,6 @@ def plot(aryVslSpc, strTtl, strXlabel, strYlabel, strPathOut, tpleLimX=None,
         varMax = np.absolute(varMin)
     else:
         varMin = np.multiply(-1.0, np.absolute(varMax))
-
-    # Fixed axis limites for comparing plots across conditions/ROIs:
-    # varMin = -250.0
-    # varMax = 250.0
-    varMin = -2.5
-    varMax = 2.5
 
     # Create main figure:
     fig01 = plt.figure(figsize=(4.0, 3.0),

@@ -430,5 +430,7 @@ for idxDpth in range(len(lstDpth)):  #noqa
                  'y-position',
                  strPthPltOtTmp,
                  tpleLimX=(varExtXmin, varExtXmax, 3.0),
-                 tpleLimY=(varExtYmin, varExtYmax, 3.0))
+                 tpleLimY=(varExtYmin, varExtYmax, 3.0),
+                 varMin=-2.5,
+                 varMax=2.5)
 # -----------------------------------------------------------------------------

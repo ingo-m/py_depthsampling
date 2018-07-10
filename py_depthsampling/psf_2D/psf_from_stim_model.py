@@ -43,8 +43,8 @@ from py_depthsampling.project.plot import plot as plot_vfp
 strPthNpy = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project/{}_{}_{}.npy'  #noqa
 
 # Depth level labels (to complete input file names).
-# lstDpthLbl = [str(x) for x in range(11)]
-lstDpthLbl = ['0']
+lstDpthLbl = [str(x) for x in range(11)]
+# lstDpthLbl = ['0']
 
 # ROI ('v1','v2', or 'v3'):
 lstRoi = ['v1', 'v2', 'v3']
@@ -310,7 +310,9 @@ for idxRoi in range(varNumRoi):
                          'y-position',
                          strPthPltOtTmp,
                          tpleLimX=(-5.19, 5.19, 3.0),
-                         tpleLimY=(-5.19, 5.19, 3.0))
+                         tpleLimY=(-5.19, 5.19, 3.0),
+                         varMin=-2.5,
+                         varMax=2.5)
 
                 # ** Plot model residuals
 
@@ -361,6 +363,29 @@ print(objDf)
 # Size of confidence intervals:
 varCi = 90
 
+# ** Plot by depth
+
+# List of x and y variables for plot:
+lstX = ['ROI'] * 5
+lstY = ['Width', 'PSC centre', 'PSC edge', 'PSC periphery', 'Residuals']
+lstHue = ['Depth'] * 5
+
+for idxPlt in range(len(lstX)):
+
+    # Plot results:
+    plot_psf_params((strPthPltOt.format(lstY[idxPlt],
+                                        lstHue[idxPlt]) + strFlTp),
+                    lstX[idxPlt],
+                    lstY[idxPlt],
+                    lstHue[idxPlt],
+                    objDf,
+                    lstRoi,
+                    varNumDpth,
+                    varCi=varCi,
+                    strClrmp="continuous")
+
+# ** Plot by condition
+
 # List of x and y variables for plot:
 lstX = ['ROI'] * 5
 lstY = ['Width', 'PSC centre', 'PSC edge', 'PSC periphery', 'Residuals']
@@ -378,7 +403,8 @@ for idxPlt in range(len(lstX)):
                     lstRoi,
                     varNumCon,
                     varCi=varCi,
-                    lstConLbls=lstCon)
+                    lstConLbls=lstCon,
+                    strClrmp="categorical")
 # -----------------------------------------------------------------------------
 
 

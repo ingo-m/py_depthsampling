@@ -34,6 +34,7 @@ from py_depthsampling.psf_2D.utilities_stim_model import plot_psf_params
 import rpy2.robjects as robjects
 from rpy2.robjects import pandas2ri
 from py_depthsampling.project.plot import plot as plot_vfp
+import seaborn as sns
 
 
 # -----------------------------------------------------------------------------
@@ -363,7 +364,7 @@ print(objDf)
 # Size of confidence intervals:
 varCi = 90
 
-# ** Plot by depth
+# ** Parameters by depth
 
 # List of x and y variables for plot:
 lstX = ['ROI'] * 5
@@ -384,7 +385,7 @@ for idxPlt in range(len(lstX)):
                     varCi=varCi,
                     strClrmp="continuous")
 
-# ** Plot by condition
+# ** Parameters by condition
 
 # List of x and y variables for plot:
 lstX = ['ROI'] * 5
@@ -405,6 +406,31 @@ for idxPlt in range(len(lstX)):
                     varCi=varCi,
                     lstConLbls=lstCon,
                     strClrmp="categorical")
+
+# ** PSF width by depth & condition
+
+# Output path:
+strPthTmp = (strPthPltOt.format('Width', 'Depth_and_Condition') + strFlTp)
+
+# Create seaborn colour palette:
+objClr = sns.light_palette((210, 90, 60), input="husl",
+                           n_colors=varNumDpth)
+
+# Draw nested barplot:
+fgr02 = sns.factorplot(x="ROI", y="Width", hue="Depth", data=objDf, size=6,
+                       kind="bar", legend=True, palette=objClr, ci=varCi,
+                       col="Condition")
+
+# Set column titles:
+for objAx, strTtl in zip(fgr02.axes.flat, lstCon):
+    objAx.set_title(strTtl)
+
+# Set x-axis labels to upper case ROI labels:
+lstRoiUp = [x.upper() for x in lstRoi]
+fgr02.set_xticklabels(lstRoiUp)
+
+# Save figure:
+fgr02.savefig(strPthTmp)
 # -----------------------------------------------------------------------------
 
 

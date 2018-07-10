@@ -71,7 +71,7 @@ strFlTp = '.png'
 varDpi = 80.0
 
 # Condition levels (used to complete file names):
-lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
+lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
 
 # Initial guess for PSF parameters (width and scaling factor; SD in degree of
 # visual angle):
@@ -317,6 +317,10 @@ if not (strPthPltOt is None):
                            kind="bar", legend=True, palette=objClr, ci=varCi,
                            col="Condition")
 
+    # Set column titles:
+    for objAx, strTtl in zip(fgr02.axes.flat, lstCon):
+        objAx.set_title(strTtl)
+
     fgr02.set_xticklabels(lstRoiUp)
 
     # Save figure:
@@ -426,6 +430,10 @@ if not (strPthPltOt is None):
     fgr02 = sns.factorplot(x="ROI", y="Residuals", hue="Depth", data=objDf,
                            size=6, kind="bar", legend=True, palette=objClr,
                            ci=varCi, col="Condition")
+
+    # Set column titles:
+    for objAx, strTtl in zip(fgr02.axes.flat, lstCon):
+        objAx.set_title(strTtl)
 
     fgr02.set_xticklabels(lstRoiUp)
 

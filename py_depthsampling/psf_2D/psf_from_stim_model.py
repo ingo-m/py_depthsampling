@@ -272,8 +272,10 @@ for idxRoi in range(varNumRoi):
 
             idxSmpl += 1
 
-            # Plot visual field projection after applying PSF:
+            # Plot results?
             if not(strPthPltVfp is None):
+
+                # ** Plot modelled visual field projection
 
                 # Apply fitted parameters to reference visual field projection:
                 aryFit = psf_stim_mdl(aryPacMan, aryEdge, aryPeri,
@@ -309,10 +311,49 @@ for idxRoi in range(varNumRoi):
                          strPthPltOtTmp,
                          tpleLimX=(-5.19, 5.19, 3.0),
                          tpleLimY=(-5.19, 5.19, 3.0))
+
+                # ** Plot model residuals
+
+                # Set right side of visual field to zero:
+                if lgcLftOnly:
+                    aryTmp = np.zeros(tplDim)
+                    aryTmp[0:varMrdnV, :] = aryTrgt
+                    aryTrgt = aryTmp
+
+                # Calculate residuals:
+                aryRes = np.subtract(aryTrgt, aryFit)
+
+                # Output path for plot:
+                strPthPltOtTmp = (strPthPltVfp.format((lstRoi[idxRoi]
+                                                       + '_'
+                                                       + lstCon[idxCon]
+                                                       + '_'
+                                                       + lstDpthLbl[idxDpth]
+                                                       + '_residuals'))
+                                  + strFlTp)
+
+                # Plot title:
+                strTmpTtl = (lstRoi[idxRoi]
+                             + ' '
+                             + lstCon[idxCon]
+                             + ' '
+                             + lstDpthLbl[idxDpth])
+
+                # Create plot:
+                plot_vfp(aryRes,
+                         strTmpTtl,
+                         'x-position',
+                         'y-position',
+                         strPthPltOtTmp,
+                         tpleLimX=(-5.19, 5.19, 3.0),
+                         tpleLimY=(-5.19, 5.19, 3.0),
+                         varMin=None,
+                         varMax=None)
 # -----------------------------------------------------------------------------
 
 
 print(objDf)
+
 
 # -----------------------------------------------------------------------------
 # *** Plot results

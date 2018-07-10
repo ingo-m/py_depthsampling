@@ -66,10 +66,6 @@ varDpi = 80.0
 # Condition levels (used to complete file names):
 # lstCon = ['Ps_sst']
 lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
-# lstCon = ['Pd_min_Ps_sst']
-# lstCon = ['Pd_min_Cd_sst']
-# lstCon = ['Cd_min_Ps_sst']
-# lstCon = ['Pd_min_Cd_Ps_sst']
 
 # Only fit in left side of visual field?
 lgcLftOnly = True

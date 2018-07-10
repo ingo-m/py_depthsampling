@@ -265,8 +265,8 @@ if not (strPthPltOt is None):
     strPthTmp = (strPthPltOt.format('PSF_width_by_condition') + strFlTp)
 
     # Create seaborn colour palette:
-    colors = ["amber", "greyish", "faded green"]
-    objClr = sns.xkcd_palette(colors)
+    lstClr = ["amber", "greyish", "faded green"]
+    objClr = sns.xkcd_palette(lstClr)
 
     # Draw nested barplot:
     fgr01 = sns.factorplot(x="ROI", y="Width", hue="Condition", data=objDf,
@@ -412,6 +412,25 @@ if not (strPthPltOt is None):
     # Save figure:
     fgr02.savefig(strPthTmp)
 
+    # -------------------------------------------------------------------------
+    # ** Residuals width by depth & condition
+
+    # Output path:
+    strPthTmp = (strPthPltOt.format('Residuals_by_depth_and_cond') + strFlTp)
+
+    # Create seaborn colour palette:
+    objClr = sns.light_palette((210, 90, 60), input="husl",
+                               n_colors=varNumDpth)
+
+    # Draw nested barplot:
+    fgr02 = sns.factorplot(x="ROI", y="Residuals", hue="Depth", data=objDf,
+                           size=6, kind="bar", legend=True, palette=objClr,
+                           ci=varCi, col="Condition")
+
+    fgr02.set_xticklabels(lstRoiUp)
+
+    # Save figure:
+    fgr02.savefig(strPthTmp)
 
 # -----------------------------------------------------------------------------
 # *** Save PSF parameters to CSV file

@@ -43,7 +43,8 @@ from py_depthsampling.project.plot import plot as plot_vfp
 strPthNpy = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project/{}_{}_{}.npy'  #noqa
 
 # Depth level labels (to complete input file names).
-lstDpthLbl = [str(x) for x in range(11)]
+# lstDpthLbl = [str(x) for x in range(11)]
+lstDpthLbl = ['0']
 
 # ROI ('v1','v2', or 'v3'):
 lstRoi = ['v1', 'v2', 'v3']
@@ -322,24 +323,6 @@ varCi = 90
 # List of x and y variables for plot:
 lstX = ['ROI'] * 5
 lstY = ['Width', 'PSC centre', 'PSC edge', 'PSC periphery', 'Residuals']
-lstHue = ['Depth'] * 5
-
-for idxPlt in range(len(lstX)):
-
-    # Plot results:
-    plot_psf_params((strPthPltOt.format(lstY[idxPlt],
-                                        lstHue[idxPlt]) + strFlTp),
-                    lstX[idxPlt],
-                    lstY[idxPlt],
-                    lstHue[idxPlt],
-                    objDf,
-                    lstRoi,
-                    varNumDpth,
-                    varCi=varCi)
-
-# List of x and y variables for plot:
-lstX = ['ROI'] * 5
-lstY = ['Width', 'PSC centre', 'PSC edge', 'PSC periphery', 'Residuals']
 lstHue = ['Condition'] * 5
 
 for idxPlt in range(len(lstX)):
@@ -352,7 +335,7 @@ for idxPlt in range(len(lstX)):
                     lstHue[idxPlt],
                     objDf,
                     lstRoi,
-                    varNumDpth,
+                    varNumCon,
                     varCi=varCi)
 # -----------------------------------------------------------------------------
 

@@ -151,11 +151,11 @@ def psf_diff_stim_mdl(vecParams, aryPacMan, aryEdge, aryPeri, aryTrgt,
 
 
 def plot_psf_params(strPathOut, strX, strY, strHue, objData, lstRoi,
-                    varNumDpth, varCi=90.0):
+                    varNumClr, varCi=90.0):
     """Plot parameters of point spread function."""
     # Create seaborn colour palette:
     objClr = sns.light_palette((210, 90, 60), input="husl",
-                               n_colors=varNumDpth)
+                               n_colors=varNumClr)
 
     # Draw nested barplot:
     fgr01 = sns.factorplot(x=strX, y=strY, hue=strHue, data=objData, size=6,

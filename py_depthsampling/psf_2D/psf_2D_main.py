@@ -33,6 +33,7 @@ reference visual field projection.
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 from py_depthsampling.psf_2D.utilities import psf
 from py_depthsampling.psf_2D.utilities import psf_diff
@@ -188,8 +189,10 @@ for idxRoi in range(varNumRoi):
 
                 idxSmpl += 1
 
-            # Plot visual field projection after applying PSF:
+            # Create plots:
             if not(strPthPltVfp is None) and not(idxDpth == 0):
+
+                # ** Plot least squares fit visual field projection
 
                 # Apply fitted parameters to reference visual field projection:
                 aryFit = psf(aryDeep, dicOptm.x[0], dicOptm.x[1])
@@ -220,6 +223,8 @@ for idxRoi in range(varNumRoi):
                      varMin=-2.5,
                      varMax=2.5)
 
+                # ** Plot residuals visual field projection
+
                 # Calculate residuals:
                 aryRes = np.subtract(aryDeep, aryFit)
 
@@ -249,6 +254,32 @@ for idxRoi in range(varNumRoi):
                      tpleLimY=(-5.19, 5.19, 3.0),
                      varMin=None,
                      varMax=None)
+
+                # ** Plot residuals by PSC
+
+                # PSC and residuals into datafram:
+                objDfRes = pd.DataFrame(data=np.array([aryDeep.flatten(),
+                                                       aryRes.flatten()]).T,
+                                        columns=['PSC', 'Residuals'])
+
+                # Plot residuals vs. PSC:
+                objAx = sns.regplot('PSC', 'Residuals', data=objDfRes,
+                                    marker='.')
+                objFgr = objAx.get_figure()
+
+                # Output path for plot:
+                strPthPltOtTmp = (strPthPltVfp.format((lstRoi[idxRoi]
+                                                       + '_'
+                                                       + lstCon[idxCon]
+                                                       + '_'
+                                                       + lstDpthLbl[idxDpth]
+                                                       + '_residuals_by_PSC'))
+                                  + strFlTp)
+
+                # Save figure:
+                objFgr.savefig(strPthPltOtTmp)
+                # plt.clf(objFgr)
+                plt.close(objFgr)
 
 # -----------------------------------------------------------------------------
 # *** Plot results

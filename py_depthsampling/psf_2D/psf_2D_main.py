@@ -74,14 +74,16 @@ varDpi = 80.0
 # Condition levels (used to complete file names):
 lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
 
-# Initial guess for PSF parameters (width and scaling factor; SD in degree of
-# visual angle):
+# Initial guess for PSF parameters (width, scaling factor, intercept; SD in
+# degree of visual angle):
 varInitSd = 1.0
 varInitFct = 5.0
+varInitInt = 0.5
 
 # Limits for PSF parameters [SD is in degrees of visual angle]:
 tplBndSd = (0.0, 2.0)
 tplBndFct = (0.0, 10.0)
+tplBndInt = (-10.0, 10.0)
 
 # Extent of visual space from centre of the screen (assumed to be the same in
 # positive/negative x/y direction:
@@ -109,8 +111,8 @@ varInitSd = (varInitSd * varScl)
 tplBndSd = ((tplBndSd[0] * varScl), (tplBndSd[1] * varScl))
 
 # Bring initial values and bounds into shape expected by scipy optimize:
-vecInit = np.array([varInitSd, varInitFct])
-lstBnds = [tplBndSd, tplBndFct]
+vecInit = np.array([varInitSd, varInitFct, varInitInt])
+lstBnds = [tplBndSd, tplBndFct, tplBndInt]
 
 # Number of ROIs/conditions/depths:
 varNumDpth = len(lstDpthLbl)
@@ -122,7 +124,8 @@ varNumCon = len(lstCon)
 varNumSmpl = (varNumRoi * varNumCon * (varNumDpth - 1))
 
 # Feature list (column names for dataframe):
-lstFtr = ['ROI', 'Condition', 'Depth', 'Width', 'Scaling', 'Residuals']
+lstFtr = ['ROI', 'Condition', 'Depth', 'Width', 'Scaling', 'Intercept',
+          'Residuals']
 
 # Dataframe for PSF model parameters:
 objDf = pd.DataFrame(0.0, index=np.arange(varNumSmpl), columns=lstFtr)
@@ -172,7 +175,9 @@ for idxRoi in range(varNumRoi):
                                    bounds=lstBnds)
 
                 # Calculate sum of model residuals:
-                varTmpRes = psf_diff((dicOptm.x[0], dicOptm.x[1]),
+                varTmpRes = psf_diff((dicOptm.x[0],
+                                      dicOptm.x[1],
+                                      dicOptm.x[2]),
                                      aryDeep,
                                      aryTrgt)
 
@@ -185,6 +190,7 @@ for idxRoi in range(varNumRoi):
                 objDf.at[idxSmpl, 'Depth'] = idxDpth
                 objDf.at[idxSmpl, 'Width'] = varTmpSd
                 objDf.at[idxSmpl, 'Scaling'] = dicOptm.x[1]
+                objDf.at[idxSmpl, 'Intercept'] = dicOptm.x[2]
                 objDf.at[idxSmpl, 'Residuals'] = varTmpRes
 
                 idxSmpl += 1
@@ -195,7 +201,7 @@ for idxRoi in range(varNumRoi):
                 # ** Plot least squares fit visual field projection
 
                 # Apply fitted parameters to reference visual field projection:
-                aryFit = psf(aryDeep, dicOptm.x[0], dicOptm.x[1])
+                aryFit = psf(aryDeep, dicOptm.x[0], dicOptm.x[1], dicOptm.x[2])
 
                 # Output path for plot:
                 strPthPltOtTmp = (strPthPltVfp.format((lstRoi[idxRoi]
@@ -347,6 +353,30 @@ if not (strPthPltOt is None):
     fgr02 = sns.factorplot(x="ROI", y="Width", hue="Depth", data=objDf, size=6,
                            kind="bar", legend=True, palette=objClr, ci=varCi,
                            col="Condition")
+
+    # Set column titles:
+    for objAx, strTtl in zip(fgr02.axes.flat, lstCon):
+        objAx.set_title(strTtl)
+
+    fgr02.set_xticklabels(lstRoiUp)
+
+    # Save figure:
+    fgr02.savefig(strPthTmp)
+
+    # -------------------------------------------------------------------------
+    # ** Intercept by depth & condition
+
+    # Output path:
+    strPthTmp = (strPthPltOt.format('PSF_intrcp_by_depth_and_cond') + strFlTp)
+
+    # Create seaborn colour palette:
+    objClr = sns.light_palette((210, 90, 60), input="husl",
+                               n_colors=varNumDpth)
+
+    # Draw nested barplot:
+    fgr02 = sns.factorplot(x="ROI", y="Intercept", hue="Depth", data=objDf,
+                           size=6, kind="bar", legend=True, palette=objClr,
+                           ci=varCi, col="Condition")
 
     # Set column titles:
     for objAx, strTtl in zip(fgr02.axes.flat, lstCon):

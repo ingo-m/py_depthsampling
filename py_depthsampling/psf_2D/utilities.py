@@ -22,7 +22,7 @@ import numpy as np
 from scipy.ndimage.filters import gaussian_filter
 
 
-def psf(aryIn, varSd, varFct):
+def psf(aryIn, varSd, varFct, varInt):
     """
     Cortical depth point spread function.
 
@@ -35,10 +35,12 @@ def psf(aryIn, varSd, varFct):
     varSd : float
         Width (standard deviation) of Gaussian function used to for point
         spread function.
-    varFct: float
+    varFct : float
         Factor by which visual field projection is multiplied (scaling is
         necessary to account for different percent signal change levels between
         cortical depth levels).
+    varInt : float
+        Intercept that is added to visual field projection.
 
     Returns
     -------
@@ -51,8 +53,11 @@ def psf(aryIn, varSd, varFct):
     Gaussian filtering and multiplication are commutative.
 
     """
+    # Add intercept:
+    aryOut = np.add(aryIn, varInt)
+
     # Apply scaling:
-    aryOut = np.multiply(aryIn, varFct)
+    aryOut = np.multiply(aryOut, varFct)
 
     # Apply Gaussian filter:
     aryOut = gaussian_filter(aryOut,
@@ -101,9 +106,10 @@ def psf_diff(vecParams, aryDeep, aryTrgt):
     # Get width of Gaussian and multiplication factor from input vector:
     varSd = vecParams[0]
     varFct = vecParams[1]
+    varInt = vecParams[2]
 
     # Apply point spread function to reference visual field projection:
-    aryDeep_fltr = psf(aryDeep, varSd, varFct)
+    aryDeep_fltr = psf(aryDeep, varSd, varFct, varInt)
 
     # Calculate difference between filtered reference and target visual field
     # projections:

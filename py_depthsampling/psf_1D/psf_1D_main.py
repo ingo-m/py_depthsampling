@@ -30,6 +30,8 @@ from py_depthsampling.psf_1D.fit_model import fitGauss
 from py_depthsampling.psf_1D.fit_model import fitLin
 from py_depthsampling.psf_1D.fit_model import funcGauss
 from py_depthsampling.psf_1D.fit_model import funcLin
+import rpy2.robjects as robjects
+from rpy2.robjects import pandas2ri
 
 
 # -----------------------------------------------------------------------------
@@ -654,8 +656,7 @@ if (not (strPthCsv is None)) and (not (strFit is None)):
 
     print('--Saving dataframe to csv.')
 
-    import rpy2.robjects as robjects
-    from rpy2.robjects import pandas2ri
+    # Activate the pandas conversion), for conversions of pandas to R objects:
     pandas2ri.activate()
 
     # We use an R function from python to write the dataframe to a csv file.

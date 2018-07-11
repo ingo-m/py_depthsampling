@@ -226,7 +226,7 @@ for idxRoi in range(varNumRoi):
                 # ** Plot residuals visual field projection
 
                 # Calculate residuals:
-                aryRes = np.subtract(aryDeep, aryFit)
+                aryRes = np.subtract(aryTrgt, aryFit)
 
                 # Output path for plot:
                 strPthPltOtTmp = (strPthPltVfp.format((lstRoi[idxRoi]

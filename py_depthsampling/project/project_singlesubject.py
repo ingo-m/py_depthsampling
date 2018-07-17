@@ -31,7 +31,7 @@ from py_depthsampling.project.plot import plot
 
 # Load/save existing projection from/to (ROI, condition, depth level label, and
 # subject ID left open):
-strPthNpz = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project_single_subject/{}_{}_{}_{}.npz'  #noqa
+strPthNpz = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project_single_subject/{}_{}_{}.npz'  #noqa
 
 # List of subject identifiers:
 lstSubIds = ['20171023',  # '20171109',

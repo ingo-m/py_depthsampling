@@ -31,7 +31,7 @@ from py_depthsampling.project.plot import plot
 
 # Load/save existing projection from/to (ROI, condition, depth level label, and
 # subject ID left open):
-strPthNpy = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project_single_subject/{}_{}_{}_{}.npy'  #noqa
+strPthNpz = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project_single_subject/{}_{}_{}_{}.npz'  #noqa
 
 # List of subject identifiers:
 lstSubIds = ['20171023',  # '20171109',
@@ -47,11 +47,11 @@ lstSubIds = ['20171023',  # '20171109',
 # three depth levels is calculated, and on a second iteration the average over
 # the subsequent three depth levels is calculated. If 1lstDpth= [[None]]1,
 # average over all depth levels.
-lstDpth = [None, [0, 1, 2], [4, 5, 6], [8, 9, 10]]
-# lstDpth = [[x] for x in range(11)]
+# lstDpth = [None, [0, 1, 2], [4, 5, 6], [8, 9, 10]]
+lstDpth = [[x] for x in range(11)]
 # Depth level condition labels (output file will contain this label):
-lstDpthLbl = ['allGM', 'deepGM', 'midGM', 'superficialGM']
-# lstDpthLbl = [str(x) for x in range(11)]
+# lstDpthLbl = ['allGM', 'deepGM', 'midGM', 'superficialGM']
+lstDpthLbl = [str(x) for x in range(11)]
 
 # ROI ('v1' or 'v2'):
 lstRoi = ['v1', 'v2', 'v3']
@@ -139,154 +139,159 @@ varNumY = 200
 
 print('-Project parametric map into visual space')
 
+# Number of subjects:
+varNumSub = len(lstSubIds)
+
 # Loop through subjects, depth levels, ROIs, and conditions:
-for idxSub in range(len(lstSubIds)):  #noqa
-    for idxDpth in range(len(lstDpth)):
-        for idxRoi in range(len(lstRoi)):
-            for idxCon in range(len(lstCon)):
+for idxDpth in range(len(lstDpth)):  #noqa
+    for idxRoi in range(len(lstRoi)):
+        for idxCon in range(len(lstCon)):
 
-                # File name of npy file for current condition:
-                strPthNpyTmp = strPthNpy.format(lstRoi[idxRoi],
-                                                lstCon[idxCon],
-                                                lstDpthLbl[idxDpth],
-                                                lstSubIds[idxSub])
+            # File name of npy file for current condition:
+            strPthNpzTmp = strPthNpz.format(lstRoi[idxRoi],
+                                            lstCon[idxCon],
+                                            lstDpthLbl[idxDpth])
 
-                if os.path.isfile(strPthNpyTmp):
+            if os.path.isfile(strPthNpzTmp):
 
-                    print('--Load existing visual field projection')
+                print('--Load existing visual field projection')
 
-                    # Load existing projection:
-                    aryVslSpc = np.load(strPthNpyTmp)
+                # Load existing projection. `aryVslSpc` contains single subject
+                # visual field projections (shape: `aryVslSpc[idxSub, x, y]`).
+                # `aryNorm` contains normalisation factors for visual space
+                # projection (same shape as `aryVslSpc`).
+                objNpz = np.load(strPthNpzTmp)
+                aryVslSpc = objNpz['aryVslSpc']
+                aryNorm = objNpz['aryNorm']
 
-                else:
+            else:
 
-                    # ---------------------------------------------------------
-                    # *** Load data
+                # -------------------------------------------------------------
+                # *** Load data
 
-                    print('--Load data from vtk meshes')
+                print('--Load data from vtk meshes')
 
-                    # Number of processes to run in parallel (one for single
-                    # subject plots):
-                    varPar = 1
+                # Create a queue to put the results in:
+                queOut = mp.Queue()
 
-                    # Create a queue to put the results in:
-                    queOut = mp.Queue()
+                # Empty list for processes:
+                lstPrcs = [None] * varNumSub
 
-                    # Empty list for processes:
-                    lstPrcs = [None] * varPar
+                # Empty list for results of parallel processes:
+                lstRes = [None] * varNumSub
 
-                    # Empty list for results of parallel processes:
-                    lstRes = [None] * varPar
+                # Create processes (one per subject):
+                for idxSub in range(varNumSub):
+                    lstPrcs[idxSub] = mp.Process(target=load_par,
+                                                 args=(lstSubIds[idxSub],
+                                                       lstCon[idxCon],
+                                                       lstRoi[idxRoi],
+                                                       strPthData,
+                                                       strPthMneEpi,
+                                                       strPthR2,
+                                                       strPthX,
+                                                       strPthY,
+                                                       strPthSd,
+                                                       strCsvRoi,
+                                                       varNumDpth,
+                                                       lstDpth[idxDpth],
+                                                       idxSub,
+                                                       queOut)
+                                                 )
 
-                    # Create processes:
-                    for idxPrc in range(varPar):
-                        lstPrcs[idxPrc] = mp.Process(target=load_par,
-                                                     args=(lstSubIds[idxSub],
-                                                           lstCon[idxCon],
-                                                           lstRoi[idxRoi],
-                                                           strPthData,
-                                                           strPthMneEpi,
-                                                           strPthR2,
-                                                           strPthX,
-                                                           strPthY,
-                                                           strPthSd,
-                                                           strCsvRoi,
-                                                           varNumDpth,
-                                                           lstDpth[idxDpth],
-                                                           idxPrc,
-                                                           queOut)
-                                                     )
+                    # Daemon (kills processes when exiting):
+                    lstPrcs[idxSub].Daemon = True
 
-                        # Daemon (kills processes when exiting):
-                        lstPrcs[idxPrc].Daemon = True
+                # Start processes:
+                for idxSub in range(varNumSub):
+                    lstPrcs[idxSub].start()
 
-                    # Don't create more processes than number of subjects:
-                    # varParTmp = int(np.min([varPar, len(lstSubIds)]))
+                # Collect results from queue:
+                for idxSub in range(varNumSub):
+                    lstRes[idxSub] = queOut.get(True)
 
-                    # Start processes:
-                    for idxPrc in range(varPar):
-                        lstPrcs[idxPrc].start()
+                # Join processes:
+                for idxSub in range(varNumSub):
+                    lstPrcs[idxSub].join()
 
-                    # Collect results from queue:
-                    for idxPrc in range(varPar):
-                        lstRes[idxPrc] = queOut.get(True)
+                # List for single-subject data vectors:
+                lstData = [None] * varNumSub
 
-                    # Join processes:
-                    for idxPrc in range(varPar):
-                        lstPrcs[idxPrc].join()
+                # List for single-subject mean EPI vectors:
+                lstMneEpi = [None] * varNumSub
 
-                    # List for single-subject data vectors:
-                    lstData = [None] * varPar
+                # List of single subject R2 vectors:
+                lstR2 = [None] * varNumSub
 
-                    # List for single-subject mean EPI vectors:
-                    lstMneEpi = [None] * varPar
+                # List for single subject SD vectors (pRF sizes):
+                lstSd = [None] * varNumSub
 
-                    # List of single subject R2 vectors:
-                    lstR2 = [None] * varPar
+                # List for single subject x-position vectors:
+                lstX = [None] * varNumSub
 
-                    # List for single subject SD vectors (pRF sizes):
-                    lstSd = [None] * varPar
+                # List for single subject y-position vectors:
+                lstY = [None] * varNumSub
 
-                    # List for single subject x-position vectors:
-                    lstX = [None] * varPar
+                # Put output into correct order (unnecessary in this
+                # context but kept for consistency):
+                for idxSub in range(varNumSub):
 
-                    # List for single subject y-position vectors:
-                    lstY = [None] * varPar
+                    # Index of results (first item in output list):
+                    varTmpIdx = lstRes[idxSub][0]
 
-                    # Put output into correct order (unnecessary in this
-                    # context but kept for consistency):
-                    for idxRes in range(varPar):
+                    # Put fitting results into list, in correct order:
+                    lstData[varTmpIdx] = lstRes[idxSub][1]
+                    lstMneEpi[varTmpIdx] = lstRes[idxSub][2]
+                    lstR2[varTmpIdx] = lstRes[idxSub][3]
+                    lstSd[varTmpIdx] = lstRes[idxSub][4]
+                    lstX[varTmpIdx] = lstRes[idxSub][5]
+                    lstY[varTmpIdx] = lstRes[idxSub][6]
 
-                        # Index of results (first item in output list):
-                        varTmpIdx = lstRes[idxRes][0]
+                # Concatenate arrays from all subjects:
+                # vecData = np.concatenate(lstData[:])
+                # vecMneEpi = np.concatenate(lstMneEpi[:])
+                # vecR2 = np.concatenate(lstR2[:])
+                # vecSd = np.concatenate(lstSd[:])
+                # vecX = np.concatenate(lstX[:])
+                # vecY = np.concatenate(lstY[:])
 
-                        # Put fitting results into list, in correct order:
-                        lstData[varTmpIdx] = lstRes[idxRes][1]
-                        lstMneEpi[varTmpIdx] = lstRes[idxRes][2]
-                        lstR2[varTmpIdx] = lstRes[idxRes][3]
-                        lstSd[varTmpIdx] = lstRes[idxRes][4]
-                        lstX[varTmpIdx] = lstRes[idxRes][5]
-                        lstY[varTmpIdx] = lstRes[idxRes][6]
+                # Delete original lists:
+                # del(lstData)
+                # del(lstMneEpi)
+                # del(lstR2)
+                # del(lstSd)
+                # del(lstX)
+                # del(lstY)
 
-                    # Concatenate arrays from all subjects:
-                    vecData = np.concatenate(lstData[:])
-                    vecMneEpi = np.concatenate(lstMneEpi[:])
-                    vecR2 = np.concatenate(lstR2[:])
-                    vecSd = np.concatenate(lstSd[:])
-                    vecX = np.concatenate(lstX[:])
-                    vecY = np.concatenate(lstY[:])
+                # -------------------------------------------------------------
+                # *** Convert cope to percent signal change
 
-                    # Delete original lists:
-                    del(lstData)
-                    del(lstMneEpi)
-                    del(lstR2)
-                    del(lstSd)
-                    del(lstX)
-                    del(lstY)
+                # According to the FSL documentation
+                # (https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FEAT/UserGuide), the
+                # PEs can be scaled to signal change with respect to the mean
+                # (over time within voxel): "This is achieved by scaling the PE
+                # or COPE values by (100*) the peak-peak height of the
+                # regressor (or effective regressor in the case of COPEs) and
+                # then by dividing by mean_func (the mean over time of
+                # filtered_func_data)."
 
-                    # ---------------------------------------------------------
-                    # *** Convert cope to percent signal change
+                # Only perform scaling if the data is from an FSL cope file:
+                if 'cope' in strPthData:
+                    print('--Convert cope to percent signal change.')
 
-                    # According to the FSL documentation
-                    # (https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FEAT/UserGuide),
-                    # the PEs can be scaled to signal change with respect to
-                    # the mean (over time within voxel): "This is achieved by
-                    # scaling the PE or COPE values by (100*) the peak-peak
-                    # height of the regressor (or effective regressor in the
-                    # case of COPEs) and then by dividing by mean_func (the
-                    # mean over time of filtered_func_data)."
+                    # The peak-peak height depends on the predictor (i.e.
+                    # condition).
+                    if 'sst' in lstCon[idxCon]:
+                        varPpheight = 1.268049
+                    elif 'trn' in lstCon[idxCon]:
+                        varPpheight = 0.2269044
 
-                    # Only perform scaling if the data is from an FSL cope
-                    # file:
-                    if 'cope' in strPthData:
-                        print('--Convert cope to percent signal change.')
+                    # Loop through subjects:
+                    for idxSub in range(varNumSub):
 
-                        # The peak-peak height depends on the predictor (i.e.
-                        # condition).
-                        if 'sst' in lstCon[idxCon]:
-                            varPpheight = 1.268049
-                        elif 'trn' in lstCon[idxCon]:
-                            varPpheight = 0.2269044
+                        # Get data vectors from list:
+                        vecData = lstData[idxSub]
+                        vecMneEpi = lstMneEpi[idxSub]
 
                         # In order to avoid division by zero, avoid
                         # zero-voxels:
@@ -305,104 +310,112 @@ for idxSub in range(len(lstSubIds)):  #noqa
                                         1.0  # 1.4
                                         )
 
-                    # ---------------------------------------------------------
-                    # *** Project data into visual space
-
-                    print('--Project data into visual space')
-
-                    # Number of processes to run in parallel:
-                    varPar = 11
-
-                    # Split data into chunks:
-                    lstData = np.array_split(vecData, varPar)
-                    lstR2 = np.array_split(vecR2, varPar)
-                    lstSd = np.array_split(vecSd, varPar)
-                    lstX = np.array_split(vecX, varPar)
-                    lstY = np.array_split(vecY, varPar)
-
-                    # Create a queue to put the results in:
-                    queOut = mp.Queue()
-
-                    # Empty list for processes:
-                    lstPrcs = [None] * varPar
-
-                    # Empty list for results of parallel processes:
-                    lstRes = [None] * varPar
-
-                    # Create processes:
-                    for idxPrc in range(varPar):
-                        lstPrcs[idxPrc] = mp.Process(target=project_par,
-                                                     args=(idxPrc,
-                                                           lstData[idxPrc],
-                                                           lstX[idxPrc],
-                                                           lstY[idxPrc],
-                                                           lstSd[idxPrc],
-                                                           lstR2[idxPrc],
-                                                           varThrR2,
-                                                           varNumX,
-                                                           varNumY,
-                                                           varExtXmin,
-                                                           varExtXmax,
-                                                           varExtYmin,
-                                                           varExtYmax,
-                                                           queOut)
-                                                     )
-
-                        # Daemon (kills processes when exiting):
-                        lstPrcs[idxPrc].Daemon = True
-
-                    # Start processes:
-                    for idxPrc in range(varPar):
-                        lstPrcs[idxPrc].start()
-
-                    # Collect results from queue:
-                    for idxPrc in range(varPar):
-                        lstRes[idxPrc] = queOut.get(True)
-
-                    # Join processes:
-                    for idxPrc in range(varPar):
-                        lstPrcs[idxPrc].join()
-
-                    # List for results after re-ordering (visual space arrays
-                    # and normalisation arrays):
-                    lstVslSpc = [None] * varPar
-                    lstNorm = [None] * varPar
-
-                    # Put output into correct order (unnecessary in this
-                    # context but kept for consistency):
-                    for idxRes in range(varPar):
-
-                        # Index of results (first item in output list):
-                        varTmpIdx = lstRes[idxRes][0]
-
-                        # Put fitting results into list, in correct order:
-                        lstVslSpc[varTmpIdx] = lstRes[idxRes][1]
-                        lstNorm[varTmpIdx] = lstRes[idxRes][2]
-
-                    # Visual space array (2D array with bins of locations in
-                    # visual space):
-                    aryVslSpc = np.zeros((varNumX, varNumY))
-
-                    # Array for normalisation (parameter estimates are summed
-                    # up over the visual field; the normalisation array is
-                    # needed to normalise the sum):
-                    aryNorm = np.zeros((varNumX, varNumY))
-
-                    # Add up results from separate processes:
-                    for idxPrc in range(varPar):
-                        aryVslSpc = np.add(lstVslSpc[idxPrc], aryVslSpc)
-                        aryNorm = np.add(lstNorm[idxPrc], aryNorm)
-
-                    # Normalise:
-                    aryVslSpc = np.divide(aryVslSpc, aryNorm)
-
-                    # Save results to disk:
-                    np.save(strPthNpyTmp, aryVslSpc)
+                        # Put PSC-scaled data back into list:
+                        lstData[idxSub] = np.copy(vecData)
 
                 # -------------------------------------------------------------
-                # *** Plot results
+                # *** Project data into visual space
 
-                print('--Plot results')
+                print('--Project data into visual space')
+
+                # Split data into chunks:
+                # lstData = np.array_split(vecData, varNumSub)
+                # lstR2 = np.array_split(vecR2, varNumSub)
+                # lstSd = np.array_split(vecSd, varNumSub)
+                # lstX = np.array_split(vecX, varNumSub)
+                # lstY = np.array_split(vecY, varNumSub)
+
+                # Create a queue to put the results in:
+                queOut = mp.Queue()
+
+                # Empty list for processes:
+                lstPrcs = [None] * varNumSub
+
+                # Empty list for results of parallel processes:
+                lstRes = [None] * varNumSub
+
+                # Create processes:
+                for idxSub in range(varNumSub):
+                    lstPrcs[idxSub] = mp.Process(target=project_par,
+                                                 args=(idxSub,
+                                                       lstData[idxSub],
+                                                       lstX[idxSub],
+                                                       lstY[idxSub],
+                                                       lstSd[idxSub],
+                                                       lstR2[idxSub],
+                                                       varThrR2,
+                                                       varNumX,
+                                                       varNumY,
+                                                       varExtXmin,
+                                                       varExtXmax,
+                                                       varExtYmin,
+                                                       varExtYmax,
+                                                       queOut)
+                                                 )
+
+                    # Daemon (kills processes when exiting):
+                    lstPrcs[idxSub].Daemon = True
+
+                # Start processes:
+                for idxSub in range(varNumSub):
+                    lstPrcs[idxSub].start()
+
+                # Collect results from queue:
+                for idxSub in range(varNumSub):
+                    lstRes[idxSub] = queOut.get(True)
+
+                # Join processes:
+                for idxSub in range(varNumSub):
+                    lstPrcs[idxSub].join()
+
+                # List for results after re-ordering (visual space arrays and
+                # normalisation arrays):
+                lstVslSpc = [None] * varNumSub
+                lstNorm = [None] * varNumSub
+
+                # Put output into correct order (unnecessary in this context
+                # but kept for consistency):
+                for idxSub in range(varNumSub):
+
+                    # Index of results (first item in output list):
+                    varTmpIdx = lstRes[idxSub][0]
+
+                    # Put fitting results into list, in correct order:
+                    lstVslSpc[varTmpIdx] = lstRes[idxSub][1]
+                    lstNorm[varTmpIdx] = lstRes[idxSub][2]
+
+                # Visual space array containing single subject visual field
+                # projections (shape: `aryVslSpc[idxSub, x, y]`). `aryNorm`
+                # contains normalisation factors for visual space projection
+                # (same shape as `aryVslSpc`).
+                aryVslSpc = np.zeros((varNumSub, varNumX, varNumY))
+
+                # Array for normalisation (parameter estimates are summed up
+                # over the visual field; the normalisation array is needed to
+                # normalise the sum):
+                aryNorm = np.zeros((varNumSub, varNumX, varNumY))
+
+                # Put single subject results into array:
+                for idxSub in range(varNumSub):
+                    aryVslSpc[idxSub, :, :] = lstVslSpc[idxSub]
+                    aryNorm[idxSub, :, :] = lstNorm[idxSub]
+
+                # Save results to disk:
+                np.savez(strPthNpzTmp,
+                         aryVslSpc=aryVslSpc,
+                         aryNorm=aryNorm)
+
+            # -----------------------------------------------------------------
+            # *** Plot results
+
+            print('--Plot results')
+
+            # Loop through subjects:
+            for idxSub in range(varNumSub):
+
+                # Normalise:
+                aryVslSpcTmp = np.divide(aryVslSpc[idxSub, :, :],
+                                         aryNorm[idxSub, :, :])
 
                 # Output path for plot:
                 strPthPltOtTmp = (strPthPltOt.format(lstRoi[idxRoi],
@@ -416,10 +429,12 @@ for idxSub in range(len(lstSubIds)):  #noqa
                              + ' '
                              + lstCon[idxCon]
                              + ' '
-                             + lstDpthLbl[idxDpth])
+                             + lstDpthLbl[idxDpth]
+                             + ' '
+                             + lstSubIds[idxSub])
 
                 # Create plot:
-                plot(aryVslSpc,
+                plot(aryVslSpcTmp,
                      strTmpTtl,
                      'x-position',
                      'y-position',

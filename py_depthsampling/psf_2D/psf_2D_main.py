@@ -147,7 +147,7 @@ for idxRoi in range(varNumRoi):
             # of the point spread function.
             if idxDpth == 0:
 
-                # File name of npy file for referecnecondition:
+                # File name of npy file for reference condition:
                 strPthNpyTmp = strPthNpy.format(lstRoi[idxRoi],
                                                 lstCon[idxCon],
                                                 lstDpthLbl[idxDpth])

@@ -181,7 +181,7 @@ for idxSub in range(len(lstSubIds)):  #noqa
                     # Create processes:
                     for idxPrc in range(varPar):
                         lstPrcs[idxPrc] = mp.Process(target=load_par,
-                                                     args=(lstSubIds[idxPrc],
+                                                     args=(lstSubIds[idxSub],
                                                            lstCon[idxCon],
                                                            lstRoi[idxRoi],
                                                            strPthData,

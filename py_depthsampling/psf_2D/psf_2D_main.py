@@ -4,13 +4,17 @@ Estimate cortical depth point spread function.
 
 The cortical depth point spread function is estimated from visual field
 projections of percent signal change (which can be created using
-`py_depthsampling.project.project_main`). The point spread function is modelled
-as a Gaussian. In addition to the Gaussian filter, the visual field projections
-are scaled (in order to account for increasing signal towards the cortical
-surface). The lowest cortical depth level (i.e. closest to white matter) is
-taken as a reference, and the point spread function is estimated by reducing
-the residuals between the visual field projection of each depth level and the
-reference visual field projection.
+`py_depthsampling.project.project_singlesubject`). The point spread function is
+modelled as a Gaussian. In addition to the Gaussian filter, the visual field
+projections are scaled (in order to account for increasing signal towards the
+cortical surface). The lowest cortical depth level (i.e. closest to white
+matter) is taken as a reference, and the point spread function is estimated by
+reducing the residuals between the visual field projection of each depth level
+and the reference visual field projection.
+
+The point spread function is estimated on group averages. In order to get an
+estimate of the variance, bootstrap confidence interval are created (sampling
+single subject visual field projections with replacement).
 """
 
 # Part of py_depthsampling library
@@ -46,7 +50,7 @@ from rpy2.robjects import pandas2ri
 # *** Define parameters
 
 # Load projection from (ROI, condition, depth level label left open):
-strPthNpy = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project/{}_{}_{}.npy'  #noqa
+strPthNpz = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project_single_subject/{}_{}_{}.npz'  #noqa
 
 # Depth level labels (to complete input file names). First depth level in list
 # is used as reference for estimation of point spread function.
@@ -90,6 +94,13 @@ varExtmax = 2.0 * 5.19
 # Save result from model fitting (i.e. parameters of PSF) to disk (pandas data
 # frame saved as csv for import in R). If `None`, data frame is not created.
 strPthCsv = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf_2D/dataframe.csv'  #noqa
+
+# Number of bootstrapping iterations:
+varNumIt = 1000
+
+# Lower and upper bound of bootstrap confidence intervals:
+varConLw = 2.5
+varConUp = 97.5
 # -----------------------------------------------------------------------------
 
 
@@ -98,8 +109,12 @@ strPthCsv = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf_2D/d
 
 # Get dimension of visual space model (assumed to be the same for x and y
 # directions, and for all ROIs/conditions/depth levels):
-aryTmp = np.load(strPthNpy.format(lstRoi[0], lstCon[0], lstDpthLbl[0]))
-varSzeVsm = aryTmp.shape[0]
+objNpzTmp = np.load(strPthNpz.format(lstRoi[0], lstCon[0], lstDpthLbl[0]))
+aryTmp = objNpzTmp['aryVslSpc']
+varSzeVsm = aryTmp.shape[1]
+
+# Get number of subjects:
+varNumSub = aryTmp.shape[0]
 
 # Scaling factor from degrees of visual angle to array dimensions:
 varScl = (float(varSzeVsm) / float(varExtmax))
@@ -121,14 +136,29 @@ varNumCon = len(lstCon)
 # no PSF parameters for the reference depth level):
 varNumSmpl = (varNumRoi * varNumCon * (varNumDpth - 1))
 
-# Feature list (column names for dataframe):
-lstFtr = ['ROI', 'Condition', 'Depth', 'Width', 'Scaling', 'Residuals']
+# Feature list (column names for dataframe). For width & scaling, there are
+# columns for lower & upper bounds of bootstrapping confidence interval.
+lstFtr = ['ROI', 'Condition', 'Depth', 'Width', 'Width CI low', 'Width CI up',
+          'Scaling', 'Scaling CI low', 'Scaling CI up', 'Residuals']
 
 # Dataframe for PSF model parameters:
 objDf = pd.DataFrame(0.0, index=np.arange(varNumSmpl), columns=lstFtr)
 
 # Coutner for dataframe samples:
 idxSmpl = 0
+
+# Bootstrap parameters:
+
+# We will sample subjects with replacement. How many subjects to sample on each
+# iteration:
+varNumSmp = varNumSub
+
+# Random array with subject indicies for bootstrapping of the form
+# aryRnd[varNumIt, varNumSmp]. Each row includes the indicies of the subjects
+# to the sampled on that iteration.
+aryRnd = np.random.randint(0,
+                           high=varNumSub,
+                           size=(varNumIt, varNumSmp))
 # -----------------------------------------------------------------------------
 
 
@@ -142,33 +172,77 @@ for idxRoi in range(varNumRoi):
     for idxCon in range(varNumCon):
         for idxDpth in range(varNumDpth):  #noqa
 
+            print(('--ROI: '
+                   + lstRoi[idxRoi]
+                   + ' | Condition: '
+                   + lstCon[idxCon]
+                   + ' | Depth level: '
+                   + lstDpthLbl[idxDpth]))
+
+            # -----------------------------------------------------------------
+            # *** Load data
+
+            print('---Load data')
+
             # The first entry in the list of depth levels is assumed to be the
             # deepest depth level, and used as the reference for the estimation
             # of the point spread function.
             if idxDpth == 0:
 
-                # File name of npy file for reference condition:
-                strPthNpyTmp = strPthNpy.format(lstRoi[idxRoi],
+                # File name of npz file for reference condition:
+                strPthNpzTmp = strPthNpz.format(lstRoi[idxRoi],
                                                 lstCon[idxCon],
                                                 lstDpthLbl[idxDpth])
 
-                # Load visual field projection:
-                aryDeep = np.load(strPthNpyTmp)
+                # Load visual field projections. `aryVslSpc` contains single
+                # subject visual field projections (shape: `aryVslSpc[idxSub,
+                # x, y]`). `aryNorm` contains normalisation factors for visual
+                # space projection (same shape as `aryVslSpc`).
+                objNpz = np.load(strPthNpzTmp)
+                aryDeep = objNpz['aryVslSpc'].astype(np.float32)
+                aryDeepNorm = objNpz['aryNorm'].astype(np.float32)
+
+                # Add up single subject visual field projections:
+                aryGrpDeep = np.sum(aryDeep, axis=0)
+                aryGrpDeepNorm = np.sum(aryDeepNorm, axis=0)
+
+                # Normalise:
+                aryGrpDeep = np.divide(aryGrpDeep, aryGrpDeepNorm)
 
             else:
 
-                # File name of npy file for current condition:
-                strPthNpyTmp = strPthNpy.format(lstRoi[idxRoi],
+                # File name of npz file for current condition:
+                strPthNpzTmp = strPthNpz.format(lstRoi[idxRoi],
                                                 lstCon[idxCon],
                                                 lstDpthLbl[idxDpth])
 
-                # Load visual field projection:
-                aryTrgt = np.load(strPthNpyTmp)
+                # Load visual field projections. `aryVslSpc` contains single
+                # subject visual field projections (shape: `aryVslSpc[idxSub,
+                # x, y]`). `aryNorm` contains normalisation factors for visual
+                # space projection (same shape as `aryVslSpc`).
+                objNpz = np.load(strPthNpzTmp)
+                aryTrgt = objNpz['aryVslSpc'].astype(np.float32)
+                aryTrgtNorm = objNpz['aryNorm'].astype(np.float32)
+
+                # Add up single subject visual field projections:
+                aryGrpTrgt = np.sum(aryTrgt, axis=0)
+                aryGrpTrgtNorm = np.sum(aryTrgtNorm, axis=0)
+
+                # Normalise:
+                aryGrpTrgt = np.divide(aryGrpTrgt, aryGrpTrgtNorm)
+
+                # -------------------------------------------------------------
+                # *** Calculate group level PSF
+
+                print('---Calculate group level PSF')
+
+                # We first calculate the PSF on the full, empirical group
+                # average visual field projection.
 
                 # Fit point spread function:
                 dicOptm = minimize(psf_diff,
                                    vecInit,
-                                   args=(aryDeep, aryTrgt),
+                                   args=(aryGrpDeep, aryGrpTrgt),
                                    bounds=lstBnds)
 
                 # Calculate sum of model residuals:
@@ -187,7 +261,90 @@ for idxRoi in range(varNumRoi):
                 objDf.at[idxSmpl, 'Scaling'] = dicOptm.x[1]
                 objDf.at[idxSmpl, 'Residuals'] = varTmpRes
 
+                # idxSmpl += 1
+
+                # -------------------------------------------------------------
+                # *** Bootstrap confidence intervals
+
+                print('---Bootstrap confidence intervals')
+
+                # Arrays for bootstrap samples (visual field projection and
+                # normalisation array, for reference and target depth levels):
+                aryBooDeep = np.zeros((varNumIt, varNumSub, varSzeVsm,
+                                       varSzeVsm)).astype(np.float32)
+                aryBooDeepNorm = np.zeros((varNumIt, varNumSub, varSzeVsm,
+                                           varSzeVsm)).astype(np.float32)
+                aryBooTrgt = np.zeros((varNumIt, varNumSub, varSzeVsm,
+                                       varSzeVsm)).astype(np.float32)
+                aryBooTrgtNorm = np.zeros((varNumIt, varNumSub, varSzeVsm,
+                                           varSzeVsm)).astype(np.float32)
+
+                # Loop through bootstrap iterations:
+                for idxIt in range(varNumIt):
+
+                    # Indices of current bootstrap sample:
+                    vecRnd = aryRnd[idxIt, :]
+
+                    # Put current bootstrap sample into array:
+                    aryBooDeep[idxIt, :, :, :] = aryDeep[vecRnd, :, :]
+                    aryBooDeepNorm[idxIt, :, :, :] = aryDeepNorm[vecRnd, :, :]
+                    aryBooTrgt[idxIt, :, :, :] = aryTrgt[vecRnd, :, :]
+                    aryBooTrgtNorm[idxIt, :, :, :] = aryTrgtNorm[vecRnd, :, :]
+
+
+                # Mean for each bootstrap sample (across subjects within the
+                # bootstrap sample). Afterwards, arrays have the following
+                # shape: `aryBoo*[varNumIt, varSzeVsm, varSzeVsm]`.
+                aryBooDeep = np.mean(aryBooDeep, axis=1)
+                aryBooDeepNorm = np.mean(aryBooDeepNorm, axis=1)
+                aryBooTrgt = np.mean(aryBooTrgt, axis=1)
+                aryBooTrgtNorm = np.mean(aryBooTrgtNorm, axis=1)
+
+                # Normalise:
+                aryBooDeep = np.divide(aryBooDeep, aryBooDeepNorm)
+                aryBooTrgt = np.divide(aryBooTrgt, aryBooTrgtNorm)
+
+                # Vectors for bootstrapping results:
+                vecBooResSd = np.zeros(varNumIt).astype(np.float32)
+                vecBooResWdth = np.zeros(varNumIt).astype(np.float32)
+
+                # The actual bootstrap PSF model fitting:
+                for idxIt in range(varNumIt):
+
+                    # Fit point spread function:
+                    dicOptm = minimize(psf_diff,
+                                       vecInit,
+                                       args=(aryBooDeep[idxIt, :, :],
+                                             aryBooTrgt[idxIt, :, :]),
+                                       bounds=lstBnds)
+
+                    # Convert width from array indices to degrees of visual
+                    # angle:
+                    varTmpSd = (dicOptm.x[0] / varScl)
+
+                    # Bootstrapping results to vector:
+                    vecBooResSd = varTmpSd
+                    vecBooResFct = dicOptm.x[1]
+
+                # Percentile bootstrap:
+                aryPrctSd = np.percentile(vecBooResSd, (varConLw, varConUp))
+                aryPrctFct = np.percentile(vecBooResFct, (varConLw, varConUp))
+
+                # Features to dataframe:
+                objDf.at[idxSmpl, 'Width CI low'] = aryPrctSd[0]
+                objDf.at[idxSmpl, 'Width CI up'] = aryPrctSd[1]
+                objDf.at[idxSmpl, 'Scaling CI low'] = aryPrctFct[0]
+                objDf.at[idxSmpl, 'Scaling CI up'] = aryPrctFct[1]
+
                 idxSmpl += 1
+
+
+
+
+
+
+
+
 
             # Create plots:
             if not(strPthPltVfp is None) and not(idxDpth == 0):

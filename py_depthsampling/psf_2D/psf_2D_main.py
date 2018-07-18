@@ -186,12 +186,31 @@ else:
         for idxCon in range(varNumCon):
             for idxDpth in range(varNumDpth):  #noqa
 
-                # Estimate PSF parameters:
-                objDf = estm_psf(idxRoi, idxCon, idxDpth, objDf, lstRoi,
-                                 lstCon, lstDpthLbl, strPthNpz, vecInit,
-                                 lstBnds, strPthPltVfp, varNumIt, varSzeVsm,
-                                 strFlTp, varNumSub, aryRnd, varScl, varConLw,
-                                 varConUp, idxSmpl)
+                # Estimate PSF parameters.
+
+                # When processing the lowest depth level, the corresponding
+                # visual field projection has to bee returned (because it will
+                # act as the reference for subsequent depth levels). Otherwise,
+                # only the dataframe with the PSF parameters is returned (and
+                # the reference visual field projection is passed into the
+                # function).
+
+                if idxDpth == 0:
+
+                    objDf, aryDeep, aryGrpDeep, aryDeepNorm = estm_psf(
+                        idxRoi, idxCon, idxDpth, objDf, lstRoi, lstCon,
+                        lstDpthLbl, strPthNpz, vecInit, lstBnds, strPthPltVfp,
+                        varNumIt, varSzeVsm, strFlTp, varNumSub, aryRnd,
+                        varScl, varConLw, varConUp, None, None, None, idxSmpl)
+
+                else:
+
+                    objDf = estm_psf(idxRoi, idxCon, idxDpth, objDf, lstRoi,
+                                     lstCon, lstDpthLbl, strPthNpz, vecInit,
+                                     lstBnds, strPthPltVfp, varNumIt,
+                                     varSzeVsm, strFlTp, varNumSub, aryRnd,
+                                     varScl, varConLw, varConUp, aryDeep,
+                                     aryGrpDeep, aryDeepNorm, idxSmpl)
 
                 # Increment counter for dataframe sample index:
                 idxSmpl += 1

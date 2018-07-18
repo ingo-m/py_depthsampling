@@ -30,7 +30,8 @@ from py_depthsampling.project.plot import plot
 
 def estm_psf(idxRoi, idxCon, idxDpth, objDf, lstRoi, lstCon, lstDpthLbl,
              strPthNpz, vecInit, lstBnds, strPthPltVfp, varNumIt, varSzeVsm,
-             strFlTp, varNumSub, aryRnd, varScl, varConLw, varConUp, idxSmpl):
+             strFlTp, varNumSub, aryRnd, varScl, varConLw, varConUp,
+             aryDeep, aryGrpDeep, aryDeepNorm, idxSmpl):
     """
     Estimate cortical depth point spread function.
 
@@ -299,5 +300,15 @@ def estm_psf(idxRoi, idxCon, idxDpth, objDf, lstRoi, lstCon, lstDpthLbl,
         objDf.at[idxSmpl, 'Scaling CI low'] = vecPrctFct[0]
         objDf.at[idxSmpl, 'Scaling CI up'] = vecPrctFct[1]
 
+    # -------------------------------------------------------------------------
+    # *** Return
+
+    # When processing the lowest depth level, the corresponding visual field
+    # projection has to bee returned (because it will act as the reference
+    # for subsequent depth levels). Otherwise, only the dataframe with the PSF
+    # parameters is returned
+    if idxDpth == 0:
+        return objDf, aryDeep, aryGrpDeep, aryDeepNorm
+    else:
         return objDf
 # -----------------------------------------------------------------------------

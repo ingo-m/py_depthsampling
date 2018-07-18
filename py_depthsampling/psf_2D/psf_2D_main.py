@@ -47,8 +47,8 @@ from py_depthsampling.psf_2D.psf_2D_estimate import estm_psf
 # *** Define parameters
 
 # PSF parameters are saved to or loaded from pickled dataframe. Path of
-# dataframe (number of samples left open):
-strPthDf = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf_2D/dataframe_{}.pickle'  #noqa
+# dataframe (number of samples and iterations left open):
+strPthDf = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf_2D/dataframe_{}_samples_{}_iterations.pickle'  #noqa
 
 # Load projection from (ROI, condition, depth level label left open):
 strPthNpz = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project_single_subject/{}_{}_{}.npz'  #noqa
@@ -67,14 +67,11 @@ strPthPltOt = '/home/john/Dropbox/PacMan_Plots/psf_2D_pe/{}'  #noqa
 # Output path & prefix for plots of visual field projections after application
 # of fitted PSF (file name left open). Set to `None` if plot should not be
 # created.
-strPthPltVfp = None  # '/home/john/Dropbox/PacMan_Plots/psf_2D_pe/{}'
+strPthPltVfp = '/home/john/Dropbox/PacMan_Plots/psf_2D_pe/{}'
 
 # File type suffix for plot:
 # strFlTp = '.svg'
 strFlTp = '.png'
-
-# Figure scaling factor:
-varDpi = 80.0
 
 # Condition levels (used to complete file names):
 lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
@@ -97,7 +94,7 @@ varExtmax = 2.0 * 5.19
 strPthCsv = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf_2D/dataframe.csv'  #noqa
 
 # Number of bootstrapping iterations:
-varNumIt = 20
+varNumIt = 1000
 
 # Lower and upper bound of bootstrap confidence intervals:
 varConLw = 5.0
@@ -165,7 +162,7 @@ aryRnd = np.random.randint(0,
 
 # Check whether dataframe with correct number of samples already exists; if
 # yes, load from disk.
-strPthDf = strPthDf.format(str(varNumSmpl))
+strPthDf = strPthDf.format(str(varNumSmpl), str(varNumIt))
 
 if os.path.isfile(strPthDf):
 

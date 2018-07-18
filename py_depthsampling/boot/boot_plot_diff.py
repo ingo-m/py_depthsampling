@@ -345,6 +345,6 @@ def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,  #noqa
     plt_dpth_prfl(aryEmpMne, None, varNumDpth, varNumCon, 80.0, varYmin,
                   varYmax, False, lstConLbl, strXlabel, strYlabel, strTtl,
                   lgcLgnd, strPath, varSizeX=1800.0, varSizeY=1600.0,
-                  varNumLblY=5, varPadY=varPadY, aryCnfLw=aryPrct[0, :, :],
+                  varNumLblY=6, varPadY=varPadY, aryCnfLw=aryPrct[0, :, :],
                   aryCnfUp=aryPrct[1, :, :])
     # ------------------------------------------------------------------------

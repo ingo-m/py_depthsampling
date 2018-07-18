@@ -90,8 +90,9 @@ tplBndFct = (0.0, 10.0)
 varExtmax = 2.0 * 5.19
 
 # Save result from model fitting (i.e. parameters of PSF) to disk (pandas data
-# frame saved as csv for import in R). If `None`, data frame is not created.
-strPthCsv = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf_2D/dataframe.csv'  #noqa
+# frame saved as csv for import in R). If `None`, data frame is not created
+# (number of samples and iterations left open).
+strPthCsv = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf_2D/dataframe_{}_samples_{}_iterations.csv'  #noqa
 
 # Number of bootstrapping iterations:
 varNumIt = 1000
@@ -346,6 +347,9 @@ if not (strPthPltOt is None):
 if (not (strPthCsv is None)):
 
     print('--Saving dataframe to csv.')
+
+    # Number of samples and bootstrap iterations in file name:
+    strPthCsv = strPthCsv.format(str(varNumSmpl), str(varNumIt))
 
     # Activate the pandas conversion), for conversions of pandas to R objects:
     pandas2ri.activate()

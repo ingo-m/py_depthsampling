@@ -58,7 +58,7 @@ strPthNpz = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project_
 lstDpthLbl = [str(x) for x in range(11)]
 
 # ROI ('v1','v2', or 'v3'):
-lstRoi = ['v1']  # , 'v2', 'v3']
+lstRoi = ['v1', 'v2', 'v3']
 
 # Output path & prefix for summary plots (file name left open). Set to `None`
 # if plot should not be created.
@@ -77,7 +77,7 @@ strFlTp = '.png'
 varDpi = 80.0
 
 # Condition levels (used to complete file names):
-lstCon = ['Pd_sst']  # , 'Ps_sst', 'Cd_sst']
+lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
 
 # Initial guess for PSF parameters (width and scaling factor; SD in degree of
 # visual angle):
@@ -97,7 +97,7 @@ varExtmax = 2.0 * 5.19
 strPthCsv = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf_2D/dataframe.csv'  #noqa
 
 # Number of bootstrapping iterations:
-varNumIt = 100
+varNumIt = 20
 
 # Lower and upper bound of bootstrap confidence intervals:
 varConLw = 5.0
@@ -211,9 +211,9 @@ else:
                                      varSzeVsm, strFlTp, varNumSub, aryRnd,
                                      varScl, varConLw, varConUp, aryDeep,
                                      aryGrpDeep, aryDeepNorm, idxSmpl)
-
-                # Increment counter for dataframe sample index:
-                idxSmpl += 1
+    
+                    # Increment counter for dataframe sample index:
+                    idxSmpl += 1
 
     # Save dataframe to pickle:
     objDf.to_pickle(strPthDf)
@@ -227,6 +227,18 @@ if not (strPthPltOt is None):
     # -------------------------------------------------------------------------
     # ** PSF width by depth & condition
 
+    # Figure dimensions:
+    varSizeX = 700
+    varSizeY = 700
+    varDpi = 80
+
+    # Figure layout parameters:
+    varYmin = 0.0
+    varYmax = 1.2
+    varNumLblY = 7
+    strXlabel = 'Cortical depth'
+    strYlabel = 'PSF width'
+
     for idxRoi in range(varNumRoi):
         for idxCon in range(varNumCon):
 
@@ -236,6 +248,9 @@ if not (strPthPltOt is None):
                          + '_'
                          + lstCon[idxCon]
                          + strFlTp)
+
+            # Title:
+            strTitle = (lstRoi[idxRoi] + ' ' + lstCon[idxCon])
 
             # Output path:
             strPthTmp = (strPthPltOt.format(strFleNme))
@@ -262,10 +277,6 @@ if not (strPthPltOt is None):
             # there are no parameters for the reference depth level).
             vecX = np.arange(0, (varNumDpth - 1))
 
-            varSizeX = 700
-            varSizeY = 700
-            varDpi = 80
-
             # Create figure:
             fgr01 = plt.figure(figsize=((varSizeX * 0.5) / varDpi,
                                         (varSizeY * 0.5) / varDpi),
@@ -274,11 +285,66 @@ if not (strPthPltOt is None):
             # Create axis:
             axs01 = fgr01.subplots(1, 1)
 
+            # Colour:
+            vecClr = np.array([57.0, 133.0, 185.0])
+            # vecClr = np.subtract(np.divide(vecClr, (255.0 * 0.5)), 1.0)
+
+            print('vecX.shape')
+            print(vecX.shape)
+            print('vecSd.shape')
+            print(vecSd.shape)
+            print('arySdErr.shape')
+            print(arySdErr.shape)
+
             # Create plot:
-            plot01 = axs01.bar(vecX, vecSd, yerr=arySdErr)
+            plot01 = axs01.bar(vecX,
+                               vecSd,
+                               yerr=arySdErr)
+            # color=vecClr)
+
+            # Y axis limits:
+            axs01.set_ylim(varYmin, varYmax)
+
+            # Which y values to label with ticks:
+            vecYlbl = np.linspace(varYmin, varYmax, num=varNumLblY,
+                                  endpoint=True)
+
+            # Set ticks:
+            axs01.set_yticks(vecYlbl)
+
+            # Set x & y tick font size:
+            axs01.tick_params(labelsize=36,
+                              top=False,
+                              right=False)
+
+            # Adjust labels:
+            axs01.set_xlabel(strXlabel,
+                             fontsize=36)
+            axs01.set_ylabel(strYlabel,
+                             fontsize=36)
+
+            # Reduce framing box:
+            axs01.spines['top'].set_visible(False)
+            axs01.spines['right'].set_visible(False)
+            axs01.spines['bottom'].set_visible(True)
+            axs01.spines['left'].set_visible(True)
+
+            # Adjust title:
+            axs01.set_title(strTitle, fontsize=36, fontweight="bold")
+
+            # Make plot & axis labels fit into figure (this may not always
+            # work, depending on the layout of the plot, matplotlib sometimes
+            # throws a ValueError ("left cannot be >= right").
+            try:
+                plt.tight_layout(pad=0.5)
+            except ValueError:
+                pass
 
             # Save figure:
             fgr01.savefig(strPthTmp)
+
+            # Close figure:
+            plt.close(fgr01)
 
 
 # -----------------------------------------------------------------------------
@@ -299,6 +365,7 @@ if (not (strPthCsv is None)):
     # Save csv to disk (using R function):
     fncR(objDf, strPthCsv)
 
+# -----------------------------------------------------------------------------
 # # Alternative grid search implementation:
 #
 # varNum = 100
@@ -319,3 +386,4 @@ if (not (strPthCsv is None)):
 # tplIdxMin = np.unravel_index(aryRes.argmin(), aryRes.shape)
 # varFitSd = vecSd[tplIdxMin[0]]
 # varFitFct = vecFct[tplIdxMin[1]]
+# -----------------------------------------------------------------------------

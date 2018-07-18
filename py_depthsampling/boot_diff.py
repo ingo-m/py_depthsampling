@@ -87,11 +87,11 @@ varNumIt = 100000
 # Lower & upper bound of percentile bootstrap (in percent), for bootstrap
 # confidence interval (models 1, 2, and 3) - this value is only printed, not
 # plotted - or plotted confidence intervals in case of model 5:
-varCnfLw = 2.5
-varCnfUp = 97.5
+varCnfLw = 5.0
+varCnfUp = 95.0
 
 # Padding around labelled values on y:
-varPadY = (0.05, 0.25)
+varPadY = (0.05, 0.05)
 # ---------------------------1--------------------------------------------------
 
 
@@ -112,34 +112,34 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                     if lstMetaCon[idxMtaCn] == 'stimulus':
                         if lstMdl[idxMdl] == '':
                             varYmin = -0.5
-                            varYmax = 0.5
+                            varYmax = 0.75
                         if lstMdl[idxMdl] == '_deconv_model_1':
                             varYmin = -0.5
-                            varYmax = 0.5
+                            varYmax = 0.75
                     if lstMetaCon[idxMtaCn] == 'periphery':
                         if lstMdl[idxMdl] == '':
                             varYmin = -0.5
-                            varYmax = 0.5
+                            varYmax = 0.75
                         if lstMdl[idxMdl] == '_deconv_model_1':
                             varYmin = -0.5
-                            varYmax = 0.5
+                            varYmax = 0.75
 
                 elif (idxRoi == 1) or (idxRoi == 3):  # v2 & v3
 
                     if lstMetaCon[idxMtaCn] == 'stimulus':
                         if lstMdl[idxMdl] == '':
                             varYmin = -0.5
-                            varYmax = 0.5
+                            varYmax = 0.75
                         if lstMdl[idxMdl] == '_deconv_model_1':
                             varYmin = -0.5
-                            varYmax = 0.5
+                            varYmax = 0.75
                     if lstMetaCon[idxMtaCn] == 'periphery':
                         if lstMdl[idxMdl] == '':
                             varYmin = -0.5
-                            varYmax = 0.5
+                            varYmax = 0.75
                         if lstMdl[idxMdl] == '_deconv_model_1':
                             varYmin = -0.5
-                            varYmax = 0.5
+                            varYmax = 0.75
 
                 # Create average plots:
                 boot_plot(strPthData.format(lstMetaCon[idxMtaCn],

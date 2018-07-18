@@ -211,7 +211,7 @@ else:
                                      varSzeVsm, strFlTp, varNumSub, aryRnd,
                                      varScl, varConLw, varConUp, aryDeep,
                                      aryGrpDeep, aryDeepNorm, idxSmpl)
-    
+
                     # Increment counter for dataframe sample index:
                     idxSmpl += 1
 
@@ -286,21 +286,16 @@ if not (strPthPltOt is None):
             axs01 = fgr01.subplots(1, 1)
 
             # Colour:
-            vecClr = np.array([57.0, 133.0, 185.0])
+            tplClr = (57.0/255.0, 133.0/255.0, 185.0/255.0)
+            # tplClr = (1.0, 0.2, 0.2)
+            # vecClr = np.array([57.0, 133.0, 185.0])
             # vecClr = np.subtract(np.divide(vecClr, (255.0 * 0.5)), 1.0)
-
-            print('vecX.shape')
-            print(vecX.shape)
-            print('vecSd.shape')
-            print(vecSd.shape)
-            print('arySdErr.shape')
-            print(arySdErr.shape)
 
             # Create plot:
             plot01 = axs01.bar(vecX,
                                vecSd,
-                               yerr=arySdErr)
-            # color=vecClr)
+                               yerr=arySdErr,
+                               color=tplClr)
 
             # Y axis limits:
             axs01.set_ylim(varYmin, varYmax)
@@ -313,15 +308,15 @@ if not (strPthPltOt is None):
             axs01.set_yticks(vecYlbl)
 
             # Set x & y tick font size:
-            axs01.tick_params(labelsize=36,
+            axs01.tick_params(labelsize=12,
                               top=False,
                               right=False)
 
             # Adjust labels:
             axs01.set_xlabel(strXlabel,
-                             fontsize=36)
+                             fontsize=12)
             axs01.set_ylabel(strYlabel,
-                             fontsize=36)
+                             fontsize=12)
 
             # Reduce framing box:
             axs01.spines['top'].set_visible(False)
@@ -330,7 +325,7 @@ if not (strPthPltOt is None):
             axs01.spines['left'].set_visible(True)
 
             # Adjust title:
-            axs01.set_title(strTitle, fontsize=36, fontweight="bold")
+            axs01.set_title(strTitle, fontsize=12, fontweight="bold")
 
             # Make plot & axis labels fit into figure (this may not always
             # work, depending on the layout of the plot, matplotlib sometimes

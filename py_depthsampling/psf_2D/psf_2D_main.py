@@ -67,7 +67,7 @@ strPthPltOt = '/home/john/Dropbox/PacMan_Plots/psf_2D_pe/{}'  #noqa
 # Output path & prefix for plots of visual field projections after application
 # of fitted PSF (file name left open). Set to `None` if plot should not be
 # created.
-strPthPltVfp = '/home/john/Dropbox/PacMan_Plots/psf_2D_pe/{}'
+strPthPltVfp = None  # '/home/john/Dropbox/PacMan_Plots/psf_2D_pe/{}'
 
 # File type suffix for plot:
 # strFlTp = '.svg'

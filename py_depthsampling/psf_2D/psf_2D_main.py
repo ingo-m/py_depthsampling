@@ -34,20 +34,21 @@ single subject visual field projections with replacement).
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import os
 import numpy as np
 import pandas as pd
-import seaborn as sns
 import matplotlib.pyplot as plt
-from scipy.optimize import minimize
-from py_depthsampling.psf_2D.utilities import psf
-from py_depthsampling.psf_2D.utilities import psf_diff
-from py_depthsampling.project.plot import plot
 import rpy2.robjects as robjects
 from rpy2.robjects import pandas2ri
+from py_depthsampling.psf_2D.psf_2D_estimate import estm_psf
 
 
 # -----------------------------------------------------------------------------
 # *** Define parameters
+
+# PSF parameters are saved to or loaded from pickled dataframe. Path of
+# dataframe (number of samples left open):
+strPthDf = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf_2D/dataframe_{}.pickle'  #noqa
 
 # Load projection from (ROI, condition, depth level label left open):
 strPthNpz = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project_single_subject/{}_{}_{}.npz'  #noqa
@@ -57,8 +58,7 @@ strPthNpz = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project_
 lstDpthLbl = [str(x) for x in range(11)]
 
 # ROI ('v1','v2', or 'v3'):
-#lstRoi = ['v1', 'v2', 'v3']
-lstRoi = ['v2']
+lstRoi = ['v1']  # , 'v2', 'v3']
 
 # Output path & prefix for summary plots (file name left open). Set to `None`
 # if plot should not be created.
@@ -67,7 +67,7 @@ strPthPltOt = '/home/john/Dropbox/PacMan_Plots/psf_2D_pe/{}'  #noqa
 # Output path & prefix for plots of visual field projections after application
 # of fitted PSF (file name left open). Set to `None` if plot should not be
 # created.
-strPthPltVfp = '/home/john/Dropbox/PacMan_Plots/psf_2D_pe/{}'
+strPthPltVfp = None  # '/home/john/Dropbox/PacMan_Plots/psf_2D_pe/{}'
 
 # File type suffix for plot:
 # strFlTp = '.svg'
@@ -77,8 +77,7 @@ strFlTp = '.png'
 varDpi = 80.0
 
 # Condition levels (used to complete file names):
-lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
-lstCon = ['Ps_sst']
+lstCon = ['Pd_sst']  # , 'Ps_sst', 'Cd_sst']
 
 # Initial guess for PSF parameters (width and scaling factor; SD in degree of
 # visual angle):
@@ -98,7 +97,7 @@ varExtmax = 2.0 * 5.19
 strPthCsv = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf_2D/dataframe.csv'  #noqa
 
 # Number of bootstrapping iterations:
-varNumIt = 1000
+varNumIt = 100
 
 # Lower and upper bound of bootstrap confidence intervals:
 varConLw = 5.0
@@ -143,304 +142,62 @@ varNumSmpl = (varNumRoi * varNumCon * (varNumDpth - 1))
 lstFtr = ['ROI', 'Condition', 'Depth', 'Width', 'Width CI low', 'Width CI up',
           'Scaling', 'Scaling CI low', 'Scaling CI up', 'Residuals']
 
-# Dataframe for PSF model parameters:
-objDf = pd.DataFrame(0.0, index=np.arange(varNumSmpl), columns=lstFtr)
-
 # Coutner for dataframe samples:
 idxSmpl = 0
 
 # Bootstrap parameters:
 
 # We will sample subjects with replacement. How many subjects to sample on each
-# iteration:
-varNumSmp = varNumSub
+# bootstrap iteration:
+varNumBooSmp = varNumSub
 
 # Random array with subject indicies for bootstrapping of the form
-# aryRnd[varNumIt, varNumSmp]. Each row includes the indicies of the subjects
-# to the sampled on that iteration.
+# aryRnd[varNumIt, varNumBooSmp]. Each row includes the indicies of the
+# subjects to the sampled on that iteration.
 aryRnd = np.random.randint(0,
                            high=varNumSub,
-                           size=(varNumIt, varNumSmp))
+                           size=(varNumIt, varNumBooSmp))
 # -----------------------------------------------------------------------------
 
 
 # -----------------------------------------------------------------------------
 # *** Parent loop
 
-print('-Estimate cortical depth point spread function')
+# Check whether dataframe with correct number of samples already exists; if
+# yes, load from disk.
+strPthDf = strPthDf.format(str(varNumSmpl))
 
-# Loop through ROIs, conditions, depth levels:
-for idxRoi in range(varNumRoi):
-    for idxCon in range(varNumCon):
-        for idxDpth in range(varNumDpth):  #noqa
+if os.path.isfile(strPthDf):
 
-            print(('--ROI: '
-                   + lstRoi[idxRoi]
-                   + ' | Condition: '
-                   + lstCon[idxCon]
-                   + ' | Depth level: '
-                   + lstDpthLbl[idxDpth]))
+    print('--Load PSF parameters from dataframe.')
 
-            # -----------------------------------------------------------------
-            # *** Load data
+    # Load existing dataframe:
+    objDf = pd.read_pickle(strPthDf)
 
-            print('---Load data')
+else:
 
-            # The first entry in the list of depth levels is assumed to be the
-            # deepest depth level, and used as the reference for the estimation
-            # of the point spread function.
-            if idxDpth == 0:
+    print('-Estimate cortical depth point spread function')
 
-                # File name of npz file for reference condition:
-                strPthNpzTmp = strPthNpz.format(lstRoi[idxRoi],
-                                                lstCon[idxCon],
-                                                lstDpthLbl[idxDpth])
+    # Dataframe for PSF model parameters:
+    objDf = pd.DataFrame(0.0, index=np.arange(varNumSmpl), columns=lstFtr)
 
-                # Load visual field projections. `aryVslSpc` contains single
-                # subject visual field projections (shape: `aryVslSpc[idxSub,
-                # x, y]`). `aryNorm` contains normalisation factors for visual
-                # space projection (same shape as `aryVslSpc`).
-                objNpz = np.load(strPthNpzTmp)
-                aryDeep = objNpz['aryVslSpc']
-                aryDeepNorm = objNpz['aryNorm']
+    # Loop through ROIs, conditions, depth levels:
+    for idxRoi in range(varNumRoi):
+        for idxCon in range(varNumCon):
+            for idxDpth in range(varNumDpth):  #noqa
 
-                # Add up single subject visual field projections:
-                aryGrpDeep = np.sum(aryDeep, axis=0)
-                aryGrpDeepNorm = np.sum(aryDeepNorm, axis=0)
+                # Estimate PSF parameters:
+                objDf = estm_psf(idxRoi, idxCon, idxDpth, objDf, lstRoi,
+                                 lstCon, lstDpthLbl, strPthNpz, vecInit,
+                                 lstBnds, strPthPltVfp, varNumIt, varSzeVsm,
+                                 strFlTp, varNumSub, aryRnd, varScl, varConLw,
+                                 varConUp, idxSmpl)
 
-                # Normalise:
-                aryGrpDeep = np.divide(aryGrpDeep, aryGrpDeepNorm)
-
-            else:
-
-                # File name of npz file for current condition:
-                strPthNpzTmp = strPthNpz.format(lstRoi[idxRoi],
-                                                lstCon[idxCon],
-                                                lstDpthLbl[idxDpth])
-
-                # Load visual field projections. `aryVslSpc` contains single
-                # subject visual field projections (shape: `aryVslSpc[idxSub,
-                # x, y]`). `aryNorm` contains normalisation factors for visual
-                # space projection (same shape as `aryVslSpc`).
-                objNpz = np.load(strPthNpzTmp)
-                aryTrgt = objNpz['aryVslSpc']
-                aryTrgtNorm = objNpz['aryNorm']
-
-                # Add up single subject visual field projections:
-                aryGrpTrgt = np.sum(aryTrgt, axis=0)
-                aryGrpTrgtNorm = np.sum(aryTrgtNorm, axis=0)
-
-                # Normalise:
-                aryGrpTrgt = np.divide(aryGrpTrgt, aryGrpTrgtNorm)
-
-                # -------------------------------------------------------------
-                # *** Calculate group level PSF
-
-                print('---Calculate group level PSF')
-
-                # We first calculate the PSF on the full, empirical group
-                # average visual field projection.
-
-                # Fit point spread function:
-                dicOptm = minimize(psf_diff,
-                                   vecInit,
-                                   args=(aryGrpDeep, aryGrpTrgt),
-                                   bounds=lstBnds)
-
-                # Calculate sum of model residuals:
-                varTmpRes = psf_diff((dicOptm.x[0], dicOptm.x[1]),
-                                     aryGrpDeep,
-                                     aryGrpTrgt)
-
-                # Convert width from array indices to degrees of visual angle:
-                varTmpSd = (dicOptm.x[0] / varScl)
-
-                # Features to dataframe:
-                objDf.at[idxSmpl, 'ROI'] = idxRoi
-                objDf.at[idxSmpl, 'Condition'] = idxCon
-                objDf.at[idxSmpl, 'Depth'] = idxDpth
-                objDf.at[idxSmpl, 'Width'] = varTmpSd
-                objDf.at[idxSmpl, 'Scaling'] = dicOptm.x[1]
-                objDf.at[idxSmpl, 'Residuals'] = varTmpRes
-
-                # idxSmpl += 1
-
-            # -----------------------------------------------------------------
-            # *** Create plots
-
-            if not(strPthPltVfp is None) and not(idxDpth == 0):
-
-                # ** Plot least squares fit visual field projection
-
-                # Apply fitted parameters to reference visual field projection:
-                aryFit = psf(aryGrpDeep, dicOptm.x[0], dicOptm.x[1])
-
-                # Output path for plot:
-                strPthPltOtTmp = (strPthPltVfp.format((lstRoi[idxRoi]
-                                                       + '_'
-                                                       + lstCon[idxCon]
-                                                       + '_'
-                                                       + lstDpthLbl[idxDpth]))
-                                  + strFlTp)
-
-                # Plot title:
-                strTmpTtl = (lstRoi[idxRoi]
-                             + ' '
-                             + lstCon[idxCon]
-                             + ' '
-                             + lstDpthLbl[idxDpth])
-
-                # Create plot:
-                plot(aryFit,
-                     strTmpTtl,
-                     'x-position',
-                     'y-position',
-                     strPthPltOtTmp,
-                     tpleLimX=(-5.19, 5.19, 3.0),
-                     tpleLimY=(-5.19, 5.19, 3.0),
-                     varMin=-2.5,
-                     varMax=2.5)
-
-                # ** Plot residuals visual field projection
-
-                # Calculate residuals:
-                aryRes = np.subtract(aryGrpTrgt, aryFit)
-
-                # Output path for plot:
-                strPthPltOtTmp = (strPthPltVfp.format((lstRoi[idxRoi]
-                                                       + '_'
-                                                       + lstCon[idxCon]
-                                                       + '_'
-                                                       + lstDpthLbl[idxDpth]
-                                                       + '_residuals'))
-                                  + strFlTp)
-
-                # Plot title:
-                strTmpTtl = (lstRoi[idxRoi]
-                             + ' '
-                             + lstCon[idxCon]
-                             + ' '
-                             + lstDpthLbl[idxDpth])
-
-                # Create plot:
-                plot(aryRes,
-                     strTmpTtl,
-                     'x-position',
-                     'y-position',
-                     strPthPltOtTmp,
-                     tpleLimX=(-5.19, 5.19, 3.0),
-                     tpleLimY=(-5.19, 5.19, 3.0),
-                     varMin=None,
-                     varMax=None)
-
-                # ** Plot residuals by PSC
-
-                # PSC and residuals into datafram:
-                objDfRes = pd.DataFrame(data=np.array([aryGrpDeep.flatten(),
-                                                       aryRes.flatten()]).T,
-                                        columns=['PSC', 'Residuals'])
-
-                # Plot residuals vs. PSC:
-                objAx = sns.regplot('PSC', 'Residuals', data=objDfRes,
-                                    marker='.')
-                objFgr = objAx.get_figure()
-
-                # Output path for plot:
-                strPthPltOtTmp = (strPthPltVfp.format((lstRoi[idxRoi]
-                                                       + '_'
-                                                       + lstCon[idxCon]
-                                                       + '_'
-                                                       + lstDpthLbl[idxDpth]
-                                                       + '_residuals_by_PSC'))
-                                  + strFlTp)
-
-                # Save figure:
-                objFgr.savefig(strPthPltOtTmp)
-                # plt.clf(objFgr)
-                plt.close(objFgr)
-
-            # -----------------------------------------------------------------
-            # *** Bootstrap confidence intervals
-
-            if not(idxDpth == 0):
-
-                print('---Bootstrap confidence intervals')
-
-                # Arrays for bootstrap samples (visual field projection and
-                # normalisation array, for reference and target depth levels):
-                aryBooDeep = np.zeros((varNumIt, varNumSub, varSzeVsm,
-                                       varSzeVsm))
-                aryBooDeepNorm = np.zeros((varNumIt, varNumSub, varSzeVsm,
-                                           varSzeVsm))
-                aryBooTrgt = np.zeros((varNumIt, varNumSub, varSzeVsm,
-                                       varSzeVsm))
-                aryBooTrgtNorm = np.zeros((varNumIt, varNumSub, varSzeVsm,
-                                           varSzeVsm))
-
-                # Loop through bootstrap iterations:
-                for idxIt in range(varNumIt):
-
-                    # Indices of current bootstrap sample:
-                    vecRnd = aryRnd[idxIt, :]
-
-                    # Put current bootstrap sample into array:
-                    aryBooDeep[idxIt, :, :, :] = aryDeep[vecRnd, :, :]
-                    aryBooDeepNorm[idxIt, :, :, :] = aryDeepNorm[vecRnd, :, :]
-                    aryBooTrgt[idxIt, :, :, :] = aryTrgt[vecRnd, :, :]
-                    aryBooTrgtNorm[idxIt, :, :, :] = aryTrgtNorm[vecRnd, :, :]
-
-                # Mean for each bootstrap sample (across subjects within the
-                # bootstrap sample). Afterwards, arrays have the following
-                # shape: `aryBoo*[varNumIt, varSzeVsm, varSzeVsm]`.
-                aryBooDeep = np.mean(aryBooDeep, axis=1)
-                aryBooDeepNorm = np.mean(aryBooDeepNorm, axis=1)
-                aryBooTrgt = np.mean(aryBooTrgt, axis=1)
-                aryBooTrgtNorm = np.mean(aryBooTrgtNorm, axis=1)
-
-                # Normalise:
-                aryBooDeep = np.divide(aryBooDeep, aryBooDeepNorm)
-                aryBooTrgt = np.divide(aryBooTrgt, aryBooTrgtNorm)
-
-                # Vectors for bootstrapping results:
-                vecBooResSd = np.zeros(varNumIt)
-                vecBooResFct = np.zeros(varNumIt)
-
-                # The actual bootstrap PSF model fitting:
-                for idxIt in range(varNumIt):
-
-                    # Fit point spread function:
-                    dicOptm = minimize(psf_diff,
-                                       vecInit,
-                                       args=(aryBooDeep[idxIt, :, :],
-                                             aryBooTrgt[idxIt, :, :]),
-                                       bounds=lstBnds)
-
-                    # Convert width from array indices to degrees of visual
-                    # angle:
-                    varTmpSd = (dicOptm.x[0] / varScl)
-
-                    # Bootstrapping results to vector:
-                    vecBooResSd[idxIt] = varTmpSd
-                    vecBooResFct[idxIt] = dicOptm.x[1]
-
-                # Percentile bootstrap:
-                vecPrctSd = np.percentile(vecBooResSd, (varConLw, varConUp))
-                vecPrctFct = np.percentile(vecBooResFct, (varConLw, varConUp))
-
-                # Features to dataframe:
-                objDf.at[idxSmpl, 'Width CI low'] = vecPrctSd[0]
-                objDf.at[idxSmpl, 'Width CI up'] = vecPrctSd[1]
-                objDf.at[idxSmpl, 'Scaling CI low'] = vecPrctFct[0]
-                objDf.at[idxSmpl, 'Scaling CI up'] = vecPrctFct[1]
-
+                # Increment counter for dataframe sample index:
                 idxSmpl += 1
 
-
-
-
-strPthDf = '/home/john/Desktop/tmp/objDf.pickle'
-objDf.to_pickle(strPthDf)
-# objDf = pd.read_pickle(strPthDf)
+    # Save dataframe to pickle:
+    objDf.to_pickle(strPthDf)
 
 
 # -----------------------------------------------------------------------------
@@ -448,62 +205,17 @@ objDf.to_pickle(strPthDf)
 
 if not (strPthPltOt is None):
 
-#    # -------------------------------------------------------------------------
-#    # ** PSF width by condition
-#
-#    # Output path:
-#    strPthTmp = (strPthPltOt.format('PSF_width_by_condition') + strFlTp)
-#
-#    # Create seaborn colour palette:
-#    lstClr = ["amber", "greyish", "faded green"]
-#    objClr = sns.xkcd_palette(lstClr)
-#
-#    # Draw nested barplot:
-#    fgr01 = sns.factorplot(x="ROI", y="Width", hue="Condition", data=objDf,
-#                           size=6, kind="bar", palette=objClr, ci=varCi)
-#
-#    # Set x-axis labels to upper case ROI labels:
-#    lstRoiUp = [x.upper() for x in lstRoi]
-#    fgr01.set_xticklabels(lstRoiUp)
-#
-#    # Set hue labels (i.e. condition labels in legend):
-#    for objTxt, strLbl in zip(fgr01._legend.texts, lstCon):
-#        objTxt.set_text(strLbl)
-#
-#    # Save figure:
-#    fgr01.savefig(strPthTmp)
-
-#    # -------------------------------------------------------------------------
-#    # ** PSF width by depth
-#
-#    # Output path:
-#    strPthTmp = (strPthPltOt.format('PSF_width_by_depth') + strFlTp)
-#
-#    # Create seaborn colour palette:
-#    objClr = sns.light_palette((210, 90, 60), input="husl",
-#                               n_colors=varNumDpth)
-#
-#    # Draw nested barplot:
-#    fgr02 = sns.factorplot(x="ROI", y="Width", hue="Depth", data=objDf, size=6,
-#                           kind="bar", legend=True, palette=objClr, ci=varCi)
-#
-#    fgr02.set_xticklabels(lstRoiUp)
-#
-#    # Save figure:
-#    fgr02.savefig(strPthTmp)
-
     # -------------------------------------------------------------------------
     # ** PSF width by depth & condition
-
 
     for idxRoi in range(varNumRoi):
         for idxCon in range(varNumCon):
 
             # Output file name:
-            strFleNme = (lstRoi[idxRoi]
+            strFleNme = ('PSF_width_by_depth_'
+                         + lstRoi[idxRoi]
                          + '_'
                          + lstCon[idxCon]
-                         + '_PSF_width_by_depth'
                          + strFlTp)
 
             # Output path:
@@ -519,9 +231,14 @@ if not (strPthPltOt is None):
             vecSdLow = objDf[objLgcRoi]["Width CI low"].values
             vecSdUp = objDf[objLgcRoi]["Width CI up"].values
 
+            # Matplotlib `yerr` are +/- sizes relative to the data, therefore
+            # subtract data points from error values:
+            vecSdLow = np.subtract(vecSd, vecSdLow)
+            vecSdUp = np.subtract(vecSdUp, vecSd)
+
             # Adjust shape for matplotlib:
             arySdErr = np.array([vecSdLow, vecSdUp])
-            
+
             # Number of bars (one less than number of depth levels, because
             # there are no parameters for the reference depth level).
             vecX = np.arange(0, (varNumDpth - 1))
@@ -534,130 +251,17 @@ if not (strPthPltOt is None):
             fgr01 = plt.figure(figsize=((varSizeX * 0.5) / varDpi,
                                         (varSizeY * 0.5) / varDpi),
                                dpi=varDpi)
-        
+
             # Create axis:
             axs01 = fgr01.subplots(1, 1)
-            
+
             # Create plot:
             plot01 = axs01.bar(vecX, vecSd, yerr=arySdErr)
 
             # Save figure:
             fgr01.savefig(strPthTmp)
 
-#    # -------------------------------------------------------------------------
-#    # ** PSF factor by condition
-#
-#    # Output path:
-#    strPthTmp = (strPthPltOt.format('PSF_factor_by_condition') + strFlTp)
-#
-#    # Create seaborn colour palette:
-#    colors = ["amber", "greyish", "faded green"]
-#    objClr = sns.xkcd_palette(colors)
-#
-#    # Draw nested barplot:
-#    fgr01 = sns.factorplot(x="ROI", y="Scaling", hue="Condition", data=objDf,
-#                           size=6, kind="bar", palette=objClr, ci=varCi)
-#
-#    # Set x-axis labels to upper case ROI labels:
-#    lstRoiUp = [x.upper() for x in lstRoi]
-#    fgr01.set_xticklabels(lstRoiUp)
-#
-#    # Set hue labels (i.e. condition labels in legend):
-#    for objTxt, strLbl in zip(fgr01._legend.texts, lstCon):
-#        objTxt.set_text(strLbl)
-#
-#    # Save figure:
-#    fgr01.savefig(strPthTmp)
 
-#    # -------------------------------------------------------------------------
-#    # ** PSF factor by depth
-#
-#    # Output path:
-#    strPthTmp = (strPthPltOt.format('PSF_factor_by_depth') + strFlTp)
-#
-#    # Create seaborn colour palette:
-#    objClr = sns.light_palette((210, 90, 60), input="husl",
-#                               n_colors=varNumDpth)
-#
-#    # Draw nested barplot:
-#    fgr02 = sns.factorplot(x="ROI", y="Scaling", hue="Depth", data=objDf,
-#                           size=6, kind="bar", legend=True, palette=objClr,
-#                           ci=varCi)
-#
-#    fgr02.set_xticklabels(lstRoiUp)
-#
-#    # Save figure:
-#    fgr02.savefig(strPthTmp)
-
-#    # -------------------------------------------------------------------------
-#    # ** Residuals by condition
-#
-#    # Output path:
-#    strPthTmp = (strPthPltOt.format('Residuals_by_condition') + strFlTp)
-#
-#    # Create seaborn colour palette:
-#    colors = ["amber", "greyish", "faded green"]
-#    objClr = sns.xkcd_palette(colors)
-#
-#    # Draw nested barplot:
-#    fgr01 = sns.factorplot(x="ROI", y="Residuals", hue="Condition", data=objDf,
-#                           size=6, kind="bar", palette=objClr, ci=varCi)
-#
-#    # Set x-axis labels to upper case ROI labels:
-#    lstRoiUp = [x.upper() for x in lstRoi]
-#    fgr01.set_xticklabels(lstRoiUp)
-#
-#    # Set hue labels (i.e. condition labels in legend):
-#    for objTxt, strLbl in zip(fgr01._legend.texts, lstCon):
-#        objTxt.set_text(strLbl)
-#
-#    # Save figure:
-#    fgr01.savefig(strPthTmp)
-#
-#    # -------------------------------------------------------------------------
-#    # ** Residuals by depth
-#
-#    # Output path:
-#    strPthTmp = (strPthPltOt.format('Residuals_by_depth') + strFlTp)
-#
-#    # Create seaborn colour palette:
-#    objClr = sns.light_palette((210, 90, 60), input="husl",
-#                               n_colors=varNumDpth)
-#
-#    # Draw nested barplot:
-#    fgr02 = sns.factorplot(x="ROI", y="Residuals", hue="Depth", data=objDf,
-#                           size=6, kind="bar", legend=True, palette=objClr,
-#                           ci=varCi)
-#
-#    fgr02.set_xticklabels(lstRoiUp)
-#
-#    # Save figure:
-#    fgr02.savefig(strPthTmp)
-#
-#    # -------------------------------------------------------------------------
-#    # ** Residuals by depth & condition
-#
-#    # Output path:
-#    strPthTmp = (strPthPltOt.format('Residuals_by_depth_and_cond') + strFlTp)
-#
-#    # Create seaborn colour palette:
-#    objClr = sns.light_palette((210, 90, 60), input="husl",
-#                               n_colors=varNumDpth)
-#
-#    # Draw nested barplot:
-#    fgr02 = sns.factorplot(x="ROI", y="Residuals", hue="Depth", data=objDf,
-#                           size=6, kind="bar", legend=True, palette=objClr,
-#                           ci=varCi, col="Condition")
-#
-#    # Set column titles:
-#    for objAx, strTtl in zip(fgr02.axes.flat, lstCon):
-#        objAx.set_title(strTtl)
-#
-#    fgr02.set_xticklabels(lstRoiUp)
-#
-#    # Save figure:
-#    fgr02.savefig(strPthTmp)
-#
 # -----------------------------------------------------------------------------
 # *** Save PSF parameters to CSV file
 

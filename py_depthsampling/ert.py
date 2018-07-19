@@ -127,5 +127,6 @@ for idxMtaCn in range(len(lstMtaCn)):
                          strVtkPth, varTr, varNumDpth, varNumVol, varStimStrt,
                          varStimEnd, strPthPic, lgcPic, strPltOtPre,
                          strPltOtSuf, varAcrSubsYmin=varAcrSubsYmin,
-                         varAcrSubsYmax=varAcrSubsYmax, varYnum=varYnum)
+                         varAcrSubsYmax=varAcrSubsYmax, varYnum=varYnum,
+                         strXlabel=strXlabel, strYlabel=strYlabel)
 # *****************************************************************************

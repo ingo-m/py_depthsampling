@@ -132,7 +132,7 @@ varDpi = 100.0
 
 # Label for axes:
 strXlabel = 'Cortical depth level'
-strYlabel = 'fMRI signal change [a.u.]'
+strYlabel = 'fMRI signal change [%]'
 
 # Condition levels (used to complete file names) - nested list:
 # lstNstCon = [['Pd', 'Cd', 'Ps'],

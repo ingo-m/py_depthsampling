@@ -52,7 +52,6 @@ strPthPic = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/era_{
 lstCon = ['pacman_dynamic', 'pacman_static', 'control_dynamic']
 
 # Condition labels (for plot legend):
-# lstConLbl = ['72.0%', '16.3%', '6.1%', '2.5%']
 lstConLbl = ['Pacman dynamic', 'Pacman static', 'Control dynamic']
 
 # Base name of vertex inclusion masks (subject ID, hemisphere, subject ID,
@@ -88,7 +87,7 @@ lgcCnvPrct = True
 
 # Label for axes:
 strXlabel = 'Time [s]'
-strYlabel = 'Percent signal change'
+strYlabel = 'fMRI signal change [%]'
 
 # Volume index of start of stimulus period (i.e. index of first volume during
 # which stimulus was on - for the plot):

@@ -441,7 +441,8 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
                                strFlTp,
                                strErr='sem',
                                vecX=vecPosEmp,
-                               vecWghts=vecNumInc)
+                               vecWghts=vecNumInc,
+                               tplPadY=(0.4, 0.1))
 
         # Across-subjects mean after deconvolution:
         strTmpTtl = '{} after deconvolution'.format(strRoi.upper())
@@ -461,7 +462,8 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
                                strFlTp,
                                strErr='sem',
                                vecX=vecIntpEqui,
-                               vecWghts=vecNumInc)
+                               vecWghts=vecNumInc,
+                               tplPadY=(0.4, 0.1))
 
     elif varMdl == 4:
 
@@ -543,10 +545,6 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
                       'Systematic error',
                       'Systematic error']
 
-        # Label for axes:
-        strXlabel = 'Cortical depth level (equivolume)'
-        strYlabel = 'fMRI signal change [a.u.]'
-
         # Colour for systematic error plot:
         aryClr = np.array(([22.0, 41.0, 248.0],
                            [230.0, 56.0, 60.0],
@@ -606,10 +604,6 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
 
         # Labels for model 6 (deep-GM-signal-intensity-scaling-factors):
         lstLblMdl5 = [(str(int(np.around(x * 100.0))) + ' %') for x in lstFctr]
-
-        # Label for axes:
-        strXlabel = 'Cortical depth level (equivolume)'
-        strYlabel = 'fMRI signal change [a.u.]'
 
         plt_dpth_prfl(aryDecon,           # aryData[Condition, Depth]
                       aryErr,             # aryError[Con., Depth]

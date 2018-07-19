@@ -48,11 +48,11 @@ lstSubIds = ['20171023',  # '20171109',
 # three depth levels is calculated, and on a second iteration the average over
 # the subsequent three depth levels is calculated. If 1lstDpth= [[None]]1,
 # average over all depth levels.
-# lstDpth = [None, [0, 1, 2], [4, 5, 6], [8, 9, 10]]
-lstDpth = [[x] for x in range(11)]
+lstDpth = [None, [0, 1, 2], [4, 5, 6], [8, 9, 10]]
+# lstDpth = [[x] for x in range(11)]
 # Depth level condition labels (output file will contain this label):
-# lstDpthLbl = ['allGM', 'deepGM', 'midGM', 'superficialGM']
-lstDpthLbl = [str(x) for x in range(11)]
+lstDpthLbl = ['allGM', 'deepGM', 'midGM', 'superficialGM']
+# lstDpthLbl = [str(x) for x in range(11)]
 
 # ROI ('v1' or 'v2'):
 lstRoi = ['v1', 'v2', 'v3']
@@ -62,8 +62,8 @@ strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/pe/{}_{}_{}'  #noqa
 # strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/z/{}_{}_{}'  #noqa
 
 # File type suffix for plot:
-# strFlTp = '.svg'
-strFlTp = '.png'
+strFlTp = '.svg'
+# strFlTp = '.png'
 
 # Figure scaling factor:
 varDpi = 80.0
@@ -76,9 +76,9 @@ varDpi = 80.0
 #           'Pd_min_Cd_Ps_trn',
 #           'Pd_min_Ps_trn', 'Pd_min_Cd_trn', 'Cd_min_Ps_trn']
 # lstCon = ['polar_angle', 'x_pos', 'y_pos', 'SD', 'R2']
-# lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
-lstCon = ['Pd_min_Ps_sst', 'Pd_min_Cd_sst', 'Cd_min_Ps_sst',
-          'Pd_min_Cd_Ps_sst']
+lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
+# lstCon = ['Pd_min_Ps_sst', 'Pd_min_Cd_sst', 'Cd_min_Ps_sst',
+#           'Pd_min_Cd_Ps_sst']
 
 # Path of vtk mesh with data to project into visual space (e.g. parameter
 # estimates; subject ID, hemisphere, and contion level left open).
@@ -431,6 +431,6 @@ for idxDpth in range(len(lstDpth)):  #noqa
                  strPthPltOtTmp,
                  tpleLimX=(varExtXmin, varExtXmax, 3.0),
                  tpleLimY=(varExtYmin, varExtYmax, 3.0),
-                 varMin=-2.5,
-                 varMax=2.5)
+                 varMin=-3.0,
+                 varMax=3.0)
 # -----------------------------------------------------------------------------

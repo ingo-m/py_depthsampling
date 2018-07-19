@@ -2,13 +2,13 @@
 """
 VTK depth samling across subjects.
 
-The purpose of this script is to visualise cortical depth sampling results from
-vtk files. The script can visualise statistical maps from vtk files. Vertices
-are selected according to several criteria:
+Visualise cortical depth sampling results from vtk files. Vertices are selected
+according to several criteria:
 
-    (1) The vertex has to be contained within the ROI (as defined by by a csv
-        file containing the indices of the ROI vertices, can be created with
-        paraview based on a retinotopic map).
+    (1) Selection criterion 1 - the vertex has to be contained within the ROI
+        (as defined by by a csv file containing the indices of the ROI
+        vertices; this csv file can be created with paraview based on a
+        retinotopic map).
     (2) Selection criterion 2 -  vertices that are BELOW threshold at any depth
         levels are excluded. (For example, a venogram, or a T2* weighted EPI
         image with low intensities around veins that is defined at all depth
@@ -16,7 +16,7 @@ are selected according to several criteria:
     (3) Selection criterion 3 - same as (2). Vertices that are BELOW threshold
         at any depth level are excluded.
     (4) Selection criterion 4 - Vertices that are WITHIN INTERVAL are included
-        (one depth level, e.g. mid-GM eccentricity).
+        (one depth level, e.g. retinotopic eccentricity).
 """
 
 # Part of py_depthsampling library

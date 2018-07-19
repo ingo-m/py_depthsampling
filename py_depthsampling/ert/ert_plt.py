@@ -46,7 +46,8 @@ def ert_plt(aryRoiErtMeanDpth,  #noqa
             strPthOut,
             varTmeScl=1.0,
             varXlbl=2,
-            varYnum=6):
+            varYnum=6,
+            tplPadY=(0.001, 0.001)):
     """Plot event-related timecourses."""
     # Create figure:
     fgr01 = plt.figure(figsize=(900.0/varDpi, 600.0/varDpi),
@@ -136,8 +137,10 @@ def ert_plt(aryRoiErtMeanDpth,  #noqa
 
     # Set x-axis range:
     # axs01.set_xlim([varStimStrt, varStimEnd])
+
     # Set y-axis range:
-    axs01.set_ylim([varYmin, varYmax])
+    axs01.set_ylim([(varYmin - tplPadY[0]),
+                    (varYmax + tplPadY[1])])
 
     # Which x values to label with ticks:
     axs01.set_xticks(vecXlbl)
@@ -198,7 +201,8 @@ def ert_plt(aryRoiErtMeanDpth,  #noqa
 
     # Plot horizontal bar for stimulus interval:
     plot03 = plt.plot(((0.0), (varStimEnd - varStimStrt)),  #noqa
-                      ((varYmin + 0.002), (varYmin + 0.002)),
+                      ((varYmin + 0.002 - tplPadY[0]),
+                       (varYmin + 0.002 - tplPadY[0])),
                       color=(0.3, 0.3, 0.3),
                       linewidth=8.0,
                       label='_nolegend_')

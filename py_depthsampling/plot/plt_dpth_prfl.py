@@ -28,7 +28,7 @@ def plt_dpth_prfl(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
                   varYmax, lgcCnvPrct, lstConLbl, strXlabel, strYlabel,
                   strTitle, lgcLgnd, strPath, vecX=None, varXmin=None,
                   varXmax=None, varSizeX=1800.0, varSizeY=1600.0,
-                  varNumLblY=5, varPadY=(0.0, 0.0), aryClr=None,
+                  varNumLblY=5, tplPadY=(0.0, 0.0), aryClr=None,
                   aryCnfLw=None, aryCnfUp=None, lstVrt=None, varRound=2):
     """
     Plot data across depth level for variable number of conditions.
@@ -84,7 +84,7 @@ def plt_dpth_prfl(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
         Height of figure.
     varNumLblY : int
         Number of labels on y axis.
-    varPadY : tuple
+    tplPadY : tuple
         Padding around labelled values on y.
     aryClr : np.array
         Line colours. Numpy array of form aryClr[idxCon, 3]; where the first
@@ -223,8 +223,8 @@ def plt_dpth_prfl(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
                     (varXmax + 0.07)])
 
     # Set y-axis range:
-    axs01.set_ylim([(varYmin - varPadY[0]),
-                    (varYmax + varPadY[1])])
+    axs01.set_ylim([(varYmin - tplPadY[0]),
+                    (varYmax + tplPadY[1])])
 
     # Which x values to label with ticks (WM & CSF boundary):
     # axs01.set_xticks([-0.1, (varNumDpth - 0.9)])

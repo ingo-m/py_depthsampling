@@ -104,7 +104,7 @@ lgcLgnd01 = True
 lgcLgnd02 = True
 
 # Output path for plots - prfix (metacondition, ROI, and hemisphere left open):
-strPltOtPre = '/home/john/Dropbox/PacMan_Plots/era/{}/{}_{}/'
+strPltOtPre = '/home/john/Dropbox/PacMan_Plots/era/{}_{}_{}_'
 # Output path for plots - suffix:
 strPltOtSuf = '_ert.svg'
 

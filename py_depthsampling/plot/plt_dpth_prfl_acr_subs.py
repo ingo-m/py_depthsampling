@@ -39,7 +39,8 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
                            varSizeY=1600.0,
                            strErr='conf95',
                            vecX=None,
-                           vecWghts=None):
+                           vecWghts=None,
+                           tplPadY=(0.0, 0.0)):
     """
     Calculate & plot across-subjects mean depth profiles.
 
@@ -101,6 +102,8 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
         non-weighted average is calculate (i.e. the 'normal' average with equal
         weights per subject). NOTE: Weighted error bars are not implemented for
         the option `strErr = prct95`.
+    tplPadY : tuple
+        Padding around labelled values on y.
     """
     # Across-subjects mean:
     if vecWghts is None:
@@ -254,15 +257,14 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
     # Set x-axis range:
     axs01.set_xlim([(np.min(vecX) - 0.07),
                     (np.max(vecX) + 0.07)])
-    # axs01.set_xlim([-0.07, 1.07])
 
     # Set y-axis range:
-    axs01.set_ylim([varAcrSubsYmin, varAcrSubsYmax])
+    axs01.set_ylim([(varAcrSubsYmin - tplPadY[0]),
+                    (varAcrSubsYmax + tplPadY[1])])
 
     # Which x values to label with ticks (WM & CSF boundary):
     axs01.set_xticks([(np.min(vecX) - 0.04),
                       (np.max(vecX) + 0.04)])
-    # axs01.set_xticks([-0.04, 1.04])
 
     # Labels for x ticks:
     axs01.set_xticklabels(['WM', 'CSF'])

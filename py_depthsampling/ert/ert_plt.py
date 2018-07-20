@@ -104,7 +104,6 @@ def ert_plt(aryRoiErtMeanDpth,  #noqa
     for idxCon in range(0, varNumCon):
 
         # Adjust the colour of current line:
-        # vecClrTmp = objCmap(objClrNorm(varNumCon - 1 - idxCon))
         vecClrTmp = objCmap(objClrNorm(idxCon))
 
         # Plot timecourse for current condition:

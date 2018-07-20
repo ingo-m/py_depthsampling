@@ -226,7 +226,7 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
     for idxIn in range(0, varNumCon):
 
         # Adjust the colour of current line:
-        vecClrTmp = objCmap(objClrNorm(varNumCon - 1 - idxIn))
+        vecClrTmp = objCmap(objClrNorm(idxIn))
 
         # Plot depth profile for current input file:
         plt01 = axs01.plot(vecX,  #noqa

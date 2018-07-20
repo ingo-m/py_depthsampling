@@ -222,10 +222,10 @@ def estm_psf_stim_mdl(idxRoi, idxCon, idxDpth, idxSmpl, lstRoi, lstCon,
 
     # Vectors for bootstrapping distributions (for PSF width, and scaling
     # factors for stimulu centre, edge, and periphery):
-    vecBooResSd = np.zeros(varNumIt)
-    vecBooResFctCntr = np.zeros(varNumIt)
-    vecBooResFctEdge = np.zeros(varNumIt)
-    vecBooResFctPeri = np.zeros(varNumIt)
+    vecBooSd = np.zeros(varNumIt)
+    vecBooFctCntr = np.zeros(varNumIt)
+    vecBooFctEdge = np.zeros(varNumIt)
+    vecBooFctPeri = np.zeros(varNumIt)
 
     # Crop visual field (only keep left hemifield):
     if lgcLftOnly:
@@ -245,19 +245,19 @@ def estm_psf_stim_mdl(idxRoi, idxCon, idxDpth, idxSmpl, lstRoi, lstCon,
         varTmpSd = (dicOptm.x[0] / varScl)
 
         # Bootstrapping results to vector:
-        vecBooResSd[idxIt] = varTmpSd
-        vecBooResFctCntr[idxIt] = dicOptm.x[1]
-        vecBooResFctEdge[idxIt] = dicOptm.x[2]
-        vecBooResFctPeri[idxIt] = dicOptm.x[3]
+        vecBooSd[idxIt] = varTmpSd
+        vecBooFctCntr[idxIt] = dicOptm.x[1]
+        vecBooFctEdge[idxIt] = dicOptm.x[2]
+        vecBooFctPeri[idxIt] = dicOptm.x[3]
 
     # Percentile bootstrap confidence intervals:
-    vecPrctSd = np.percentile(vecBooResSd, (varConLw, varConUp))
-    vecPrctFctCntr = np.percentile(vecBooResFctCntr, (varConLw, varConUp))
-    vecPrctFctEdge = np.percentile(vecBooResFctEdge, (varConLw, varConUp))
-    vecPrctFctPeri = np.percentile(vecBooResFctPeri, (varConLw, varConUp))
+    # vecPrctSd = np.percentile(vecBooSd, (varConLw, varConUp))
+    # vecPrctFctCntr = np.percentile(vecBooFctCntr, (varConLw, varConUp))
+    # vecPrctFctEdge = np.percentile(vecBooFctEdge, (varConLw, varConUp))
+    # vecPrctFctPeri = np.percentile(vecBooFctPeri, (varConLw, varConUp))
 
     # -------------------------------------------------------------------------
     # *** Return
 
-    return objDf, vecPrctSd, vecPrctFctCntr, vecPrctFctEdge, vecPrctFctPeri
+    return objDf, vecBooSd, vecBooFctCntr, vecBooFctEdge, vecBooFctPeri
 # -----------------------------------------------------------------------------

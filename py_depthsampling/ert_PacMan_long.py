@@ -76,18 +76,18 @@ strPrcdData = 'SCALARS'
 varNumLne = 2
 
 # Limits of y-axis:
-varAcrSubsYmin = -0.04
-varAcrSubsYmax = 0.03
-
-# Number of labels on the y axis:
-varYnum = 8
+varAcrSubsYmin = -0.03
+varAcrSubsYmax = 0.02
 
 # Convert y-axis values to percent (i.e. divide label values by 100)?
 lgcCnvPrct = True
 
-# Label for axes:
-strXlabel = 'Time [s]'
-strYlabel = 'Percent signal change'
+# Number of labels on the y axis:
+varYnum = 6
+
+# Which x-values to label on the axis (e.g., if `varXlbl = 2`, every second
+# x-value is labelled).
+varXlbl = 10
 
 # Volume TR (in seconds, for the plot):
 varTr = 2.079
@@ -101,22 +101,22 @@ varTmeScl = 10.0
 varStimStrt = 5.0  # 5 volumes prestimulus interval in ERT
 
 # Stimulus offset in seconds (for the plot), in volumes (will be converted to
-# seconds later):
-varStimEnd = varStimStrt + (25.0 / varTr)  # 25 s stimulus plus prestimulus interval
+# seconds later). (25 s stimulus plus prestimulus interval.)
+varStimEnd = varStimStrt + (25.0 / varTr)
 
 # Plot legend - single subject plots:
 lgcLgnd01 = True
 # Plot legend - across subject plots:
 lgcLgnd02 = True
 
+# Label for axes:
+strXlabel = 'Time [s]'
+strYlabel = 'fMRI signal change [%]'
+
 # Output path for plots - prfix (metacondition, ROI, and hemisphere left open):
 strPltOtPre = '/home/john/Dropbox/PacMan_Plots/era_long/{}/{}_{}/'
 # Output path for plots - suffix:
 strPltOtSuf = '_ert_long.svg'
-
-# Which x-values to label on the axis (e.g., if `varXlbl = 2`, every second
-# x-value is labelled).
-varXlbl = 10
 
 # Figure scaling factor:
 varDpi = 70.0
@@ -136,9 +136,10 @@ for idxMtaCn in range(len(lstMtaCn)):
                          lstHmsph[idxHmsph], lstRoi[idxRoi], strVtkMsk,
                          strVtkPth, varTr, varNumDpth, varNumVol, varStimStrt,
                          varStimEnd, strPthPic, lgcPic, strPltOtPre,
-                         strPltOtSuf, varAcrSubsYmin=varAcrSubsYmin,
-                         varAcrSubsYmax=varAcrSubsYmax, lgcCnvPrct=lgcCnvPrct,
-                         lgcLgnd01=lgcLgnd01, lgcLgnd02=lgcLgnd02,
-                         varTmeScl=varTmeScl, varXlbl=varXlbl, varYnum=varYnum,
-                         varDpi=varDpi)
+                         strPltOtSuf, strXlabel=strXlabel, strYlabel=strYlabel,
+                         varAcrSubsYmin=varAcrSubsYmin,
+                         varAcrSubsYmax=varAcrSubsYmax, tplPadY=(0.005, 0.005),
+                         lgcCnvPrct=lgcCnvPrct, lgcLgnd01=lgcLgnd01,
+                         lgcLgnd02=lgcLgnd02, varTmeScl=varTmeScl,
+                         varXlbl=varXlbl, varYnum=varYnum, varDpi=varDpi)
 # *****************************************************************************

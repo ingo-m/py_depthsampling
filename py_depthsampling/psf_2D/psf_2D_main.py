@@ -238,7 +238,7 @@ else:
     # Save dataframe to pickle:
     objDf.to_pickle(strPthDf)
 
-    # Save boostrap distribution of PSF parameters to npz files:
+    # Save boostrap distribution of PSF parameters to npz file:
     np.savez(strPthNpz,
              aryBooResSd=aryBooResSd,
              aryBooResFct=aryBooResFct)

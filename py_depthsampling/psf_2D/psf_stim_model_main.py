@@ -101,7 +101,7 @@ varExtMin = -5.19
 varExtMax = 5.19
 
 # Number of bootstrapping iterations:
-varNumIt = 10
+varNumIt = 1000
 
 # Lower and upper bound of bootstrap confidence intervals:
 varConLw = 5.0
@@ -349,16 +349,14 @@ arySdUp = np.subtract(arySdUp, arySdMdn)
 
 for idxDpth in range(varNumDpth):
 
-    # Output file name:
-    strFleNme = ('PSF_width_by_ROI_'
-                 + lstDpthLbl[idxDpth]
-                 + strFlTp)
-
     # Title:
     strTitle = lstDpthLbl[idxDpth]
 
     # Output path:
-    strPthTmp = (strPthPltOt.format(strFleNme))
+    strPthTmp = (strPthPltOt.format('Width', 'ROI')
+                 + '_Depth_'
+                 + str(idxDpth)
+                 + strFlTp)
 
     # Adjust shape of confidence interval array for matplotlib:
     arySdErr = np.array([arySdLw[:, idxDpth], arySdUp[:, idxDpth]])
@@ -524,5 +522,5 @@ if (not (strPthCsv is None)):
     fncR = robjects.r('write.csv')
 
     # Save csv to disk (using R function):
-    fncR(objDf, strPthCsv)
+    fncR(objDf, strPthCsv.format(str(varNumSmpl), str(varNumIt)))
 # -----------------------------------------------------------------------------

@@ -46,12 +46,15 @@ from py_depthsampling.psf_2D.psf_2D_estimate import estm_psf
 # -----------------------------------------------------------------------------
 # *** Define parameters
 
-# PSF parameters are saved to or loaded from pickled dataframe. Path of
-# dataframe (number of samples and iterations left open):
-strPthDf = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf_2D/dataframe_{}_samples_{}_iterations.pickle'  #noqa
+# PSF parameters are saved to or loaded to/from pickled dataframe. Also, the
+# bootstrap distributions of PSF parameters (Gaussian width and scaling factor)
+# are saved to or loaded from and npz file. Path of respective files (number of
+# samples and iterations left open):
+strPthData = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf_2D/dataframe_{}_samples_{}_iterations'  #noqa
 
-# Load projection from (ROI, condition, depth level label left open):
-strPthNpz = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project_single_subject/{}_{}_{}.npz'  #noqa
+# Load visual field projection from (ROI, condition, depth level label left
+# open):
+strPthVfp = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project_single_subject/{}_{}_{}.npz'  #noqa
 
 # Depth level labels (to complete input file names). First depth level in list
 # is used as reference for estimation of point spread function.
@@ -108,7 +111,7 @@ varConUp = 95.0
 
 # Get dimension of visual space model (assumed to be the same for x and y
 # directions, and for all ROIs/conditions/depth levels):
-objNpzTmp = np.load(strPthNpz.format(lstRoi[0], lstCon[0], lstDpthLbl[0]))
+objNpzTmp = np.load(strPthVfp.format(lstRoi[0], lstCon[0], lstDpthLbl[0]))
 aryTmp = objNpzTmp['aryVslSpc']
 varSzeVsm = aryTmp.shape[1]
 
@@ -155,21 +158,18 @@ varNumBooSmp = varNumSub
 aryRnd = np.random.randint(0,
                            high=varNumSub,
                            size=(varNumIt, varNumBooSmp))
-
-# Array for bootstrapping distribution of PSF paramters (needed in order to
-# calculate the across-conditions average).
-aryBooResSd = np.zeros((varNumRoi, varNumCon, (varNumDpth - 1), varNumIt))
-aryBooResFct = np.zeros((varNumRoi, varNumCon, (varNumDpth - 1), varNumIt))
 # -----------------------------------------------------------------------------
 
 
 # -----------------------------------------------------------------------------
 # *** Parent loop
 
+# Complete paths for dataframe and npz files:
+strPthDf = (strPthData.format(str(varNumSmpl), str(varNumIt)) + '.pickle')
+strPthNpz = (strPthData.format(str(varNumSmpl), str(varNumIt)) + '.npz')
+
 # Check whether dataframe with correct number of samples already exists; if
 # yes, load from disk.
-strPthDf = strPthDf.format(str(varNumSmpl), str(varNumIt))
-
 if os.path.isfile(strPthDf):
 
     print('--Load PSF parameters from dataframe.')
@@ -177,12 +177,22 @@ if os.path.isfile(strPthDf):
     # Load existing dataframe:
     objDf = pd.read_pickle(strPthDf)
 
+    # Load bootstrap distribution of PSF parameters:
+    objNpz = np.load(strPthNpz)
+    aryBooResSd = objNpz['aryBooResSd']
+    aryBooResFct = objNpz['aryBooResFct']
+
 else:
 
     print('-Estimate cortical depth point spread function')
 
     # Dataframe for PSF model parameters:
     objDf = pd.DataFrame(0.0, index=np.arange(varNumSmpl), columns=lstFtr)
+
+    # Array for bootstrapping distribution of PSF paramters (needed in order to
+    # calculate the across-conditions average).
+    aryBooResSd = np.zeros((varNumRoi, varNumCon, (varNumDpth - 1), varNumIt))
+    aryBooResFct = np.zeros((varNumRoi, varNumCon, (varNumDpth - 1), varNumIt))
 
     # Loop through ROIs, conditions, depth levels:
     for idxRoi in range(varNumRoi):
@@ -202,7 +212,7 @@ else:
 
                     objDf, aryDeep, aryGrpDeep, aryDeepNorm = estm_psf(
                         idxRoi, idxCon, idxDpth, objDf, lstRoi, lstCon,
-                        lstDpthLbl, strPthNpz, vecInit, lstBnds, strPthPltVfp,
+                        lstDpthLbl, strPthVfp, vecInit, lstBnds, strPthPltVfp,
                         varNumIt, varSzeVsm, strFlTp, varNumSub, aryRnd,
                         varScl, varConLw, varConUp, None, None, None, idxSmpl)
 
@@ -210,7 +220,7 @@ else:
 
                     objDf, vecTmp01, vecTmp02 = estm_psf(
                         idxRoi, idxCon, idxDpth, objDf, lstRoi, lstCon,
-                        lstDpthLbl, strPthNpz, vecInit, lstBnds, strPthPltVfp,
+                        lstDpthLbl, strPthVfp, vecInit, lstBnds, strPthPltVfp,
                         varNumIt, varSzeVsm, strFlTp, varNumSub, aryRnd,
                         varScl, varConLw, varConUp, aryDeep, aryGrpDeep,
                         aryDeepNorm, idxSmpl)
@@ -227,6 +237,12 @@ else:
 
     # Save dataframe to pickle:
     objDf.to_pickle(strPthDf)
+
+    # Save boostrap distribution of PSF parameters to npz files:
+    np.savez(strPthNpz,
+             aryBooResSd=aryBooResSd,
+             aryBooResFct=aryBooResFct)
+# -----------------------------------------------------------------------------
 
 
 # -----------------------------------------------------------------------------

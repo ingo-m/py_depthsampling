@@ -27,13 +27,10 @@ field can be created using `py_depthsampling.project.project_main`.
 import numpy as np
 from scipy.ndimage.filters import gaussian_filter
 import pandas as pd
-from scipy.optimize import minimize
-from py_depthsampling.psf_2D.utilities_stim_model import psf_stim_mdl
-from py_depthsampling.psf_2D.utilities_stim_model import psf_diff_stim_mdl
+from py_depthsampling.psf_2D.psf_stim_model_estimate import estm_psf_stim_mdl
 from py_depthsampling.psf_2D.utilities_stim_model import plot_psf_params
 import rpy2.robjects as robjects
 from rpy2.robjects import pandas2ri
-from py_depthsampling.project.plot import plot as plot_vfp
 import seaborn as sns
 
 
@@ -56,7 +53,7 @@ strPthPltOt = '/home/john/Dropbox/PacMan_Plots/psf_2D_pe_stim_model/PSF_{}_by_{}
 
 # Output path & prefix for plots of modelled visual field projections. Set to
 # `None` if plot should not be created.
-strPthPltVfp = '/home/john/Dropbox/PacMan_Plots/psf_2D_pe_stim_model/{}'
+strPthPltVfp = None  # '/home/john/Dropbox/PacMan_Plots/psf_2D_pe_stim_model/{}'  #noqa
 
 # File type suffix for plot:
 # strFlTp = '.svg'
@@ -228,134 +225,16 @@ for idxRoi in range(varNumRoi):
     for idxCon in range(varNumCon):
         for idxDpth in range(varNumDpth):  #noqa
 
-            # File name of npy file for current condition:
-            strPthNpyTmp = strPthNpy.format(lstRoi[idxRoi],
-                                            lstCon[idxCon],
-                                            lstDpthLbl[idxDpth])
-
-            # Load visual field projection:
-            aryTrgt = np.load(strPthNpyTmp)
-
-            # Crop visual field (only keep left hemifield):
-            if lgcLftOnly:
-                aryTrgt = aryTrgt[0:varMrdnV, :]
-
-            # Fit point spread function:
-            dicOptm = minimize(psf_diff_stim_mdl,
-                               vecInit,
-                               args=(aryPacMan, aryEdge, aryPeri, aryTrgt,
-                                     vecVslX),
-                               bounds=lstBnds)
-
-            # Fitted model parameters:
-            tplFit = (dicOptm.x[0], dicOptm.x[1], dicOptm.x[2], dicOptm.x[3])
-
-            # Calculate sum of model residuals:
-            varTmpRes = psf_diff_stim_mdl(tplFit,
-                                          aryPacMan,
-                                          aryEdge,
-                                          aryPeri,
-                                          aryTrgt,
-                                          vecVslX)
-
-            # Convert width from array indices to degrees of visual angle:
-            varTmpSd = (dicOptm.x[0] / varScl)
-
-            # Features to dataframe:
-            objDf.at[idxSmpl, 'ROI'] = idxRoi
-            objDf.at[idxSmpl, 'Condition'] = idxCon
-            objDf.at[idxSmpl, 'Depth'] = idxDpth
-            objDf.at[idxSmpl, 'Width'] = varTmpSd
-            objDf.at[idxSmpl, 'PSC centre'] = dicOptm.x[1]
-            objDf.at[idxSmpl, 'PSC edge'] = dicOptm.x[2]
-            objDf.at[idxSmpl, 'PSC periphery'] = dicOptm.x[3]
-            objDf.at[idxSmpl, 'Residuals'] = varTmpRes
+            # Estimate PSF parameters:
+            objDf = estm_psf_stim_mdl(idxRoi, idxCon, idxDpth, idxSmpl, lstRoi,
+                                      lstCon, lstDpthLbl, lgcLftOnly, varMrdnV,
+                                      vecInit, aryPacMan, aryEdge, aryPeri,
+                                      vecVslX, lstBnds, varScl, tplDim,
+                                      strPthNpy, strPthPltVfp, strFlTp, objDf)
 
             idxSmpl += 1
 
-            # Plot results?
-            if not(strPthPltVfp is None):
-
-                # ** Plot modelled visual field projection
-
-                # Apply fitted parameters to reference visual field projection:
-                aryFit = psf_stim_mdl(aryPacMan, aryEdge, aryPeri,
-                                      dicOptm.x[0], dicOptm.x[1], dicOptm.x[2],
-                                      dicOptm.x[3])
-
-                # Set right side of visual field to zero:
-                if lgcLftOnly:
-                    aryTmp = np.zeros(tplDim)
-                    aryTmp[0:varMrdnV, :] = aryFit
-                    aryFit = aryTmp
-
-                # Output path for plot:
-                strPthPltOtTmp = (strPthPltVfp.format((lstRoi[idxRoi]
-                                                       + '_'
-                                                       + lstCon[idxCon]
-                                                       + '_'
-                                                       + lstDpthLbl[idxDpth]))
-                                  + strFlTp)
-
-                # Plot title:
-                strTmpTtl = (lstRoi[idxRoi]
-                             + ' '
-                             + lstCon[idxCon]
-                             + ' '
-                             + lstDpthLbl[idxDpth])
-
-                # Create plot:
-                plot_vfp(aryFit,
-                         strTmpTtl,
-                         'x-position',
-                         'y-position',
-                         strPthPltOtTmp,
-                         tpleLimX=(-5.19, 5.19, 3.0),
-                         tpleLimY=(-5.19, 5.19, 3.0),
-                         varMin=-2.5,
-                         varMax=2.5)
-
-                # ** Plot model residuals
-
-                # Set right side of visual field to zero:
-                if lgcLftOnly:
-                    aryTmp = np.zeros(tplDim)
-                    aryTmp[0:varMrdnV, :] = aryTrgt
-                    aryTrgt = aryTmp
-
-                # Calculate residuals:
-                aryRes = np.subtract(aryTrgt, aryFit)
-
-                # Output path for plot:
-                strPthPltOtTmp = (strPthPltVfp.format((lstRoi[idxRoi]
-                                                       + '_'
-                                                       + lstCon[idxCon]
-                                                       + '_'
-                                                       + lstDpthLbl[idxDpth]
-                                                       + '_residuals'))
-                                  + strFlTp)
-
-                # Plot title:
-                strTmpTtl = (lstRoi[idxRoi]
-                             + ' '
-                             + lstCon[idxCon]
-                             + ' '
-                             + lstDpthLbl[idxDpth])
-
-                # Create plot:
-                plot_vfp(aryRes,
-                         strTmpTtl,
-                         'x-position',
-                         'y-position',
-                         strPthPltOtTmp,
-                         tpleLimX=(-5.19, 5.19, 3.0),
-                         tpleLimY=(-5.19, 5.19, 3.0),
-                         varMin=None,
-                         varMax=None)
 # -----------------------------------------------------------------------------
-
-
-print(objDf)
 
 
 # -----------------------------------------------------------------------------

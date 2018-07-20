@@ -264,9 +264,9 @@ if not (strPthPltOt is None):
     strXlabel = 'Cortical depth'
     strYlabel = 'PSF width'
 
-    # Compute median PSF width across conditions, now of the form
+    # Compute mean PSF width across conditions, now of the form
     # arySdMdn[idxRoi, idxDpth, idxIt].
-    arySdMdn = np.median(aryBooResSd, axis=1)
+    arySdMdn = np.mean(aryBooResSd, axis=1)
 
     # Percentile bootstrap confidence intervals (across iterations, resulting
     # shape is arySd*[idxRoi, idxDpth]):

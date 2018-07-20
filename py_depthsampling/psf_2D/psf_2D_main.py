@@ -70,8 +70,8 @@ strPthPltOt = '/home/john/Dropbox/PacMan_Plots/psf_2D_pe/{}'  #noqa
 strPthPltVfp = None  # '/home/john/Dropbox/PacMan_Plots/psf_2D_pe/{}'
 
 # File type suffix for plot:
-# strFlTp = '.svg'
-strFlTp = '.png'
+strFlTp = '.svg'
+# strFlTp = '.png'
 
 # Condition levels (used to complete file names):
 lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
@@ -155,6 +155,11 @@ varNumBooSmp = varNumSub
 aryRnd = np.random.randint(0,
                            high=varNumSub,
                            size=(varNumIt, varNumBooSmp))
+
+# Array for bootstrapping distribution of PSF paramters (needed in order to
+# calculate the across-conditions average).
+aryBooResSd = np.zeros((varNumRoi, varNumCon, (varNumDpth - 1), varNumIt))
+aryBooResFct = np.zeros((varNumRoi, varNumCon, (varNumDpth - 1), varNumIt))
 # -----------------------------------------------------------------------------
 
 
@@ -203,12 +208,19 @@ else:
 
                 else:
 
-                    objDf = estm_psf(idxRoi, idxCon, idxDpth, objDf, lstRoi,
-                                     lstCon, lstDpthLbl, strPthNpz, vecInit,
-                                     lstBnds, strPthPltVfp, varNumIt,
-                                     varSzeVsm, strFlTp, varNumSub, aryRnd,
-                                     varScl, varConLw, varConUp, aryDeep,
-                                     aryGrpDeep, aryDeepNorm, idxSmpl)
+                    objDf, vecTmp01, vecTmp02 = estm_psf(
+                        idxRoi, idxCon, idxDpth, objDf, lstRoi, lstCon,
+                        lstDpthLbl, strPthNpz, vecInit, lstBnds, strPthPltVfp,
+                        varNumIt, varSzeVsm, strFlTp, varNumSub, aryRnd,
+                        varScl, varConLw, varConUp, aryDeep, aryGrpDeep,
+                        aryDeepNorm, idxSmpl)
+
+                    print(vecTmp01)
+
+                    aryBooResSd[idxRoi, idxCon, (idxDpth - 1), :] = np.copy(
+                        vecTmp01)
+                    aryBooResFct[idxRoi, idxCon, (idxDpth - 1), :] = np.copy(
+                        vecTmp02)
 
                     # Increment counter for dataframe sample index:
                     idxSmpl += 1
@@ -221,6 +233,123 @@ else:
 # *** Plot results
 
 if not (strPthPltOt is None):
+
+    # -------------------------------------------------------------------------
+    # ** PSF width by depth (average across conditions)
+
+    # Figure dimensions:
+    varSizeX = 700
+    varSizeY = 700
+    varDpi = 80
+
+    # Figure layout parameters:
+    varYmin = 0.0
+    varYmax = 1.2
+    varNumLblY = 7
+    strXlabel = 'Cortical depth'
+    strYlabel = 'PSF width'
+
+    # Compute median PSF width across conditions, now of the form
+    # arySdMdn[idxRoi, idxDpth, idxIt].
+    arySdMdn = np.median(aryBooResSd, axis=1)
+
+    # Percentile bootstrap confidence intervals (across iterations, resulting
+    # shape is arySd*[idxRoi, idxDpth]):
+    arySdLw = np.percentile(arySdMdn, varConLw, axis=2)
+    arySdUp = np.percentile(arySdMdn, varConUp, axis=2)
+
+    # Compute median across iterations (new shape is arySdMdn[idxRoi,
+    # idxDpth]).
+    arySdMdn = np.median(arySdMdn, axis=2)
+
+    # Matplotlib `yerr` are +/- sizes relative to the data, therefore
+    # subtract data points from error values:
+    arySdLw = np.subtract(arySdMdn, arySdLw)
+    arySdUp = np.subtract(arySdUp, arySdMdn)
+
+    for idxRoi in range(varNumRoi):
+
+        # Output file name:
+        strFleNme = ('PSF_width_by_depth_'
+                     + lstRoi[idxRoi]
+                     + strFlTp)
+
+        # Title:
+        strTitle = lstRoi[idxRoi]
+
+        # Output path:
+        strPthTmp = (strPthPltOt.format(strFleNme))
+
+        # Adjust shape of confidence interval array for matplotlib:
+        arySdErr = np.array([arySdLw[idxRoi, :], arySdUp[idxRoi, :]])
+
+        # Number of bars (one less than number of depth levels, because there
+        # are no parameters for the reference depth level).
+        vecX = np.arange(0, (varNumDpth - 1))
+
+        # Create figure:
+        fgr01 = plt.figure(figsize=((varSizeX * 0.5) / varDpi,
+                                    (varSizeY * 0.5) / varDpi),
+                           dpi=varDpi)
+
+        # Create axis:
+        axs01 = fgr01.subplots(1, 1)
+
+        # Colour:
+        tplClr = (57.0/255.0, 133.0/255.0, 185.0/255.0)
+        # tplClr = (1.0, 0.2, 0.2)
+        # vecClr = np.array([57.0, 133.0, 185.0])
+        # vecClr = np.subtract(np.divide(vecClr, (255.0 * 0.5)), 1.0)
+
+        # Create plot:
+        plot01 = axs01.bar(vecX,
+                           arySdMdn[idxRoi, :],
+                           yerr=arySdErr,
+                           color=tplClr)
+
+        # Y axis limits:
+        axs01.set_ylim(varYmin, varYmax)
+
+        # Which y values to label with ticks:
+        vecYlbl = np.linspace(varYmin, varYmax, num=varNumLblY,
+                              endpoint=True)
+
+        # Set ticks:
+        axs01.set_yticks(vecYlbl)
+
+        # Set x & y tick font size:
+        axs01.tick_params(labelsize=12,
+                          top=False,
+                          right=False)
+
+        # Adjust labels:
+        axs01.set_xlabel(strXlabel,
+                         fontsize=12)
+        axs01.set_ylabel(strYlabel,
+                         fontsize=12)
+
+        # Reduce framing box:
+        axs01.spines['top'].set_visible(False)
+        axs01.spines['right'].set_visible(False)
+        axs01.spines['bottom'].set_visible(True)
+        axs01.spines['left'].set_visible(True)
+
+        # Adjust title:
+        axs01.set_title(strTitle, fontsize=12, fontweight="bold")
+
+        # Make plot & axis labels fit into figure (this may not always work,
+        # depending on the layout of the plot, matplotlib sometimes throws a
+        # ValueError ("left cannot be >= right").
+        try:
+            plt.tight_layout(pad=0.5)
+        except ValueError:
+            pass
+
+        # Save figure:
+        fgr01.savefig(strPthTmp)
+
+        # Close figure:
+        plt.close(fgr01)
 
     # -------------------------------------------------------------------------
     # ** PSF width by depth & condition

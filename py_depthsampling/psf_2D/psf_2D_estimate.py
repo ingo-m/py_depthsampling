@@ -305,10 +305,12 @@ def estm_psf(idxRoi, idxCon, idxDpth, objDf, lstRoi, lstCon, lstDpthLbl,
 
     # When processing the lowest depth level, the corresponding visual field
     # projection has to bee returned (because it will act as the reference
-    # for subsequent depth levels). Otherwise, only the dataframe with the PSF
-    # parameters is returned
+    # for subsequent depth levels). Otherwise, the dataframe with the PSF
+    # parameters and vectors with the bootstrapping distribution of paramters
+    # are returned (the latter is needed in order to calculate the across-
+    # condition average).
     if idxDpth == 0:
         return objDf, aryDeep, aryGrpDeep, aryDeepNorm
     else:
-        return objDf
+        return objDf, vecPrctSd, vecPrctFct
 # -----------------------------------------------------------------------------

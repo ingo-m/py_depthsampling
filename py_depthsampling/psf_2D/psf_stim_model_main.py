@@ -37,8 +37,9 @@ import seaborn as sns
 # -----------------------------------------------------------------------------
 # *** Define parameters
 
-# Load projection from (ROI, condition, depth level label left open):
-strPthNpy = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project/{}_{}_{}.npy'  #noqa
+# Load visual field projection from (ROI, condition, depth level label left
+# open):
+strPthVfp = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project_single_subject/{}_{}_{}.npz'  #noqa
 
 # Depth level labels (to complete input file names).
 lstDpthLbl = [str(x) for x in range(11)]
@@ -98,8 +99,9 @@ varExtMax = 5.19
 
 # Get dimension of visual space model (assumed to be the same for x and y
 # directions, and for all ROIs/conditions/depth levels):
-aryTmp = np.load(strPthNpy.format(lstRoi[0], lstCon[0], lstDpthLbl[0]))
-varSzeVsm = aryTmp.shape[0]
+objNpzTmp = np.load(strPthVfp.format(lstRoi[0], lstCon[0], lstDpthLbl[0]))
+aryTmp = objNpzTmp['aryVslSpc']
+varSzeVsm = aryTmp.shape[1]
 
 # Scaling factor from degrees of visual angle to array dimensions:
 varScl = (float(varSzeVsm) / float(varExtMax))
@@ -230,7 +232,7 @@ for idxRoi in range(varNumRoi):
                                       lstCon, lstDpthLbl, lgcLftOnly, varMrdnV,
                                       vecInit, aryPacMan, aryEdge, aryPeri,
                                       vecVslX, lstBnds, varScl, tplDim,
-                                      strPthNpy, strPthPltVfp, strFlTp, objDf)
+                                      strPthVfp, strPthPltVfp, strFlTp, objDf)
 
             idxSmpl += 1
 

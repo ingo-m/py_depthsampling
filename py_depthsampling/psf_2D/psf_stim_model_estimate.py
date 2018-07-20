@@ -29,7 +29,7 @@ from py_depthsampling.project.plot import plot as plot_vfp
 def estm_psf_stim_mdl(idxRoi, idxCon, idxDpth, idxSmpl, lstRoi, lstCon,
                       lstDpthLbl, lgcLftOnly, varMrdnV, vecInit, aryPacMan,
                       aryEdge, aryPeri, vecVslX, lstBnds, varScl, tplDim,
-                      strPthNpy, strPthPltVfp, strFlTp, objDf):
+                      strPthVfp, strPthPltVfp, strFlTp, objDf):
     """
     Calculate similarity between visual field projections and stimulus model.
 
@@ -48,12 +48,24 @@ def estm_psf_stim_mdl(idxRoi, idxCon, idxDpth, idxSmpl, lstRoi, lstCon,
     print('---Load visual field projection.')
 
     # File name of npy file for current condition:
-    strPthNpyTmp = strPthNpy.format(lstRoi[idxRoi],
+    strPthVfpTmp = strPthVfp.format(lstRoi[idxRoi],
                                     lstCon[idxCon],
                                     lstDpthLbl[idxDpth])
 
-    # Load visual field projection:
-    aryTrgt = np.load(strPthNpyTmp)
+    # Load visual field projections. `aryVslSpc` contains single subject visual
+    # field projections (shape: `aryVslSpc[idxSub, x, y]`). `aryNorm` contains
+    # normalisation factors for visual field projection (same shape as
+    # `aryVslSpc`).
+    objNpz = np.load(strPthVfpTmp)
+    aryTrgt = objNpz['aryVslSpc']
+    aryTrgtNorm = objNpz['aryNorm']
+
+    # Add up single subject visual field projections:
+    aryGrpTrgt = np.sum(aryTrgt, axis=0)
+    aryGrpTrgtNorm = np.sum(aryTrgtNorm, axis=0)
+
+    # Normalise:
+    aryGrpTrgt = np.divide(aryGrpTrgt, aryGrpTrgtNorm)
 
     # -------------------------------------------------------------------------
     # *** Calculate group level PSF
@@ -62,12 +74,12 @@ def estm_psf_stim_mdl(idxRoi, idxCon, idxDpth, idxSmpl, lstRoi, lstCon,
 
     # Crop visual field (only keep left hemifield):
     if lgcLftOnly:
-        aryTrgt = aryTrgt[0:varMrdnV, :]
+        aryGrpTrgt = aryGrpTrgt[0:varMrdnV, :]
 
     # Fit point spread function:
     dicOptm = minimize(psf_diff_stim_mdl,
                        vecInit,
-                       args=(aryPacMan, aryEdge, aryPeri, aryTrgt,
+                       args=(aryPacMan, aryEdge, aryPeri, aryGrpTrgt,
                              vecVslX),
                        bounds=lstBnds)
 
@@ -79,7 +91,7 @@ def estm_psf_stim_mdl(idxRoi, idxCon, idxDpth, idxSmpl, lstRoi, lstCon,
                                   aryPacMan,
                                   aryEdge,
                                   aryPeri,
-                                  aryTrgt,
+                                  aryGrpTrgt,
                                   vecVslX)
 
     # Convert width from array indices to degrees of visual angle:
@@ -145,11 +157,11 @@ def estm_psf_stim_mdl(idxRoi, idxCon, idxDpth, idxSmpl, lstRoi, lstCon,
         # Set right side of visual field to zero:
         if lgcLftOnly:
             aryTmp = np.zeros(tplDim)
-            aryTmp[0:varMrdnV, :] = aryTrgt
-            aryTrgt = aryTmp
+            aryTmp[0:varMrdnV, :] = aryGrpTrgt
+            aryGrpTrgt = aryTmp
 
         # Calculate residuals:
-        aryRes = np.subtract(aryTrgt, aryFit)
+        aryRes = np.subtract(aryGrpTrgt, aryFit)
 
         # Output path for plot:
         strPthPltOtTmp = (strPthPltVfp.format((lstRoi[idxRoi]

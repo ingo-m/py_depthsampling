@@ -24,6 +24,7 @@ field can be created using `py_depthsampling.project.project_main`.
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import os
 import numpy as np
 from scipy.ndimage.filters import gaussian_filter
 import pandas as pd
@@ -36,6 +37,12 @@ import seaborn as sns
 
 # -----------------------------------------------------------------------------
 # *** Define parameters
+
+# PSF parameters are saved to or loaded to/from pickled dataframe. Also, the
+# bootstrap distributions of PSF parameters (Gaussian width and scaling factor)
+# are saved to or loaded from and npz file. Path of respective files (number of
+# samples and iterations left open):
+strPthData = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf_2D_stim_model/dataframe_{}_samples_{}_iterations'  #noqa
 
 # Load visual field projection from (ROI, condition, depth level label left
 # open):
@@ -85,12 +92,19 @@ tplBndPeri = (-50.0, 50.0)
 
 # Save result from model fitting (i.e. parameters of PSF) to disk (pandas data
 # frame saved as csv for import in R). If `None`, data frame is not created.
-strPthCsv = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf_2D_stim_model/dataframe.csv'  #noqa
+strPthCsv = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf_2D_stim_model/dataframe_{}_samples_{}_iterations.csv'  #noqa
 
 # Extent of visual space from centre of the screen (assumed to be the same in
 # positive/negative x/y direction:
 varExtMin = -5.19
 varExtMax = 5.19
+
+# Number of bootstrapping iterations:
+varNumIt = 10
+
+# Lower and upper bound of bootstrap confidence intervals:
+varConLw = 5.0
+varConUp = 95.0
 # -----------------------------------------------------------------------------
 
 
@@ -102,6 +116,9 @@ varExtMax = 5.19
 objNpzTmp = np.load(strPthVfp.format(lstRoi[0], lstCon[0], lstDpthLbl[0]))
 aryTmp = objNpzTmp['aryVslSpc']
 varSzeVsm = aryTmp.shape[1]
+
+# Get number of subjects:
+varNumSub = aryTmp.shape[0]
 
 # Scaling factor from degrees of visual angle to array dimensions:
 varScl = (float(varSzeVsm) / float(varExtMax))
@@ -126,11 +143,21 @@ varNumSmpl = (varNumRoi * varNumCon * varNumDpth)
 lstFtr = ['ROI', 'Condition', 'Depth', 'Width', 'PSC centre', 'PSC edge',
           'PSC periphery', 'Residuals']
 
-# Dataframe for PSF model parameters:
-objDf = pd.DataFrame(0.0, index=np.arange(varNumSmpl), columns=lstFtr)
-
 # Coutner for dataframe samples:
 idxSmpl = 0
+
+# Bootstrap parameters:
+
+# We will sample subjects with replacement. How many subjects to sample on each
+# bootstrap iteration:
+varNumBooSmp = varNumSub
+
+# Random array with subject indicies for bootstrapping of the form
+# aryRnd[varNumIt, varNumBooSmp]. Each row includes the indicies of the
+# subjects to the sampled on that iteration.
+aryRnd = np.random.randint(0,
+                           high=varNumSub,
+                           size=(varNumIt, varNumBooSmp))
 # -----------------------------------------------------------------------------
 
 
@@ -220,22 +247,54 @@ if lgcLftOnly:
 # -----------------------------------------------------------------------------
 # *** Parent loop
 
-print('-Estimate cortical depth point spread function')
+# Complete paths for dataframe and npz files:
+strPthDf = (strPthData.format(str(varNumSmpl), str(varNumIt)) + '.pickle')
+strPthNpz = (strPthData.format(str(varNumSmpl), str(varNumIt)) + '.npz')
 
-# Loop through ROIs, conditions, depth levels:
-for idxRoi in range(varNumRoi):
-    for idxCon in range(varNumCon):
-        for idxDpth in range(varNumDpth):  #noqa
+# Check whether dataframe with correct number of samples already exists; if
+# yes, load from disk.
+if os.path.isfile(strPthDf):
 
-            # Estimate PSF parameters:
-            objDf = estm_psf_stim_mdl(idxRoi, idxCon, idxDpth, idxSmpl, lstRoi,
-                                      lstCon, lstDpthLbl, lgcLftOnly, varMrdnV,
-                                      vecInit, aryPacMan, aryEdge, aryPeri,
-                                      vecVslX, lstBnds, varScl, tplDim,
-                                      strPthVfp, strPthPltVfp, strFlTp, objDf)
+    print('--Load PSF parameters from dataframe.')
 
-            idxSmpl += 1
+    # Load existing dataframe:
+    objDf = pd.read_pickle(strPthDf)
 
+    # Load bootstrap distribution of PSF parameters:
+    objNpz = np.load(strPthNpz)
+    aryBooResSd = objNpz['aryBooResSd']
+    aryBooResFct = objNpz['aryBooResFct']
+
+else:
+
+    print('-Estimate cortical depth point spread function')
+
+    # Dataframe for PSF model parameters:
+    objDf = pd.DataFrame(0.0, index=np.arange(varNumSmpl), columns=lstFtr)
+
+    # Loop through ROIs, conditions, depth levels:
+    for idxRoi in range(varNumRoi):
+        for idxCon in range(varNumCon):
+            for idxDpth in range(varNumDpth):  #noqa
+
+                # Estimate PSF parameters:
+                objDf = estm_psf_stim_mdl(idxRoi, idxCon, idxDpth, idxSmpl,
+                                          lstRoi, lstCon, lstDpthLbl,
+                                          lgcLftOnly, varMrdnV, vecInit,
+                                          aryPacMan, aryEdge, aryPeri, vecVslX,
+                                          lstBnds, varScl, tplDim, strPthVfp,
+                                          strPthPltVfp, strFlTp, objDf)
+
+                # Increment counter for dataframe sample index:
+                idxSmpl += 1
+
+    # Save dataframe to pickle:
+    objDf.to_pickle(strPthDf)
+
+    # Save boostrap distribution of PSF parameters to npz file:
+    np.savez(strPthNpz,
+             aryBooResSd=aryBooResSd,
+             aryBooResFct=aryBooResFct)
 # -----------------------------------------------------------------------------
 
 

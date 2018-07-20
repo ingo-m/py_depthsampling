@@ -26,6 +26,7 @@ field can be created using `py_depthsampling.project.project_main`.
 
 import os
 import numpy as np
+import matplotlib.pyplot as plt
 from scipy.ndimage.filters import gaussian_filter
 import pandas as pd
 from py_depthsampling.psf_2D.psf_stim_model_estimate import estm_psf_stim_mdl
@@ -314,7 +315,125 @@ else:
 
 
 # -----------------------------------------------------------------------------
-# *** Plot results
+# *** Plot PSF width by ROI
+
+# Figure dimensions:
+varSizeX = 700
+varSizeY = 700
+varDpi = 80
+
+# Figure layout parameters:
+varYmin = 0.0
+varYmax = 1.2
+varNumLblY = 7
+strXlabel = 'ROI'
+strYlabel = 'PSF width'
+
+# Compute mean PSF width across conditions, now of the form
+# arySdMdn[idxRoi, idxDpth, idxIt].
+arySdMdn = np.mean(aryBooSd, axis=1)
+
+# Percentile bootstrap confidence intervals (across iterations, resulting
+# shape is arySd*[idxRoi, idxDpth]):
+arySdLw = np.percentile(arySdMdn, varConLw, axis=2)
+arySdUp = np.percentile(arySdMdn, varConUp, axis=2)
+
+# Compute median across iterations (new shape is arySdMdn[idxRoi,
+# idxDpth]).
+arySdMdn = np.median(arySdMdn, axis=2)
+
+# Matplotlib `yerr` are +/- sizes relative to the data, therefore
+# subtract data points from error values:
+arySdLw = np.subtract(arySdMdn, arySdLw)
+arySdUp = np.subtract(arySdUp, arySdMdn)
+
+for idxDpth in range(varNumDpth):
+
+    # Output file name:
+    strFleNme = ('PSF_width_by_ROI_'
+                 + lstDpthLbl[idxDpth]
+                 + strFlTp)
+
+    # Title:
+    strTitle = lstDpthLbl[idxDpth]
+
+    # Output path:
+    strPthTmp = (strPthPltOt.format(strFleNme))
+
+    # Adjust shape of confidence interval array for matplotlib:
+    arySdErr = np.array([arySdLw[:, idxDpth], arySdUp[:, idxDpth]])
+
+    # Number of bars:
+    vecX = np.arange(0, varNumRoi)
+
+    # Create figure:
+    fgr01 = plt.figure(figsize=((varSizeX * 0.5) / varDpi,
+                                (varSizeY * 0.5) / varDpi),
+                       dpi=varDpi)
+
+    # Create axis:
+    axs01 = fgr01.subplots(1, 1)
+
+    # Colour:
+    tplClr = (57.0/255.0, 133.0/255.0, 185.0/255.0)
+    # tplClr = (1.0, 0.2, 0.2)
+    # vecClr = np.array([57.0, 133.0, 185.0])
+    # vecClr = np.subtract(np.divide(vecClr, (255.0 * 0.5)), 1.0)
+
+    # Create plot:
+    plot01 = axs01.bar(vecX,
+                       arySdMdn[:, idxDpth],
+                       yerr=arySdErr,
+                       color=tplClr)
+
+    # Y axis limits:
+    axs01.set_ylim(varYmin, varYmax)
+
+    # Which y values to label with ticks:
+    vecYlbl = np.linspace(varYmin, varYmax, num=varNumLblY,
+                          endpoint=True)
+
+    # Set ticks:
+    axs01.set_yticks(vecYlbl)
+
+    # Set x & y tick font size:
+    axs01.tick_params(labelsize=12,
+                      top=False,
+                      right=False)
+
+    # Adjust labels:
+    axs01.set_xlabel(strXlabel,
+                     fontsize=12)
+    axs01.set_ylabel(strYlabel,
+                     fontsize=12)
+
+    # Reduce framing box:
+    axs01.spines['top'].set_visible(False)
+    axs01.spines['right'].set_visible(False)
+    axs01.spines['bottom'].set_visible(True)
+    axs01.spines['left'].set_visible(True)
+
+    # Adjust title:
+    axs01.set_title(strTitle, fontsize=12, fontweight="bold")
+
+    # Make plot & axis labels fit into figure (this may not always work,
+    # depending on the layout of the plot, matplotlib sometimes throws a
+    # ValueError ("left cannot be >= right").
+    try:
+        plt.tight_layout(pad=0.5)
+    except ValueError:
+        pass
+
+    # Save figure:
+    fgr01.savefig(strPthTmp)
+
+    # Close figure:
+    plt.close(fgr01)
+# -----------------------------------------------------------------------------
+
+
+# -----------------------------------------------------------------------------
+# *** Plot summaries
 
 # Size of confidence intervals:
 varCi = 90

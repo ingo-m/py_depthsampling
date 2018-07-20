@@ -98,7 +98,7 @@ varExtmax = 2.0 * 5.19
 strPthCsv = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf_2D/dataframe_{}_samples_{}_iterations.csv'  #noqa
 
 # Number of bootstrapping iterations:
-varNumIt = 1000
+varNumIt = 25
 
 # Lower and upper bound of bootstrap confidence intervals:
 varConLw = 5.0
@@ -225,8 +225,7 @@ else:
                         varScl, varConLw, varConUp, aryDeep, aryGrpDeep,
                         aryDeepNorm, idxSmpl)
 
-                    print(vecTmp01)
-
+                    # Hard copy bootstrapping distribution:
                     aryBooResSd[idxRoi, idxCon, (idxDpth - 1), :] = np.copy(
                         vecTmp01)
                     aryBooResFct[idxRoi, idxCon, (idxDpth - 1), :] = np.copy(

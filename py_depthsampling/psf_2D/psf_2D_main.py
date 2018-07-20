@@ -98,7 +98,7 @@ varExtmax = 2.0 * 5.19
 strPthCsv = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf_2D/dataframe_{}_samples_{}_iterations.csv'  #noqa
 
 # Number of bootstrapping iterations:
-varNumIt = 25
+varNumIt = 1000
 
 # Lower and upper bound of bootstrap confidence intervals:
 varConLw = 5.0

@@ -29,8 +29,9 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
              varStimEnd, strPthPic, lgcPic, strPltOtPre, strPltOtSuf,
              varNumLne=2, strPrcdData='SCALARS', strXlabel='Time [s]',
              strYlabel='Percent signal change', varAcrSubsYmin=-0.06,
-             varAcrSubsYmax=0.04, lgcCnvPrct=True, lgcLgnd01=True,
-             lgcLgnd02=True, varTmeScl=1.0, varXlbl=5, varYnum=6, varDpi=70.0):
+             varAcrSubsYmax=0.04, tplPadY=(0.001, 0.001), lgcCnvPrct=True,
+             lgcLgnd01=True, lgcLgnd02=True, varTmeScl=1.0, varXlbl=5,
+             varYnum=6, varDpi=70.0):
     """
     Plot event-related timecourses sampled across cortical depth levels.
 
@@ -92,6 +93,8 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
         Lower limit of y-axis.
     varAcrSubsYmax : float
         Upper limit of y-axis.
+    tplPadY : tuple
+        Padding around labelled values on y.
     lgcCnvPrct : bool
         Convert y-axis values to percent (i.e. divide label values by 100)?
     lgcLgnd01 : bool
@@ -262,7 +265,8 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
                         strTmpPth,
                         varTmeScl=varTmeScl,
                         varXlbl=varXlbl,
-                        varYnum=varYnum)
+                        varYnum=varYnum,
+                        tplPadY=tplPadY)
 
     # *************************************************************************
     # *** Plot across-subjects average
@@ -350,7 +354,8 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
                 strTmpPth,
                 varTmeScl=varTmeScl,
                 varXlbl=varXlbl,
-                varYnum=varYnum)
+                varYnum=varYnum,
+                tplPadY=tplPadY)
 
     # *************************************************************************
     # *** Plot across-subjects average (mean across depth levels)
@@ -416,5 +421,6 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
             strTmpPth,
             varTmeScl=varTmeScl,
             varXlbl=varXlbl,
-            varYnum=varYnum)
+            varYnum=varYnum,
+            tplPadY=tplPadY)
     # *************************************************************************

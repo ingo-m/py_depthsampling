@@ -29,7 +29,8 @@ from py_depthsampling.project.plot import plot as plot_vfp
 def estm_psf_stim_mdl(idxRoi, idxCon, idxDpth, idxSmpl, lstRoi, lstCon,
                       lstDpthLbl, lgcLftOnly, varMrdnV, vecInit, aryPacMan,
                       aryEdge, aryPeri, vecVslX, lstBnds, varScl, tplDim,
-                      strPthVfp, strPthPltVfp, strFlTp, objDf):
+                      strPthVfp, strPthPltVfp, strFlTp, aryRnd, varNumIt,
+                      varConLw, varConUp, varNumSub, varSzeVsm, objDf):
     """
     Calculate similarity between visual field projections and stimulus model.
 
@@ -193,6 +194,70 @@ def estm_psf_stim_mdl(idxRoi, idxCon, idxDpth, idxSmpl, lstRoi, lstCon,
     # -------------------------------------------------------------------------
     # *** Bootstrap confidence intervals
 
+    print('---Bootstrap confidence intervals')
+
+    # Arrays for bootstrap samples (visual field projection and normalisation
+    # array):
+    aryBooTrgt = np.zeros((varNumIt, varNumSub, varSzeVsm, varSzeVsm))
+    aryBooTrgtNorm = np.zeros((varNumIt, varNumSub, varSzeVsm, varSzeVsm))
+
+    # Loop through bootstrap iterations:
+    for idxIt in range(varNumIt):
+
+        # Indices of current bootstrap sample:
+        vecRnd = aryRnd[idxIt, :]
+
+        # Put current bootstrap sample into array:
+        aryBooTrgt[idxIt, :, :, :] = aryTrgt[vecRnd, :, :]
+        aryBooTrgtNorm[idxIt, :, :, :] = aryTrgtNorm[vecRnd, :, :]
+
+    # Median for each bootstrap sample (across subjects within the
+    # bootstrap sample). Afterwards, arrays have the following shape:
+    # `aryBoo*[varNumIt, varSzeVsm, varSzeVsm]`.
+    aryBooTrgt = np.median(aryBooTrgt, axis=1)
+    aryBooTrgtNorm = np.median(aryBooTrgtNorm, axis=1)
+
+    # Normalise:
+    aryBooTrgt = np.divide(aryBooTrgt, aryBooTrgtNorm)
+
+    # Vectors for bootstrapping distributions (for PSF width, and scaling
+    # factors for stimulu centre, edge, and periphery):
+    vecBooResSd = np.zeros(varNumIt)
+    vecBooResFctCntr = np.zeros(varNumIt)
+    vecBooResFctEdge = np.zeros(varNumIt)
+    vecBooResFctPeri = np.zeros(varNumIt)
+
+    # Crop visual field (only keep left hemifield):
+    if lgcLftOnly:
+        aryBooTrgt = aryBooTrgt[:, 0:varMrdnV, :]
+
+    # The actual bootstrap PSF model fitting:
+    for idxIt in range(varNumIt):
+
+        # Fit point spread function:
+        dicOptm = minimize(psf_diff_stim_mdl,
+                           vecInit,
+                           args=(aryPacMan, aryEdge, aryPeri,
+                                 aryBooTrgt[idxIt, :, :], vecVslX),
+                           bounds=lstBnds)
+
+        # Convert width from array indices to degrees of visual angle:
+        varTmpSd = (dicOptm.x[0] / varScl)
+
+        # Bootstrapping results to vector:
+        vecBooResSd[idxIt] = varTmpSd
+        vecBooResFctCntr[idxIt] = dicOptm.x[1]
+        vecBooResFctEdge[idxIt] = dicOptm.x[2]
+        vecBooResFctPeri[idxIt] = dicOptm.x[3]
+
+    # Percentile bootstrap confidence intervals:
+    vecPrctSd = np.percentile(vecBooResSd, (varConLw, varConUp))
+    vecPrctFctCntr = np.percentile(vecBooResFctCntr, (varConLw, varConUp))
+    vecPrctFctEdge = np.percentile(vecBooResFctEdge, (varConLw, varConUp))
+    vecPrctFctPeri = np.percentile(vecBooResFctPeri, (varConLw, varConUp))
+
     # -------------------------------------------------------------------------
-    return objDf
+    # *** Return
+
+    return objDf, vecPrctSd, vecPrctFctCntr, vecPrctFctEdge, vecPrctFctPeri
 # -----------------------------------------------------------------------------

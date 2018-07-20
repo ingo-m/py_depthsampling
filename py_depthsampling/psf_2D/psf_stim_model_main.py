@@ -262,8 +262,7 @@ if os.path.isfile(strPthDf):
 
     # Load bootstrap distribution of PSF parameters:
     objNpz = np.load(strPthNpz)
-    aryBooResSd = objNpz['aryBooResSd']
-    aryBooResFct = objNpz['aryBooResFct']
+    aryBooSd = objNpz['aryBooSd']
 
 else:
 
@@ -272,18 +271,32 @@ else:
     # Dataframe for PSF model parameters:
     objDf = pd.DataFrame(0.0, index=np.arange(varNumSmpl), columns=lstFtr)
 
+    # Array for bootstrapping distribution of PSF paramters (needed in order to
+    # calculate the across-conditions average).
+    aryBooSd = np.zeros((varNumRoi, varNumCon, varNumDpth, varNumIt))
+    aryBooFctCntr = np.zeros((varNumRoi, varNumCon, varNumDpth, varNumIt))
+    aryBooFctEdge = np.zeros((varNumRoi, varNumCon, varNumDpth, varNumIt))
+    aryBooFctPeri = np.zeros((varNumRoi, varNumCon, varNumDpth, varNumIt))
+
     # Loop through ROIs, conditions, depth levels:
     for idxRoi in range(varNumRoi):
         for idxCon in range(varNumCon):
             for idxDpth in range(varNumDpth):  #noqa
 
                 # Estimate PSF parameters:
-                objDf = estm_psf_stim_mdl(idxRoi, idxCon, idxDpth, idxSmpl,
-                                          lstRoi, lstCon, lstDpthLbl,
-                                          lgcLftOnly, varMrdnV, vecInit,
-                                          aryPacMan, aryEdge, aryPeri, vecVslX,
-                                          lstBnds, varScl, tplDim, strPthVfp,
-                                          strPthPltVfp, strFlTp, objDf)
+                objDf, vecTmpSd, vecTmpCntr, vecTmpEdge,  vecTmpPeri = \
+                    estm_psf_stim_mdl(
+                        idxRoi, idxCon, idxDpth, idxSmpl, lstRoi, lstCon,
+                        lstDpthLbl, lgcLftOnly, varMrdnV, vecInit, aryPacMan,
+                        aryEdge, aryPeri, vecVslX, lstBnds, varScl, tplDim,
+                        strPthVfp, strPthPltVfp, strFlTp, aryRnd, varNumIt,
+                        varConLw, varConUp, varNumSub, varSzeVsm, objDf)
+
+                # Hard copy bootstrapping distribution:
+                aryBooSd[idxRoi, idxCon, idxDpth, :] = np.copy(vecTmpSd)
+                aryBooFctCntr[idxRoi, idxCon, idxDpth, :] = np.copy(vecTmpCntr)
+                aryBooFctEdge[idxRoi, idxCon, idxDpth, :] = np.copy(vecTmpEdge)
+                aryBooFctPeri[idxRoi, idxCon, idxDpth, :] = np.copy(vecTmpPeri)
 
                 # Increment counter for dataframe sample index:
                 idxSmpl += 1
@@ -293,8 +306,10 @@ else:
 
     # Save boostrap distribution of PSF parameters to npz file:
     np.savez(strPthNpz,
-             aryBooResSd=aryBooResSd,
-             aryBooResFct=aryBooResFct)
+             aryBooSd=aryBooSd,
+             aryBooFctCntr=aryBooFctCntr,
+             aryBooFctEdge=aryBooFctEdge,
+             aryBooFctPeri=aryBooFctPeri)
 # -----------------------------------------------------------------------------
 
 

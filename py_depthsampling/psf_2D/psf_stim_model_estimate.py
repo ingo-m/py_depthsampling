@@ -211,11 +211,11 @@ def estm_psf_stim_mdl(idxRoi, idxCon, idxDpth, idxSmpl, lstRoi, lstCon,
         aryBooTrgt[idxIt, :, :, :] = aryTrgt[vecRnd, :, :]
         aryBooTrgtNorm[idxIt, :, :, :] = aryTrgtNorm[vecRnd, :, :]
 
-    # Median for each bootstrap sample (across subjects within the
-    # bootstrap sample). Afterwards, arrays have the following shape:
-    # `aryBoo*[varNumIt, varSzeVsm, varSzeVsm]`.
-    aryBooTrgt = np.median(aryBooTrgt, axis=1)
-    aryBooTrgtNorm = np.median(aryBooTrgtNorm, axis=1)
+    # Sum over each bootstrap sample (across subjects within the bootstrap
+    # sample). Afterwards, arrays have the following shape: `aryBoo*[varNumIt,
+    # varSzeVsm, varSzeVsm]`.
+    aryBooTrgt = np.sum(aryTrgt, axis=1)
+    aryBooTrgtNorm = np.sum(aryTrgtNorm, axis=1)
 
     # Normalise:
     aryBooTrgt = np.divide(aryBooTrgt, aryBooTrgtNorm)

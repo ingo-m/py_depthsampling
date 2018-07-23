@@ -216,8 +216,8 @@ def estm_psf_stim_mdl(idxRoi, idxCon, idxDpth, idxSmpl, lstRoi, lstCon,  #noqa
     # Sum over each bootstrap sample (across subjects within the bootstrap
     # sample). Afterwards, arrays have the following shape: `aryBoo*[varNumIt,
     # varSzeVsm, varSzeVsm]`.
-    aryBooTrgt = np.sum(aryTrgt, axis=1)
-    aryBooTrgtNorm = np.sum(aryTrgtNorm, axis=1)
+    aryBooTrgt = np.sum(aryBooTrgt, axis=1)
+    aryBooTrgtNorm = np.sum(aryBooTrgtNorm, axis=1)
 
     # Normalise:
     aryBooTrgt = np.divide(aryBooTrgt, aryBooTrgtNorm)
@@ -234,7 +234,7 @@ def estm_psf_stim_mdl(idxRoi, idxCon, idxDpth, idxSmpl, lstRoi, lstCon,  #noqa
     # Split data for parallel processing (list elements have shape
     # aryBooTrgt[varNumItChnk, varSzeVsm, varSzeVsm], where varNumItChnk are
     # the number of bootstrap samples per chunk).
-    lstBooTrgt = np.split(aryBooTrgt, varPar, axis=0)
+    lstBooTrgt = np.array_split(aryBooTrgt, varPar, axis=0)
     del(aryBooTrgt)
 
     # Create a queue to put the results in:

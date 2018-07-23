@@ -20,13 +20,15 @@
 
 import numpy as np
 import pandas as pd  #noqa
+import multiprocessing as mp
 from scipy.optimize import minimize
 from py_depthsampling.psf_2D.utilities_stim_model import psf_stim_mdl
 from py_depthsampling.psf_2D.utilities_stim_model import psf_diff_stim_mdl
 from py_depthsampling.project.plot import plot as plot_vfp
+from py_depthsampling.psf_2D.psf_stim_model_estimate_par import est_par
 
 
-def estm_psf_stim_mdl(idxRoi, idxCon, idxDpth, idxSmpl, lstRoi, lstCon,
+def estm_psf_stim_mdl(idxRoi, idxCon, idxDpth, idxSmpl, lstRoi, lstCon,  #noqa
                       lstDpthLbl, lgcLftOnly, varMrdnV, vecInit, aryPacMan,
                       aryEdge, aryPeri, vecVslX, lstBnds, varScl, tplDim,
                       strPthVfp, strPthPltVfp, strFlTp, aryRnd, varNumIt,
@@ -220,41 +222,86 @@ def estm_psf_stim_mdl(idxRoi, idxCon, idxDpth, idxSmpl, lstRoi, lstCon,
     # Normalise:
     aryBooTrgt = np.divide(aryBooTrgt, aryBooTrgtNorm)
 
-    # Vectors for bootstrapping distributions (for PSF width, and scaling
-    # factors for stimulu centre, edge, and periphery):
-    vecBooSd = np.zeros(varNumIt)
-    vecBooFctCntr = np.zeros(varNumIt)
-    vecBooFctEdge = np.zeros(varNumIt)
-    vecBooFctPeri = np.zeros(varNumIt)
-
     # Crop visual field (only keep left hemifield):
     if lgcLftOnly:
         aryBooTrgt = aryBooTrgt[:, 0:varMrdnV, :]
 
-    # The actual bootstrap PSF model fitting:
-    for idxIt in range(varNumIt):
+    # ** Parallelised bootstrap
 
-        # Fit point spread function:
-        dicOptm = minimize(psf_diff_stim_mdl,
-                           vecInit,
-                           args=(aryPacMan, aryEdge, aryPeri,
-                                 aryBooTrgt[idxIt, :, :], vecVslX),
-                           bounds=lstBnds)
+    # Number of processes to run in parallel:
+    varPar = 11
 
-        # Convert width from array indices to degrees of visual angle:
-        varTmpSd = (dicOptm.x[0] / varScl)
+    # Split data for parallel processing (list elements have shape
+    # aryBooTrgt[varNumItChnk, varSzeVsm, varSzeVsm], where varNumItChnk are
+    # the number of bootstrap samples per chunk).
+    lstBooTrgt = np.split(aryBooTrgt, varPar, axis=0)
+    del(aryBooTrgt)
 
-        # Bootstrapping results to vector:
-        vecBooSd[idxIt] = varTmpSd
-        vecBooFctCntr[idxIt] = dicOptm.x[1]
-        vecBooFctEdge[idxIt] = dicOptm.x[2]
-        vecBooFctPeri[idxIt] = dicOptm.x[3]
+    # Create a queue to put the results in:
+    queOut = mp.Queue()
 
-    # Percentile bootstrap confidence intervals:
-    # vecPrctSd = np.percentile(vecBooSd, (varConLw, varConUp))
-    # vecPrctFctCntr = np.percentile(vecBooFctCntr, (varConLw, varConUp))
-    # vecPrctFctEdge = np.percentile(vecBooFctEdge, (varConLw, varConUp))
-    # vecPrctFctPeri = np.percentile(vecBooFctPeri, (varConLw, varConUp))
+    # Empty list for processes:
+    lstPrcs = [None] * varPar
+
+    # Empty list for results of parallel processes:
+    lstRes = [None] * varPar
+
+    # Create processes:
+    for idxPrc in range(0, varPar):
+        lstPrcs[idxPrc] = mp.Process(target=est_par,
+                                     args=(idxPrc,
+                                           lstBooTrgt[idxPrc],
+                                           vecInit,
+                                           aryPacMan,
+                                           aryEdge,
+                                           aryPeri,
+                                           vecVslX,
+                                           lstBnds,
+                                           varScl,
+                                           queOut)
+                                     )
+
+        # Daemon (kills processes when exiting):
+        lstPrcs[idxPrc].Daemon = True
+
+    # Start processes:
+    for idxPrc in range(0, varPar):
+        lstPrcs[idxPrc].start()
+
+    # Collect results from queue:
+    for idxPrc in range(0, varPar):
+        lstRes[idxPrc] = queOut.get(True)
+
+    # Join processes:
+    for idxPrc in range(0, varPar):
+        lstPrcs[idxPrc].join()
+
+    del(lstBooTrgt)
+
+    # List for bootstrapping distributions (for PSF width, and scaling
+    # factors for stimulu centre, edge, and periphery):
+    lstBooSd = []
+    lstBooFctCntr = []
+    lstBooFctEdge = []
+    lstBooFctPeri = []
+
+    # Append bootstrap results to lists:
+    for idxPrc in range(0, varPar):
+
+        # The list with results from parallel processes has the shape:
+        # lstOut[idxPrc, vecBooSd, vecBooFctCntr, vecBooFctEdge, vecBooFctPeri]
+        # One such list per process is contained in `lstRes`.
+        lstOutTmp = lstRes[idxPrc]
+        lstBooSd.append(lstOutTmp[1])
+        lstBooFctCntr.append(lstOutTmp[2])
+        lstBooFctEdge.append(lstOutTmp[3])
+        lstBooFctPeri.append(lstOutTmp[4])
+
+    # Bootstrap distribution from list to array:
+    vecBooSd = np.concatenate(lstBooSd, axis=0)
+    vecBooFctCntr = np.concatenate(lstBooFctCntr, axis=0)
+    vecBooFctEdge = np.concatenate(lstBooFctEdge, axis=0)
+    vecBooFctPeri = np.concatenate(lstBooFctPeri, axis=0)
 
     # -------------------------------------------------------------------------
     # *** Return

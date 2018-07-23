@@ -324,22 +324,23 @@ varDpi = 80
 
 # Figure layout parameters:
 varYmin = 0.0
-varYmax = 1.2
-varNumLblY = 7
+varYmax = 0.8
+varNumLblY = 5
 strXlabel = 'ROI'
 strYlabel = 'PSF width'
 
+# Shape of data: aryBooSd[idxRoi, idxCon, idxDpth, idxIt]
+
 # Compute mean PSF width across conditions, now of the form
 # arySdMdn[idxRoi, idxDpth, idxIt].
-arySdMdn = np.mean(aryBooSd, axis=1)
+arySdMdn = np.median(aryBooSd, axis=1)
 
 # Percentile bootstrap confidence intervals (across iterations, resulting
 # shape is arySd*[idxRoi, idxDpth]):
 arySdLw = np.percentile(arySdMdn, varConLw, axis=2)
 arySdUp = np.percentile(arySdMdn, varConUp, axis=2)
 
-# Compute median across iterations (new shape is arySdMdn[idxRoi,
-# idxDpth]).
+# Compute median across iterations (new shape is arySdMdn[idxRoi, idxDpth]).
 arySdMdn = np.median(arySdMdn, axis=2)
 
 # Matplotlib `yerr` are +/- sizes relative to the data, therefore

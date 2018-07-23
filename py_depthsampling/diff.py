@@ -48,22 +48,22 @@ lstHmsph = ['rh']
 # condition, and model index left open):
 strPthData = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npz'  #noqa
 
-# Output path & prefix for plots (meta-condition, ROI, ROI, hemisphere, and
+# Output path & prefix for plots (meta-condition, ROI, hemisphere, and
 # model index left open):
-strPthPltOt = '/home/john/Dropbox/PacMan_Plots/diff/{}/{}/{}_{}{}'  #noqa
+strPthPltOt = '/home/john/Dropbox/PacMan_Plots/diff/{}_{}_{}{}_SEM'  #noqa
 
 # Output path for single subject plot, (ROI, metacondition, hemisphere, drain
 # model, and condition left open):
 # strPthPtlSnglOt = '/home/john/Dropbox/PacMan_Plots/diff_sngle/{}_{}_{}{}_{}'
 
 # File type suffix for plot:
-strFlTp = '.png'
+strFlTp = '.svg'
 
 # Figure scaling factor:
 varDpi = 100.0
 
 # Label for axes:
-strXlabel = 'Cortical depth level (equivolume)'
+strXlabel = 'Cortical depth level'
 strYlabel = 'Signal change [%]'
 
 # Condition levels (used to complete file names):
@@ -76,11 +76,11 @@ lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
 lstConLbl = lstCon
 
 # Which conditions to compare (list of tuples with condition indices):
-lstDiff = [(0, 1), (0, 2), (2, 1)]
+lstDiff = [(0, 1), (0, 2), (1, 2)]
 # lstDiff = [(0, 3)]
 
 # Padding around labelled values on y:
-tplPadY = (0.05, 0.25)
+tplPadY = (0.01, 0.01)
 # -----------------------------------------------------------------------------
 
 
@@ -100,34 +100,34 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
 
                     if lstMetaCon[idxMtaCn] == 'stimulus':
                         if lstMdl[idxMdl] == '':
-                            varYmin = -0.5
+                            varYmin = -0.25
                             varYmax = 0.5
                         if lstMdl[idxMdl] == '_deconv_model_1':
-                            varYmin = -0.5
+                            varYmin = -0.25
                             varYmax = 0.5
                     if lstMetaCon[idxMtaCn] == 'periphery':
                         if lstMdl[idxMdl] == '':
-                            varYmin = -0.5
+                            varYmin = -0.25
                             varYmax = 0.5
                         if lstMdl[idxMdl] == '_deconv_model_1':
-                            varYmin = -0.5
+                            varYmin = -0.25
                             varYmax = 0.5
 
                 elif (idxRoi == 1) or (idxRoi == 3):  # v2 & v3
 
                     if lstMetaCon[idxMtaCn] == 'stimulus':
                         if lstMdl[idxMdl] == '':
-                            varYmin = -0.5
+                            varYmin = -0.25
                             varYmax = 0.5
                         if lstMdl[idxMdl] == '_deconv_model_1':
-                            varYmin = -0.5
+                            varYmin = -0.25
                             varYmax = 0.5
                     if lstMetaCon[idxMtaCn] == 'periphery':
                         if lstMdl[idxMdl] == '':
-                            varYmin = -0.5
+                            varYmin = -0.25
                             varYmax = 0.5
                         if lstMdl[idxMdl] == '_deconv_model_1':
-                            varYmin = -0.5
+                            varYmin = -0.25
                             varYmax = 0.5
 
                 # Create average plots:
@@ -137,7 +137,6 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                                            '{}',
                                            lstMdl[idxMdl]),
                          (strPthPltOt.format(lstMetaCon[idxMtaCn],
-                                             lstRoi[idxRoi],
                                              lstRoi[idxRoi],
                                              lstHmsph[idxHmsph],
                                              lstMdl[idxMdl])

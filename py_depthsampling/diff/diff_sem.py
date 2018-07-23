@@ -278,5 +278,5 @@ def diff_sem(objDpth, strPath, lstCon, lstConLbl, strTtl='', varYmin=0.0,  #noqa
     plt_dpth_prfl(aryEmpMne, arySem, varNumDpth, varNumCon, 80.0, varYmin,
                   varYmax, False, lstConLbl, strXlabel, strYlabel, strTtl,
                   lgcLgnd, strPath, varSizeX=1800.0, varSizeY=1600.0,
-                  varNumLblY=5, varPadY=tplPadY)
+                  varNumLblY=4, tplPadY=tplPadY)
     # ------------------------------------------------------------------------

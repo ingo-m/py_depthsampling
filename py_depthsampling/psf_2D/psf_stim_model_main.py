@@ -65,8 +65,8 @@ strPthPltOt = '/home/john/Dropbox/PacMan_Plots/psf_2D_pe_stim_model/PSF_{}_by_{}
 strPthPltVfp = None  # '/home/john/Dropbox/PacMan_Plots/psf_2D_pe_stim_model/{}'  #noqa
 
 # File type suffix for plot:
-# strFlTp = '.svg'
-strFlTp = '.png'
+strFlTp = '.svg'
+# strFlTp = '.png'
 
 # Figure scaling factor:
 varDpi = 80.0

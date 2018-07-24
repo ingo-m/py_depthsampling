@@ -232,12 +232,12 @@ aryPacMan = np.rot90(aryPacMan, k=3)
 aryEdge = np.rot90(aryEdge, k=3)
 aryPeri = np.rot90(aryPeri, k=3)
 
+# Remember original dimensions:
+tplDim = aryPacMan.shape
+# Index of vertical meridian:
+varMrdnV = int(np.around(float(tplDim[0] * 0.5)))
 # Crop visual field (only keep left hemifield):
 if lgcLftOnly:
-    # Remember original dimensions:
-    tplDim = aryPacMan.shape
-    # Index of vertical meridian:
-    varMrdnV = int(np.around(float(tplDim[0] * 0.5)))
     # Crop visual field model:
     aryPacMan = aryPacMan[0:varMrdnV, :]
     aryEdge = aryEdge[0:varMrdnV, :]
@@ -315,195 +315,200 @@ else:
 
 
 # -----------------------------------------------------------------------------
-# *** Plot PSF width by ROI
+# *** Create summary plots?
 
-# Figure dimensions:
-varSizeX = 700
-varSizeY = 700
-varDpi = 80
+if (not (strPthPltOt is None)):
 
-# Figure layout parameters:
-varYmin = 0.0
-varYmax = 0.8
-varNumLblY = 5
-strXlabel = 'ROI'
-strYlabel = 'PSF width'
+    # -------------------------------------------------------------------------
+    # *** Plot PSF width by ROI
 
-# Shape of data: aryBooSd[idxRoi, idxCon, idxDpth, idxIt]
+    # Figure dimensions:
+    varSizeX = 700
+    varSizeY = 700
+    varDpi = 80
 
-# Compute mean PSF width across conditions, now of the form
-# arySdMdn[idxRoi, idxDpth, idxIt].
-arySdMdn = np.median(aryBooSd, axis=1)
+    # Figure layout parameters:
+    varYmin = 0.0
+    varYmax = 0.8
+    varNumLblY = 5
+    strXlabel = 'ROI'
+    strYlabel = 'PSF width'
 
-# Percentile bootstrap confidence intervals (across iterations, resulting
-# shape is arySd*[idxRoi, idxDpth]):
-arySdLw = np.percentile(arySdMdn, varConLw, axis=2)
-arySdUp = np.percentile(arySdMdn, varConUp, axis=2)
+    # Shape of data: aryBooSd[idxRoi, idxCon, idxDpth, idxIt]
 
-# Compute median across iterations (new shape is arySdMdn[idxRoi, idxDpth]).
-arySdMdn = np.median(arySdMdn, axis=2)
+    # Compute mean PSF width across conditions, now of the form
+    # arySdMdn[idxRoi, idxDpth, idxIt].
+    arySdMdn = np.median(aryBooSd, axis=1)
 
-# Matplotlib `yerr` are +/- sizes relative to the data, therefore
-# subtract data points from error values:
-arySdLw = np.subtract(arySdMdn, arySdLw)
-arySdUp = np.subtract(arySdUp, arySdMdn)
+    # Percentile bootstrap confidence intervals (across iterations, resulting
+    # shape is arySd*[idxRoi, idxDpth]):
+    arySdLw = np.percentile(arySdMdn, varConLw, axis=2)
+    arySdUp = np.percentile(arySdMdn, varConUp, axis=2)
 
-for idxDpth in range(varNumDpth):
+    # Compute median across iterations (new shape is arySdMdn[idxRoi,
+    # idxDpth]).
+    arySdMdn = np.median(arySdMdn, axis=2)
 
-    # Title:
-    strTitle = lstDpthLbl[idxDpth]
+    # Matplotlib `yerr` are +/- sizes relative to the data, therefore
+    # subtract data points from error values:
+    arySdLw = np.subtract(arySdMdn, arySdLw)
+    arySdUp = np.subtract(arySdUp, arySdMdn)
+
+    for idxDpth in range(varNumDpth):
+
+        # Title:
+        strTitle = lstDpthLbl[idxDpth]
+
+        # Output path:
+        strPthTmp = (strPthPltOt.format('Width', 'ROI')
+                     + '_Depth_'
+                     + str(idxDpth)
+                     + strFlTp)
+
+        # Adjust shape of confidence interval array for matplotlib:
+        arySdErr = np.array([arySdLw[:, idxDpth], arySdUp[:, idxDpth]])
+
+        # Number of bars:
+        vecX = np.arange(0, varNumRoi)
+
+        # Create figure:
+        fgr01 = plt.figure(figsize=((varSizeX * 0.5) / varDpi,
+                                    (varSizeY * 0.5) / varDpi),
+                           dpi=varDpi)
+
+        # Create axis:
+        axs01 = fgr01.subplots(1, 1)
+
+        # Colour:
+        tplClr = (57.0/255.0, 133.0/255.0, 185.0/255.0)
+        # tplClr = (1.0, 0.2, 0.2)
+        # vecClr = np.array([57.0, 133.0, 185.0])
+        # vecClr = np.subtract(np.divide(vecClr, (255.0 * 0.5)), 1.0)
+
+        # Create plot:
+        plot01 = axs01.bar(vecX,
+                           arySdMdn[:, idxDpth],
+                           yerr=arySdErr,
+                           color=tplClr)
+
+        # Y axis limits:
+        axs01.set_ylim(varYmin, varYmax)
+
+        # Which y values to label with ticks:
+        vecYlbl = np.linspace(varYmin, varYmax, num=varNumLblY,
+                              endpoint=True)
+
+        # Set ticks:
+        axs01.set_yticks(vecYlbl)
+
+        # Set x & y tick font size:
+        axs01.tick_params(labelsize=12,
+                          top=False,
+                          right=False)
+
+        # Adjust labels:
+        axs01.set_xlabel(strXlabel,
+                         fontsize=12)
+        axs01.set_ylabel(strYlabel,
+                         fontsize=12)
+
+        # Reduce framing box:
+        axs01.spines['top'].set_visible(False)
+        axs01.spines['right'].set_visible(False)
+        axs01.spines['bottom'].set_visible(True)
+        axs01.spines['left'].set_visible(True)
+
+        # Adjust title:
+        axs01.set_title(strTitle, fontsize=12, fontweight="bold")
+
+        # Make plot & axis labels fit into figure (this may not always work,
+        # depending on the layout of the plot, matplotlib sometimes throws a
+        # ValueError ("left cannot be >= right").
+        try:
+            plt.tight_layout(pad=0.5)
+        except ValueError:
+            pass
+
+        # Save figure:
+        fgr01.savefig(strPthTmp)
+
+        # Close figure:
+        plt.close(fgr01)
+    # -------------------------------------------------------------------------
+
+    # -------------------------------------------------------------------------
+    # *** Plot summaries
+
+    # Size of confidence intervals:
+    varCi = 90
+
+    # ** Parameters by depth
+
+    # List of x and y variables for plot:
+    lstX = ['ROI'] * 5
+    lstY = ['Width', 'PSC centre', 'PSC edge', 'PSC periphery', 'Residuals']
+    lstHue = ['Depth'] * 5
+
+    for idxPlt in range(len(lstX)):
+
+        # Plot results:
+        plot_psf_params((strPthPltOt.format(lstY[idxPlt],
+                                            lstHue[idxPlt]) + strFlTp),
+                        lstX[idxPlt],
+                        lstY[idxPlt],
+                        lstHue[idxPlt],
+                        objDf,
+                        lstRoi,
+                        varNumDpth,
+                        varCi=varCi,
+                        strClrmp="continuous")
+
+    # ** Parameters by condition
+
+    # List of x and y variables for plot:
+    lstX = ['ROI'] * 5
+    lstY = ['Width', 'PSC centre', 'PSC edge', 'PSC periphery', 'Residuals']
+    lstHue = ['Condition'] * 5
+
+    for idxPlt in range(len(lstX)):
+
+        # Plot results:
+        plot_psf_params((strPthPltOt.format(lstY[idxPlt],
+                                            lstHue[idxPlt]) + strFlTp),
+                        lstX[idxPlt],
+                        lstY[idxPlt],
+                        lstHue[idxPlt],
+                        objDf,
+                        lstRoi,
+                        varNumCon,
+                        varCi=varCi,
+                        lstConLbls=lstCon,
+                        strClrmp="categorical")
+
+    # ** PSF width by depth & condition
 
     # Output path:
-    strPthTmp = (strPthPltOt.format('Width', 'ROI')
-                 + '_Depth_'
-                 + str(idxDpth)
-                 + strFlTp)
+    strPthTmp = (strPthPltOt.format('Width', 'Depth_and_Condition') + strFlTp)
 
-    # Adjust shape of confidence interval array for matplotlib:
-    arySdErr = np.array([arySdLw[:, idxDpth], arySdUp[:, idxDpth]])
+    # Create seaborn colour palette:
+    objClr = sns.light_palette((210, 90, 60), input="husl",
+                               n_colors=varNumDpth)
 
-    # Number of bars:
-    vecX = np.arange(0, varNumRoi)
+    # Draw nested barplot:
+    fgr02 = sns.factorplot(x="ROI", y="Width", hue="Depth", data=objDf, size=6,
+                           kind="bar", legend=True, palette=objClr, ci=varCi,
+                           col="Condition")
 
-    # Create figure:
-    fgr01 = plt.figure(figsize=((varSizeX * 0.5) / varDpi,
-                                (varSizeY * 0.5) / varDpi),
-                       dpi=varDpi)
+    # Set column titles:
+    for objAx, strTtl in zip(fgr02.axes.flat, lstCon):
+        objAx.set_title(strTtl)
 
-    # Create axis:
-    axs01 = fgr01.subplots(1, 1)
-
-    # Colour:
-    tplClr = (57.0/255.0, 133.0/255.0, 185.0/255.0)
-    # tplClr = (1.0, 0.2, 0.2)
-    # vecClr = np.array([57.0, 133.0, 185.0])
-    # vecClr = np.subtract(np.divide(vecClr, (255.0 * 0.5)), 1.0)
-
-    # Create plot:
-    plot01 = axs01.bar(vecX,
-                       arySdMdn[:, idxDpth],
-                       yerr=arySdErr,
-                       color=tplClr)
-
-    # Y axis limits:
-    axs01.set_ylim(varYmin, varYmax)
-
-    # Which y values to label with ticks:
-    vecYlbl = np.linspace(varYmin, varYmax, num=varNumLblY,
-                          endpoint=True)
-
-    # Set ticks:
-    axs01.set_yticks(vecYlbl)
-
-    # Set x & y tick font size:
-    axs01.tick_params(labelsize=12,
-                      top=False,
-                      right=False)
-
-    # Adjust labels:
-    axs01.set_xlabel(strXlabel,
-                     fontsize=12)
-    axs01.set_ylabel(strYlabel,
-                     fontsize=12)
-
-    # Reduce framing box:
-    axs01.spines['top'].set_visible(False)
-    axs01.spines['right'].set_visible(False)
-    axs01.spines['bottom'].set_visible(True)
-    axs01.spines['left'].set_visible(True)
-
-    # Adjust title:
-    axs01.set_title(strTitle, fontsize=12, fontweight="bold")
-
-    # Make plot & axis labels fit into figure (this may not always work,
-    # depending on the layout of the plot, matplotlib sometimes throws a
-    # ValueError ("left cannot be >= right").
-    try:
-        plt.tight_layout(pad=0.5)
-    except ValueError:
-        pass
+    # Set x-axis labels to upper case ROI labels:
+    lstRoiUp = [x.upper() for x in lstRoi]
+    fgr02.set_xticklabels(lstRoiUp)
 
     # Save figure:
-    fgr01.savefig(strPthTmp)
-
-    # Close figure:
-    plt.close(fgr01)
-# -----------------------------------------------------------------------------
-
-
-# -----------------------------------------------------------------------------
-# *** Plot summaries
-
-# Size of confidence intervals:
-varCi = 90
-
-# ** Parameters by depth
-
-# List of x and y variables for plot:
-lstX = ['ROI'] * 5
-lstY = ['Width', 'PSC centre', 'PSC edge', 'PSC periphery', 'Residuals']
-lstHue = ['Depth'] * 5
-
-for idxPlt in range(len(lstX)):
-
-    # Plot results:
-    plot_psf_params((strPthPltOt.format(lstY[idxPlt],
-                                        lstHue[idxPlt]) + strFlTp),
-                    lstX[idxPlt],
-                    lstY[idxPlt],
-                    lstHue[idxPlt],
-                    objDf,
-                    lstRoi,
-                    varNumDpth,
-                    varCi=varCi,
-                    strClrmp="continuous")
-
-# ** Parameters by condition
-
-# List of x and y variables for plot:
-lstX = ['ROI'] * 5
-lstY = ['Width', 'PSC centre', 'PSC edge', 'PSC periphery', 'Residuals']
-lstHue = ['Condition'] * 5
-
-for idxPlt in range(len(lstX)):
-
-    # Plot results:
-    plot_psf_params((strPthPltOt.format(lstY[idxPlt],
-                                        lstHue[idxPlt]) + strFlTp),
-                    lstX[idxPlt],
-                    lstY[idxPlt],
-                    lstHue[idxPlt],
-                    objDf,
-                    lstRoi,
-                    varNumCon,
-                    varCi=varCi,
-                    lstConLbls=lstCon,
-                    strClrmp="categorical")
-
-# ** PSF width by depth & condition
-
-# Output path:
-strPthTmp = (strPthPltOt.format('Width', 'Depth_and_Condition') + strFlTp)
-
-# Create seaborn colour palette:
-objClr = sns.light_palette((210, 90, 60), input="husl",
-                           n_colors=varNumDpth)
-
-# Draw nested barplot:
-fgr02 = sns.factorplot(x="ROI", y="Width", hue="Depth", data=objDf, size=6,
-                       kind="bar", legend=True, palette=objClr, ci=varCi,
-                       col="Condition")
-
-# Set column titles:
-for objAx, strTtl in zip(fgr02.axes.flat, lstCon):
-    objAx.set_title(strTtl)
-
-# Set x-axis labels to upper case ROI labels:
-lstRoiUp = [x.upper() for x in lstRoi]
-fgr02.set_xticklabels(lstRoiUp)
-
-# Save figure:
-fgr02.savefig(strPthTmp)
+    fgr02.savefig(strPthTmp)
 # -----------------------------------------------------------------------------
 
 

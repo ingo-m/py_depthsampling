@@ -24,7 +24,7 @@ from py_depthsampling.plot.plt_dpth_prfl import plt_dpth_prfl
 
 
 def diff_sem(objDpth, strPath, lstCon, lstConLbl, strTtl='', varYmin=0.0,  #noqa
-             varYmax=2.0, tplPadY=(0.0, 0.0),
+             varYmax=2.0, tplPadY=(0.0, 0.0), varNumLblY=5,
              strXlabel='Cortical depth level (equivolume)',
              strYlabel='fMRI signal change [arbitrary units]',
              lgcLgnd=False, lstDiff=None, vecNumInc=None, strParam='mean'):
@@ -52,6 +52,8 @@ def diff_sem(objDpth, strPath, lstCon, lstConLbl, strTtl='', varYmin=0.0,  #noqa
         Maximum of Y axis.
     tplPadY : tuple
         Padding around labelled values on y.
+    varNumLblY : int
+        Number of labels on y axis.
     strXlabel : str
         Label for x axis.
     strYlabel : str
@@ -278,5 +280,5 @@ def diff_sem(objDpth, strPath, lstCon, lstConLbl, strTtl='', varYmin=0.0,  #noqa
     plt_dpth_prfl(aryEmpMne, arySem, varNumDpth, varNumCon, 80.0, varYmin,
                   varYmax, False, lstConLbl, strXlabel, strYlabel, strTtl,
                   lgcLgnd, strPath, varSizeX=1800.0, varSizeY=1600.0,
-                  varNumLblY=4, tplPadY=tplPadY)
+                  varNumLblY=varNumLblY, tplPadY=tplPadY)
     # ------------------------------------------------------------------------

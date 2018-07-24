@@ -80,7 +80,7 @@ lstDiff = [(0, 1), (0, 2), (1, 2)]
 # lstDiff = [(0, 3)]
 
 # Padding around labelled values on y:
-tplPadY = (0.01, 0.01)
+tplPadY = (0.03, 0.03)
 # -----------------------------------------------------------------------------
 
 
@@ -93,42 +93,17 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
         for idxRoi in range(len(lstRoi)):
             for idxHmsph in range(len(lstHmsph)):
 
-                # Limits of axes need to be adjusted based on ROI,
-                # condition, hemisphere.
+                # Limits of axes can be adjusted based on ROI, condition,
+                # hemisphere, deconvolution model.
 
-                if idxRoi == 0:  # v1
-
-                    if lstMetaCon[idxMtaCn] == 'stimulus':
-                        if lstMdl[idxMdl] == '':
-                            varYmin = -0.25
-                            varYmax = 0.5
-                        if lstMdl[idxMdl] == '_deconv_model_1':
-                            varYmin = -0.25
-                            varYmax = 0.5
-                    if lstMetaCon[idxMtaCn] == 'periphery':
-                        if lstMdl[idxMdl] == '':
-                            varYmin = -0.25
-                            varYmax = 0.5
-                        if lstMdl[idxMdl] == '_deconv_model_1':
-                            varYmin = -0.25
-                            varYmax = 0.5
-
-                elif (idxRoi == 1) or (idxRoi == 3):  # v2 & v3
-
-                    if lstMetaCon[idxMtaCn] == 'stimulus':
-                        if lstMdl[idxMdl] == '':
-                            varYmin = -0.25
-                            varYmax = 0.5
-                        if lstMdl[idxMdl] == '_deconv_model_1':
-                            varYmin = -0.25
-                            varYmax = 0.5
-                    if lstMetaCon[idxMtaCn] == 'periphery':
-                        if lstMdl[idxMdl] == '':
-                            varYmin = -0.25
-                            varYmax = 0.5
-                        if lstMdl[idxMdl] == '_deconv_model_1':
-                            varYmin = -0.25
-                            varYmax = 0.5
+                if lstMdl[idxMdl] == '':
+                    varYmin = -0.6
+                    varYmax = 0.8
+                    varNumLblY = 8
+                if lstMdl[idxMdl] == '_deconv_model_1':
+                    varYmin = -0.25
+                    varYmax = 0.5
+                    varNumLblY = 4
 
                 # Create average plots:
                 diff_sem(strPthData.format(lstMetaCon[idxMtaCn],
@@ -146,6 +121,7 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                          varYmin=varYmin,
                          varYmax=varYmax,
                          tplPadY=tplPadY,
+                         varNumLblY=varNumLblY,
                          strXlabel=strXlabel,
                          strYlabel=strYlabel,
                          lgcLgnd=True,

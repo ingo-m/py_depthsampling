@@ -46,15 +46,15 @@ lstHmsph = ['rh']
 
 # Path of corrected depth-profiles (meta-condition, ROI, hemisphere,
 # condition, and model index left open):
-strPthData = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npz'  #noqa
+strPthData = '/Users/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npz'  #noqa
 
 # Output path & prefix for plots (meta-condition, ROI, hemisphere, and
 # model index left open):
-strPthPltOt = '/home/john/Dropbox/PacMan_Plots/diff/{}_{}_{}{}_SEM'  #noqa
+strPthPltOt = '/Users/john/Dropbox/PacMan_Plots/diff/{}_{}_{}{}_SEM'  #noqa
 
 # Output path for single subject plot, (ROI, metacondition, hemisphere, drain
 # model, and condition left open):
-# strPthPtlSnglOt = '/home/john/Dropbox/PacMan_Plots/diff_sngle/{}_{}_{}{}_{}'
+# strPthPtlSnglOt = '/Users/john/Dropbox/PacMan_Plots/diff_sngle/{}_{}_{}{}_{}'
 
 # File type suffix for plot:
 strFlTp = '.svg'

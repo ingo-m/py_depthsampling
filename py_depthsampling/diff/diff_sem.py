@@ -20,6 +20,8 @@
 
 import numpy as np
 import rpy2.robjects as robjects
+import matplotlib.pyplot as plt
+import matplotlib.colors as colors
 from py_depthsampling.plot.plt_dpth_prfl import plt_dpth_prfl
 
 
@@ -264,7 +266,7 @@ def diff_sem(objDpth, strPath, lstCon, lstConLbl, strTtl='', varYmin=0.0,  #noqa
                             objFuncR(list(aryDiff[:, idxDpth]),
                                      list(vecNumInc))[0]
 
-                # TODO: SEM
+                # TODO: SEM for median
 
         # Create condition labels for differences:
         lstDiffLbl = [None] * varNumCon
@@ -277,8 +279,28 @@ def diff_sem(objDpth, strPath, lstCon, lstConLbl, strTtl='', varYmin=0.0,  #noqa
     # ------------------------------------------------------------------------
     # *** Plot results
 
+    # For the plots of condition differences we use a different colour schemea
+    # as for the plots of individual condition depth profiles.
+
+    # Prepare colour map:
+    objClrNorm = colors.Normalize(vmin=0, vmax=9)
+    objCmap = plt.cm.tab10
+    aryClr = np.zeros((varNumCon, 3))
+
+    # Use custom colour scheme for PacMan data (three differences):
+    if varNumCon == 3:
+        aryClr[0, :] = objCmap(objClrNorm(9))[0:3]
+        aryClr[1, :] = objCmap(objClrNorm(6))[0:3]
+        aryClr[2, :] = objCmap(objClrNorm(8))[0:3]
+
+    # Use tab10 colour map (but leave out first items, as those are used for
+    # single condition plots).
+    else:
+        for idxCon in range(varNumCon):
+            aryClr[idxCon, :] = objCmap(objClrNorm(varNumCon + 2 - idxCon))
+
     plt_dpth_prfl(aryEmpMne, arySem, varNumDpth, varNumCon, 80.0, varYmin,
                   varYmax, False, lstConLbl, strXlabel, strYlabel, strTtl,
                   lgcLgnd, strPath, varSizeX=1800.0, varSizeY=1600.0,
-                  varNumLblY=varNumLblY, tplPadY=tplPadY)
+                  varNumLblY=varNumLblY, tplPadY=tplPadY, aryClr=aryClr)
     # ------------------------------------------------------------------------

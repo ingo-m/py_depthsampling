@@ -152,8 +152,8 @@ def estm_psf_stim_mdl(idxRoi, idxCon, idxDpth, idxSmpl, lstRoi, lstCon,  #noqa
                  strPthPltOtTmp,
                  tpleLimX=(-5.19, 5.19, 3.0),
                  tpleLimY=(-5.19, 5.19, 3.0),
-                 varMin=-2.5,
-                 varMax=2.5)
+                 varMin=-3.0,
+                 varMax=3.0)
 
         # ** Plot model residuals
 

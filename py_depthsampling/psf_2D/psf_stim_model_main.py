@@ -41,13 +41,13 @@ import seaborn as sns
 
 # PSF parameters are saved to or loaded to/from pickled dataframe. Also, the
 # bootstrap distributions of PSF parameters (Gaussian width and scaling factor)
-# are saved to or loaded from and npz file. Path of respective files (number of
+# are saved to or loaded from an npz file. Path of respective files (number of
 # samples and iterations left open):
-strPthData = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf_2D_stim_model/dataframe_{}_samples_{}_iterations'  #noqa
+strPthData = '/Users/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf_2D_stim_model/dataframe_{}_samples_{}_iterations'  #noqa
 
 # Load visual field projection from (ROI, condition, depth level label left
 # open):
-strPthVfp = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project_single_subject/{}_{}_{}.npz'  #noqa
+strPthVfp = '/Users/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project_single_subject/{}_{}_{}.npz'  #noqa
 
 # Depth level labels (to complete input file names).
 lstDpthLbl = [str(x) for x in range(11)]
@@ -58,11 +58,11 @@ lstRoi = ['v1', 'v2', 'v3']
 
 # Output path & prefix for summary plots (dependent and independent variable
 # left open). Set to `None` if plot should not be created.
-strPthPltOt = '/home/john/Dropbox/PacMan_Plots/psf_2D_pe_stim_model/PSF_{}_by_{}'  #noqa
+strPthPltOt = '/Users/john/Dropbox/PacMan_Plots/psf_2D_pe_stim_model/PSF_{}_by_{}'  #noqa
 
 # Output path & prefix for plots of modelled visual field projections. Set to
 # `None` if plot should not be created.
-strPthPltVfp = None  # '/home/john/Dropbox/PacMan_Plots/psf_2D_pe_stim_model/{}'  #noqa
+strPthPltVfp = None  # '/Users/john/Dropbox/PacMan_Plots/psf_2D_pe_stim_model/{}'  #noqa
 
 # File type suffix for plot:
 strFlTp = '.svg'
@@ -93,7 +93,7 @@ tplBndPeri = (-50.0, 50.0)
 
 # Save result from model fitting (i.e. parameters of PSF) to disk (pandas data
 # frame saved as csv for import in R). If `None`, data frame is not created.
-strPthCsv = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf_2D_stim_model/dataframe_{}_samples_{}_iterations.csv'  #noqa
+strPthCsv = '/Users/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/psf_2D_stim_model/dataframe_{}_samples_{}_iterations.csv'  #noqa
 
 # Extent of visual space from centre of the screen (assumed to be the same in
 # positive/negative x/y direction:

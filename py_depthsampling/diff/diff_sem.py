@@ -215,7 +215,7 @@ def diff_sem(objDpth, strPath, lstCon, lstConLbl, strTtl='', varYmin=0.0,  #noqa
                                                   varSum
                                                   )
 
-                # Formular for SEM according to Franz & Loftus (2012). Standard
+                # Formula for SEM according to Franz & Loftus (2012). Standard
                 # errors and confidence intervals in within-subjects designs:
                 # generalizing Loftus and Masson (1994) and avoiding the biases
                 # of alternative accounts. Psychonomic Bulletin & Review,

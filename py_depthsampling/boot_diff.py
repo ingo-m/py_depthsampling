@@ -78,8 +78,8 @@ lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
 lstConLbl = lstCon
 
 # Which conditions to compare (list of tuples with condition indices):
-lstDiff = [(0, 1), (0, 2), (2, 1)]
-# lstDiff = [(0, 1), (0, 2), (2, 1), (0, 3)]
+lstDiff = [(0, 1), (0, 2), (1, 2)]
+# lstDiff = [(0, 1), (0, 2), (1, 2), (0, 3)]
 
 # Number of resampling iterations:
 varNumIt = 100000

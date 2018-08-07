@@ -2,26 +2,26 @@
 """
 Permutation test for difference in peak position for cortical depth profiles.
 
-The purpose of this script is to performe a permutation hypothesis test for a
-difference in the peak position in cortical depth profiles between ROIs, e.g.
-V1 and V2. More specifically, the equality of distributions of the peak
-positions is tested (i.e. a possible difference could be due to a difference in
-means, variance, or the shape of the distribution).
+Performe a permutation hypothesis test for a difference in the peak position in
+cortical depth profiles between ROIs or experimental conditions. More
+specifically, the equality of distributions of the peak positions is tested
+(i.e. a possible difference could be due to a difference in means, variance, or
+the shape of the distribution).
 
-This version assumes that there are sevaral depth profiles per subject
-(for several stimulus conditions), i.e. the input depth profiles have three
-dimensions (corresponding to subjects, conditions, depth levels).
+Because ROI/condition labels are permuted within subjects, single subject depth
+profiles need to be provided (i.e. the input depth profiles have three
+dimensions, corresponding to subjects, conditions, depth levels).
 
 The procedure is as follow:
-- Condition labels (i.e. V1 & V2) are permuted within subjects for each
-  permutation data set (i.e. on each iteration).
+- Condition labels are permuted within subjects for each permutation data set
+  (i.e. on each iteration).
 - For each permutation dataset, the mean depth profile of the two randomised
   groups are calculated.
 - The peak of the depth profiles is identified for both randomised groups.
 - The mean difference in peak position between the two randomised groups is the
   null distribution.
-- The peak difference on the full profile is calculated, and the permutation
-  p-value with respect to the null distribution is produced.
+- The peak difference on the empirical profile is calculated, and the
+  permutation p-value with respect to the null distribution is produced.
 
 Function of the depth sampling pipeline.
 """
@@ -44,7 +44,8 @@ Function of the depth sampling pipeline.
 
 
 import numpy as np
-from ds_findPeak import find_peak
+from py_depthsampling.main.find_peak import find_peak
+
 
 
 # ----------------------------------------------------------------------------
@@ -145,7 +146,7 @@ aryDpthRnd02 = np.zeros((varNumIt, varNumSubs, varNumCon, varNumDpt))
 
 # Loop through iterations:
 for idxIt in range(0, varNumIt):
-    
+
     # Assign values from original group 1 to permutation group 1:
     aryDpthRnd01[idxIt, aryRnd01[idxIt, :], :, :] = \
         aryDpth01[aryRnd01[idxIt, :], :, :]

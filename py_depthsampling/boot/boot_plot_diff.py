@@ -25,7 +25,7 @@ from py_depthsampling.plot.plt_dpth_prfl import plt_dpth_prfl
 
 def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,  #noqa
               varConLw=2.5, varConUp=97.5, strTtl='', varYmin=0.0, varYmax=2.0,
-              varPadY=(0.0, 0.0),
+              tplPadY=(0.0, 0.0),
               strXlabel='Cortical depth level (equivolume)',
               strYlabel='fMRI signal change [arbitrary units]',
               lgcLgnd=False, lstDiff=None, vecNumInc=None, strParam='mean'):
@@ -59,7 +59,7 @@ def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,  #noqa
         Minimum of Y axis.
     varYmax : float
         Maximum of Y axis.
-    varPadY : tuple
+    tplPadY : tuple
         Padding around labelled values on y.
     strXlabel : str
         Label for x axis.
@@ -345,6 +345,6 @@ def boot_plot(objDpth, strPath, lstCon, lstConLbl, varNumIt=10000,  #noqa
     plt_dpth_prfl(aryEmpMne, None, varNumDpth, varNumCon, 80.0, varYmin,
                   varYmax, False, lstConLbl, strXlabel, strYlabel, strTtl,
                   lgcLgnd, strPath, varSizeX=1800.0, varSizeY=1600.0,
-                  varNumLblY=6, varPadY=varPadY, aryCnfLw=aryPrct[0, :, :],
+                  varNumLblY=6, tplPadY=tplPadY, aryCnfLw=aryPrct[0, :, :],
                   aryCnfUp=aryPrct[1, :, :])
     # ------------------------------------------------------------------------

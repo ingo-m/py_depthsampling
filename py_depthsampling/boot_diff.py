@@ -48,15 +48,15 @@ lstHmsph = ['rh']
 
 # Path of corrected depth-profiles (meta-condition, ROI, hemisphere,
 # condition, and model index left open):
-strPthData = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npz'  #noqa
+strPthData = '/Users/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npz'  #noqa
 
-# Output path & prefix for plots (meta-condition, ROI, ROI, hemisphere, and
-# model index left open):
-strPthPltOt = '/home/john/Dropbox/PacMan_Plots/boot_diff/{}/{}/{}_{}{}'  #noqa
+# Output path & prefix for plots (meta-condition, ROI, hemisphere, and model
+# index left open):
+strPthPltOt = '/Users/john/Dropbox/PacMan_Plots/boot_diff/{}_{}_{}{}'  #noqa
 
 # Output path for single subject plot (heatmap), (ROI, metacondition,
 # hemisphere, drain model, and condition left open):
-# strPthPtlSnglOt = '/home/john/Dropbox/PacMan_Plots/boot_diff_sngle/{}_{}_{}{}_{}'
+# strPthPtlSnglOt = '/Users/john/Dropbox/PacMan_Plots/boot_diff_sngle/{}_{}_{}{}_{}'  #noqa
 
 # File type suffix for plot:
 strFlTp = '.png'
@@ -91,7 +91,7 @@ varCnfLw = 5.0
 varCnfUp = 95.0
 
 # Padding around labelled values on y:
-varPadY = (0.05, 0.05)
+tplPadY = (0.05, 0.05)
 # ---------------------------1--------------------------------------------------
 
 
@@ -149,7 +149,6 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                                             lstMdl[idxMdl]),
                           (strPthPltOt.format(lstMetaCon[idxMtaCn],
                                               lstRoi[idxRoi],
-                                              lstRoi[idxRoi],
                                               lstHmsph[idxHmsph],
                                               lstMdl[idxMdl])
                            + strFlTp),
@@ -161,7 +160,7 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                           strTtl='',
                           varYmin=varYmin,
                           varYmax=varYmax,
-                          varPadY=varPadY,
+                          tplPadY=tplPadY,
                           strXlabel=strXlabel,
                           strYlabel=strYlabel,
                           lgcLgnd=True,

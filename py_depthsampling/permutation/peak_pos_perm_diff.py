@@ -105,7 +105,9 @@ def peak_diff(strPthData, lstDiff):
     aryDpthB02 = objNpzB02['arySubDpthMns']
 
     # Array with number of vertices (for weighted averaging across subjects),
-    # shape: vecNumInc[subjects].
+    # shape: vecNumInc[subjects]. Only one instance is needed per comparison, because the
+    # number of vertices is assumed to be constant across conditions (at least within the comparison). The two comparisons
+    # could have an unequal number of vertices (e.g. if comparing the same contrast between ROI).
     vecNumIncA01 = objNpzA01['vecNumInc']
     # vecNumIncA02 = objNpzA02['vecNumInc']
     vecNumIncB01 = objNpzB01['vecNumInc']
@@ -136,18 +138,18 @@ def peak_diff(strPthData, lstDiff):
     # New array shape: vecDpthDiffA[depth]
 
     # Peak positions in empirical depth profiles:
-    vecEmpPeaksA = find_peak(vecDpthDiffA.reshape(1, varNumDpth))
-    vecEmpPeaksB = find_peak(vecDpthDiffB.reshape(1, varNumDpth))
+    varEmpPeaksA = find_peak(vecDpthDiffA.reshape(1, varNumDpth))[0]
+    varEmpPeaksB = find_peak(vecDpthDiffB.reshape(1, varNumDpth))[0]
 
     # Absolute peak difference in contrast of empirical profiles:
-    vecEmpPeakDiff = np.absolute(np.subtract(vecEmpPeaksA, vecEmpPeaksB))
+    varEmpPeakDiff = np.absolute(np.subtract(varEmpPeaksA, varEmpPeaksB))
 
     print(('------Peak positions in mean empirical profiles, contrast A:  '
            + str(np.around(vecEmpPeaksA, decimals=3))))
     print(('------Peak positions in mean empirical profiles, contrast B:  '
            + str(np.around(vecEmpPeaksB, decimals=3))))
     print(('------Absolute difference in peak positions (empirical): '
-           + str(np.around(vecEmpPeakDiff, decimals=3))))
+           + str(np.around(varEmpPeakDiff, decimals=3))))
 
     # -------------------------------------------------------------------------
     # *** Create permutation samples
@@ -170,158 +172,76 @@ def peak_diff(strPthData, lstDiff):
     del(aryRnd)
 
     # Arrays for permuted depth profiles for the randomised groups:
-    aryDpthRndA01 = np.zeros((varNumIt, varNumSub, varNumDpth))
-    aryDpthRndA02 = np.zeros((varNumIt, varNumSub, varNumDpth))
-    aryDpthRndB01 = np.zeros((varNumIt, varNumSub, varNumDpth))
-    aryDpthRndB02 = np.zeros((varNumIt, varNumSub, varNumDpth))
-
-    # Arrays for number of vertices per subject in permuation samples:
-    vecNumIncRndA = np.zeros((varNumIt, varNumSub))
-    vecNumIncRndB = np.zeros((varNumIt, varNumSub))
+    aryDpthRndA = np.zeros((varNumIt, varNumSub, varNumDpth))
+    aryDpthRndB = np.zeros((varNumIt, varNumSub, varNumDpth))
 
     # Loop through iterations:
     for idxIt in range(0, varNumIt):
 
-        # Assign permuted depth profiles for comparison A:
-        
-        # Assign values from original group 1 to permutation group 1:
-        aryDpthRndA01[idxIt, aryRnd01[idxIt, :], :] = \
-            aryDpthA01[aryRnd01[idxIt, :], :]
+        # Assign values from original group A to permutation group A:
+        aryDpthRndA[idxIt, aryRnd01[idxIt, :], :] = \
+            aryDpthDiffA[aryRnd01[idxIt, :], :]
 
-        # Assign values from original group 2 to permutation group 1:
-        aryDpthRndA01[idxIt, aryRnd02[idxIt, :], :] = \
-            aryDpthA01[aryRnd02[idxIt, :], :]
+        # Assign values from original group B to permutation group A:
+        aryDpthRndA[idxIt, aryRnd02[idxIt, :], :] = \
+            aryDpthDiffB[aryRnd02[idxIt, :], :]
 
-        # Assign values from original group 1 to permutation group 2:
-        aryDpthRndA02[idxIt, aryRnd02[idxIt, :], :] = \
-            aryDpthA02[aryRnd02[idxIt, :], :]
+        # Assign values from original group A to permutation group B:
+        aryDpthRndB[idxIt, aryRnd02[idxIt, :], :] = \
+            aryDpthDiffA[aryRnd02[idxIt, :], :]
 
-        # Assign values from original group 2 to permutation group 2:
-        aryDpthRndA02[idxIt, aryRnd01[idxIt, :], :] = \
-            aryDpthA02[aryRnd01[idxIt, :], :]
-
-        # Number of vertices included in permutation samples for comparison A:
-        vecNumIncRndA[idxIt, aryRnd01[idxIt, :]] = \
-            vecNumIncA01[aryRnd01[idxIt, :]]
-        vecNumIncRndA[idxIt, aryRnd02[idxIt, :]] = \
-            vecNumIncA01[aryRnd02[idxIt, :]]
-
-        # Assign permuted depth profiles for comparison B:
-        
-        # Assign values from original group 1 to permutation group 1:
-        aryDpthRndB01[idxIt, aryRnd01[idxIt, :], :] = \
-            aryDpthB01[aryRnd01[idxIt, :], :]
-
-        # Assign values from original group 2 to permutation group 1:
-        aryDpthRndB01[idxIt, aryRnd02[idxIt, :], :] = \
-            aryDpthB01[aryRnd02[idxIt, :], :]
-
-        # Assign values from original group 1 to permutation group 2:
-        aryDpthRndB02[idxIt, aryRnd02[idxIt, :], :] = \
-            aryDpthB02[aryRnd02[idxIt, :], :]
-
-        # Assign values from original group 2 to permutation group 2:
-        aryDpthRndB02[idxIt, aryRnd01[idxIt, :], :] = \
-            aryDpthB02[aryRnd01[idxIt, :], :]
-
-        # Number of vertices included in permutation samples for comparison B:
-        vecNumIncRndB[idxIt, aryRnd01[idxIt, :]] = \
-            vecNumIncB01[aryRnd01[idxIt, :]]
-        vecNumIncRndB[idxIt, aryRnd02[idxIt, :]] = \
-            vecNumIncB01[aryRnd02[idxIt, :]]
+        # Assign values from original group B to permutation group B:
+        aryDpthRndB[idxIt, aryRnd01[idxIt, :], :] = \
+            aryDpthDiffB[aryRnd01[idxIt, :], :]
 
     # -------------------------------------------------------------------------
-    # *** 
+    # *** Average within permutation samples
 
-    # Condition difference (within subjects) in permuted samples:
+    # Weighted average (across subjects within permutation samples):
+    aryDpthRndA = np.average(aryDpthRndA, axis=1, weights=vecNumIncA01)
+    aryDpthRndB = np.average(aryDpthRndB, axis=1, weights=vecNumIncB01)
 
-    # Condition difference comparison A:
-    aryDpthRndDiffA = np.subtract(aryDpthRndA01, aryDpthRndA02)
-    # Condition difference comparison B:
-    aryDpthRndDiffB = np.subtract(aryDpthRndB01, aryDpthRndB02)
-
-    del(aryDpthRndA01)
-    del(aryDpthRndA02)
-    del(aryDpthRndB01)
-    del(aryDpthRndB02)
-
-
-
-
-
-    # Weighted average (across subjects):
-    vecDpthDiffA = np.average(aryDpthDiffA, axis=0, weights=vecNumIncA01)
-    vecDpthDiffB = np.average(aryDpthDiffB, axis=0, weights=vecNumIncB01)
-
-
-
-
-    # Take mean across subjects in permutation samples:
-    aryDpthRnd01 = np.mean(aryDpthRnd01, axis=1)
-    aryDpthRnd02 = np.mean(aryDpthRnd02, axis=1)
-
-
-    # ----------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # *** Find peaks in permutation samples
 
     print('---Find peaks in permutation samples')
 
-    # Array for peak positions in permutation samples, of the form
-    # aryPermPeaks01[idxCondition, idxIteration]
-    aryPermPeaks01 = np.zeros((varNumCon, varNumIt))
-    aryPermPeaks02 = np.zeros((varNumCon, varNumIt))
+    vecPermPeaksA = find_peak(aryDpthRndA)
+    vecPermPeaksB = find_peak(aryDpthRndB)
 
-    # Loop through conditions and find peaks:
-    for idxCon in range(0, varNumCon):
-        aryPermPeaks01[idxCon, :] = find_peak(aryDpthRnd01[:, idxCon, :],
-                                              lgcStat=False)
-        aryPermPeaks02[idxCon, :] = find_peak(aryDpthRnd02[:, idxCon, :],
-                                              lgcStat=False)
-
-
-
-
-
-
-
-
-    # ----------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # *** Create null distribution
 
     print('---Create null distribution')
 
     # The mean difference in peak position between the two randomised groups is the
-    # null distribution (aryNull[idxCondition, idxIteration]).
-    aryNull = np.subtract(aryPermPeaks01, aryPermPeaks02)
+    # null distribution (vecNull[idxIteration]).
+    vecNull = np.subtract(vecPermPeaksA, vecPermPeaksB)
 
-
-    # ----------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # *** Calculate p-value
 
     print('---Calculate p-value')
 
     # Absolute of the mean difference in peak position between the two randomised
     # groups (null distribution).
-    aryNullAbs = np.absolute(aryNull)
+    vecNullAbs = np.absolute(vecNull)
 
     # Number of resampled cases with absolute peak position difference that is at
     # least as large as the empirical peak difference:
-    vecNumGe = np.sum(np.greater_equal(aryNullAbs,
-                                       vecEmpPeakDiff[:, None]),
-                      axis=1)
+    varNumGe = np.sum(np.greater_equal(vecNullAbs, varEmpPeakDiff))
 
     print('------Number of resampled cases with absolute peak position')
     print('      difference that is at least as large as the empirical peak')
     print(('      difference: '
-          + str(vecNumGe)))
+          + str(varNumGe)))
 
     # Ratio of resampled cases with absolute peak position difference that is at
     # least as large as the empirical peak difference (permutation p-value):
-    vecP = np.divide(vecNumGe.astype(np.float64),
-                     float(varNumIt))
+    varP = np.divide(float(varNumGe), float(varNumIt))
 
     print('------Permutation p-value for equality of distributions of peak')
     print('      position of contrast-at-half-maximum response depth profiles')
     print(('      between the two ROIs: '
-           + str(np.around(vecP, decimals=4))))
+           + str(np.around(varP, decimals=4))))
     # ----------------------------------------------------------------------------

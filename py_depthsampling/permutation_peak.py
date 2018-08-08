@@ -1,34 +1,35 @@
 # -*- coding: utf-8 -*-
 """
-Permutation test peak position for depth profiles of condition difference.
+Permutation test peak position in depth profiles of condition difference.
 
 This version: Do not perform permutation test directly on single-condition
               depth profiles, but on depth profiles of condition differences
-              (e.g. is the peak position in contrast of condition A vs. B the
+              (e.g., is the peak position in the contrast condition A vs. B the
               same as in the contrast A vs. C).
 
 Performe a permutation hypothesis test for a difference in the peak position in
-cortical depth profiles between experimental conditions. More specifically, the
-equality of distributions of the peak positions is tested (i.e. a possible
-difference could be due to a difference in means, variance, or the shape of the
+cortical depth profiles between two contrasts. More specifically, the equality
+of distributions of the peak positions is tested (i.e. a possible difference
+could be due to a difference in mean, variance, or the shape of the
 distribution).
 
-Because condition labels are permuted within subjects, single subject depth
-profiles need to be provided (i.e. the input depth profiles have three
-dimensions, corresponding to subjects, conditions, depth levels).
+Because contrast labels are permuted within subjects, single subject depth
+profiles need to be provided.
 
 The procedure is as follows:
-- Condition labels are permuted within subjects for each permutation data set
-  (i.e. on each iteration).
-
-- The condition contrast
-
-- For each permutation dataset, the mean depth profile of the two randomised
-  groups are calculated.
-- The peak of the depth profiles is identified for both randomised groups.
-- The mean difference in peak position between the two randomised groups is the
-  null distribution.
-- The peak difference on the empirical profile is calculated, and the
+- Condition contrasts are computed within subjects (i.e. depth profiles of both
+  comparisons are subtracted, e.g. A-B and A-C).
+- Contrast labels (i.e. first comparison, e.g. A-B, and second comparison, e.g.
+  A-C) are permuted within subjects for each permutation data set (i.e. on each
+  resampling iteration).
+- For each resamling iteration, the mean difference depth profile is computed
+  (across across subjects within permutation samples).
+- For each resampling iteration, the peak position in both (randomly resampled)
+  contrasts is located.
+- The difference in peak positions between permutation samples is computed
+  (separately for each permutation sample). The distribution of differences in
+  peak position is the null distribution.
+- The peak difference on the empirical contrasts is calculated, and the
   permutation p-value with respect to the null distribution is produced.
 
 Function of the depth sampling pipeline.
@@ -101,19 +102,13 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
 
 
 
-                diff_sem(strPthData.format(lstMetaCon[idxMtaCn],
-                                           lstRoi[idxRoi],
-                                           lstHmsph[idxHmsph],
-                                           '{}',
-                                           lstMdl[idxMdl]),
-                         (strPthPltOt.format(lstMetaCon[idxMtaCn],
-                                             lstRoi[idxRoi],
-                                             lstHmsph[idxHmsph],
-                                             lstMdl[idxMdl])
-                          + strFlTp),
-                         lstCon,
+strPthData = strPthData.format(lstMetaCon[0],
+                               lstRoi[0],
+                               lstHmsph[0],
+                               '{}',
+                               lstMdl[1])
 
-                         lstDiff=lstDiff)
+
 # ----------------------------------------------------------------------------
 
 

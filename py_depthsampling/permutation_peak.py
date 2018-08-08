@@ -53,6 +53,8 @@ Function of the depth sampling pipeline.
 
 
 import numpy as np
+import pandas as pd
+from py_depthsampling.permutation.peak_pos_perm_diff import peak_diff
 
 
 # -----------------------------------------------------------------------------
@@ -84,7 +86,26 @@ lstDiff = [[(0, 1), (0, 2)],
            [(0, 2), (1, 2)]]
 
 # Number of resampling iterations:
-varNumIt = 500
+varNumIt = 1000
+# -----------------------------------------------------------------------------
+
+
+# -----------------------------------------------------------------------------
+# *** Preparations
+
+# List of features for dataframe:
+lstFtr = ['ROI', 'Deconvolution', 'pRF position', 'Hemisphere', 'Contrast',
+          'p-value']
+
+# Number of samples:
+varNumSmpl = (len(lstMetaCon) * len(lstMdl) * len(lstRoi) * len(lstHmsph)
+              * len(lstDiff))
+
+# Create dataframe:
+objDf = pd.DataFrame(0.0, index=np.arange(varNumSmpl), columns=lstFtr,
+                     dtype={'ROI': str, 'Deconvolution': str,
+                            'pRF position': str, 'Hemisphere': str,
+                            'Contrast': str, 'p-value': np.float64})
 # -----------------------------------------------------------------------------
 
 
@@ -93,30 +114,47 @@ varNumIt = 500
 
 print('-Peak position permutation test')
 
-# Loop through metaconditions, models, ROIs, hemispheres, and comparisons to create plots:
-for idxMtaCn in range(len(lstMetaCon)):  #noqa
-    for idxMdl in range(len(lstMdl)):  #noqa
+# Counter for samples:
+idxSmpl = 0
+
+# Loop through metaconditions, models, ROIs, hemispheres, and comparisons:
+for idxMtaCn in range(len(lstMetaCon)):
+    for idxMdl in range(len(lstMdl)):
         for idxRoi in range(len(lstRoi)):
             for idxHmsph in range(len(lstHmsph)):
                 for idxDiff in range(len(lstDiff)):
 
+                    # Permutation test:
+                    varTmpP = peak_diff(strPthData.format(lstMetaCon[idxMtaCn],
+                                                          lstRoi[idxRoi],
+                                                          lstHmsph[idxHmsph],
+                                                          '{}',
+                                                          lstMdl[idxMdl]),
+                                        lstDiff[idxDiff],
+                                        lstCon,
+                                        varNumIt=1000)
 
+                    # Current comparison:
+                    strTmp = (lstCon[lstDiff[idxDiff][0][0]]
+                              + ' - '
+                              + lstCon[lstDiff[idxDiff][0][1]]
+                              + ' vs '
+                              + lstCon[lstDiff[idxDiff][1][0]]
+                              + ' - '
+                              + lstCon[lstDiff[idxDiff][1][1]])
 
-strPthData = strPthData.format(lstMetaCon[0],
-                               lstRoi[0],
-                               lstHmsph[0],
-                               '{}',
-                               lstMdl[1])
+                    # Result to data frame:
+                    objDf.at[idxSmpl, 'ROI'] = lstRoi[idxRoi]
+                    objDf.at[idxSmpl, 'Deconvolution'] = lstMdl[idxMdl]
+                    objDf.at[idxSmpl, 'pRF position'] = idxMtaCn[idxMtaCn]
+                    objDf.at[idxSmpl, 'Hemisphere'] = lstHmsph[idxHmsph]
+                    objDf.at[idxSmpl, 'Contrast'] = strTmp
+                    objDf.at[idxSmpl, 'p-value'] = varTmpP
 
+print(' ')
+print(objDf)
+print(' ')
 
 # ----------------------------------------------------------------------------
-
-
-
-
-
-
-
-
 
 print('-Done.')

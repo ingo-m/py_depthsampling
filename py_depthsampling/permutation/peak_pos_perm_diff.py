@@ -1,13 +1,14 @@
+
 # -*- coding: utf-8 -*-
 """Function of the depth sampling pipeline."""
 
 # Part of py_depthsampling library
 # Copyright (C) 2018  Ingo Marquardt
 #
-# This program is free software: you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the Free
-# Software Foundation, either version 3 of the License, or (at your option) any
-# later version.
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -18,73 +19,50 @@
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Which draining model to load ('' for none):
-lstMdl = ['', '_deconv_model_1']
-
-# Meta-condition (within or outside of retinotopic stimulus area):
-lstMetaCon = ['stimulus']
-
-# ROI ('v1', 'v2', or 'v3'):
-lstRoi = ['v1', 'v2', 'v3']
-
-# Hemisphere ('rh' or 'lh'):
-lstHmsph = ['rh']
-
-# Path of depth-profiles (meta-condition, ROI, hemisphere, condition, and model
-# index left open):
-strPthData = '/Users/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npz'  #noqa
-
-# Condition levels (used to complete file names):
-lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
-# lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst', 'Ps_sst_plus_Cd_sst']
-
-# Which conditions to compare (nested list of tuples with condition indices):
-lstDiff = [[(0, 1), (0, 2)],
-           [(0, 1), (1, 2)],
-           [(0, 2), (1, 2)]]
-
-# Number of resampling iterations:
-varNumIt = 500
-
-lstDiff = lstDiff[0]
-strPthData = strPthData.format(lstMetaCon[0],
-                               lstRoi[0],
-                               lstHmsph[0],
-                               '{}',
-                               lstMdl[1])
-
-
-
 import numpy as np
 from py_depthsampling.main.find_peak import find_peak
 
 
-def peak_diff(strPthData, lstDiff):
+def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000):
     """
     Plot across-subject cortical depth profiles with SEM.
 
     Parameters
     ----------
-
+    strPthData : str
+        Path of single subject depth-profiles (npz files, condition left open).
+    lstDiff : list
+        Which conditions to compare (list of tuples with condition indices,
+        with respect to `lstCon`).
+    lstCon : list
+        Condition levels (list of strings, used to complete file names).
+    varNumIt : int
+        Number of resampling iteration
 
     Returns
     -------
-
+    varP : float
+        Permutation p-value for difference in peak position. (The ratio of
+        resampled cases with an absolute peak position difference that is at
+        least as large as the empirical peak difference.
 
     Notes
     -----
-
+    The permutation test is performed on depth profiles of condition
+    differences (e.g., is the peak position in the contrast condition A vs. B
+    the same as in the contrast A vs. C). The equality of distributions of the
+    peak positions is tested (i.e. a possible difference could be due to a
+    difference in means, variance, or the shape of the distribution).
 
     Function of the depth sampling pipeline.
+
     """
     # -------------------------------------------------------------------------
     # *** Load data from disk
 
-    # [(0, 1), (0, 2)]
-
     # We compare the the peak positions between profiles of condition
-    # differences. Thus, four profiles need to be loaded (two for each condition
-    # comparison.
+    # differences. Thus, four profiles need to be loaded (two for each
+    # condition comparison).
 
     # For example:
     # A01 = PacMan Dynamic
@@ -105,9 +83,11 @@ def peak_diff(strPthData, lstDiff):
     aryDpthB02 = objNpzB02['arySubDpthMns']
 
     # Array with number of vertices (for weighted averaging across subjects),
-    # shape: vecNumInc[subjects]. Only one instance is needed per comparison, because the
-    # number of vertices is assumed to be constant across conditions (at least within the comparison). The two comparisons
-    # could have an unequal number of vertices (e.g. if comparing the same contrast between ROI).
+    # shape: vecNumInc[subjects]. Only one instance is needed per comparison,
+    # because the number of vertices is assumed to be constant across
+    # conditions (at least within the comparison). The two comparisons could
+    # have an unequal number of vertices (e.g. if comparing the same contrast
+    # between ROI).
     vecNumIncA01 = objNpzA01['vecNumInc']
     # vecNumIncA02 = objNpzA02['vecNumInc']
     vecNumIncB01 = objNpzB01['vecNumInc']
@@ -145,9 +125,9 @@ def peak_diff(strPthData, lstDiff):
     varEmpPeakDiff = np.absolute(np.subtract(varEmpPeaksA, varEmpPeaksB))
 
     print(('------Peak positions in mean empirical profiles, contrast A:  '
-           + str(np.around(vecEmpPeaksA, decimals=3))))
+           + str(np.around(varEmpPeaksA, decimals=3))))
     print(('------Peak positions in mean empirical profiles, contrast B:  '
-           + str(np.around(vecEmpPeaksB, decimals=3))))
+           + str(np.around(varEmpPeaksB, decimals=3))))
     print(('------Absolute difference in peak positions (empirical): '
            + str(np.around(varEmpPeakDiff, decimals=3))))
 
@@ -158,13 +138,12 @@ def peak_diff(strPthData, lstDiff):
 
     # Random array that is used to permute condition labels within subjects, of
     # the form aryRnd[idxIteration, idxSub]. For each iteration and subject,
-    # there is either a zero or a one. 'Zero' means that the actual label
-    # gets assigned to the permuted group. 'One' means that the labels are
-    # switched.
+    # there is either a zero or a one. 'Zero' means that the actual label gets
+    # assigned to the permuted group. 'One' means that the labels are switched.
     aryRnd = np.random.randint(0, high=2, size=(varNumIt, varNumSub))
 
-    # We need two versions of the randomisation array, one for sampling from the
-    # first input array, and a second version to sample from the second
+    # We need two versions of the randomisation array, one for sampling from
+    # the first input array, and a second version to sample from the second
     # input array. (I.e. the second version is the inverse of the first
     # version.)
     aryRnd01 = np.equal(aryRnd, 1)
@@ -214,8 +193,8 @@ def peak_diff(strPthData, lstDiff):
 
     print('---Create null distribution')
 
-    # The mean difference in peak position between the two randomised groups is the
-    # null distribution (vecNull[idxIteration]).
+    # The mean difference in peak position between the two randomised groups is
+    # the null distribution (vecNull[idxIteration]).
     vecNull = np.subtract(vecPermPeaksA, vecPermPeaksB)
 
     # -------------------------------------------------------------------------
@@ -223,12 +202,12 @@ def peak_diff(strPthData, lstDiff):
 
     print('---Calculate p-value')
 
-    # Absolute of the mean difference in peak position between the two randomised
-    # groups (null distribution).
+    #  # Absolute of the mean difference in peak position between the two
+    # randomised # groups (null distribution).
     vecNullAbs = np.absolute(vecNull)
 
-    # Number of resampled cases with absolute peak position difference that is at
-    # least as large as the empirical peak difference:
+    # Number of resampled cases with absolute peak position difference that is
+    # at least as large as the empirical peak difference:
     varNumGe = np.sum(np.greater_equal(vecNullAbs, varEmpPeakDiff))
 
     print('------Number of resampled cases with absolute peak position')
@@ -236,12 +215,14 @@ def peak_diff(strPthData, lstDiff):
     print(('      difference: '
           + str(varNumGe)))
 
-    # Ratio of resampled cases with absolute peak position difference that is at
-    # least as large as the empirical peak difference (permutation p-value):
+    # Ratio of resampled cases with absolute peak position difference that is
+    # at least as large as the empirical peak difference (permutation p-value):
     varP = np.divide(float(varNumGe), float(varNumIt))
 
     print('------Permutation p-value for equality of distributions of peak')
     print('      position of contrast-at-half-maximum response depth profiles')
     print(('      between the two ROIs: '
            + str(np.around(varP, decimals=4))))
-    # ----------------------------------------------------------------------------
+
+    return varP
+# -----------------------------------------------------------------------------

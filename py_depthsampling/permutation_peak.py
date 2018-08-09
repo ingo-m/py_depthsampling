@@ -94,18 +94,26 @@ varNumIt = 1000
 # *** Preparations
 
 # List of features for dataframe:
-lstFtr = ['ROI', 'Deconvolution', 'pRF position', 'Hemisphere', 'Contrast',
-          'p-value']
+lstFtr = ['ROI', 'Deconvolution', 'pRF-position', 'Hemisphere', 'Contrast',
+          'Emp.-peak-pos.-diff.', 'p-value']
 
 # Number of samples:
 varNumSmpl = (len(lstMetaCon) * len(lstMdl) * len(lstRoi) * len(lstHmsph)
               * len(lstDiff))
 
 # Create dataframe:
-objDf = pd.DataFrame(0.0, index=np.arange(varNumSmpl), columns=lstFtr,
-                     dtype={'ROI': str, 'Deconvolution': str,
-                            'pRF position': str, 'Hemisphere': str,
-                            'Contrast': str, 'p-value': np.float64})
+objDf = pd.DataFrame(None, index=np.arange(varNumSmpl), columns=lstFtr)
+
+# Dictionary for dataframe column datatypes:
+dicType = {'ROI': str,
+           'Deconvolution': str,
+           'pRF-position': str,
+           'Hemisphere': str,
+           'Contrast': str,
+           'Emp.-peak-pos.-diff.': np.float64,
+           'p-value': np.float64}
+
+objDf.astype(dicType)
 # -----------------------------------------------------------------------------
 
 
@@ -125,31 +133,39 @@ for idxMtaCn in range(len(lstMetaCon)):
                 for idxDiff in range(len(lstDiff)):
 
                     # Permutation test:
-                    varTmpP = peak_diff(strPthData.format(lstMetaCon[idxMtaCn],
-                                                          lstRoi[idxRoi],
-                                                          lstHmsph[idxHmsph],
-                                                          '{}',
-                                                          lstMdl[idxMdl]),
-                                        lstDiff[idxDiff],
-                                        lstCon,
-                                        varNumIt=1000)
+                    varTmpP, varTmpDiff= \
+                        peak_diff(strPthData.format(lstMetaCon[idxMtaCn],
+                                                    lstRoi[idxRoi],
+                                                    lstHmsph[idxHmsph],
+                                                    '{}',
+                                                    lstMdl[idxMdl]),
+                                  lstDiff[idxDiff],
+                                  lstCon,
+                                  varNumIt=1000)
 
                     # Current comparison:
                     strTmp = (lstCon[lstDiff[idxDiff][0][0]]
-                              + ' - '
+                              + '-'
                               + lstCon[lstDiff[idxDiff][0][1]]
-                              + ' vs '
+                              + '_vs_'
                               + lstCon[lstDiff[idxDiff][1][0]]
-                              + ' - '
+                              + '-'
                               + lstCon[lstDiff[idxDiff][1][1]])
 
                     # Result to data frame:
-                    objDf.at[idxSmpl, 'ROI'] = lstRoi[idxRoi]
-                    objDf.at[idxSmpl, 'Deconvolution'] = lstMdl[idxMdl]
-                    objDf.at[idxSmpl, 'pRF position'] = idxMtaCn[idxMtaCn]
+                    objDf.at[idxSmpl, 'ROI'] = lstRoi[idxRoi].upper()
+                    if lstMdl[idxMdl] == '':
+                        objDf.at[idxSmpl, 'Deconvolution'] = 'No'
+                    else:
+                        objDf.at[idxSmpl, 'Deconvolution'] = 'Yes'
+                    objDf.at[idxSmpl, 'pRF-position'] = lstMetaCon[idxMtaCn]
                     objDf.at[idxSmpl, 'Hemisphere'] = lstHmsph[idxHmsph]
                     objDf.at[idxSmpl, 'Contrast'] = strTmp
+                    objDf.at[idxSmpl, 'Emp.-peak-pos.-diff.'] = varTmpDiff
                     objDf.at[idxSmpl, 'p-value'] = varTmpP
+
+                    # Increment counter:
+                    idxSmpl += 1
 
 print(' ')
 print(objDf)

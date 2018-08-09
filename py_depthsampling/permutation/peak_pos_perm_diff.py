@@ -45,6 +45,9 @@ def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000):
         Permutation p-value for difference in peak position. (The ratio of
         resampled cases with an absolute peak position difference that is at
         least as large as the empirical peak difference.
+    varEmpPeakDiff : float
+        Absolute peak difference in empirical profiles of condition contrast
+        (in relative cortical depth, i.e. between zero and one).
 
     Notes
     -----
@@ -121,7 +124,7 @@ def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000):
     varEmpPeaksA = find_peak(vecDpthDiffA.reshape(1, varNumDpth))[0]
     varEmpPeaksB = find_peak(vecDpthDiffB.reshape(1, varNumDpth))[0]
 
-    # Absolute peak difference in contrast of empirical profiles:
+    # Absolute peak difference in empirical profiles of condition contrast:
     varEmpPeakDiff = np.absolute(np.subtract(varEmpPeaksA, varEmpPeaksB))
 
     print(('------Peak positions in mean empirical profiles, contrast A:  '
@@ -224,5 +227,5 @@ def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000):
     print(('      between the two ROIs: '
            + str(np.around(varP, decimals=4))))
 
-    return varP
+    return varP, varEmpPeakDiff
 # -----------------------------------------------------------------------------

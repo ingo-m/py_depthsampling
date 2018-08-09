@@ -105,6 +105,59 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05, lgcStat=True):
                                     order=varNumOrd,
                                     mode='clip')
 
+    # Create vector with one peak position per case. In some cases, no local
+    # maximum could be identified. For those cases, the global maximum will
+    # be selected as peak. In other cases, there may be more than one local
+    # maximum. In this case, the local maximum with the greater amplitude will
+    # be selected.
+    vecPeak2 = np.zeros((varNumIt), dtype=np.int64)
+
+    # Loop through all identified peaks (there can be more than one per depth
+    # profile, or none):
+    for idxPeak in range(vecPeak.shape[0]):
+
+        # Index of current peak (i.e., which iteration does the current peak
+        # refer to with respect to aryDpthSmth[iteration, depthlevel]):
+        varIdxPeak01 = vecPos[idxPeak]
+
+        # Amplitude of current peak:
+        varAmplt01 = aryDpthSmth[varIdxPeak01, vecPeak[idxPeak]]
+
+        # Do not compare to previous peak on first iteration:
+        if np.greater(idxPeak, 0):
+
+            # Does the current peak refer to the same iteration (with respect
+            # to aryDpthSmth[iteration, depthlevel])?
+            if varIdxPeak02 == varIdxPeak01:
+
+                # Is the amplitude of the current peak greater than that of
+                # the previous peak?
+                if np.greater(varAmplt01, varAmplt02):
+
+                    # Replace peak position in output array (relative peak
+                    # position with respect to cortical depth):
+                    vecPeak2[varIdxPeak01] = vecPeak[idxPeak]
+
+            else:
+
+                # New iteration (with respect to aryDpthSmth[iteration,
+                # depthlevel], place relative peak position in output array:
+                vecPeak2[varIdxPeak01] = vecPeak[idxPeak]
+
+        else:
+
+            # First iteration:
+            vecPeak2[varIdxPeak01] = vecPeak[idxPeak]
+
+        # Remember index of current peak (i.e. which depth profile does it
+        # refer to, so as to compare on the next iteration of the loop whether
+        # it refers to the same depth profile):
+        varIdxPeak02 = vecPos[idxPeak]
+
+        # Remember amplitude of current peak (for comparison on next iteration
+        # of the loop):
+        varAmplt02 = aryDpthSmth[varIdxPeak02, vecPeak[idxPeak]]
+
     # Number of cases for which a peak was found:
     varNumPeaks = vecPeak.shape[0]
 
@@ -115,14 +168,9 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05, lgcStat=True):
                + str(varNumIt)
                + ' cases.'))
 
-    # Create vector with one peak position per case (for depth profiles that
-    # are monotonically increasing, no local maximum can be identified). There
-    # peak it their maximum value.
-    vecPeak2 = np.zeros((varNumIt), dtype=np.int64)
-    vecPeak2[vecPos] = vecPeak
-
     # Cases for which no loacl maximum has been identified (depth profiles with
-    # monotonic increase):
+    # monotonic increase). In this case, the global maximum is defined as the
+    # peak.
     vecPosMono = np.equal(vecPeak2, 0)
 
     # Identifty position of global maximum:

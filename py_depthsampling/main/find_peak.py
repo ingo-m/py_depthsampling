@@ -47,7 +47,7 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05, lgcStat=True, varThr=None):
     varThr : float or None, optional
         Amplitude threshold for peak identification. For example, if `varThr =
         0.05`, peaks with an absolute amplitude that is greater than the mean
-        amplitude (over cortical depth) plus 0.05 are identified. The rational
+        amplitude (over cortical depth) plus 0.05 are identified. The rationale
         for this is that even for very flat profiles a peak is identified. The
         threshold does not influence the peak search; instead, if a threshold
         is provided, an additional output vector is returned, containing

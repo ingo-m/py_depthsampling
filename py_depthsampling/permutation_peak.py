@@ -133,7 +133,7 @@ for idxMtaCn in range(len(lstMetaCon)):
                 for idxDiff in range(len(lstDiff)):
 
                     # Permutation test:
-                    varTmpP, varTmpDiff= \
+                    varTmpP, varTmpDiff = \
                         peak_diff(strPthData.format(lstMetaCon[idxMtaCn],
                                                     lstRoi[idxRoi],
                                                     lstHmsph[idxHmsph],

@@ -23,7 +23,7 @@ import numpy as np
 from py_depthsampling.main.find_peak import find_peak
 
 
-def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000, varThr=0.05):
+def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000, varThr=0.01):
     """
     Plot across-subject cortical depth profiles with SEM.
 
@@ -147,12 +147,18 @@ def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000, varThr=0.05):
     varEmpPeaksA = vecEmpPeaksA[0]
     varEmpPeaksB = vecEmpPeaksB[0]
     lgcEmpPeaksA = vecEmpLgcA[0]
-    lgcEmpPeaksB = vecEmpLgcA[0]
+    lgcEmpPeaksB = vecEmpLgcB[0]
 
     # Absolute peak difference in empirical profiles of condition contrast:
     if np.multiply(lgcEmpPeaksA, lgcEmpPeaksB):
+        # If there is a peak in both profiles, calculate distance between
+        # peaks:
         varEmpPeakDiff = np.absolute(np.subtract(varEmpPeaksA, varEmpPeaksB))
+    elif np.logical_or(lgcEmpPeaksA, lgcEmpPeaksB):
+        # If only one profile has a peak, difference is maximal.
+        varEmpPeakDiff = 1.0
     else:
+        # If both profiles don't have a peak, the difference is zero.
         varEmpPeakDiff = 0.0
 
     print(('------Peak positions in mean empirical profiles, contrast A:  '
@@ -225,7 +231,7 @@ def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000, varThr=0.05):
           + str(np.around(varRatioPeak, decimals=3))))
 
     # Cases for which no peak was identified in both permutation samples:
-    vecLgc = np.invert(np.multiply(vecLgcA, vecLgcB))
+    # vecLgc = np.invert(np.multiply(vecLgcA, vecLgcB))
 
     # -------------------------------------------------------------------------
     # *** Create null distribution
@@ -234,11 +240,19 @@ def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000, varThr=0.05):
 
     # The mean difference in peak position between the two randomised groups is
     # the null distribution (vecNull[idxIteration]).
-    vecNull = np.subtract(vecPermPeaksA, vecPermPeaksB)
+    vecNull = np.zeros((varNumIt))
 
-    # If no peak was identified in one or both permutation samples, there is
-    # no peak position difference.
-    vecNull[vecLgc] = 0.0
+    # If there is a peak in both profiles, calculate distance between peaks:
+    lgcTmp = np.multiply(vecLgcA, vecLgcB)
+    vecNull[lgcTmp] = np.subtract(vecPermPeaksA[lgcTmp], vecPermPeaksB[lgcTmp])
+
+    # If only one profile has a peak, difference is maximal.
+    lgcTmp = np.logical_xor(vecLgcA, vecLgcB)
+    vecNull[lgcTmp] = 1.0
+
+    # If both profiles don't have a peak, the difference is zero.
+    lgcTmp = np.invert(np.multiply(vecLgcA, vecLgcB))
+    vecNull[lgcTmp] = 0.0
 
     # -------------------------------------------------------------------------
     # *** Calculate p-value

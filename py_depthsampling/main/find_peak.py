@@ -23,7 +23,7 @@ from scipy.ndimage.filters import gaussian_filter1d
 from scipy.signal import argrelextrema
 
 
-def find_peak(aryDpth, varNumIntp=100, varSd=0.05, lgcStat=True):
+def find_peak(aryDpth, varNumIntp=100, varSd=0.05, lgcStat=True, varThr=None):
     """
     Find peak in cortical depth profile.
 
@@ -42,8 +42,16 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05, lgcStat=True):
         Standard deviation of the Gaussian kernel used for smoothing, relative
         to cortical thickness (i.e. a value of 0.05 would result in a Gaussian
         with FWHM of 5 percent of the cortical thickness).
-    lgcStat : bool
+    lgcStat : bool, optional
         Whether to print status messages.
+    varThr : float or None, optional
+        Amplitude threshold for peak identification. For example, if `varThr =
+        0.05`, peaks with an absolute amplitude that is greater than the mean
+        amplitude (over cortical depth) plus 0.05 are identified. The rational
+        for this is that even for very flat profiles a peak is identified. The
+        threshold does not influence the peak search; instead, if a threshold
+        is provided, an additional output vector is returned, containing
+        boolean values (true if peak amplitude exceeds threshold).
 
     Returns
     -------
@@ -51,6 +59,10 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05, lgcStat=True):
         Relative position of the peak (between 0.0 and 1.0) for each depth
         profile. 1D array with length equal to the number of depth profiles of
         the input array.
+    vecLgc : np.array, optional
+        Peak amplitude threshold check. 1D vector with boolean values (true if
+        peak amplitude exceeds threshold). One value per depth profile.
+        Optional; only returned if a peak amplitude threshold is provided.
 
     Notes
     -----
@@ -99,7 +111,7 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05, lgcStat=True):
     # Identify peaks (the algorithm procudes a tuple of two arrays, the first
     # with the indicies of cases (i.e. bootstrap iterations) for which a peak
     # was identified, the second with the indicies of the peak.
-    vecPos, vecPeak = argrelextrema(aryDpthSmth,
+    vecIdx, vecPeak = argrelextrema(aryDpthSmth,
                                     np.greater,
                                     axis=1,
                                     order=varNumOrd,
@@ -112,13 +124,16 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05, lgcStat=True):
     # be selected.
     vecPeak2 = np.zeros((varNumIt), dtype=np.int64)
 
+    # Vector for peak amplitudes:
+    vecAmp = np.zeros((varNumIt))
+
     # Loop through all identified peaks (there can be more than one per depth
     # profile, or none):
     for idxPeak in range(vecPeak.shape[0]):
 
         # Index of current peak (i.e., which iteration does the current peak
         # refer to with respect to aryDpthSmth[iteration, depthlevel]):
-        varIdxPeak01 = vecPos[idxPeak]
+        varIdxPeak01 = vecIdx[idxPeak]
 
         # Amplitude of current peak:
         varAmplt01 = aryDpthSmth[varIdxPeak01, vecPeak[idxPeak]]
@@ -138,28 +153,35 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05, lgcStat=True):
                     # position with respect to cortical depth):
                     vecPeak2[varIdxPeak01] = vecPeak[idxPeak]
 
+                    # Replace old amplitude with new (greater) amplitude:
+                    vecAmp[varIdxPeak01] = varAmplt01
+
             else:
 
                 # New iteration (with respect to aryDpthSmth[iteration,
                 # depthlevel], place relative peak position in output array:
                 vecPeak2[varIdxPeak01] = vecPeak[idxPeak]
 
+                # Save amplitude:
+                vecAmp[varIdxPeak01] = varAmplt01
+
         else:
 
             # First iteration:
             vecPeak2[varIdxPeak01] = vecPeak[idxPeak]
+            vecAmp[varIdxPeak01] = varAmplt01
 
         # Remember index of current peak (i.e. which depth profile does it
         # refer to, so as to compare on the next iteration of the loop whether
         # it refers to the same depth profile):
-        varIdxPeak02 = vecPos[idxPeak]
+        varIdxPeak02 = vecIdx[idxPeak]
 
         # Remember amplitude of current peak (for comparison on next iteration
         # of the loop):
         varAmplt02 = aryDpthSmth[varIdxPeak02, vecPeak[idxPeak]]
 
     # Number of cases for which a peak was found:
-    varNumPeaks = vecPeak.shape[0]
+    varNumPeaks = np.shape(np.unique(vecIdx))[0]
 
     if lgcStat:
         print(('------Identified local maxima in '
@@ -168,16 +190,23 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05, lgcStat=True):
                + str(varNumIt)
                + ' cases.'))
 
-    # Cases for which no loacl maximum has been identified (depth profiles with
+    # Cases for which no local maximum has been identified (depth profiles with
     # monotonic increase). In this case, the global maximum is defined as the
     # peak.
     vecPosMono = np.equal(vecPeak2, 0)
 
     # Identifty position of global maximum:
-    vecMax = np.argmax(aryDpthSmth, axis=1)
+    vecArgMax = np.argmax(aryDpthSmth, axis=1)
 
     # Replace zeros with global maximum for respective cases:
-    vecPeak2[vecPosMono] = vecMax[vecPosMono]
+    vecPeak2[vecPosMono] = vecArgMax[vecPosMono]
+
+    # Amplitude of global maximum:
+    vecMax = np.max(aryDpthSmth, axis=1)
+
+    # Save amplitude of global maximum for cases where no local maximum was
+    # found:
+    vecAmp[vecPosMono] = vecMax[vecPosMono]
 
     # Number of cases for which a local or global maxima was found:
     varNumPeaks2 = vecPeak2.shape[0]
@@ -193,4 +222,21 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05, lgcStat=True):
     # relative cortical depth):
     vecPeak2 = np.divide(vecPeak2, np.float64(varNumIntp))
 
-    return vecPeak2
+    # If no peak threshold is given, just return the vector with relative peak
+    # positions.
+    if varThr is None:
+
+        return vecPeak2
+
+    else:
+
+        # Mean along depth dimension (separately for each depth profile):
+        vecMne = np.mean(aryDpth, axis=1)
+
+        # Add peak-threshold to mean:
+        vecThr = np.add(np.absolute(vecMne), varThr)
+
+        # Is the absolute amplitude greater than threshold?
+        vecLgc = np.greater(np.absolute(vecAmp), vecThr)
+
+        return vecPeak2, vecLgc

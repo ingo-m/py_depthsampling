@@ -95,7 +95,8 @@ varNumIt = 1000
 
 # List of features for dataframe:
 lstFtr = ['ROI', 'Deconvolution', 'pRF-position', 'Hemisphere', 'Contrast',
-          'Emp.-peak-pos.-diff.', 'p-value']
+          'Emp.-peak-pos.-diff.', 'Emp.-peak-A?', 'Emp.-peak-B?',
+          'Perm.-peak-ratio[%]', 'p-value']
 
 # Number of samples:
 varNumSmpl = (len(lstMetaCon) * len(lstMdl) * len(lstRoi) * len(lstHmsph)
@@ -110,7 +111,10 @@ dicType = {'ROI': str,
            'pRF-position': str,
            'Hemisphere': str,
            'Contrast': str,
+           'Emp.-peak-A?': np.bool,
+           'Emp.-peak-B?': np.bool,
            'Emp.-peak-pos.-diff.': np.float64,
+           'Perm.-peak-ratio[%]': np.float64,
            'p-value': np.float64}
 
 objDf.astype(dicType)
@@ -133,7 +137,7 @@ for idxMtaCn in range(len(lstMetaCon)):
                 for idxDiff in range(len(lstDiff)):
 
                     # Permutation test:
-                    varTmpP, varTmpDiff = \
+                    varTmpP, varTmpDiff, lgcTmpA, lgcTmpB, varTmpRatioPeak = \
                         peak_diff(strPthData.format(lstMetaCon[idxMtaCn],
                                                     lstRoi[idxRoi],
                                                     lstHmsph[idxHmsph],
@@ -162,6 +166,9 @@ for idxMtaCn in range(len(lstMetaCon)):
                     objDf.at[idxSmpl, 'Hemisphere'] = lstHmsph[idxHmsph]
                     objDf.at[idxSmpl, 'Contrast'] = strTmp
                     objDf.at[idxSmpl, 'Emp.-peak-pos.-diff.'] = varTmpDiff
+                    objDf.at[idxSmpl, 'Emp.-peak-A?'] = lgcTmpA
+                    objDf.at[idxSmpl, 'Emp.-peak-B?'] = lgcTmpB
+                    objDf.at[idxSmpl, 'Perm.-peak-ratio[%]'] = varTmpRatioPeak
                     objDf.at[idxSmpl, 'p-value'] = varTmpP
 
                     # Increment counter:

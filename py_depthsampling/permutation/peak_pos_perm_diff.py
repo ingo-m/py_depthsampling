@@ -23,7 +23,7 @@ import numpy as np
 from py_depthsampling.main.find_peak import find_peak
 
 
-def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000):
+def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000, varThr=0.05):
     """
     Plot across-subject cortical depth profiles with SEM.
 
@@ -37,7 +37,16 @@ def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000):
     lstCon : list
         Condition levels (list of strings, used to complete file names).
     varNumIt : int
-        Number of resampling iteration
+        Number of resampling iterations.
+    varThr : float
+        Amplitude threshold for peak identification. For example, if `varThr =
+        0.05`, peaks with an absolute amplitude that is greater than the mean
+        amplitude (over cortical depth) plus 0.05 are identified. The rationale
+        for this is that even for very flat profiles a peak is identified. The
+        threshold does not influence the peak search directly; instead, in case
+        of a peak below thershold, the difference in peak position (between the
+        two conditions that are compared) is set to zero for the respective
+        comparison.
 
     Returns
     -------
@@ -48,6 +57,13 @@ def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000):
     varEmpPeakDiff : float
         Absolute peak difference in empirical profiles of condition contrast
         (in relative cortical depth, i.e. between zero and one).
+    lgcEmpPeaksA : bool
+        Was a peak found in empirical contrast A?
+    lgcEmpPeaksB : bool
+        Was a peak found in empirical contrast B?
+    varRatioPeak : float
+        Ratio of depth profiles (iterations) where a peak was found, according
+        to amplitude threshold.
 
     Notes
     -----
@@ -121,11 +137,23 @@ def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000):
     # New array shape: vecDpthDiffA[depth]
 
     # Peak positions in empirical depth profiles:
-    varEmpPeaksA = find_peak(vecDpthDiffA.reshape(1, varNumDpth))[0]
-    varEmpPeaksB = find_peak(vecDpthDiffB.reshape(1, varNumDpth))[0]
+    vecEmpPeaksA, vecEmpLgcA = find_peak(vecDpthDiffA.reshape(1, varNumDpth),
+                                         varThr=varThr)
+    vecEmpPeaksB, vecEmpLgcB = find_peak(vecDpthDiffB.reshape(1, varNumDpth),
+                                         varThr=varThr)
+
+    # The peak finding function returns a vector, even in case of a single
+    # depth profile.
+    varEmpPeaksA = vecEmpPeaksA[0]
+    varEmpPeaksB = vecEmpPeaksB[0]
+    lgcEmpPeaksA = vecEmpLgcA[0]
+    lgcEmpPeaksB = vecEmpLgcA[0]
 
     # Absolute peak difference in empirical profiles of condition contrast:
-    varEmpPeakDiff = np.absolute(np.subtract(varEmpPeaksA, varEmpPeaksB))
+    if np.multiply(lgcEmpPeaksA, lgcEmpPeaksB):
+        varEmpPeakDiff = np.absolute(np.subtract(varEmpPeaksA, varEmpPeaksB))
+    else:
+        varEmpPeakDiff = 0.0
 
     print(('------Peak positions in mean empirical profiles, contrast A:  '
            + str(np.around(varEmpPeaksA, decimals=3))))
@@ -188,8 +216,16 @@ def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000):
 
     print('---Find peaks in permutation samples')
 
-    vecPermPeaksA = find_peak(aryDpthRndA)
-    vecPermPeaksB = find_peak(aryDpthRndB)
+    vecPermPeaksA, vecLgcA = find_peak(aryDpthRndA, varThr=varThr)
+    vecPermPeaksB, vecLgcB = find_peak(aryDpthRndB, varThr=varThr)
+
+    # Ratio of iterations with peak:
+    varRatioPeak = (np.sum(vecLgcA) + np.sum(vecLgcB)) / (2.0 * varNumIt)
+    print(('------Percentage of permutation samples with peak: '
+          + str(np.around(varRatioPeak, decimals=3))))
+
+    # Cases for which no peak was identified in both permutation samples:
+    vecLgc = np.invert(np.multiply(vecLgcA, vecLgcB))
 
     # -------------------------------------------------------------------------
     # *** Create null distribution
@@ -199,6 +235,10 @@ def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000):
     # The mean difference in peak position between the two randomised groups is
     # the null distribution (vecNull[idxIteration]).
     vecNull = np.subtract(vecPermPeaksA, vecPermPeaksB)
+
+    # If no peak was identified in one or both permutation samples, there is
+    # no peak position difference.
+    vecNull[vecLgc] = 0.0
 
     # -------------------------------------------------------------------------
     # *** Calculate p-value
@@ -227,5 +267,5 @@ def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000):
     print(('      between the two ROIs: '
            + str(np.around(varP, decimals=4))))
 
-    return varP, varEmpPeakDiff
+    return varP, varEmpPeakDiff, lgcEmpPeaksA, lgcEmpPeaksB, varRatioPeak
 # -----------------------------------------------------------------------------

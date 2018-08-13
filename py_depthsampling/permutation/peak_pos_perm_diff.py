@@ -61,6 +61,10 @@ def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000, varThr=0.05):
         Was a peak found in empirical contrast A?
     lgcEmpPeaksB : bool
         Was a peak found in empirical contrast B?
+    varEmpPeaksA : float
+        Peak position (relative cortical depth) in empricial profile A.
+    varEmpPeaksB : float
+        Peak position (relative cortical depth) in empricial profile B.
     varRatioPeak : float
         Ratio of depth profiles (iterations) where a peak was found, according
         to amplitude threshold.
@@ -290,5 +294,6 @@ def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000, varThr=0.05):
     print(('      between the two ROIs: '
            + str(np.around(varP, decimals=4))))
 
-    return varP, varEmpPeakDiff, lgcEmpPeaksA, lgcEmpPeaksB, varRatioPeak
+    return varP, varEmpPeakDiff, lgcEmpPeaksA, lgcEmpPeaksB, varEmpPeaksA, \
+        varEmpPeaksB, varRatioPeak
 # -----------------------------------------------------------------------------

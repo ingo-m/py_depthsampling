@@ -104,8 +104,8 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05, lgcStat=True, varThr=None):
                                     mode='nearest')
 
     # Order of the search for the local maximum: how many points on each side
-    # to use for the comparison to consider.
-    varNumOrd = int(np.around((np.float64(varNumIntp) * 0.1),
+    # for the comparison to consider.
+    varNumOrd = int(np.around((np.float64(varNumIntp) * 0.05),
                               decimals=0))
 
     # Identify peaks (the algorithm procudes a tuple of two arrays, the first
@@ -234,9 +234,9 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.05, lgcStat=True, varThr=None):
         vecMne = np.mean(aryDpth, axis=1)
 
         # Add peak-threshold to mean:
-        vecThr = np.add(np.absolute(vecMne), varThr)
+        vecThr = np.absolute(np.subtract(vecAmp, vecMne))
 
         # Is the absolute amplitude greater than threshold?
-        vecLgc = np.greater(np.absolute(vecAmp), vecThr)
+        vecLgc = np.greater(vecThr, varThr)
 
         return vecPeak2, vecLgc

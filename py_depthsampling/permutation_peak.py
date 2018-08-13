@@ -145,7 +145,7 @@ for idxMtaCn in range(len(lstMetaCon)):
                                                     lstMdl[idxMdl]),
                                   lstDiff[idxDiff],
                                   lstCon,
-                                  varNumIt=1000)
+                                  varNumIt=varNumIt)
 
                     # Current comparison:
                     strTmp = (lstCon[lstDiff[idxDiff][0][0]]

@@ -23,7 +23,7 @@ from scipy.ndimage.filters import gaussian_filter1d
 from scipy.signal import argrelextrema
 
 
-def find_peak(aryDpth, varNumIntp=100, varSd=0.05, lgcStat=True, varThr=None):
+def find_peak(aryDpth, varNumIntp=100, varSd=0.1, lgcStat=True, varThr=None):
     """
     Find peak in cortical depth profile.
 

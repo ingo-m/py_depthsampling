@@ -56,9 +56,10 @@ def permute_max(aryDpth01, aryDpth02, vecNumInc=None, varNumIt=10000):
     conditions is significant at *any* cortical depth. This is in contrast to
     `perm_main.py`, where the permutation test is conducted separately for each
     depth level. The problem with a separate test at each depth level is that
-    this leads to a massive multiple comparisons problem. Here, we the
-    amplitude of the maximum across depth is different between conditions,
-    irrespective of where the amplitude is.
+    this leads to a massive multiple comparisons problem. Here, we test whether
+    the maximal difference in amplitude (across coritcal depth) is different
+    between conditions, irrespective of where along the cortical depth the
+    maximum difference in amplitude occurs.
 
     The procedure is as follow:
     - Condition labels (i.e. 'PacMan Dynamic' and 'PacMan Static') are permuted

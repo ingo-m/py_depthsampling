@@ -23,7 +23,7 @@ import numpy as np
 from py_depthsampling.main.find_peak import find_peak
 
 
-def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000, varThr=0.01):
+def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000, varThr=0.05):
     """
     Plot across-subject cortical depth profiles with SEM.
 
@@ -136,6 +136,10 @@ def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000, varThr=0.01):
     vecDpthDiffB = np.average(aryDpthDiffB, axis=0, weights=vecNumIncB01)
     # New array shape: vecDpthDiffA[depth]
 
+    # Peak finding on absolute difference (so as to also count negative peaks):
+    vecDpthDiffA = np.absolute(vecDpthDiffA)
+    vecDpthDiffB = np.absolute(vecDpthDiffB)
+
     # Peak positions in empirical depth profiles:
     vecEmpPeaksA, vecEmpLgcA = find_peak(vecDpthDiffA.reshape(1, varNumDpth),
                                          varThr=varThr)
@@ -222,6 +226,11 @@ def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000, varThr=0.01):
 
     print('---Find peaks in permutation samples')
 
+    # Absolute difference (so as to also count negative peaks):
+    aryDpthRndA = np.absolute(aryDpthRndA)
+    aryDpthRndB = np.absolute(aryDpthRndB)
+
+    # Find peaks:
     vecPermPeaksA, vecLgcA = find_peak(aryDpthRndA, varThr=varThr)
     vecPermPeaksB, vecLgcB = find_peak(aryDpthRndB, varThr=varThr)
 

@@ -4,7 +4,9 @@ Permutation test for difference between conditions in depth profiles.
 
 Compares cortical depth profiles from two different conditions (e.g. PacMan
 dynamic vs. PacMan statis). Tests whether the difference between the two
-conditions is significant at any cortical depth.
+conditions is significant at *any* cortical depth.
+
+Prints results of permutation test.
 
 Inputs are *.npz files containing depth profiles for each subject.
 """
@@ -48,7 +50,7 @@ lstHmsph = ['rh']
 
 # Path of depth-profile to load (meta-condition, ROI, hemisphere, condition,
 # and deconvolution suffix left open):
-strPthPrf = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npz'  #noqa
+strPthPrf = '/Users/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npz'  #noqa
 
 # Label for axes:
 strXlabel = 'Cortical depth level'

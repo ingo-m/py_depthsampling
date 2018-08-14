@@ -4,9 +4,12 @@ Permutation test for difference between conditions in depth profiles.
 
 Compares cortical depth profiles from two different conditions (e.g. PacMan
 dynamic vs. PacMan statis). Tests whether the difference between the two
-conditions is significant at any cortical depth.
+conditions is significant *separately at each* cortical depth.
 
-Inputs are *.npy files containing depth profiles for each subject.
+Creates plots of empirical condition differences and permutation null
+distribution over cortical depth.
+
+Inputs are *.npz files containing depth profiles for each subject.
 """
 
 # Part of py_depthsampling library
@@ -48,11 +51,11 @@ lstHmsph = ['rh']
 
 # Path of depth-profile to load (meta-condition, ROI, hemisphere, condition,
 # and deconvolution suffix left open):
-strPthPrf = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npz'  #noqa
+strPthPrf = '/Users/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npz'  #noqa
 
 # Output path & prefix for plots (meta-condition, ROI, hemisphere, condition,
 # and deconvolution suffix left open):
-strPthPltOt = '/home/john/Dropbox/PacMan_Plots/permutation/{}_{}_{}_{}{}_'  #noqa
+strPthPltOt = '/Users/john/Dropbox/PacMan_Plots/permutation/{}_{}_{}_{}{}_'  #noqa
 
 # File type suffix for plot:
 strFlTp = '.svg'
@@ -79,8 +82,8 @@ varLow = 2.5
 varUp = 97.5
 
 # Limits of y-axis:
-varYmin = -50.0
-varYmax = 50.0
+varYmin = -0.5
+varYmax = 0.5
 
 # Figure scaling factor:
 varDpi = 100.0
@@ -202,8 +205,8 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                                       False,
                                       ['Empirical condition difference',
                                        'Permutation null distribution'],
-                                      'Cortical depth level (equivolume)',
-                                      'fMRI signal change [a.u.]',
+                                      'Cortical depth level',
+                                      'fMRI signal change [%]',
                                       (lstRoi[idxRoi].upper()
                                        + ' '
                                        + lstHmsph[idxHmsph].upper()

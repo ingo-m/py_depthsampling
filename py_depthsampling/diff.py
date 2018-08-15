@@ -69,7 +69,7 @@ strYlabel = 'Signal change [%]'
 # Condition levels (used to complete file names):
 lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
 # lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst', 'Ps_sst_plus_Cd_sst']
-# lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
+# lstCon = ['Pd_trn', 'Ps_trn', 'Cd_trn']
 # lstCon = ['Pd_trn', 'Ps_trn', 'Cd_trn', 'Ps_trn_plus_Cd_trn']
 
 # Condition labels:

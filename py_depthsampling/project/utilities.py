@@ -91,11 +91,26 @@ def get_data(strData, strPthMneEpi, strPthR2, strPthSd, strPthX, strPthY,
 
         # Load time series data from npy file:
         aryData = np.load(strData)
-        aryData = aryData[:, varTr, :].T
-        # New shape: aryData[idxVertex, idxDepth]
 
-        # Subtract one from time series that data is centred at zero:
+        # Subtract one from time series so that data are centred at zero:
         aryData = np.subtract(aryData, 1.0)
+
+        # Maximum absolute values over time and cortical depth:
+        aryMax = np.max(np.absolute(aryData), axis=(0, 1))
+
+        # Standard deviation of maximum
+        varMaxSd = np.std(aryMax)
+
+        # Vertices with a z-score of more than three standard deviations:
+        vecLgc = np.greater(aryMax, np.multiply(varMaxSd, 3.0))
+
+        # Set extreme vertices to zero (in order to avoid extreme values that
+        # were introduced when dividing by baseline values very close to
+        # zero):
+        aryData[:, :, vecLgc] = 0.0
+
+        # New shape: aryData[idxVertex, idxDepth]
+        aryData = aryData[:, varTr, :].T
 
     else:
 

@@ -170,6 +170,7 @@ for idxRoi in range(len(lstRoi)):  #noqa
                                                    strCsvRoi,
                                                    varNumDpth,
                                                    None,
+                                                   None,
                                                    idxPrc,
                                                    queOut)
                                              )

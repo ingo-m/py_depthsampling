@@ -1,33 +1,32 @@
 # -*- coding: utf-8 -*-
-"""Project parameter estimates into a visual space representation."""
+"""
+Project event-related time courses into visual field.
 
-# Part of py_depthsampling library
-# Copyright (C) 2018  Ingo Marquardt
-#
-# This program is free software: you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation, either version 3 of the License, or (at your option) any later
-# version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-# details.
-#
-# You should have received a copy of the GNU General Public License along with
-# this program.  If not, see <http://www.gnu.org/licenses/>.
+Function of the depth sampling library.
+
+Timecourses have to be cut into event-related segments and averaged across
+trials (using the 'cut_sgmnts.py' script of the depth-sampling library, or
+automatically as part of the PacMan analysis pipeline,
+n_03x_py_evnt_rltd_avrgs.py). Depth-sampling has to be performed with CBS
+tools, resulting in a 3D mesh for each time point.
+"""
 
 
 from py_depthsampling.project.project_main import project
 
 
-# -----------------------------------------------------------------------------
+# *****************************************************************************
 # *** Define parameters
 
-# Load/save existing projection from/to (ROI, condition, depth level label left
-# open):
-strPthNpy = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project/{}_{}_{}.npy'  #noqa
-# strPthNpy = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project/{}_{}_{}_z.npy'  #noqa
+# Load/save existing projection from/to (ROI, condition, depth level label, and
+# volume index left open):
+strPthNpy = '/home/john/PhD/PacMan_Depth_Data_Dropbox_Relieve/project_ert/{}_{}_{}_volume_{}.npy'  #noqa
+
+# Output path & prefix for plots (ROI, condition, depth level label left open):
+strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/ert/{}_{}_{}'  #noqa
+
+# Region of interest ('v1' or 'v2'):
+lstRoi = ['v1', 'v2', 'v3']
 
 # List of subject identifiers:
 lstSubIds = ['20171023',  # '20171109',
@@ -38,51 +37,62 @@ lstSubIds = ['20171023',  # '20171109',
              '20180111',
              '20180118']
 
+# Condition levels (used to complete file names):
+lstCon = ['pacman_dynamic', 'pacman_static', 'control_dynamic']
+
+# Condition labels (for plot legend):
+lstConLbl = ['Pacman dynamic', 'Pacman static', 'Control dynamic']
+
+# Number of cortical depths:
+varNumDpth = 11
+
+# Number of timepoints:
+varNumVol = 19
+
+# Beginning of string which precedes vertex data in data vtk files (i.e. in the
+# statistical maps):
+strPrcdData = 'SCALARS'
+
+# Number of lines between vertex-identification-string and first data point:
+varNumLne = 2
+
+# Limits of y-axis:
+varAcrSubsYmin = -0.04
+varAcrSubsYmax = 0.02
+
+# Number of labels on y-axis:
+varYnum = 4
+
+# Convert y-axis values to percent (i.e. divide label values by 100)?
+# lgcCnvPrct = False
+
 # Nested list with depth levels to average over. For instance, if `lstDpth =
 # [[0, 1, 2], [3, 4, 5]]`, on a first iteration, the average over the first
 # three depth levels is calculated, and on a second iteration the average over
-# the subsequent three depth levels is calculated. If 1lstDpth= [[None]]1,
+# the subsequent three depth levels is calculated. If `lstDpth= [[None]]`,
 # average over all depth levels.
-lstDpth = [None, [0, 1, 2], [4, 5, 6], [8, 9, 10]]
-# lstDpth = [[x] for x in range(11)]
+lstDpth = [None]
 # Depth level condition labels (output file will contain this label):
-lstDpthLbl = ['allGM', 'deepGM', 'midGM', 'superficialGM']
-# lstDpthLbl = [str(x) for x in range(11)]
-
-# ROI ('v1' or 'v2'):
-lstRoi = ['v1', 'v2', 'v3']
-
-# Output path & prefix for plots (ROI, condition, depth level label left open):
-strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/pe/{}_{}_{}'  #noqa
-# strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/z/{}_{}_{}'  #noqa
+lstDpthLbl = ['allGM']
 
 # File type suffix for plot:
-strFlTp = '.svg'
-# strFlTp = '.png'
+# strFlTp = '.svg'
+strFlTp = '.png'
 
 # Figure scaling factor:
 varDpi = 80.0
 
-# Condition levels (used to complete file names):
-# lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst',
-#           'Pd_trn', 'Cd_trn', 'Ps_trn',
-#           'Pd_min_Ps_sst', 'Pd_min_Cd_sst', 'Cd_min_Ps_sst',
-#           'Pd_min_Cd_Ps_sst',
-#           'Pd_min_Cd_Ps_trn',
-#           'Pd_min_Ps_trn', 'Pd_min_Cd_trn', 'Cd_min_Ps_trn']
-# lstCon = ['polar_angle', 'x_pos', 'y_pos', 'SD', 'R2']
-lstCon = ['Pd_sst', 'Cd_sst', 'Ps_sst']
-# lstCon = ['Pd_min_Ps_sst', 'Pd_min_Cd_sst', 'Cd_min_Ps_sst',
-#           'Pd_min_Cd_Ps_sst']
+# Path of csv file with ROI definition (subject ID, hemisphere, and ROI left
+# open).
+strCsvRoi = '/home/john/PhD/GitLab/PacMan/analysis/{}/08_depthsampling/{}/{}_mod.csv'  #noqa
 
 # Path of vtk mesh with data to project into visual space (e.g. parameter
-# estimates; subject ID, hemisphere, and contion level left open).
-strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/feat_level_2_{}_cope.vtk'  #noqa
-# strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/feat_level_2_{}_zstat.vtk'  #noqa
-# strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_{}.vtk'  #noqa
+# estimates; subject ID, hemisphere, condition, and condition level left open).
+strPthData =  '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}_era/{}/aryErt_{}.npy'  #noqa
 
 # Path of mean EPI (for scaling to percent signal change; subject ID and
-# hemisphere left open):
+# hemisphere left open). Not used here, but necessary because of modularity
+# (multiprocessing function does not take kwargs).
 strPthMneEpi = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/combined_mean.vtk'  #noqa
 
 # Path of vtk mesh with R2 values from pRF mapping (at multiple depth levels;
@@ -100,14 +110,6 @@ strPthX = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_x_pos.
 # Path of vtk mesh with pRF y positions at multiple depth levels; subject ID
 # and hemisphere left open).
 strPthY = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_y_pos.vtk'  #noqa
-
-# Path of csv file with ROI definition (subject ID, hemisphere, and ROI left
-# open).
-strCsvRoi = '/home/john/PhD/GitLab/PacMan/analysis/{}/08_depthsampling/{}/{}_mod.csv'  #noqa
-# strCsvRoi = '/Users/john/1_PhD/GitLab/PacMan/analysis/{}/08_depthsampling/{}/{}_mod.csv'  #noqa
-
-# Number of cortical depths.
-varNumDpth = 11
 
 # Extent of visual space from centre of the screen in negative x-direction
 # (i.e. from the fixation point to the left end of the screen) in degrees of
@@ -135,6 +137,10 @@ varThrR2 = 0.15
 # in x- and y-directions).
 varNumX = 200
 varNumY = 200
+
+# Minimum and maximum of colour bar:
+varMin = -0.05
+varMax = 0.05
 # -----------------------------------------------------------------------------
 
 
@@ -150,11 +156,14 @@ varNumSub = len(lstSubIds)
 for idxDpth in range(len(lstDpth)):  #noqa
     for idxRoi in range(len(lstRoi)):
         for idxCon in range(len(lstCon)):
+            for idxVol in range(varNumVol):
 
-            project(lstRoi[idxRoi], lstCon[idxCon], lstDpth[idxDpth],
-                    lstDpthLbl[idxDpth], strPthNpy, varNumSub,
-                    lstSubIds, strPthData, strPthMneEpi, strPthR2, strPthX,
-                    strPthY, strPthSd, strCsvRoi, varNumDpth, varThrR2,
-                    varNumX, varNumY, varExtXmin, varExtXmax, varExtYmin,
-                    varExtYmax, strPthPltOt, strFlTp)
+                project(lstRoi[idxRoi], lstCon[idxCon], lstDpth[idxDpth],
+                        lstDpthLbl[idxDpth], strPthNpy.format('{}', '{}', '{}',
+                        idxVol), varNumSub, lstSubIds, strPthData,
+                        strPthMneEpi, strPthR2, strPthX, strPthY, strPthSd,
+                        strCsvRoi, varNumDpth, varThrR2, varNumX, varNumY,
+                        varExtXmin, varExtXmax, varExtYmin, varExtYmax,
+                        strPthPltOt, strFlTp, varMin=varMin, varMax=varMax,
+                        varTr=idxVol)
 # -----------------------------------------------------------------------------

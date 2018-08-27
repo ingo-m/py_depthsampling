@@ -31,7 +31,7 @@ def project(strRoi, strCon, strDpth, strDpthLbl, strPthNpy, varNumSub,
             lstSubIds, strPthData, strPthMneEpi, strPthR2, strPthX, strPthY,
             strPthSd, strCsvRoi, varNumDpth, varThrR2, varNumX, varNumY,
             varExtXmin, varExtXmax, varExtYmin, varExtYmax, strPthPltOt,
-            strFlTp):
+            strFlTp, varMin=-3.0, varMax=3.0, varTr=None):
     """Project parameter estimates into a visual space representation."""
     # File name of npy file for current condition:
     strPthNpyTmp = strPthNpy.format(strRoi,
@@ -79,6 +79,7 @@ def project(strRoi, strCon, strDpth, strDpthLbl, strPthNpy, varNumSub,
                                                strCsvRoi,
                                                varNumDpth,
                                                strDpth,
+                                               varTr,
                                                idxPrc,
                                                queOut)
                                          )
@@ -285,11 +286,24 @@ def project(strRoi, strCon, strDpth, strDpthLbl, strPthNpy, varNumSub,
 
     print('--Plot results')
 
-    # Output path for plot:
-    strPthPltOtTmp = (strPthPltOt.format(strRoi,
-                                         strCon,
-                                         strDpthLbl)
-                      + strFlTp)
+    if varTr is None:
+
+        # Output path for plot:
+        strPthPltOtTmp = (strPthPltOt.format(strRoi,
+                                             strCon,
+                                             strDpthLbl)
+                          + strFlTp)
+
+    else:
+
+        # In case of time series data, the volume index is part of the file
+        # name.
+        strPthPltOtTmp = (strPthPltOt.format(strRoi,
+                                             strCon,
+                                             strDpthLbl)
+                          + '_volume_'
+                          + str(varTr)
+                          + strFlTp)
 
     # Plot title:
     strTmpTtl = (strRoi
@@ -306,6 +320,6 @@ def project(strRoi, strCon, strDpth, strDpthLbl, strPthNpy, varNumSub,
          strPthPltOtTmp,
          tpleLimX=(varExtXmin, varExtXmax, 3.0),
          tpleLimY=(varExtYmin, varExtYmax, 3.0),
-         varMin=-3.0,
-         varMax=3.0)
+         varMin=varMin,
+         varMax=varMax)
 # -----------------------------------------------------------------------------

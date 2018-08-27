@@ -248,6 +248,7 @@ for idxDpth in range(len(lstDpth)):  #noqa
                                                        strCsvRoi,
                                                        varNumDpth,
                                                        lstDpth[idxDpth],
+                                                       None,  # varTr
                                                        idxPrc,
                                                        queOut)
                                                  )

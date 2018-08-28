@@ -101,8 +101,8 @@ def get_data(strData, strPthMneEpi, strPthR2, strPthSd, strPthX, strPthY,
         # Standard deviation of maximum
         varMaxSd = np.std(aryMax)
 
-        # Vertices with a z-score of more than three standard deviations:
-        vecLgc = np.greater(aryMax, np.multiply(varMaxSd, 3.0))
+        # Vertices with a z-score of more than two standard deviations:
+        vecLgc = np.greater(aryMax, np.multiply(varMaxSd, 2.0))
 
         # Set extreme vertices to zero (in order to avoid extreme values that
         # were introduced when dividing by baseline values very close to

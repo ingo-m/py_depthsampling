@@ -100,7 +100,7 @@ def ert_onset(lstPthPic, strPthPlt, lstConLbl, strTitle=' ', varSkip=2):
             aryGrndSem = np.zeros((varNumRoi, varNumVol))
 
             # Vector for index of onset:
-            vecOnset = np.zeros(varNumRoi, dtype=np.int16)
+            lstOnset = [None] * varNumRoi
 
         # *********************************************************************
         # *** Subtract baseline mean
@@ -169,7 +169,7 @@ def ert_onset(lstPthPic, strPthPlt, lstConLbl, strTitle=' ', varSkip=2):
 
         # Find first volume over threshold:
         varFirst = np.argmax(vecLgc)
-        vecOnset[idxRoi] = varFirst
+        lstOnset[idxRoi] = varFirst
 
         # *********************************************************************
         # *** Weighted average (for plot)
@@ -236,7 +236,7 @@ def ert_onset(lstPthPic, strPthPlt, lstConLbl, strTitle=' ', varSkip=2):
     lgcLgnd = True
 
     # Figure scaling factor:
-    varDpi = 100.0
+    varDpi = 90.0
 
     ert_plt(aryGrndMne,
             aryGrndSem,
@@ -259,7 +259,8 @@ def ert_onset(lstPthPic, strPthPlt, lstConLbl, strTitle=' ', varSkip=2):
             varTmeScl=1.0,
             varXlbl=5,
             varYnum=varYnum,
-            tplPadY=(0.001, 0.001))
+            tplPadY=(0.001, 0.001),
+            lstVrt=lstOnset)
     # *************************************************************************
 
 

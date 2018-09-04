@@ -23,14 +23,7 @@ from scipy.stats import ttest_1samp
 from py_depthsampling.ert.ert_plt import ert_plt
 
 
-lstPthPic = ['/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/era_v1_rh.pickle',
-             '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/periphery/era_v1_rh.pickle']
-
-strPthPic = lstPthPic[0]
-
-varSkip=2
-
-def ert_onset(lstPthPic, varSkip=2):
+def ert_onset(lstPthPic, strPthPlt, lstConLbl, strTitle=' ', varSkip=2):
     """
     Plot event-related time courses and compute response onset time.
 
@@ -44,6 +37,10 @@ def ert_onset(lstPthPic, varSkip=2):
         depth levels), and an integer - the number of vertices that contribute
         to the subject's time course. By passing in several strings, more than
         one region of interest can be plotted/analysed.
+    strPthPlt : str
+        Path & file name for plot.
+    lstConLbl : list
+        List of strings containing condition labels (one per input pickle).
     varSkip : int
         Number of pre-stimulus volumes to skip in response onset time
         calculation. This is used because the input time courses may contain
@@ -52,13 +49,16 @@ def ert_onset(lstPthPic, varSkip=2):
         but the timecourses contain an additional two volumes before that which
         are included in the plots).
 
-
     Returns
     -------
-
+    This function has no return value.
 
     Notes
     -----
+    Create plot of event-related timecourse, and calcualte onset time of
+    response using one-sample t-test. Onset time is highlighted in the plot.
+    By providing the path of more than one pickle file, several ROI can be
+    compared (e.g. time course of central & edge ROI in PacMan experiments).
 
     """
     # *************************************************************************
@@ -69,6 +69,8 @@ def ert_onset(lstPthPic, varSkip=2):
 
     # *************************************************************************
     # *** Loop through ROIs
+
+    # Note that here, 'ROI' may refer to stimulus & edge ROIs within e.g. V1.
 
     for idxRoi in range(varNumRoi):
 
@@ -86,6 +88,19 @@ def ert_onset(lstPthPic, varSkip=2):
         varNumCon = tplShpe[0]
         varNumDpth = tplShpe[1]
         varNumVol = tplShpe[2]
+
+        # On first iteration, initialise array for mean (across subjects,
+        # conditions, depths) ERT:
+        if idxRoi == 0:
+
+            # Grand mean:
+            aryGrndMne = np.zeros((varNumRoi, varNumVol))
+
+            # Standard error:
+            aryGrndSem = np.zeros((varNumRoi, varNumVol))
+
+            # Vector for index of onset:
+            vecOnset = np.zeros(varNumRoi, dtype=np.int16)
 
         # *********************************************************************
         # *** Subtract baseline mean
@@ -137,10 +152,6 @@ def ert_onset(lstPthPic, varSkip=2):
         # shape: aryMneWthn[varNumSub, varNumVol].
         aryMneWthn = np.mean(aryAllSubsRoiErt, axis=(1, 2))
 
-        # Calculate mean ERT across subjects (weighted by number of vertices
-        # per subject) - for the plot.
-        vecMne = np.average(aryMneWthn, weights=vecNumVrtcs, axis=0)
-
         # One-sample t-test, testing the hypothesis that the signal is
         # different from zeros, separately for each time point (volume).
         vecT, vecP = ttest_1samp(aryMneWthn, 0.0, axis=0)
@@ -158,5 +169,141 @@ def ert_onset(lstPthPic, varSkip=2):
 
         # Find first volume over threshold:
         varFirst = np.argmax(vecLgc)
+        vecOnset[idxRoi] = varFirst
 
         # *********************************************************************
+        # *** Weighted average (for plot)
+
+        # Calculate mean ERT across subjects (weighted by number of vertices
+        # per subject) - for the plot.
+        aryMneTmp = np.average(aryMneWthn, weights=vecNumVrtcs, axis=0)
+
+        # Weighted variance:
+        aryVar = np.average(
+                            np.power(
+                                     np.subtract(
+                                                 aryMneWthn,
+                                                 aryMneTmp[None, :]
+                                                 ),
+                                     2.0
+                                     ),
+                            axis=0,
+                            weights=vecNumVrtcs
+                            )
+
+        # Weighted standard deviation:
+        arySd = np.sqrt(aryVar)
+
+        # Calculate standard error of the mean (for error bar):
+        arySem = np.divide(arySd, np.sqrt(varNumSub))
+
+        aryGrndMne[idxRoi, :] = np.copy(aryMneTmp)
+        aryGrndSem[idxRoi, :] = np.copy(arySem)
+
+    # *************************************************************************
+    # *** Create plot
+
+    # Limits of axes:
+    varYmin = -0.04
+    varYmax = 0.02
+
+    # Number of labels on y-axis:
+    varYnum = 4
+
+    # Convert y-axis values to percent (i.e. divide label values by 100)?
+    lgcCnvPrct = True
+
+    # Label for axes:
+    strXlabel = 'Time [s]'
+    strYlabel = 'fMRI signal change [%]'
+
+    # Volume index of start of stimulus period (i.e. index of first volume
+    # during which stimulus was on - for the plot):
+    varStimStrt = 5
+
+    # Volume index of end of stimulus period (i.e. index of last volume during
+    # which stimulus was on - for the plot):
+    varStimEnd = 10
+
+    # Volume TR (in seconds, for the plot):
+    varTr = 2.079
+
+    # Plot legend?
+    lgcLgnd = True
+
+    # Figure scaling factor:
+    varDpi = 100.0
+
+    ert_plt(aryGrndMne,
+            aryGrndSem,
+            1,
+            varNumRoi,
+            varNumVol,
+            varDpi,
+            varYmin,
+            varYmax,
+            varStimStrt,
+            varStimEnd,
+            varTr,
+            lstConLbl,
+            lgcLgnd,
+            strXlabel,
+            strYlabel,
+            lgcCnvPrct,
+            strTitle,
+            strPthPlt,
+            varTmeScl=1.0,
+            varXlbl=2,
+            varYnum=varYnum,
+            tplPadY=(0.001, 0.001))
+    # *************************************************************************
+
+
+if __name__ == "__main__":
+
+    # *************************************************************************
+    # *** Define parameters
+
+    # Meta-condition (within or outside of retinotopic stimulus area):
+    lstMtaCn = ['stimulus', 'periphery']
+
+    # Condition label:
+    lstConLbl = lstMtaCn
+
+    # Region of interest ('v1' or 'v2'):
+    lstRoi = ['v1', 'v2', 'v3']
+
+    # Hemispheres ('lh' or 'rh'):
+    lstHmsph = ['rh']
+
+    # Output path for plots - prfix (ROI and hemisphere left open):
+    strPlt = '/home/john/Dropbox/PacMan_Plots/era_onset/{}_{}.svg'
+
+    # Name of pickle file from which to load time course data (metacondition,
+    # ROI, and hemisphere left open):
+    strPthPic = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/era_{}_{}.pickle'  #noqa
+
+    # *************************************************************************
+    # *** Create plots
+
+    # Loop through ROIs, hemispheres, and conditions to create plots:
+    for idxRoi in range(len(lstRoi)):
+        for idxHmsph in range(len(lstHmsph)):
+
+            # Complete path of input pickle (stimulus centre):
+            strPthPic01 = strPthPic.format(lstMtaCn[0], lstRoi[idxRoi],
+                                           lstHmsph[idxHmsph])
+
+            # Complete path of input pickle (stimulus edge):
+            strPthPic02 = strPthPic.format(lstMtaCn[1], lstRoi[idxRoi],
+                                           lstHmsph[idxHmsph])
+
+            lstPthPic = [strPthPic01, strPthPic02]
+
+            strTitleTmp = lstRoi[idxRoi].upper()
+
+            strPltTmp = strPlt.format(lstRoi[idxRoi], lstHmsph[idxHmsph])
+
+            ert_onset(lstPthPic, strPltTmp, lstConLbl, strTitle=strTitleTmp)
+
+    # *************************************************************************

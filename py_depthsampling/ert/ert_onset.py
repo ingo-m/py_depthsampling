@@ -228,6 +228,10 @@ def ert_onset(lstPthPic, strPthPlt, lstConLbl, strTitle=' ', varSkip=2):
     # Volume TR (in seconds, for the plot):
     varTr = 2.079
 
+    # Convert stimulus onset & offset times from volume indicies to seconds:
+    varStimStrt = float(varStimStrt) * varTr
+    varStimEnd = float(varStimEnd) * varTr
+
     # Plot legend?
     lgcLgnd = True
 
@@ -253,7 +257,7 @@ def ert_onset(lstPthPic, strPthPlt, lstConLbl, strTitle=' ', varSkip=2):
             strTitle,
             strPthPlt,
             varTmeScl=1.0,
-            varXlbl=2,
+            varXlbl=5,
             varYnum=varYnum,
             tplPadY=(0.001, 0.001))
     # *************************************************************************

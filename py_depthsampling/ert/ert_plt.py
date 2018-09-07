@@ -47,7 +47,8 @@ def ert_plt(aryRoiErtMeanDpth,  #noqa
             varTmeScl=1.0,
             varXlbl=2,
             varYnum=6,
-            tplPadY=(0.001, 0.001)):
+            tplPadY=(0.001, 0.001),
+            lstVrt=None):
     """Plot event-related timecourses."""
     # Create figure:
     fgr01 = plt.figure(figsize=(900.0/varDpi, 600.0/varDpi),
@@ -98,6 +99,38 @@ def ert_plt(aryRoiErtMeanDpth,  #noqa
     # objCmap = plt.cm.winter
     objClrNorm = colors.Normalize(vmin=0, vmax=9)
     objCmap = plt.cm.tab10
+
+    # Plot vertical lines (e.g. representing response onset):
+    if lstVrt is not None:
+
+        # Loop through list with line positions:
+        for idxVrt in range(len(lstVrt)):
+
+            # If the response at no time point was significantly different from
+            # zero, the list contains a zero for that time point. Only plot
+            # vertical bar if response is significant.
+            if lstVrt[idxVrt] != 0:
+
+                # Adjust the colour of current line:
+                vecClrTmp = objCmap(objClrNorm(idxVrt))
+
+                # Scale vertical position from array index to seconds:
+                varVrtTmp = np.multiply(
+                                        np.divide(float(lstVrt[idxVrt]),
+                                                  varTmeScl),
+                                        varTr
+                                        )
+
+                # Subtract pre-stimulus interval:
+                varVrtTmp = np.subtract(varVrtTmp, varStimStrt)
+
+                # Plot vertical line:
+                axs01.axvline(varVrtTmp,
+                              color=vecClrTmp,
+                              alpha=0.75,
+                              linewidth=4.0,
+                              linestyle=':',
+                              antialiased=True)
 
     # Loop through conditions:
     # for idxCon in [3, 2, 1, 0]:

@@ -26,15 +26,18 @@ from py_depthsampling.get_data.load_vtk_multi import load_vtk_multi
 
 def get_data(strData, strPthMneEpi, strPthR2, strPthSd, strPthX, strPthY,
              strCsvRoi, varNumDpth=11, strPrcdData='SCALARS', varNumLne=2,
-             varNumHdrRoi=1, lstDpth=None):
+             varNumHdrRoi=1, lstDpth=None, varTr=None):
     """
     Load data for projection into visual space.
 
     Parameters
     ----------
     strData : string
-        Path of vtk mesh with data to project into visual space (e.g. parameter
-        estimates).
+        Path of vtk mesh or npy file with data to project into visual space
+        (e.g. parameter estimates). Option for loading data from npy files is
+        provided for visual field projection of time courses. In this case,
+        the time point which is supposed  to be extracted from the file needs
+        to be provided as well (`varTr`).
     strPthR2 : string
         Path of vtk mesh with R2 values from pRF mapping (at multiple depth
         levels).
@@ -59,6 +62,9 @@ def get_data(strData, strPthMneEpi, strPthR2, strPthSd, strPthX, strPthY,
         List with depth levels to average over. For instance, if `lstDpth = [0,
         1, 2]`, the average over the first three depth levels is calculated. If
         `None`, average over all depth levels.
+    varTr : int
+        In case time series data is loaded from npy file, index of the volumne
+        to load/return.
 
     Returns
     -------
@@ -75,16 +81,44 @@ def get_data(strData, strPthMneEpi, strPthR2, strPthSd, strPthX, strPthY,
 
     Notes
     -----
-    Load data from vtk meshes for projection into visual space.
+    Load data from vtk meshes (or npy file in case of time series data) for
+    projection into visual space.
     """
     # -------------------------------------------------------------------------
     # *** Load data
 
-    # Load data to be projected:
-    aryData = load_vtk_multi(strData,
-                             strPrcdData,
-                             varNumLne,
-                             varNumDpth)
+    if '.npy' in strData:
+
+        # Load time series data from npy file:
+        aryData = np.load(strData)
+
+        # Subtract one from time series so that data are centred at zero:
+        aryData = np.subtract(aryData, 1.0)
+
+        # Maximum absolute values over time and cortical depth:
+        aryMax = np.max(np.absolute(aryData), axis=(0, 1))
+
+        # Standard deviation of maximum
+        varMaxSd = np.std(aryMax)
+
+        # Vertices with a z-score of more than two standard deviations:
+        vecLgc = np.greater(aryMax, np.multiply(varMaxSd, 2.0))
+
+        # Set extreme vertices to zero (in order to avoid extreme values that
+        # were introduced when dividing by baseline values very close to
+        # zero):
+        aryData[:, :, vecLgc] = 0.0
+
+        # New shape: aryData[idxVertex, idxDepth]
+        aryData = aryData[:, varTr, :].T
+
+    else:
+
+        # Load data to be projected from vtk mesh:
+        aryData = load_vtk_multi(strData,
+                                 strPrcdData,
+                                 varNumLne,
+                                 varNumDpth)
 
     # Load mean EPI:
     aryMneEpi = load_vtk_multi(strPthMneEpi,

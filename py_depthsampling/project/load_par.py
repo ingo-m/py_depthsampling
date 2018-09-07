@@ -24,7 +24,7 @@ from py_depthsampling.project.utilities import get_data
 
 def load_par(strSub, strCon, strRoi, strPthData, strPthMneEpi, strPthR2,
              strPthX, strPthY, strPthSd, strCsvRoi, varNumDpth, lstDpth,
-             idxPrc, queOut):
+             varTr, idxPrc, queOut):
     """
     Load single subject vtk meshes in parallel.
 
@@ -34,7 +34,13 @@ def load_par(strSub, strCon, strRoi, strPthData, strPthMneEpi, strPthR2,
     multiprocessing queue.
     """
     # Temporary input paths for left hemisphere:
-    strPthLhData = strPthData.format(strSub, 'lh', strCon)
+    if '.npy' in strPthData:
+        # Time series data:
+        strPthLhData = strPthData.format(strSub, 'lh', strCon, strCon)
+    else:
+        # Statistical map (PEs):
+        strPthLhData = strPthData.format(strSub, 'lh', strCon)
+
     strPthLhMneEpi = strPthMneEpi.format(strSub, 'lh')
     strPthLhR2 = strPthR2.format(strSub, 'lh')
     strPthLhSd = strPthSd.format(strSub, 'lh')
@@ -45,10 +51,17 @@ def load_par(strSub, strCon, strRoi, strPthData, strPthMneEpi, strPthR2,
     # Load single subject data for left hemisphere:
     vecLhData, vecLhMneEpi, vecLhR2, vecLhSd, vecLhX, vecLhY = get_data(
         strPthLhData, strPthLhMneEpi, strPthLhR2, strPthLhSd, strPthLhX,
-        strPthLhY, strCsvLhRoi, varNumDpth=varNumDpth, lstDpth=lstDpth)
+        strPthLhY, strCsvLhRoi, varNumDpth=varNumDpth, lstDpth=lstDpth,
+        varTr=varTr)
 
     # Temporary input paths for right hemisphere:
-    strPthRhData = strPthData.format(strSub, 'rh', strCon)
+    if '.npy' in strPthData:
+        # Time series data:
+        strPthRhData = strPthData.format(strSub, 'rh', strCon, strCon)
+    else:
+        # Statistical map (PEs):
+        strPthRhData = strPthData.format(strSub, 'rh', strCon)
+
     strPthRhMneEpi = strPthMneEpi.format(strSub, 'rh')
     strPthRhR2 = strPthR2.format(strSub, 'rh')
     strPthRhSd = strPthSd.format(strSub, 'rh')
@@ -59,7 +72,8 @@ def load_par(strSub, strCon, strRoi, strPthData, strPthMneEpi, strPthR2,
     # Load single subject data for right hemisphere:
     vecRhData, vecRhMneEpi, vecRhR2, vecRhSd, vecRhX, vecRhY = get_data(
         strPthRhData, strPthRhMneEpi, strPthRhR2, strPthRhSd, strPthRhX,
-        strPthRhY, strCsvRhRoi, varNumDpth=varNumDpth, lstDpth=lstDpth)
+        strPthRhY, strCsvRhRoi, varNumDpth=varNumDpth, lstDpth=lstDpth,
+        varTr=varTr)
 
     # Concatenate LH and RH data:
     vecData = np.concatenate([vecLhData, vecRhData])

@@ -180,7 +180,7 @@ def ert_onset(lstPthPic, strPthPlt, lstConLbl, strTitle=' ', varSkip=2,
             # Select depth levels:
             aryAllSubsRoiErt = aryAllSubsRoiErt[:, :, lstDpth, :]
 
-            # Mean over conditions:
+            # Mean over conditions & depth levels:
             aryMneWthn = np.mean(aryAllSubsRoiErt, axis=(1, 2))
 
         # *********************************************************************

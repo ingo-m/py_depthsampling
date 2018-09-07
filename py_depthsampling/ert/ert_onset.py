@@ -23,7 +23,8 @@ from scipy.stats import ttest_1samp
 from py_depthsampling.ert.ert_plt import ert_plt
 
 
-def ert_onset(lstPthPic, strPthPlt, lstConLbl, strTitle=' ', varSkip=2):
+def ert_onset(lstPthPic, strPthPlt, lstConLbl, strTitle=' ', varSkip=2,
+              lstDpth=None):
     """
     Plot event-related time courses and compute response onset time.
 
@@ -48,6 +49,10 @@ def ert_onset(lstPthPic, strPthPlt, lstConLbl, strTitle=' ', varSkip=2):
         PacMan study, three volumes before stimulus onset are used as baseline,
         but the timecourses contain an additional two volumes before that which
         are included in the plots).
+    lstDpth : list
+        Nested list with depth levels to average over. For instance, if
+        `lstDpth = [0, 1, 2]`, the average over the first three depth levels is
+        calculated. If `lstDpth= [None]`,  average over all depth levels.
 
     Returns
     -------
@@ -146,11 +151,40 @@ def ert_onset(lstPthPic, strPthPlt, lstConLbl, strTitle=' ', varSkip=2):
             idxSub += 1
 
         # *********************************************************************
-        # *** Compute onset time
+        # *** Average across depth levels and conditions
 
-        # First, average over conditions and depth levels within subject. New
-        # shape: aryMneWthn[varNumSub, varNumVol].
-        aryMneWthn = np.mean(aryAllSubsRoiErt, axis=(1, 2))
+        # Current shape:
+        # aryAllSubsRoiErt[varNumSub, varNumCon, varNumDpth, varNumVol]
+
+        if lstDpth is None:
+
+            # Average over conditions and over all depth levels within subject.
+            # New shape: aryMneWthn[varNumSub, varNumVol].
+            aryMneWthn = np.mean(aryAllSubsRoiErt, axis=(1, 2))
+
+        elif len(lstDpth) == 1:
+
+            # If there is only one depth level, averaging over depth levels
+            # does not make sense. Take that depth level, and average over
+            # conditions.
+
+            # Select depth level:
+            aryAllSubsRoiErt = aryAllSubsRoiErt[:, :, lstDpth[0], :]
+            # New shape: aryAllSubsRoiErt[varNumSub, varNumCon, varNumVol]
+
+            # Mean over conditions:
+            aryMneWthn = np.mean(aryAllSubsRoiErt, axis=1)
+
+        else:
+
+            # Select depth levels:
+            aryAllSubsRoiErt = aryAllSubsRoiErt[:, :, lstDpth, :]
+
+            # Mean over conditions:
+            aryMneWthn = np.mean(aryAllSubsRoiErt, axis=(1, 2))
+
+        # *********************************************************************
+        # *** Compute onset time
 
         # One-sample t-test, testing the hypothesis that the signal is
         # different from zeros, separately for each time point (volume).
@@ -281,8 +315,19 @@ if __name__ == "__main__":
     # Hemispheres ('lh' or 'rh'):
     lstHmsph = ['rh']
 
-    # Output path for plots - prfix (ROI and hemisphere left open):
-    strPlt = '/home/john/Dropbox/PacMan_Plots/era_onset/{}_{}.svg'
+    # Nested list with depth levels to average over. For instance, if `lstDpth
+    # = [[0, 1, 2], [3, 4, 5]]`, on a first iteration, the average over the
+    # first three depth levels is calculated, and on a second iteration the
+    # average over the subsequent three depth levels is calculated. If
+    # 1lstDpth= [[None]]1, average over all depth levels.
+    lstDpth = [None, [0, 1, 2], [4, 5, 6], [8, 9, 10]]
+    # lstDpth = [[x] for x in range(11)]
+    # Depth level condition labels (output file will contain this label):
+    lstDpthLbl = ['allGM', 'deepGM', 'midGM', 'superficialGM']
+    # lstDpthLbl = [str(x) for x in range(11)]
+
+    # Output path for plots. ROI,hemisphere, and depth level left open):
+    strPlt = '/home/john/Dropbox/PacMan_Plots/era_onset/{}_{}_{}.svg'
 
     # Name of pickle file from which to load time course data (metacondition,
     # ROI, and hemisphere left open):
@@ -291,24 +336,26 @@ if __name__ == "__main__":
     # *************************************************************************
     # *** Create plots
 
-    # Loop through ROIs, hemispheres, and conditions to create plots:
+    # Loop through ROIs, hemispheres, and depth levels to create plots:
     for idxRoi in range(len(lstRoi)):
         for idxHmsph in range(len(lstHmsph)):
+            for idxDpth in range(len(lstDpth)):
 
-            # Complete path of input pickle (stimulus centre):
-            strPthPic01 = strPthPic.format(lstMtaCn[0], lstRoi[idxRoi],
-                                           lstHmsph[idxHmsph])
+                # Complete path of input pickle (stimulus centre):
+                strPthPic01 = strPthPic.format(lstMtaCn[0], lstRoi[idxRoi],
+                                               lstHmsph[idxHmsph])
 
-            # Complete path of input pickle (stimulus edge):
-            strPthPic02 = strPthPic.format(lstMtaCn[1], lstRoi[idxRoi],
-                                           lstHmsph[idxHmsph])
+                # Complete path of input pickle (stimulus edge):
+                strPthPic02 = strPthPic.format(lstMtaCn[1], lstRoi[idxRoi],
+                                               lstHmsph[idxHmsph])
 
-            lstPthPic = [strPthPic01, strPthPic02]
+                lstPthPic = [strPthPic01, strPthPic02]
 
-            strTitleTmp = lstRoi[idxRoi].upper()
+                strTitleTmp = lstRoi[idxRoi].upper()
 
-            strPltTmp = strPlt.format(lstRoi[idxRoi], lstHmsph[idxHmsph])
+                strPltTmp = strPlt.format(lstRoi[idxRoi], lstHmsph[idxHmsph],
+                                          lstDpthLbl[idxDpth])
 
-            ert_onset(lstPthPic, strPltTmp, lstConLbl, strTitle=strTitleTmp)
-
+                ert_onset(lstPthPic, strPltTmp, lstConLbl,
+                          strTitle=strTitleTmp, lstDpth=lstDpth[idxDpth])
     # *************************************************************************

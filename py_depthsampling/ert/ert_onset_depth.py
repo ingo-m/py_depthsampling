@@ -19,23 +19,22 @@
 
 import pickle
 import numpy as np
-from scipy.stats import ttest_1samp
 from scipy.interpolate import griddata
-from py_depthsampling.ert.ert_plt import ert_plt
+from py_depthsampling.ert.utilities import onset
 from py_depthsampling.plot.plt_dpth_prfl import plt_dpth_prfl
 
 
 #lstPthPic = ['/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/era_v1_rh.pickle',
 #             '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/periphery/era_v1_rh.pickle']
 #varSkip=2
-#idxRoi = 1
-#lstBse = [2, 3, 4]
+#idxRoi = 0
 ## Timepoint of first stimulus volume:
 #varBse = 5
 #varTr = 2.079
 
+
 def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
-                    strTtl='Response onset time difference'):
+                    strTtl='Response onset time difference', strFleTpe='.svg'):
     """
     Plot response onset times over cortical depth.
 
@@ -61,6 +60,8 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
         the stimulus was on.
     strTtl : str
         Title for plot.
+    strFleTpe : str
+        File extension.
 
     Returns
     -------
@@ -77,6 +78,20 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
 
     # Number of ROIs:
     varNumRoi = len(lstPthPic)
+
+    # Number of bootstrap iterations:
+    varNumIt = 1000
+
+    # z-threshold for peak finding. Peak is identified if signal is above/below
+    # varThr times mean baseline signal.
+    varThr = 3.0
+
+    # Temporal upsampling factor:
+    varUp = 100
+
+    # Upper and lower bound for percentile bootstrap confidence interval:
+    varConLw = 5.0
+    varConUp = 95.0
 
     # *************************************************************************
     # *** Loop through ROIs
@@ -103,17 +118,24 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
         # On first iteration, initialise arrays:
         if idxRoi == 0:
 
-            # Grand mean:
-            # aryGrndMne = np.zeros((varNumRoi, varNumVol))
-
-            # Standard error:
-            # aryGrndSem = np.zeros((varNumRoi, varNumVol))
-
-            # Vector for index of onset:
-            # lstOnset = [None] * varNumRoi
-
             # Array for indices of response onset:
-            aryFirst = np.zeros((varNumRoi, varNumSub, varNumDpth))
+            aryFirst = np.zeros((varNumRoi, varNumDpth), dtype=np.int32)
+
+            # Array for bootstrapped response onset (for confidence interval of
+            # response onset). Shape: aryFirstBoo[ROI, depth, upper/lower
+            # bound].
+            aryFirstBoo = np.zeros((varNumRoi, varNumDpth, 2), dtype=np.int32)
+
+            # Bootstrap preparations. We will sample subjects with replacement.
+            # How many subjects to sample on each iteration:
+            varNumSmp = varNumSub
+
+            # Random array with subject indicies for bootstrapping of the form
+            # aryRnd[varNumIt, varNumSmp]. Each row includes the indicies of
+            # the subjects to be sampled on that iteration.
+            aryRnd = np.random.randint(0,
+                                       high=varNumSub,
+                                       size=(varNumIt, varNumSmp))
 
         # *********************************************************************
         # *** Subtract baseline mean
@@ -142,7 +164,7 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
 
         # Vector for number of vertices per subject (used for weighted
         # averaging):
-        vecNumVrtcs = np.zeros((varNumSub))
+        vecNumVrtcs = np.zeros((varNumSub), dtype=np.float32)
 
         idxSub = 0
 
@@ -152,17 +174,18 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
             aryRoiErt = lstItem[0]
 
             # Get number of vertices for this subject:
-            vecNumVrtcs[idxSub] = lstItem[1]
+            vecNumVrtcs[idxSub] = int(lstItem[1])
 
             aryAllSubsRoiErt[idxSub, :, :, :] = aryRoiErt
 
             idxSub += 1
 
+        # The number of vertices are going to be used as weights, so we cast
+        # to float:
+        vecNumVrtcs = vecNumVrtcs.astype(np.float32)
+
         # *********************************************************************
         # *** Upsample timecourses
-
-        # Temporal upsampling factor:
-        varUp = 1000
 
         # New number of volumes:
         varNumVolUp = varNumVol * varUp
@@ -184,7 +207,8 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
                                endpoint=True)
 
         # Array for upsampled timecourses:
-        aryErtUp = np.zeros((varNumSub, varNumDpth, varNumVolUp))
+        aryErtUp = np.zeros((varNumSub, varNumDpth, varNumVolUp),
+                            dtype=np.float32)
 
         # Loop through subjects and depth levels (upsampling in 1D):
         for idxSub in range(varNumSub):
@@ -193,94 +217,142 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
                 # Interpolation:
                 aryErtUp[idxSub, idxDpth, :] = griddata(
                         vecPosEmp, aryMneWthn[idxSub, idxDpth, :], vecPosUp,
-                        method='cubic')
+                        method='cubic').astype(np.float32)
 
         # *********************************************************************
         # *** Compute onset time
 
-        # Mean (over time) in pre-stimulus period, separately for each subject and
-        # depth level.
-        aryBseMne = np.mean(aryMneWthn[:, :, :varBse], axis=2)
+        # Weighted mean across subjects:
+        aryErtUpMne = np.average(aryErtUp, weights=vecNumVrtcs, axis=0)
 
-        # Mean (over time) in pre-stimulus period, separately for each subject and
-        # depth level.
-        aryBseSd = np.std(aryMneWthn[:, :, :varBse], axis=2)
+        # Add array dimension, new shape: aryErtUpMne[1, depth, volumes]
+        aryErtUpMne = aryErtUpMne[None, ].astype(np.float32)
 
-        # z-threshold
-        varThr = 2.0
+        # Scale baseline interval:
+        varBseUp = (varUp * varBse)
 
-        # z-score interval around mean:
-        aryLimUp = np.add(aryBseMne, np.multiply(aryBseSd, varThr))
-        aryLimLow = np.subtract(aryBseMne, np.multiply(aryBseSd, varThr))
+        # Calculate onset times:
+        aryFirst[idxRoi, :] = onset(aryErtUpMne, varBseUp, varThr)[0, :]
 
-        # Which timepoints are above threshold?
-        aryLgc = np.logical_or(
-                               np.greater(aryErtUp, aryLimUp[:, :, None]),
-                               np.less(aryErtUp, aryLimLow[:, :, None])
-                               )
+        # *********************************************************************
+        # *** Bootstrap onset time
 
-        # Set volumes before baseline to false (avoiding false positives on
-        # first and second volume due to uncomplete recovery of signal in the
-        # volumes before pre-stimulus baseline):
-        aryLgc[:, :, :(varUp * varBse)] = False
+        # Array for bootstrap samples:
+        aryBoo = np.zeros((varNumIt, varNumSub, varNumDpth, varNumVolUp),
+                          dtype=np.float32)
 
-        # Find first volume over threshold:
-        aryFirst[idxRoi, :, :] = np.argmax(aryLgc, axis=2)
+        # Array with number of vertices per subject for each bootstrapping
+        # sample (needed for weighted averaging), shape: aryWght[iterations,
+        # subjects]
+        aryWght = np.zeros((varNumIt, varNumSub), dtype=np.float32)
+
+        # Loop through bootstrap iterations:
+        for idxIt in range(varNumIt):
+            # Indices of current bootstrap sample:
+            vecRnd = aryRnd[idxIt, :]
+            # Put current bootstrap sample into array:
+            aryBoo[idxIt, :, :, :] = aryErtUp[vecRnd, :, :]
+            # Put number of vertices per subject into respective array (for
+            # weighted averaging):
+            aryWght[idxIt, :] = vecNumVrtcs[vecRnd]
+
+        # Weightes mean for each bootstrap sample (across subjects within the
+        # bootstrap sample):
+
+        # Sum of weights over subjects (i.e. total number of vertices across
+        # subjects, one value per iteration; for scaling).
+        vecSum = np.sum(aryWght, axis=1)
+
+        # Multiply depth profiles by weights (weights are broadcasted over
+        # depth levels and volumes):
+        aryTmp = np.multiply(aryBoo, aryWght[:, :, None, None])
+
+        # Sum over subjects, and scale by number of vertices (sum of vertices
+        # is broadcasted over conditions and depth levels):
+        aryBooMne = np.divide(
+                              np.sum(aryTmp, axis=1),
+                              vecSum[:, None, None]
+                              )
+        # Resulting shape: aryBooMne[iterations, depth, volumes].
+
+        # Delete large bootstrap array:
+        del(aryBoo)
+
+        # Calculate onset times, result has shape aryTmp[iterations, depth].
+        aryTmp = onset(aryBooMne, varBseUp, varThr)
+
+        # Percentile bootstrap:
+        aryPrct = np.percentile(aryTmp, (varConLw, varConUp), axis=0)
+        aryFirstBoo[idxRoi, :, 0] = aryPrct[0, :]
+        aryFirstBoo[idxRoi, :, 1] = aryPrct[1, :]
 
     # *************************************************************************
     # *** Response onset difference
-    
-    # Single subject onset time difference, shape: aryDiff[subject, depth].
-    aryDiff = np.subtract(aryFirst[0, :, :], aryFirst[1, :, :])
 
-    # Weighted mean over subjects:
-    vecDiff = np.average(aryDiff, weights=vecNumVrtcs, axis=0)
-
-    # Weighted variance:
-    vecVar = np.average(
-                        np.power(
-                                 np.subtract(
-                                             aryDiff,
-                                             vecDiff[None, :]
-                                             ),
-                                 2.0
-                                 ),
-                        axis=0,
-                        weights=vecNumVrtcs
-                        )
-
-    # Weighted standard deviation:
-    vecSd = np.sqrt(vecVar)
-
-    # Calculate standard error of the mean (for error bar):
-    vecSem = np.divide(vecSd, np.sqrt(varNumSub))
+    # Group level onset time difference, shape: aryDiff[depth].
+    vecDiff = np.subtract(aryFirst[0, :], aryFirst[1, :])
 
     # Scale result to seconds & new shape (for plot function):
     aryDiff = np.divide(
                         np.multiply(vecDiff,
                                     varTr),
                         varUp).reshape(1, varNumDpth)
-    arySem = np.divide(
-                       np.multiply(vecSem,
-                                   varTr),
-                       varUp).reshape(1, varNumDpth)
 
     # *************************************************************************
-    # *** Create plot
+    # *** Plot onset time
 
-    varYmin = -1.0
-    varYmax = 3.0
-    varNumLblY = 5
+    # Scale result to seconds:
+    aryFirst = np.divide(
+                         np.multiply(aryFirst.astype(np.float64),
+                                     varTr),
+                         varUp)
+    aryFirstBoo = np.divide(
+                            np.multiply(aryFirstBoo.astype(np.float64),
+                                        varTr),
+                            varUp)
+
+    # Subtract per-stimulus baseline:
+    aryFirst = np.subtract(aryFirst, (float(varBse) * varTr))
+    aryFirstBoo = np.subtract(aryFirstBoo, (float(varBse) * varTr))
+
+    # Output file path:
+    strPthOut = strPthPlt + 'onset_by_depth' + strFleTpe
+
+    varYmin = 0.0
+    varYmax = 6.0
+    varNumLblY = 4
     tplPadY = (0.1, 0.1)
-    lgcLgnd = False
+    lgcLgnd = True
     strXlabel = 'Cortical depth'
-    strYlabel = 'Time difference [s]'
-    
+    strYlabel = 'Onset time [s]'
 
-    plt_dpth_prfl(aryDiff, arySem, varNumDpth, 1, 80.0, varYmin,
+    plt_dpth_prfl(aryFirst, None, varNumDpth, 2, 80.0, varYmin,
                   varYmax, False, lstConLbl, strXlabel, strYlabel, strTtl,
-                  lgcLgnd, strPthPlt, varSizeX=1800.0, varSizeY=1600.0,
-                  varNumLblY=varNumLblY, tplPadY=tplPadY)
+                  lgcLgnd, strPthOut, varSizeX=1200.0, varSizeY=1000.0,
+                  varNumLblY=varNumLblY, tplPadY=tplPadY,
+                  aryCnfLw=aryFirstBoo[:, :, 0], aryCnfUp=aryFirstBoo[:, :, 1])
+
+    # *************************************************************************
+    # *** Plot onset time difference
+
+#    varYmin = 0.0
+#    varYmax = 4.0
+#    varNumLblY = 5
+#    tplPadY = (0.1, 0.1)
+#    lgcLgnd = False
+#    strXlabel = 'Cortical depth'
+#    strYlabel = 'Time difference [s]'
+#
+#    arySem = np.zeros(aryDiff.shape) + 0.01
+#
+#    # Output file path:
+#    strPthOut = strPthPlt + 'onsetdiff_by_depth' + strFleTpe
+#
+#    plt_dpth_prfl(aryDiff, None, varNumDpth, 1, 80.0, varYmin,
+#                  varYmax, False, lstConLbl, strXlabel, strYlabel, strTtl,
+#                  lgcLgnd, strPthOut, varSizeX=1200.0, varSizeY=1000.0,
+#                  varNumLblY=varNumLblY, tplPadY=tplPadY)
+
     # *************************************************************************
 
 
@@ -302,7 +374,10 @@ if __name__ == "__main__":
     lstHmsph = ['rh']
 
     # Output path for plots. ROI,hemisphere, and depth level left open):
-    strPlt = '/home/john/Dropbox/PacMan_Plots/era_onset/onset_by_depth_{}_{}.svg'
+    strPlt = '/home/john/Dropbox/PacMan_Plots/era_onset/{}_{}_'
+
+    # Output file extension:
+    strFleTpe = '.svg'
 
     # Name of pickle file from which to load time course data (metacondition,
     # ROI, and hemisphere left open):
@@ -310,7 +385,7 @@ if __name__ == "__main__":
 
     # Volume TR [s]:
     varTr = 2.079
-    
+
     # Time point of first volume after stimulus onset (index in event related
     # time course):
     varBse = 5
@@ -337,5 +412,5 @@ if __name__ == "__main__":
             strPltTmp = strPlt.format(lstRoi[idxRoi], lstHmsph[idxHmsph])
 
             ert_onset_depth(lstPthPic, strPltTmp, lstConLbl, varTr, varBse,
-                            strTtl=strTitleTmp)
+                            strTtl=strTitleTmp, strFleTpe=strFleTpe)
     # *************************************************************************

@@ -113,15 +113,25 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
             # Array for indices of response onset:
             aryFirst = np.zeros((varNumRoi, varNumDpth), dtype=np.int32)
 
-            # Array for percentile bootstrap of response onset (for confidence
-            # interval of response onset). Shape: aryFirstPrc[ROI, depth,
-            # upper/lower bound].
-            aryFirstPrc = np.zeros((varNumRoi, varNumDpth, 2), dtype=np.int32)
+            # Array with information on whether there is a detectable response
+            # at all (`True` if a response onset was detected).
+            aryLgc = np.zeros((varNumRoi, varNumDpth), dtype=np.bool)
 
             # Array for bootstrap onset times (needed for calculation of
             # bootstrap confidence intervals of response onset difference).
             aryFirstBoo = np.zeros((varNumRoi, varNumIt, varNumDpth),
                                    dtype=np.float32)
+
+            # Array for percentile bootstrap of response onset (for confidence
+            # interval of response onset). Shape: aryFirstPrc[ROI, depth,
+            # upper/lower bound].
+            aryFirstPrc = np.zeros((varNumRoi, varNumDpth, 2), dtype=np.int32)
+
+            # Array with information on whether there is a detectable response
+            # at all for each bootstrap iteration (`True` if a response onset
+            # was detected).
+            aryLgcBoo = np.zeros((varNumRoi, varNumIt, varNumDpth),
+                                 dtype=np.bool)
 
             # Bootstrap preparations. We will sample subjects with replacement.
             # How many subjects to sample on each iteration:
@@ -226,10 +236,12 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
         aryErtUpMne = aryErtUpMne[None, ].astype(np.float32)
 
         # Scale baseline interval:
-        varBseUp = (varUp * varBse)
+        varBseUp = (varUp * (varBse + 1)) - 1
 
         # Calculate onset times:
-        aryFirst[idxRoi, :] = onset(aryErtUpMne, varBseUp, varThr)[0, :]
+        aryTmp01, aryTmp02 = onset(aryErtUpMne, varBseUp, varThr)
+        aryFirst[idxRoi, :] = aryTmp01[0, :]
+        aryLgc[idxRoi, :] = aryTmp02
 
         # *********************************************************************
         # *** Bootstrap onset time
@@ -276,17 +288,38 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
         del(aryBoo)
 
         # Calculate onset times, return value has shape [iterations, depth].
-        aryFirstBoo[idxRoi, :, :] = onset(aryBooMne, varBseUp, varThr)
-
-        # Percentile bootstrap:
-        aryPrct = np.percentile(aryFirstBoo[idxRoi, :, :],
-                                (varConLw, varConUp),
-                                axis=0)
-        aryFirstPrc[idxRoi, :, 0] = aryPrct[0, :]
-        aryFirstPrc[idxRoi, :, 1] = aryPrct[1, :]
+        aryFirstBoo[idxRoi, :, :], aryLgcBoo[idxRoi, :, :] = onset(
+            aryBooMne, varBseUp, varThr)
 
     # *************************************************************************
-    # *** Response onset difference
+    # *** Percentile boostrap - onset time
+
+    # Was an onset detected in both ROIs? Shape: aryLgcBoo[iterations, depth].
+    aryLgcBoo = np.min(aryLgcBoo, axis=0)
+
+    # In order to exclude cases in which no onset was detected, we need to loop
+    # through ROIs and depth levels (np.percentile does not accept weights).
+    for idxRoi in range(varNumRoi):
+
+        for idxDpth in range(varNumDpth):
+
+            # Temporary vector for onset times on iterations without iterations
+            # where no response was detected.
+            vecTmp = aryFirstBoo[idxRoi, :, idxDpth]
+            vecTmp = vecTmp[aryLgcBoo[:, idxDpth]]
+
+            vecPrct = np.percentile(vecTmp,
+                                    (varConLw, varConUp),
+                                    axis=0)
+
+            aryFirstPrc[idxRoi, idxDpth, 0] = vecPrct[0]
+            aryFirstPrc[idxRoi, idxDpth, 1] = vecPrct[1]
+
+    # *************************************************************************
+    # *** Percentile boostrap - onset time difference
+
+    # Was a response detected in both ROIs? Shape: vecLgc[depth].
+    # vecLgc = np.min(aryLgc, axis=0)
 
     # Group level onset time difference, shape: vec[depth].
     vecDiff = np.subtract(aryFirst[0, :], aryFirst[1, :])
@@ -298,7 +331,8 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
                         float(varUp)).reshape(1, varNumDpth)
 
     # Onset difference for bootstrap samples:
-    aryDiffBoo = np.subtract(aryFirstBoo[0, :, :], aryFirstBoo[1, :, :])
+    aryDiffBoo = np.subtract(aryFirstBoo[0, :, :],
+                             aryFirstBoo[1, :, :])
     # Shape: aryDiffBoo[varNumIt, varNumDpth]
 
     # Scale result to seconds:
@@ -307,11 +341,26 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
                                        varTr),
                            float(varUp))
 
-    # Percentile bootstrap:
-    aryOnsetPrct = np.percentile(aryDiffBoo,
-                                 (varConLw, varConUp),
-                                 axis=0)
+    # Array for percentile bootstrap CI of onset difference.
+    aryOnsetPrct = np.zeros((2, varNumDpth))
     # Shape: aryOnsetPrct[lower/upper bound, depth]
+
+    # Was an onset detected in both ROIs? Shape: aryLgcBoo[iterations, depth].
+    # aryLgcBoo = np.min(aryLgcBoo, axis=0)
+
+    # In order to exclude cases in which no onset was detected, we need to
+    # loop through depth levels (np.percentile does not accept weights).
+    for idxDpth in range(varNumDpth):
+
+        # Temporary vector for onset times on iterations without iterations
+        # where no response was detected.
+        vecTmp = aryDiffBoo[:, idxDpth]
+        vecTmp = vecTmp[aryLgcBoo[:, idxDpth]]
+
+        # Percentile bootstrap:
+        aryOnsetPrct[:, idxDpth] = np.percentile(vecTmp,
+                                                 (varConLw, varConUp),
+                                                 axis=0)
 
     # *************************************************************************
     # *** Plot onset time
@@ -337,7 +386,7 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
     varYmin = 0.0
     varYmax = 6.0
     varNumLblY = 4
-    tplPadY = (0.1, 0.1)
+    tplPadY = (0.0, 0.1)
     lgcLgnd = True
     strXlabel = 'Cortical depth'
     strYlabel = 'Onset time [s]'
@@ -355,7 +404,7 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
     varYmin = 0.0
     varYmax = 4.0
     varNumLblY = 5
-    tplPadY = (0.1, 0.1)
+    tplPadY = (0.0, 0.1)
     lgcLgnd = False
     strXlabel = 'Cortical depth'
     strYlabel = 'Time difference [s]'

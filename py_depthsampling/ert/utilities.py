@@ -27,6 +27,12 @@ def onset(aryErt, varBse, varThr):
     aryFirst : np.array
         Array with indicies of first time point above/below threshold. Shape:
         aryFirst[iterations, depth].
+    aryLgc : np.array
+        There may be no time point above threshold. Therefore, an array with
+        the information whether any time point was above threshold is returned
+        along with the index of the onset time points (`True` if any time point
+        is above threshold, `False` otherwise). Shape: aryLgc[iteration,
+        depth].
 
     """
     # Mean (over time) in pre-stimulus period, separately for each depth level.
@@ -48,13 +54,20 @@ def onset(aryErt, varBse, varThr):
                            np.greater(aryErt, aryLimUp[:, :, None]),
                            np.less(aryErt, aryLimLow[:, :, None])
                            )
+    # Shape: aryLgc[iterations, depth, volumes]
 
     # Set volumes before baseline to false (avoiding false positives on first
     # and second volume due to uncomplete recovery of signal in the volumes
     # before pre-stimulus baseline):
     aryLgc[:, :, :varBse] = False
 
-    # Find first time point over threshold:
+    # Find first time point above threshold:
     aryFirst = np.argmax(aryLgc, axis=2)
 
-    return aryFirst
+    # There may be no time point above threshold. Therefore, an array with the
+    # information whether any time point was above threshold is returned
+    # along with the index of the onset time points (`True` if any time point
+    # is above threshold, `False` otherwise). Shape: aryLgc[iteration, depth].
+    aryLgc = np.max(aryLgc, axis=2)
+
+    return aryFirst, aryLgc

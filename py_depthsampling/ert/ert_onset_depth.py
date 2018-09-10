@@ -24,15 +24,6 @@ from py_depthsampling.ert.utilities import onset
 from py_depthsampling.plot.plt_dpth_prfl import plt_dpth_prfl
 
 
-#lstPthPic = ['/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/era_v1_rh.pickle',
-#             '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/periphery/era_v1_rh.pickle']
-#varSkip=2
-#idxRoi = 0
-## Timepoint of first stimulus volume:
-#varBse = 5
-#varTr = 2.079
-
-
 def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
                     strTtl='Response onset time difference', strFleTpe='.svg'):
     """
@@ -72,6 +63,7 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
     Plot response onset time by cortical depth. Event-related time courses
     are upsampled in order to estimate the onset time, separately for each
     subject.
+
     """
     # *************************************************************************
     # *** Preparations
@@ -121,10 +113,15 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
             # Array for indices of response onset:
             aryFirst = np.zeros((varNumRoi, varNumDpth), dtype=np.int32)
 
-            # Array for bootstrapped response onset (for confidence interval of
-            # response onset). Shape: aryFirstBoo[ROI, depth, upper/lower
-            # bound].
-            aryFirstBoo = np.zeros((varNumRoi, varNumDpth, 2), dtype=np.int32)
+            # Array for percentile bootstrap of response onset (for confidence
+            # interval of response onset). Shape: aryFirstPrc[ROI, depth,
+            # upper/lower bound].
+            aryFirstPrc = np.zeros((varNumRoi, varNumDpth, 2), dtype=np.int32)
+
+            # Array for bootstrap onset times (needed for calculation of
+            # bootstrap confidence intervals of response onset difference).
+            aryFirstBoo = np.zeros((varNumRoi, varNumIt, varNumDpth),
+                                   dtype=np.float32)
 
             # Bootstrap preparations. We will sample subjects with replacement.
             # How many subjects to sample on each iteration:
@@ -278,25 +275,43 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
         # Delete large bootstrap array:
         del(aryBoo)
 
-        # Calculate onset times, result has shape aryTmp[iterations, depth].
-        aryTmp = onset(aryBooMne, varBseUp, varThr)
+        # Calculate onset times, return value has shape [iterations, depth].
+        aryFirstBoo[idxRoi, :, :] = onset(aryBooMne, varBseUp, varThr)
 
         # Percentile bootstrap:
-        aryPrct = np.percentile(aryTmp, (varConLw, varConUp), axis=0)
-        aryFirstBoo[idxRoi, :, 0] = aryPrct[0, :]
-        aryFirstBoo[idxRoi, :, 1] = aryPrct[1, :]
+        aryPrct = np.percentile(aryFirstBoo[idxRoi, :, :],
+                                (varConLw, varConUp),
+                                axis=0)
+        aryFirstPrc[idxRoi, :, 0] = aryPrct[0, :]
+        aryFirstPrc[idxRoi, :, 1] = aryPrct[1, :]
 
     # *************************************************************************
     # *** Response onset difference
 
-    # Group level onset time difference, shape: aryDiff[depth].
+    # Group level onset time difference, shape: vec[depth].
     vecDiff = np.subtract(aryFirst[0, :], aryFirst[1, :])
 
     # Scale result to seconds & new shape (for plot function):
     aryDiff = np.divide(
                         np.multiply(vecDiff,
                                     varTr),
-                        varUp).reshape(1, varNumDpth)
+                        float(varUp)).reshape(1, varNumDpth)
+
+    # Onset difference for bootstrap samples:
+    aryDiffBoo = np.subtract(aryFirstBoo[0, :, :], aryFirstBoo[1, :, :])
+    # Shape: aryDiffBoo[varNumIt, varNumDpth]
+
+    # Scale result to seconds:
+    aryDiffBoo = np.divide(
+                           np.multiply(aryDiffBoo,
+                                       varTr),
+                           float(varUp))
+
+    # Percentile bootstrap:
+    aryOnsetPrct = np.percentile(aryDiffBoo,
+                                 (varConLw, varConUp),
+                                 axis=0)
+    # Shape: aryOnsetPrct[lower/upper bound, depth]
 
     # *************************************************************************
     # *** Plot onset time
@@ -305,19 +320,20 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
     aryFirst = np.divide(
                          np.multiply(aryFirst.astype(np.float64),
                                      varTr),
-                         varUp)
-    aryFirstBoo = np.divide(
-                            np.multiply(aryFirstBoo.astype(np.float64),
+                         float(varUp))
+    aryFirstPrc = np.divide(
+                            np.multiply(aryFirstPrc.astype(np.float64),
                                         varTr),
-                            varUp)
+                            float(varUp))
 
     # Subtract per-stimulus baseline:
     aryFirst = np.subtract(aryFirst, (float(varBse) * varTr))
-    aryFirstBoo = np.subtract(aryFirstBoo, (float(varBse) * varTr))
+    aryFirstPrc = np.subtract(aryFirstPrc, (float(varBse) * varTr))
 
     # Output file path:
     strPthOut = strPthPlt + 'onset_by_depth' + strFleTpe
 
+    # Plot parameters:
     varYmin = 0.0
     varYmax = 6.0
     varNumLblY = 4
@@ -330,28 +346,29 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
                   varYmax, False, lstConLbl, strXlabel, strYlabel, strTtl,
                   lgcLgnd, strPthOut, varSizeX=1200.0, varSizeY=1000.0,
                   varNumLblY=varNumLblY, tplPadY=tplPadY,
-                  aryCnfLw=aryFirstBoo[:, :, 0], aryCnfUp=aryFirstBoo[:, :, 1])
+                  aryCnfLw=aryFirstPrc[:, :, 0], aryCnfUp=aryFirstPrc[:, :, 1])
 
     # *************************************************************************
     # *** Plot onset time difference
 
-#    varYmin = 0.0
-#    varYmax = 4.0
-#    varNumLblY = 5
-#    tplPadY = (0.1, 0.1)
-#    lgcLgnd = False
-#    strXlabel = 'Cortical depth'
-#    strYlabel = 'Time difference [s]'
-#
-#    arySem = np.zeros(aryDiff.shape) + 0.01
-#
-#    # Output file path:
-#    strPthOut = strPthPlt + 'onsetdiff_by_depth' + strFleTpe
-#
-#    plt_dpth_prfl(aryDiff, None, varNumDpth, 1, 80.0, varYmin,
-#                  varYmax, False, lstConLbl, strXlabel, strYlabel, strTtl,
-#                  lgcLgnd, strPthOut, varSizeX=1200.0, varSizeY=1000.0,
-#                  varNumLblY=varNumLblY, tplPadY=tplPadY)
+    # Plot parameters:
+    varYmin = 0.0
+    varYmax = 4.0
+    varNumLblY = 5
+    tplPadY = (0.1, 0.1)
+    lgcLgnd = False
+    strXlabel = 'Cortical depth'
+    strYlabel = 'Time difference [s]'
+
+    # Output file path:
+    strPthOut = strPthPlt + 'onsetdiff_by_depth' + strFleTpe
+
+    plt_dpth_prfl(aryDiff, None, varNumDpth, 1, 80.0, varYmin,
+                  varYmax, False, lstConLbl, strXlabel, strYlabel, strTtl,
+                  lgcLgnd, strPthOut, varSizeX=1200.0, varSizeY=1000.0,
+                  varNumLblY=varNumLblY, tplPadY=tplPadY,
+                  aryCnfLw=aryOnsetPrct[0, :][None, :],
+                  aryCnfUp=aryOnsetPrct[1, :][None, :])
 
     # *************************************************************************
 

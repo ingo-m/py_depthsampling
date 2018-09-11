@@ -76,7 +76,7 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
 
     # z-threshold for peak finding. Peak is identified if signal is above/below
     # varThr times mean baseline signal.
-    varThr = 2.0
+    varThr = 2.5
 
     # Temporal upsampling factor:
     varUp = 100
@@ -236,7 +236,7 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
         aryErtUpMne = aryErtUpMne[None, ].astype(np.float32)
 
         # Scale baseline interval:
-        varBseUp = (varUp * (varBse + 1)) - 1
+        varBseUp = (varUp * varBse) - 1
 
         # Calculate onset times:
         aryTmp01, aryTmp02 = onset(aryErtUpMne, varBseUp, varThr)

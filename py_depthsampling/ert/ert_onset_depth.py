@@ -390,11 +390,14 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
     lgcLgnd = True
     strXlabel = 'Cortical depth'
     strYlabel = 'Onset time [s]'
+    aryClr = np.array([[49.0, 128.0, 182.0],
+                       [253.0, 134.0, 47.0]])
+    aryClr = np.divide(aryClr, 255.0)
 
     plt_dpth_prfl(aryFirst, None, varNumDpth, 2, 80.0, varYmin,
                   varYmax, False, lstConLbl, strXlabel, strYlabel, strTtl,
                   lgcLgnd, strPthOut, varSizeX=1200.0, varSizeY=1000.0,
-                  varNumLblY=varNumLblY, tplPadY=tplPadY,
+                  varNumLblY=varNumLblY, tplPadY=tplPadY, aryClr=aryClr,
                   aryCnfLw=aryFirstPrc[:, :, 0], aryCnfUp=aryFirstPrc[:, :, 1])
 
     # *************************************************************************

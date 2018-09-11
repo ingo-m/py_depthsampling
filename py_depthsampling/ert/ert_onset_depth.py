@@ -76,7 +76,7 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
 
     # z-threshold for peak finding. Peak is identified if signal is above/below
     # varThr times mean baseline signal.
-    varThr = 3.0
+    varThr = 2.0
 
     # Temporal upsampling factor:
     varUp = 100
@@ -405,8 +405,8 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
 
     # Plot parameters:
     varYmin = 0.0
-    varYmax = 4.0
-    varNumLblY = 5
+    varYmax = 3.0
+    varNumLblY = 4
     tplPadY = (0.0, 0.1)
     lgcLgnd = False
     strXlabel = 'Cortical depth'
@@ -434,7 +434,7 @@ if __name__ == "__main__":
     lstMtaCn = ['stimulus', 'periphery']
 
     # Condition label:
-    lstConLbl = lstMtaCn
+    lstConLbl = ['stimulus', 'edge']
 
     # Region of interest ('v1' or 'v2'):
     lstRoi = ['v1', 'v2', 'v3']
@@ -446,7 +446,7 @@ if __name__ == "__main__":
     strPlt = '/home/john/Dropbox/PacMan_Plots/era_onset/{}_{}_'
 
     # Output file extension:
-    strFleTpe = '.svg'
+    strFleTpe = '.png'
 
     # Name of pickle file from which to load time course data (metacondition,
     # ROI, and hemisphere left open):

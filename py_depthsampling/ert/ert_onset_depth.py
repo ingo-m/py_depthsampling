@@ -74,8 +74,8 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
     # Number of bootstrap iterations:
     varNumIt = 1000
 
-    # z-threshold for peak finding. Peak is identified if signal is above/below
-    # varThr times mean baseline signal.
+    # z-threshold for response onset. Onset is identified if signal is
+    # above/below varThr times mean baseline signal.
     varThr = 2.5
 
     # Temporal upsampling factor:
@@ -384,9 +384,9 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
 
     # Plot parameters:
     varYmin = 0.0
-    varYmax = 6.0
-    varNumLblY = 4
-    tplPadY = (0.0, 0.1)
+    varYmax = 4.0
+    varNumLblY = 3
+    tplPadY = (0.0, 1.5)
     lgcLgnd = True
     strXlabel = 'Cortical depth'
     strYlabel = 'Onset time [s]'
@@ -394,9 +394,9 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
                        [253.0, 134.0, 47.0]])
     aryClr = np.divide(aryClr, 255.0)
 
-    plt_dpth_prfl(aryFirst, None, varNumDpth, 2, 80.0, varYmin,
+    plt_dpth_prfl(aryFirst, None, varNumDpth, 2, 90.0, varYmin,
                   varYmax, False, lstConLbl, strXlabel, strYlabel, strTtl,
-                  lgcLgnd, strPthOut, varSizeX=1200.0, varSizeY=1000.0,
+                  lgcLgnd, strPthOut, varSizeX=1440.0, varSizeY=1200.0,
                   varNumLblY=varNumLblY, tplPadY=tplPadY, aryClr=aryClr,
                   aryCnfLw=aryFirstPrc[:, :, 0], aryCnfUp=aryFirstPrc[:, :, 1])
 
@@ -407,7 +407,7 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
     varYmin = 0.0
     varYmax = 3.0
     varNumLblY = 4
-    tplPadY = (0.0, 0.1)
+    tplPadY = (0.0, 0.3)
     lgcLgnd = False
     strXlabel = 'Cortical depth'
     strYlabel = 'Time difference [s]'
@@ -415,9 +415,9 @@ def ert_onset_depth(lstPthPic, strPthPlt, lstConLbl, varTr, varBse,
     # Output file path:
     strPthOut = strPthPlt + 'onsetdiff_by_depth' + strFleTpe
 
-    plt_dpth_prfl(aryDiff, None, varNumDpth, 1, 80.0, varYmin,
+    plt_dpth_prfl(aryDiff, None, varNumDpth, 1, 90.0, varYmin,
                   varYmax, False, lstConLbl, strXlabel, strYlabel, strTtl,
-                  lgcLgnd, strPthOut, varSizeX=1200.0, varSizeY=1000.0,
+                  lgcLgnd, strPthOut, varSizeX=1440.0, varSizeY=1200.0,
                   varNumLblY=varNumLblY, tplPadY=tplPadY,
                   aryCnfLw=aryOnsetPrct[0, :][None, :],
                   aryCnfUp=aryOnsetPrct[1, :][None, :])
@@ -446,7 +446,7 @@ if __name__ == "__main__":
     strPlt = '/home/john/Dropbox/PacMan_Plots/era_onset/{}_{}_'
 
     # Output file extension:
-    strFleTpe = '.png'
+    strFleTpe = '.svg'
 
     # Name of pickle file from which to load time course data (metacondition,
     # ROI, and hemisphere left open):

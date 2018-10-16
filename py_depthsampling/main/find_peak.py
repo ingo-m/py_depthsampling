@@ -41,7 +41,7 @@ def find_peak(aryDpth, varNumIntp=100, varSd=0.1, lgcStat=True, varThr=None):
     varSd : float
         Standard deviation of the Gaussian kernel used for smoothing, relative
         to cortical thickness (i.e. a value of 0.05 would result in a Gaussian
-        with FWHM of 5 percent of the cortical thickness).
+        with SD of 5 percent of the cortical thickness).
     lgcStat : bool, optional
         Whether to print status messages.
     varThr : float or None, optional

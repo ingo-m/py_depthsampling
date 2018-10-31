@@ -27,7 +27,7 @@ from py_depthsampling.ert.ert_main_PacMan import ert_main
 lgcPic = False
 
 # Meta-condition (within or outside of retinotopic stimulus area):
-lstMtaCn = ['stimulus', 'periphery']
+lstMtaCn = ['centre', 'edge', 'background']
 
 # Region of interest ('v1' or 'v2'):
 lstRoi = ['v1', 'v2', 'v3']
@@ -36,37 +36,31 @@ lstRoi = ['v1', 'v2', 'v3']
 lstHmsph = ['lh', 'rh']
 
 # List of subject identifiers:
-lstSubIds = ['20171023',  # '20171109',
-             '20171204_01',
-             '20171204_02',
-             '20171211',
-             '20171213',
-             '20180111',
-             '20180118']
+lstSubIds = ['20181029']
 
 # Name of pickle file from which to load time course data or save time course
 # data to (metacondition, ROI, and hemisphere left open):
-strPthPic = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/era_{}_{}.pickle'  #noqa
+strPthPic = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/era_{}_{}.pickle'  #noqa
 
 # Condition levels (used to complete file names):
-lstCon = ['pacman_dynamic', 'pacman_static', 'control_dynamic']
+lstCon = ['bright_square', 'dark_square', 'kanizsa']
 
 # Condition labels (for plot legend):
-lstConLbl = ['Pacman dynamic', 'Pacman static', 'Control dynamic']
+lstConLbl = ['Bright square', 'Dark square', 'Kanizsa']
 
 # Base name of vertex inclusion masks (subject ID, hemisphere, subject ID,
 # ROI, and metacondition left open):
-strVtkMsk = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/{}_vertex_inclusion_mask_{}_mod_{}.vtk'  #noqa
+strVtkMsk = '/media/sf_D_DRIVE/MRI_Data_PhD/09_surface/{}/cbs/{}/{}_vertex_inclusion_mask_{}_mod_{}.vtk'  #noqa
 
 # Base name of single-volume vtk meshes that together make up the timecourse
 # (subject ID, hemisphere, stimulus level, and volume index left open):
-strVtkPth = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}_era/{}/vol_{}.vtk'  #noqa
+strVtkPth = '/media/sf_D_DRIVE/MRI_Data_PhD/09_surface/{}/cbs/{}_era/{}/vol_{}.vtk'  #noqa
 
 # Number of cortical depths:
 varNumDpth = 11
 
 # Number of timepoints:
-varNumVol = 19
+varNumVol = 20
 
 # Beginning of string which precedes vertex data in data vtk files (i.e. in the
 # statistical maps):
@@ -94,9 +88,9 @@ strYlabel = 'fMRI signal change [%]'
 varStimStrt = 5
 # Volume index of end of stimulus period (i.e. index of last volume during
 # which stimulus was on - for the plot):
-varStimEnd = 10
+varStimEnd = 11
 # Volume TR (in seconds, for the plot):
-varTr = 2.079
+varTr = 1.947
 
 # Plot legend - single subject plots:
 lgcLgnd01 = True
@@ -104,7 +98,7 @@ lgcLgnd01 = True
 lgcLgnd02 = True
 
 # Output path for plots - prfix (metacondition, ROI, and hemisphere left open):
-strPltOtPre = '/home/john/Dropbox/PacMan_Plots/era/{}_{}_{}_'
+strPltOtPre = '/home/john/PhD/Surface_Plots/era/{}_{}_{}_'
 # Output path for plots - suffix:
 strPltOtSuf = '_ert.svg'
 

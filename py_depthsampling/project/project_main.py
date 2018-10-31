@@ -163,7 +163,7 @@ def project(strRoi, strCon, strDpth, strDpthLbl, strPthNpy, varNumSub,
         # of filtered_func_data)."
 
         # Only perform scaling if the data is from an FSL cope file:
-        if 'cope' in strPthData:
+        if (('cope' in strPthData) or ('_pe' in strPthData)):
             print('--Convert cope to percent signal change.')
 
             # The peak-peak height depends on the predictor (i.e.

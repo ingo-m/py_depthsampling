@@ -73,7 +73,8 @@ def ds_main(strRoi, strHmsph, lstSubIds, lstCon, lstConLbl, strVtkDpth01,
         strCsvRoiTmp = strCsvRoi.format(lstSubIds[idxSub], strHmsph, strRoi)
         strVtkSlct02Tmp = strVtkSlct02.format(lstSubIds[idxSub], strHmsph)
         strVtkSlct03Tmp = strVtkSlct03.format(lstSubIds[idxSub], strHmsph)
-        strVtkSlct04Tmp = strVtkSlct04.format(lstSubIds[idxSub], strHmsph)
+        strVtkSlct04Tmp = strVtkSlct04.format(lstSubIds[idxSub], strHmsph,
+                                              strMetaCon)
 
         # Prepare processes that plot & return single subject data:
         lstPrcs[idxSub] = \

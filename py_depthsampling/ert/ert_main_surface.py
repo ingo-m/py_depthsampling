@@ -24,7 +24,7 @@ from py_depthsampling.ert.ert_get_sub_data import ert_get_sub_data
 from py_depthsampling.ert.ert_plt import ert_plt
 
 
-def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
+def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, lstHmsph, strRoi,
              strVtkMsk, strVtkPth, varTr, varNumDpth, varNumVol, varStimStrt,
              varStimEnd, strPthPic, lgcPic, strPltOtPre, strPltOtSuf,
              varNumLne=2, strPrcdData='SCALARS', strXlabel='Time [s]',
@@ -45,8 +45,8 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
         Condition labels (for plot legend).
     strMtaCn : string
         Metacondition ('stimulus' or 'periphery').
-    strHmsph : string
-        Hemisphere ('rh' or 'lh').
+    lstHmsph : list
+        Hemispheres ('rh' and/or 'lh').
     strRoi : string
         Region of interest ('v1', 'v2', or 'v3').
     strVtkMsk : string
@@ -70,13 +70,13 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
         during which stimulus was on - for the plot).
     strPthPic : string
         Name of pickle file from which to load time course data or save time
-        course data to (metacondition, ROI, and hemisphere left open).
+        course data to (metacondition and ROI left open).
     lgcPic : bool
         Load data from previously prepared pickle? If 'False', data is loaded
         from vtk meshes and saved as pickle.
     strPltOtPre : string
-        Output path for plots - prefix, i.e. path and file name (metacondition,
-        ROI, and hemisphere left open).
+        Output path for plots - prefix, i.e. path and file name (metacondition
+        and ROI left open).
     strPltOtSuf : string
         Output path for plots - suffix, i.e. file extension.
     varNumLne : int
@@ -139,15 +139,15 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
 
     print('-Event-related timecourses depth sampling')
 
-    # Complete strings:
-    strPthPic = strPthPic.format(strMtaCn, strRoi, strHmsph)
-    strPltOtPre = strPltOtPre.format(strMtaCn, strRoi, strHmsph)
-
     # Number of subjects:
     varNumSub = len(lstSubId)
 
     # Number of conditions:
     varNumCon = len(lstCon)
+
+    # Complete strings:
+    strPthPic = strPthPic.format(strMtaCn, strRoi)
+    strPltOtPre = strPltOtPre.format(strMtaCn, strRoi)
 
     if lgcPic:
 
@@ -174,24 +174,58 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
 
             print(('------Subject: ' + strSubID))
 
-            # Complete file path of vertex inclusion mask for current subject:
-            strVtkMskTmp = strVtkMsk.format(strSubID, strHmsph, strSubID,
-                                            strRoi, strMtaCn)
+            # List for event related time courses from each hemisphere:
+            lstErt = [None] * len(lstHmsph)
 
-            # Load data for current subject (returns a list with two elements:
-            # First, an array of the form
-            #    aryRoiErt[varNumCon, varNumDpth, varNumVol]
-            # and the number of vertices contained in the ROI (a single
-            # integer):
-            dicAllSubsRoiErt[strSubID] = ert_get_sub_data(strSubID,
-                                                          strHmsph,
-                                                          strVtkMskTmp,
-                                                          strVtkPth,
-                                                          lstCon,
-                                                          varNumVol,
-                                                          varNumDpth,
-                                                          strPrcdData,
-                                                          varNumLne)
+            # Loop through hemispheres:
+            for idxHmsph in range(len(lstHmsph)):
+
+                # Complete file path of vertex inclusion mask for current
+                # subject:
+                strVtkMskTmp = strVtkMsk.format(strSubID, lstHmsph[idxHmsph],
+                                                strSubID, strRoi, strMtaCn)
+
+                # Load data for current subject (returns a list with two
+                # elements:
+                # First, an array of the form
+                #    aryRoiErt[varNumCon, varNumDpth, varNumVol]
+                # and the number of vertices contained in the ROI (a single
+                # integer):
+                lstErt[idxHmsph] = ert_get_sub_data(strSubID,
+                                                    lstHmsph[idxHmsph],
+                                                    strVtkMskTmp,
+                                                    strVtkPth,
+                                                    lstCon,
+                                                    varNumVol,
+                                                    varNumDpth,
+                                                    strPrcdData,
+                                                    varNumLne)
+
+            # In case only one hemisphere is analysed, there is no need to
+            # average.
+            if (len(lstHmsph) == 1):
+
+                # Single hemisphere to dictionary:
+                dicAllSubsRoiErt[strSubID] = lstErt[0]
+
+            else:
+
+                # Weighted average of both hemispheres:
+                aryErt = np.add(
+                                np.multiply(lstErt[0][0],
+                                            float(lstErt[0][1])),
+                                np.multiply(lstErt[1][0],
+                                            float(lstErt[1][1]))
+                                )
+
+                # Number of vertices of both hemispheres together:
+                varNumVrtc = np.add(lstErt[0][1], lstErt[1][1])
+
+                # Weighted average of both hemispheres:
+                aryErt = np.divide(aryErt, varNumVrtc)
+
+                # Mean of both hemispheres to dictionary:
+                dicAllSubsRoiErt[strSubID] = [aryErt, varNumVrtc]
 
         # Save event-related timecourses to disk as pickle:
         pickle.dump(dicAllSubsRoiErt, open(strPthPic, 'wb'))
@@ -320,7 +354,7 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, strHmsph, strRoi,
 
     # Loop through depth levels:
     # for idxDpth in range(0, varNumDpth):
-    for idxDpth in [0, 5, 10]:
+    if False:  # for idxDpth in [0, 5, 10]:
 
         # Title for plot:
         # strTmpTtl = ('Event-related average, depth level ' + str(idxDpth))

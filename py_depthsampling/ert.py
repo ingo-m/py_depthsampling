@@ -16,7 +16,7 @@ condition) are combined across time and conditions to be plotted and analysed.
 """
 
 
-from py_depthsampling.ert.ert_main_PacMan import ert_main
+from py_depthsampling.ert.ert_main_surface import ert_main
 
 
 # *****************************************************************************
@@ -39,8 +39,8 @@ lstHmsph = ['lh', 'rh']
 lstSubIds = ['20181029']
 
 # Name of pickle file from which to load time course data or save time course
-# data to (metacondition, ROI, and hemisphere left open):
-strPthPic = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/era_{}_{}.pickle'  #noqa
+# data to (metacondition and ROI left open):
+strPthPic = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/era_{}.pickle'  #noqa
 
 # Condition levels (used to complete file names):
 lstCon = ['bright_square', 'dark_square', 'kanizsa']
@@ -50,7 +50,7 @@ lstConLbl = ['Bright square', 'Dark square', 'Kanizsa']
 
 # Base name of vertex inclusion masks (subject ID, hemisphere, subject ID,
 # ROI, and metacondition left open):
-strVtkMsk = '/media/sf_D_DRIVE/MRI_Data_PhD/09_surface/{}/cbs/{}/{}_vertex_inclusion_mask_{}_mod_{}.vtk'  #noqa
+strVtkMsk = '/media/sf_D_DRIVE/MRI_Data_PhD/09_surface/{}/cbs/{}/{}_vertex_inclusion_mask_{}_{}.vtk'  #noqa
 
 # Base name of single-volume vtk meshes that together make up the timecourse
 # (subject ID, hemisphere, stimulus level, and volume index left open):
@@ -70,8 +70,8 @@ strPrcdData = 'SCALARS'
 varNumLne = 2
 
 # Limits of y-axis:
-varAcrSubsYmin = -0.04
-varAcrSubsYmax = 0.02
+varAcrSubsYmin = -0.01
+varAcrSubsYmax = 0.03
 
 # Number of labels on y-axis:
 varYnum = 4
@@ -97,10 +97,10 @@ lgcLgnd01 = True
 # Plot legend - across subject plots:
 lgcLgnd02 = True
 
-# Output path for plots - prfix (metacondition, ROI, and hemisphere left open):
-strPltOtPre = '/home/john/PhD/Surface_Plots/era/{}_{}_{}_'
+# Output path for plots - prfix (metacondition and ROI left open):
+strPltOtPre = '/home/john/PhD/Surface_Plots/era/{}_{}_'
 # Output path for plots - suffix:
-strPltOtSuf = '_ert.svg'
+strPltOtSuf = '_ert.png'
 
 # Figure scaling factor:
 varDpi = 100.0
@@ -113,14 +113,13 @@ varDpi = 100.0
 # Loop through ROIs, hemispheres, and conditions to create plots:
 for idxMtaCn in range(len(lstMtaCn)):
     for idxRoi in range(len(lstRoi)):
-        for idxHmsph in range(len(lstHmsph)):
 
-                # Call main function:
-                ert_main(lstSubIds, lstCon, lstConLbl, lstMtaCn[idxMtaCn],
-                         lstHmsph[idxHmsph], lstRoi[idxRoi], strVtkMsk,
-                         strVtkPth, varTr, varNumDpth, varNumVol, varStimStrt,
-                         varStimEnd, strPthPic, lgcPic, strPltOtPre,
-                         strPltOtSuf, varAcrSubsYmin=varAcrSubsYmin,
-                         varAcrSubsYmax=varAcrSubsYmax, varYnum=varYnum,
-                         strXlabel=strXlabel, strYlabel=strYlabel)
+            # Call main function:
+            ert_main(lstSubIds, lstCon, lstConLbl, lstMtaCn[idxMtaCn],
+                     lstHmsph, lstRoi[idxRoi], strVtkMsk, strVtkPth, varTr,
+                     varNumDpth, varNumVol, varStimStrt, varStimEnd, strPthPic,
+                     lgcPic, strPltOtPre, strPltOtSuf,
+                     varAcrSubsYmin=varAcrSubsYmin,
+                     varAcrSubsYmax=varAcrSubsYmax, varYnum=varYnum,
+                     strXlabel=strXlabel, strYlabel=strYlabel)
 # *****************************************************************************

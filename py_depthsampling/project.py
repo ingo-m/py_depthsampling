@@ -46,7 +46,7 @@ lstDpthLbl = ['allGM']
 lstRoi = ['v1', 'v2', 'v3']
 
 # Output path & prefix for plots (ROI, condition, depth level label left open):
-strPthPltOt = '/home/john/PhD/Surface_Plots/project/pe/{}_{}_{}'  #noqa
+strPthPltOt = '/home/john/PhD/Surface_Plots/project/{}_{}_{}'  #noqa
 
 # File type suffix for plot:
 # strFlTp = '.svg'

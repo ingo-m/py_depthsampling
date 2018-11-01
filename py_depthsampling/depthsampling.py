@@ -107,15 +107,13 @@ varThrSlct03 = 7000.0
 # Use vertex selection criterion 4 (vertices that are WITHIN INTERVAL are
 # included - median across depth levels):
 lgcSlct04 = True
-
 # Path of vtk files with for vertex selection criterion. This vtk file is
 # supposed to contain one set of data values for each depth level. (With
 # subject ID, hemisphere, and meta-condition left open.)
 strVtkSlct04 = '/media/sf_D_DRIVE/MRI_Data_PhD/09_surface/{}/cbs/{}/pRF_results_ovrlp_ctnr_{}.vtk'  #noqa
-
 # Threshold for vertex selection - list of tuples (interval per meta-condition,
 # e.g. within & outside stimulus area):
-lstThrSlct04 = [(0.5, 1.0), (0.5, 1.0), (0.5, 1.0)]
+lstThrSlct04 = [(0.5, 1000.0), (0.5, 1000.0), (0.5, 1000.0)]
 
 # Number of cortical depths:
 varNumDpth = 11

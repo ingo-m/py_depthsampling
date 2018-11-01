@@ -69,13 +69,6 @@ strPrcdData = 'SCALARS'
 # Number of lines between vertex-identification-string and first data point:
 varNumLne = 2
 
-# Limits of y-axis:
-varAcrSubsYmin = -0.01
-varAcrSubsYmax = 0.03
-
-# Number of labels on y-axis:
-varYnum = 4
-
 # Convert y-axis values to percent (i.e. divide label values by 100)?
 lgcCnvPrct = True
 
@@ -112,6 +105,28 @@ varDpi = 100.0
 
 # Loop through ROIs, hemispheres, and conditions to create plots:
 for idxMtaCn in range(len(lstMtaCn)):
+
+    if lstMtaCn[idxMtaCn] == 'centre':
+        # Limits of y-axis:
+        varAcrSubsYmin = -0.01
+        varAcrSubsYmax = 0.02
+        # Number of labels on y-axis:
+        varYnum = 4
+
+    if lstMtaCn[idxMtaCn] == 'edge':
+        # Limits of y-axis:
+        varAcrSubsYmin = -0.01
+        varAcrSubsYmax = 0.03
+        # Number of labels on y-axis:
+        varYnum = 5
+
+    if lstMtaCn[idxMtaCn] == 'background':
+        # Limits of y-axis:
+        varAcrSubsYmin = -0.01
+        varAcrSubsYmax = 0.02
+        # Number of labels on y-axis:
+        varYnum = 4
+
     for idxRoi in range(len(lstRoi)):
 
             # Call main function:

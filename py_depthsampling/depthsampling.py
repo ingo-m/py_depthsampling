@@ -59,16 +59,16 @@ lstSubIds = ['20181105',
 # Condition levels (used to complete file names) - nested list:
 lstNstCon = [['bright_square_sst_pe',
               'kanizsa_rotated_sst_pe',
-              'kanizsa_sst_pe'],
-             ['bright_square_sst_zstat',
-              'kanizsa_rotated_sst_zstat',
-              'kanizsa_sst_zstat'],
-             ['bright_square_trn_pe',
-              'kanizsa_rotated_trn_pe',
-              'kanizsa_trn_pe'],
-             ['bright_square_trn_zstat',
-              'kanizsa_rotated_trn_zstat',
-              'kanizsa_trn_zstat']]
+              'kanizsa_sst_pe']]
+#             ['bright_square_sst_zstat',
+#              'kanizsa_rotated_sst_zstat',
+#              'kanizsa_sst_zstat'],
+#             ['bright_square_trn_pe',
+#              'kanizsa_rotated_trn_pe',
+#              'kanizsa_trn_pe'],
+#             ['bright_square_trn_zstat',
+#              'kanizsa_rotated_trn_zstat',
+#              'kanizsa_trn_zstat']]
 
 # Condition labels:
 lstNstConLbl = lstNstCon
@@ -123,7 +123,7 @@ lgcSlct04 = True
 strVtkSlct04 = '/media/sf_D_DRIVE/MRI_Data_PhD/09_surface/{}/cbs/{}/pRF_results_ovrlp_ctnr_{}.vtk'  #noqa
 # Threshold for vertex selection - list of tuples (interval per meta-condition,
 # e.g. within & outside stimulus area):
-lstThrSlct04 = [(0.5, 1000.0), (0.5, 1000.0), (0.5, 1000.0)]
+lstThrSlct04 = [(0.5, 1000.0), (0.5, 1000.0), (0.5, 1000.0), (0.5, 1000.0)]
 
 # Number of cortical depths:
 varNumDpth = 11

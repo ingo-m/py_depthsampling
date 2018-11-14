@@ -27,7 +27,7 @@ from py_depthsampling.ert.ert_main_surface import ert_main
 lgcPic = False
 
 # Meta-condition (within or outside of retinotopic stimulus area):
-lstMtaCn = ['centre', 'edge', 'background']
+lstMtaCn = ['centre', 'edge', 'diamond', 'background']
 
 # Region of interest ('v1' or 'v2'):
 lstRoi = ['v1', 'v2', 'v3']
@@ -36,17 +36,19 @@ lstRoi = ['v1', 'v2', 'v3']
 lstHmsph = ['lh', 'rh']
 
 # List of subject identifiers:
-lstSubIds = ['20181029']
+lstSubIds = ['20181105',
+             '20181107',
+             '20181108']
 
 # Name of pickle file from which to load time course data or save time course
 # data to (metacondition and ROI left open):
 strPthPic = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/era_{}.pickle'  #noqa
 
 # Condition levels (used to complete file names):
-lstCon = ['bright_square', 'dark_square', 'kanizsa']
+lstCon = ['bright_square', 'kanizsa_rotated', 'kanizsa']
 
 # Condition labels (for plot legend):
-lstConLbl = ['Bright square', 'Dark square', 'Kanizsa']
+lstConLbl = ['Bright square', 'Kanizsa rotated', 'Kanizsa']
 
 # Base name of vertex inclusion masks (subject ID, hemisphere, subject ID,
 # ROI, and metacondition left open):
@@ -83,7 +85,7 @@ varStimStrt = 5
 # which stimulus was on - for the plot):
 varStimEnd = 11
 # Volume TR (in seconds, for the plot):
-varTr = 1.947
+varTr = 2.079
 
 # Plot legend - single subject plots:
 lgcLgnd01 = True

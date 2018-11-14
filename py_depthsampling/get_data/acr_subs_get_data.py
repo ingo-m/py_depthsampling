@@ -161,8 +161,9 @@ def acr_subs_get_data(idxPrc,              # Process ID  #noqa
     # is obtained from `design.mat`.
 
     # Only perform scaling if the data is from an FSL cope file:
-    if 'cope' in lstVtkDpth01[0]:
-        print('---------Convert cope to percent signal change.')
+    if (('cope' in lstVtkDpth01[0]) or ('_pe' in lstVtkDpth01[0])):
+        if idxPrc == 0:
+            print('---------Convert cope to percent signal change.')
 
         # The peak-peak height depends on the predictor (i.e. condition).
         if 'sst' in lstVtkDpth01[0]:
@@ -170,8 +171,10 @@ def acr_subs_get_data(idxPrc,              # Process ID  #noqa
         elif 'trn' in lstVtkDpth01[0]:
             varPpheight = 0.2269044
         else:
-            print(('------------WARNING: Cannot determine condition from file '
-                   + 'name, peak-peak height of the regressor ist set to 1.'))
+            if idxPrc == 0:
+                print(('------------WARNING: Cannot determine condition from '
+                       + 'file name, peak-peak height of the regressor is set '
+                       + 'to 1.'))
             varPpheight = 1.0
 
         # Loop through input data files:

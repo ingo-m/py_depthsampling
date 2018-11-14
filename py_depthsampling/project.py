@@ -29,7 +29,9 @@ from py_depthsampling.project.project_main import project
 strPthNpy = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/project/{}_{}_{}.npy'  #noqa
 
 # List of subject identifiers:
-lstSubIds = ['20181029']
+lstSubIds = ['20181105',
+             '20181107',
+             '20181108']
 
 # Nested list with depth levels to average over. For instance, if `lstDpth =
 # [[0, 1, 2], [3, 4, 5]]`, on a first iteration, the average over the first
@@ -58,17 +60,19 @@ varDpi = 80.0
 # Condition levels (used to complete file names):
 lstCon = ['feat_level_2_bright_square_sst_pe',
           'feat_level_2_bright_square_sst_zstat',
-          'feat_level_2_dark_square_sst_pe',
-          'feat_level_2_dark_square_sst_zstat',
+          'feat_level_2_kanizsa_rotated_sst_pe',
+          'feat_level_2_kanizsa_rotated_sst_zstat',
           'feat_level_2_kanizsa_sst_pe',
           'feat_level_2_kanizsa_sst_zstat',
           'pRF_results_eccentricity',
           'pRF_results_ovrlp_ctnr_background',
           'pRF_results_ovrlp_ctnr_centre',
           'pRF_results_ovrlp_ctnr_edge',
+          'pRF_results_ovrlp_ctnr_diamond',
           'pRF_results_ovrlp_ratio_background',
           'pRF_results_ovrlp_ratio_centre',
           'pRF_results_ovrlp_ratio_edge',
+          'pRF_results_ovrlp_ratio_diamond',
           'pRF_results_PE_01',
           'pRF_results_polar_angle',
           'pRF_results_R2',

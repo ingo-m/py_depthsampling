@@ -43,7 +43,7 @@ from py_depthsampling.main.main import ds_main
 # *** Define parameters
 
 # Meta-condition (within or outside of retinotopic stimulus area):
-lstMetaCon = ['centre', 'edge', 'background']
+lstMetaCon = ['centre', 'edge', 'diamond', 'background']
 
 # Region of interest ('v1' or 'v2'):
 lstRoi = ['v1', 'v2', 'v3']
@@ -52,13 +52,23 @@ lstRoi = ['v1', 'v2', 'v3']
 lstHmsph = ['rh', 'lh']
 
 # List of subject identifiers:
-lstSubIds = ['20181029']
+lstSubIds = ['20181105',
+             '20181107',
+             '20181108']
 
 # Condition levels (used to complete file names) - nested list:
-lstNstCon = [['bright_square_sst_pe', 'dark_square_sst_pe', 'kanizsa_sst_pe'],
-             ['bright_square_sst_zstat', 'dark_square_sst_zstat', 'kanizsa_sst_zstat'],
-             ['bright_square_trn_pe', 'dark_square_trn_pe', 'kanizsa_trn_pe'],
-             ['bright_square_trn_zstat', 'dark_square_trn_zstat', 'kanizsa_trn_zstat']]
+lstNstCon = [['bright_square_sst_pe',
+              'kanizsa_rotated_sst_pe',
+              'kanizsa_sst_pe'],
+             ['bright_square_sst_zstat',
+              'kanizsa_rotated_sst_zstat',
+              'kanizsa_sst_zstat'],
+             ['bright_square_trn_pe',
+              'kanizsa_rotated_trn_pe',
+              'kanizsa_trn_pe'],
+             ['bright_square_trn_zstat',
+              'kanizsa_rotated_trn_zstat',
+              'kanizsa_trn_zstat']]
 
 # Condition labels:
 lstNstConLbl = lstNstCon

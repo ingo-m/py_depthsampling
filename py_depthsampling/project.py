@@ -28,10 +28,16 @@ from py_depthsampling.project.project_main import project
 # open):
 strPthNpy = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/project/{}_{}_{}.npy'  #noqa
 
-# List of subject identifiers:
-lstSubIds = ['20181105',
-             '20181107',
-             '20181108']
+# List of subject identifiers. In the first pilot session ('20181029'), there
+# was no 'Kanizsa rotated' condition. Thus, we have to skip this session for
+# the respective condition.
+lstSubIds01 = ['20181029',
+               '20181105',
+               '20181107',
+               '20181108']
+lstSubIds02 = ['20181105',
+               '20181107',
+               '20181108']
 
 # Nested list with depth levels to average over. For instance, if `lstDpth =
 # [[0, 1, 2], [3, 4, 5]]`, on a first iteration, the average over the first
@@ -130,7 +136,7 @@ varExtYmax = 5.19
 
 # R2 threshold for vertex inclusion (vertices with R2 value below threshold are
 # not considered for plot):
-varThrR2 = 0.15
+varThrR2 = 0.1
 
 # Number of bins for visual space representation in x- and y-direction (ratio
 # of number of x and y bins should correspond to ratio of size of visual space
@@ -145,13 +151,21 @@ varNumY = 200
 
 print('-Project parametric map into visual space')
 
-# Number of subjects:
-varNumSub = len(lstSubIds)
-
 # Loop through depth levels, ROIs, and conditions:
 for idxDpth in range(len(lstDpth)):  #noqa
     for idxRoi in range(len(lstRoi)):
         for idxCon in range(len(lstCon)):
+
+            # Skip first subject for 'kanizsa_rotated' condition (pilot session
+            # did not include this condition).
+            if (('kanizsa_rotated' in lstCon[idxCon])
+                    or ('diamond' in lstCon[idxCon])):
+                lstSubIds = lstSubIds02
+            else:
+                lstSubIds = lstSubIds01
+
+            # Number of subjects:
+            varNumSub = len(lstSubIds)
 
             project(lstRoi[idxRoi], lstCon[idxCon], lstDpth[idxDpth],
                     lstDpthLbl[idxDpth], strPthNpy, varNumSub,

@@ -235,6 +235,8 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, lstHmsph, strRoi,
                     lgcTmp = ((strTmpCon == 'kanizsa_rotated')
                               and (strMtaCn == 'centre'))
                     if lgcTmp:
+                        print(('------Using diamond ROI (instead of square '
+                               + 'ROI) for Kanizsa rotated condition.'))
                         # Use diamond ROI:
                         strMtaCnTmp = 'diamond'
                     else:

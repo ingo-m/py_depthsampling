@@ -27,7 +27,7 @@ from py_depthsampling.ert.ert_main_surface import ert_main
 lgcPic = False
 
 # Meta-condition (within or outside of retinotopic stimulus area):
-lstMtaCn = ['centre', 'edge', 'diamond', 'background']
+lstMtaCn = ['centre', 'edge', 'background']
 
 # Region of interest ('v1' or 'v2'):
 lstRoi = ['v1', 'v2', 'v3']

@@ -182,8 +182,8 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, lstHmsph, strRoi,
 
                 # Complete file path of vertex inclusion mask for current
                 # subject:
-                strVtkMskTmp = strVtkMsk.format(strSubID, lstHmsph[idxHmsph],
-                                                strSubID, strRoi, strMtaCn)
+                # strVtkMskTmp = strVtkMsk.format(strSubID, lstHmsph[idxHmsph],
+                #                                 strSubID, strRoi, strMtaCn)
 
                 # Load data for current subject (returns a list with two
                 # elements:
@@ -191,15 +191,89 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, lstHmsph, strRoi,
                 #    aryRoiErt[varNumCon, varNumDpth, varNumVol]
                 # and the number of vertices contained in the ROI (a single
                 # integer):
-                lstErt[idxHmsph] = ert_get_sub_data(strSubID,
+                # lstErt[idxHmsph] = ert_get_sub_data(strSubID,
+                #                                     lstHmsph[idxHmsph],
+                #                                     strVtkMskTmp,
+                #                                     strVtkPth,
+                #                                     lstCon,
+                #                                     varNumVol,
+                #                                     varNumDpth,
+                #                                     strPrcdData,
+                #                                     varNumLne)
+
+                # -------------------------------------------------------------
+                # --- Makeshift solution for asymmetrical ROIs ---
+                # In the surface experiment, the central ROI needs to be
+                # slightly different for the 'Kanizsa' condition than for the
+                # 'Kanizsa rotated' condition. In the 'Kanizsa' condition, the
+                # central ROI is a square (avoiding the illusory contours). In
+                # the 'Kanizsa roated' condition, the central ROI is a diamond
+                # of the size than the square (rotated by 45 deg). The diamond
+                # avoids the rotated Kanizsa inducer (which extends further
+                # towards the centre of the field of view, because the 'mouth'
+                # of the inducer is oriented away from the centre).
+
+                # Array for event-related timecourses:
+                aryRoiErt = np.zeros((varNumCon, varNumDpth, varNumVol),
+                                     dtype=np.float16)
+
+                # lstCon = ['bright_square', 'kanizsa_rotated', 'kanizsa']
+                # lstMtaCn = ['centre', 'edge', 'diamond', 'background']
+
+                # Number of vertices:
+                varNumVrtc = 0
+
+                # Loop through conditions:
+                for idxCon in range(varNumCon):
+
+                    # Current condition:
+                    strTmpCon = lstCon[idxCon]
+
+                    # If processing the central ROI for the 'Kanizsa rotated'
+                    # condition, don't use the square ROI mask, but use the
+                    # diamond ROI instead.
+                    lgcTmp = ((strTmpCon == 'kanizsa_rotated')
+                              and (strMtaCn == 'centre'))
+                    if lgcTmp:
+                        # Use diamond ROI:
+                        strMtaCnTmp = 'diamond'
+                    else:
+                        # Use square ROI:
+                        strMtaCnTmp = strMtaCn
+
+                    # Complete file path of vertex inclusion mask for current
+                    # subject:
+                    strVtkMskTmp = strVtkMsk.format(strSubID,
                                                     lstHmsph[idxHmsph],
-                                                    strVtkMskTmp,
-                                                    strVtkPth,
-                                                    lstCon,
-                                                    varNumVol,
-                                                    varNumDpth,
-                                                    strPrcdData,
-                                                    varNumLne)
+                                                    strSubID,
+                                                    strRoi,
+                                                    strMtaCnTmp)
+
+                    # Load data for current subject (returns a list with two
+                    # elements:
+                    # First, an array of the form
+                    #    aryRoiErt[varNumCon, varNumDpth, varNumVol]
+                    # and the number of vertices contained in the ROI (a single
+                    # integer):
+                    aryRoiErt[idxCon, :, :, :], varTmp01 = ert_get_sub_data(
+                        strSubID,
+                        lstHmsph[idxHmsph],
+                        strVtkMskTmp,
+                        strVtkPth,
+                        [lstCon[idxCon]],  # Makeshift solution asymmetric ROIs
+                        varNumVol,
+                        varNumDpth,
+                        strPrcdData,
+                        varNumLne)
+
+                    # Number of vertices should not depend on order of
+                    # conditions; use maximum across conditions:
+                    if varNumVrtc < varTmp01:
+                        varNumVrtc = varTmp01
+
+                lstErt[idxHmsph] = [np.copy(aryRoiErt), varNumVrtc]
+                # --- End of makeshift solution ---
+                # -------------------------------------------------------------
 
             # In case only one hemisphere is analysed, there is no need to
             # average.

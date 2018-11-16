@@ -257,7 +257,7 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, lstHmsph, strRoi,
                     #    aryRoiErt[varNumCon, varNumDpth, varNumVol]
                     # and the number of vertices contained in the ROI (a single
                     # integer):
-                    aryRoiErt[idxCon, :, :, :], varTmp01 = ert_get_sub_data(
+                    aryRoiErt[idxCon, :, :], varTmp01 = ert_get_sub_data(
                         strSubID,
                         lstHmsph[idxHmsph],
                         strVtkMskTmp,

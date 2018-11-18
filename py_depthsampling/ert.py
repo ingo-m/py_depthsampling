@@ -45,10 +45,10 @@ lstSubIds = ['20181105',
 strPthPic = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/era_{}.pickle'  #noqa
 
 # Condition levels (used to complete file names):
-lstCon = ['bright_square', 'kanizsa_rotated', 'kanizsa']
+lstCon = ['bright_square', 'kanizsa', 'kanizsa_rotated']
 
 # Condition labels (for plot legend):
-lstConLbl = ['Bright square', 'Kanizsa rotated', 'Kanizsa']
+lstConLbl = ['Bright square', 'Kanizsa', 'Kanizsa rotated']
 
 # Base name of vertex inclusion masks (subject ID, hemisphere, subject ID,
 # ROI, and metacondition left open):

@@ -40,11 +40,20 @@ from scipy.interpolate import griddata
 
 # Paths of pickle file with even-related timecourses for all subjects except
 # pilot session. The pilot session will be appended to this file, and the file
-# will be overwritten:
-strPthPic01 = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/centre/era_v1.pickle'
+# will be overwritten (ROI left open).
+strPthPic01 = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}.pickle'  #noqa
 
-# Path of pickle file with event-related time courses of pilot session:
-strPthPic02 = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/centre/era_v1_20181029.pickle'
+# Path of pickle file with event-related time courses of pilot session (ROI
+# left open).
+strPthPic02 = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}_20181029.pickle'  #noqa
+
+# List of ROIs:
+lstRoi = ['centre/era_v1',
+          'centre/era_v2',
+          'background/era_v1',
+          'background/era_v2',
+          'edge/era_v1',
+          'edge/era_v2']
 
 # The order of conditions in the ERT files (within the respective numpy array)
 # is supposed to be as follow:
@@ -70,97 +79,109 @@ strSesId02 = '20181029'
 
 
 # -----------------------------------------------------------------------------
-# ### Preparations
+# ### Loop through ROIs
 
-# Load previously prepared event-related timecourses from pickle:
-dicRoiErt01 = pickle.load(open(strPthPic01, 'rb'))
+print('-Adjusting event-related time courses from pilot session.')
 
-# Load previously prepared event-related timecourses from pickle, pilot
-# session:
-dicRoiErt02 = pickle.load(open(strPthPic02, 'rb'))
+for idxRoi in lstRoi:
 
-# Event-related timecourses from pilot session:
-aryErt02 = dicRoiErt02[strSesId02][0]
+    # -------------------------------------------------------------------------
+    # ### Preparations
 
-# Number of conditions in pilot session:
-varNumCon02 = aryErt02.shape[0]
+    # Complete filepaths:
+    strFle01 = strPthPic01.format(idxRoi)
+    strFle02 = strPthPic02.format(idxRoi)
 
-# Number of depth levels:
-varNumDpth = aryErt02.shape[1]
+    print(('---ERT file, all subjects (but pilot session): ' + strFle01))
+    print(('---ERT file, pilot session:                    ' + strFle02))
 
-# Number of timepoints:
-varNumVol = aryErt02.shape[2]
+    # Load previously prepared event-related timecourses from pickle:
+    dicRoiErt01 = pickle.load(open(strFle01, 'rb'))
 
-# Number of vertices in pilot session:
-varNumVrtc = dicRoiErt02[strSesId02][1]
-# -----------------------------------------------------------------------------
+    # Load previously prepared event-related timecourses from pickle, pilot
+    # session:
+    dicRoiErt02 = pickle.load(open(strFle02, 'rb'))
 
+    # Event-related timecourses from pilot session:
+    aryErt02 = dicRoiErt02[strSesId02][0]
 
-# -----------------------------------------------------------------------------
-# ### Temporal interpolation
+    # Number of conditions in pilot session:
+    varNumCon02 = aryErt02.shape[0]
 
-# Interpolate data from pilot session to the sampling rate (TR) of subsequent
-# sessions.
+    # Number of depth levels:
+    varNumDpth = aryErt02.shape[1]
 
-# Position of time points for all but pilot session:
-vecPos01 = np.linspace((-1.0 * varStimStrt * varTr01),
-                       (float(varNumVol - varStimStrt) * varTr01),
-                       num=varNumVol,
-                       endpoint=False)
+    # Number of timepoints:
+    varNumVol = aryErt02.shape[2]
 
-# Position of time points for pilot session:
-vecPos02 = np.linspace((-1.0 * varStimStrt * varTr02),
-                       (float(varNumVol - varStimStrt) * varTr02),
-                       num=varNumVol,
-                       endpoint=False)
+    # Number of vertices in pilot session:
+    varNumVrtc = dicRoiErt02[strSesId02][1]
+    # -------------------------------------------------------------------------
 
-# Array for interpolated timepoints:
-aryErtInt02 = np.zeros(aryErt02.shape)
+    # -------------------------------------------------------------------------
+    # ### Temporal interpolation
 
-# Loop through conditions:
-for idxCon in range(varNumCon02):
-    
-    # Loop through depth levels:
-    for idxDpth in range(varNumDpth):
+    # Interpolate data from pilot session to the sampling rate (TR) of
+    # subsequent sessions.
 
-        # Interpolation:
-        aryErtInt02[idxCon, idxDpth, :] = griddata(
-            vecPos02, aryErt02[idxCon, idxDpth, :], vecPos01, method='cubic',
-            fill_value=1.0)
-# -----------------------------------------------------------------------------
+    # Position of time points for all but pilot session:
+    vecPos01 = np.linspace((-1.0 * varStimStrt * varTr01),
+                           (float(varNumVol - varStimStrt) * varTr01),
+                           num=varNumVol,
+                           endpoint=False)
 
+    # Position of time points for pilot session:
+    vecPos02 = np.linspace((-1.0 * varStimStrt * varTr02),
+                           (float(varNumVol - varStimStrt) * varTr02),
+                           num=varNumVol,
+                           endpoint=False)
 
-# -----------------------------------------------------------------------------
-# ### Match condition
-        
-# Control condition 'Kanizsa rotated' was not included in the pilot session.
-# Fill the ERT array with the corresponding timecourse from the same subject
-# from a separate session (20181108). The missing condition is assumed to be
-# the third condition in the ERT array (see above for details).        
+    # Array for interpolated timepoints:
+    aryErtInt02 = np.zeros(aryErt02.shape)
 
-# Session ID of matching session:
-strSesId01 = '20181108'        
+    # Loop through conditions:
+    for idxCon in range(varNumCon02):
 
-# Get 'kanizsa_rotated' condition from matching session:
-aryMtch = dicRoiErt01[strSesId01][0][2]
+        # Loop through depth levels:
+        for idxDpth in range(varNumDpth):
 
-# Array for matched ERT (pilot session):
-aryErtMtch02 = np.zeros(((varNumCon02 + 1), varNumDpth, varNumVol))
+            # Interpolation:
+            aryErtInt02[idxCon, idxDpth, :] = griddata(
+                vecPos02, aryErt02[idxCon, idxDpth, :], vecPos01,
+                method='cubic', fill_value=1.0)
+    # -------------------------------------------------------------------------
 
-# Place interpolated ERT from pilot session:
-aryErtMtch02[0:2, :, :] = aryErtInt02
+    # -------------------------------------------------------------------------
+    # ### Match condition
 
-# Place ERT from matching session:
-aryErtMtch02[2, :, :] = aryMtch
-# -----------------------------------------------------------------------------
+    # Control condition 'Kanizsa rotated' was not included in the pilot
+    # session. Fill the ERT array with the corresponding timecourse from the
+    # same subject from a separate session (20181108). The missing condition is
+    # assumed to be the third condition in the ERT array (see above for
+    # details).
 
+    # Session ID of matching session:
+    strSesId01 = '20181108'
 
-# -----------------------------------------------------------------------------
-# ### Save results
+    # Get 'kanizsa_rotated' condition from matching session:
+    aryMtch = dicRoiErt01[strSesId01][0][2]
 
-# Place adjusted ERT in dictionary:
-dicRoiErt01[strSesId02] = [aryErtMtch02, varNumVrtc]
+    # Array for matched ERT (pilot session):
+    aryErtMtch02 = np.zeros(((varNumCon02 + 1), varNumDpth, varNumVol))
 
-# Save adjusted ERT array to pickle.
-pickle.dump(dicRoiErt01, open(strPthPic01, 'wb'))
-# -----------------------------------------------------------------------------
+    # Place interpolated ERT from pilot session:
+    aryErtMtch02[0:2, :, :] = aryErtInt02
+
+    # Place ERT from matching session:
+    aryErtMtch02[2, :, :] = aryMtch
+    # -------------------------------------------------------------------------
+
+    # -------------------------------------------------------------------------
+    # ### Save results
+
+    # Place adjusted ERT in dictionary:
+    dicRoiErt01[strSesId02] = [aryErtMtch02, varNumVrtc]
+
+    # Save adjusted ERT array to pickle.
+    pickle.dump(dicRoiErt01, open(strFle01, 'wb'))
+    # -------------------------------------------------------------------------

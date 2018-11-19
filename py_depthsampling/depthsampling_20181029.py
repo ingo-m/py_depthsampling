@@ -46,7 +46,7 @@ from py_depthsampling.main.main import ds_main
 lstMetaCon = ['centre', 'edge', 'diamond', 'background']
 
 # Region of interest ('v1' or 'v2'):
-lstRoi = ['v1', 'v2']  # , 'v3']
+lstRoi = ['v1', 'v2', 'v3']
 
 # Hemispheres ('lh' or 'rh'):
 lstHmsph = ['rh', 'lh']

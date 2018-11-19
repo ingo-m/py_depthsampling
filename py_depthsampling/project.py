@@ -136,7 +136,7 @@ varExtYmax = 5.19
 
 # R2 threshold for vertex inclusion (vertices with R2 value below threshold are
 # not considered for plot):
-varThrR2 = 0.1
+varThrR2 = 0.15
 
 # Number of bins for visual space representation in x- and y-direction (ratio
 # of number of x and y bins should correspond to ratio of size of visual space

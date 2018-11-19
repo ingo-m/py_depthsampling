@@ -30,7 +30,7 @@ lgcPic = False
 lstMtaCn = ['centre', 'edge', 'background']
 
 # Region of interest ('v1' or 'v2'):
-lstRoi = ['v1', 'v2']  # , 'v3']
+lstRoi = ['v1', 'v2', 'v3']
 
 # Hemispheres ('lh' or 'rh'):
 lstHmsph = ['lh', 'rh']

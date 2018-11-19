@@ -24,7 +24,7 @@ from py_depthsampling.ert.ert_main_surface import ert_main
 
 # Load data from previously prepared pickle? If 'False', data is loaded from
 # vtk meshes and saved as pickle.
-lgcPic = False
+lgcPic = True
 
 # Meta-condition (within or outside of retinotopic stimulus area):
 lstMtaCn = ['centre', 'edge', 'background']
@@ -36,7 +36,8 @@ lstRoi = ['v1', 'v2', 'v3']
 lstHmsph = ['lh', 'rh']
 
 # List of subject identifiers:
-lstSubIds = ['20181105',
+lstSubIds = ['20181029',
+             '20181105',
              '20181107',
              '20181108']
 
@@ -95,7 +96,7 @@ lgcLgnd02 = True
 # Output path for plots - prfix (metacondition and ROI left open):
 strPltOtPre = '/home/john/PhD/Surface_Plots/era/{}_{}_'
 # Output path for plots - suffix:
-strPltOtSuf = '_ert.png'
+strPltOtSuf = '_ert.svg'
 
 # Figure scaling factor:
 varDpi = 100.0
@@ -110,24 +111,30 @@ for idxMtaCn in range(len(lstMtaCn)):
 
     if lstMtaCn[idxMtaCn] == 'centre':
         # Limits of y-axis:
-        varAcrSubsYmin = -0.01
-        varAcrSubsYmax = 0.02
+        varAcrSubsYmin = -0.005
+        varAcrSubsYmax = 0.01
         # Number of labels on y-axis:
         varYnum = 4
-
-    if lstMtaCn[idxMtaCn] == 'edge':
-        # Limits of y-axis:
-        varAcrSubsYmin = -0.01
-        varAcrSubsYmax = 0.03
-        # Number of labels on y-axis:
-        varYnum = 5
+        # Padding around labelled values on y:
+        tplPadY = (0.003, 0.003)
 
     if lstMtaCn[idxMtaCn] == 'background':
         # Limits of y-axis:
         varAcrSubsYmin = -0.01
-        varAcrSubsYmax = 0.02
+        varAcrSubsYmax = 0.01
+        # Number of labels on y-axis:
+        varYnum = 3
+        # Padding around labelled values on y:
+        tplPadY = (0.005, 0.005)
+
+    if lstMtaCn[idxMtaCn] == 'edge':
+        # Limits of y-axis:
+        varAcrSubsYmin = -0.0
+        varAcrSubsYmax = 0.03
         # Number of labels on y-axis:
         varYnum = 4
+        # Padding around labelled values on y:
+        tplPadY = (0.006, 0.006)
 
     for idxRoi in range(len(lstRoi)):
 
@@ -137,6 +144,6 @@ for idxMtaCn in range(len(lstMtaCn)):
                      varNumDpth, varNumVol, varStimStrt, varStimEnd, strPthPic,
                      lgcPic, strPltOtPre, strPltOtSuf,
                      varAcrSubsYmin=varAcrSubsYmin,
-                     varAcrSubsYmax=varAcrSubsYmax, varYnum=varYnum,
-                     strXlabel=strXlabel, strYlabel=strYlabel)
+                     varAcrSubsYmax=varAcrSubsYmax, tplPadY=tplPadY,
+                     varYnum=varYnum, strXlabel=strXlabel, strYlabel=strYlabel)
 # *****************************************************************************

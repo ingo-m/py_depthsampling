@@ -50,10 +50,13 @@ strPthPic02 = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}_20
 # List of ROIs:
 lstRoi = ['centre/era_v1',
           'centre/era_v2',
+          'centre/era_v3',
           'background/era_v1',
           'background/era_v2',
+          'background/era_v3',
           'edge/era_v1',
-          'edge/era_v2']
+          'edge/era_v2',
+          'edge/era_v3']
 
 # The order of conditions in the ERT files (within the respective numpy array)
 # is supposed to be as follow:

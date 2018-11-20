@@ -176,16 +176,10 @@ def ds_main(strRoi, lstHmsph, lstSubIds, lstCon, lstConLbl, strVtkDpth01,
     # subjects.
     for idxSub in range(varNumSubs):
 
-        # Get array for current subject:
-        aryTmp = np.copy(arySubDpthMns[idxSub, :, :, :])
-
-        # Replace nan by zero (in case of empty depth profile - these will be
-        # weighted with zero in the across hemispheres averaging anyway.
-        aryTmp = np.nan_to_num(aryTmp)
-
         # Average across hemispheres:
         arySubDpthMns02[idxSub, :, :] = np.average(
-            aryTmp, axis=0, weights=vecNumInc[idxSub, :])
+            arySubDpthMns[idxSub, :, :, :], axis=0,
+            weights=vecNumInc[idxSub, :])
 
     del(arySubDpthMns)
     arySubDpthMns = arySubDpthMns02

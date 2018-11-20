@@ -255,12 +255,22 @@ def acr_subs_get_data(idxPrc,              # Process ID  #noqa
         # Loop through depth levels:
         for idxDpth in range(0, varNumDpth):
 
-            # Retrieve all vertex data for current input file & current depth
-            # level:
-            aryTmp = lstDpthData01[idxIn][:, idxDpth]
+            # Avoid warning in case of empty array (i.e. no vertices included
+            # in ROI for current ROI/subject/hemisphere):
+            if np.greater(np.sum(vecInc), 0):
 
-            # Calculate mean over vertices:
-            varTmp = np.mean(aryTmp)
+                # Retrieve all vertex data for current input file & current
+                # depth level:
+                aryTmp = lstDpthData01[idxIn][:, idxDpth]
+
+                # Calculate mean over vertices:
+                varTmp = np.mean(aryTmp)
+
+            else:
+
+                # No vertices in ROI:
+                varTmp = 0.0
+
             # Place mean in array:
             aryDpthMean[idxIn, idxDpth] = varTmp
 

@@ -137,8 +137,8 @@ strYlabel = 'fMRI signal change [%]'
 # Condition levels (used to complete file names) - nested list:
 # NOTE: Higher level contrast should be calculated again after deconvolution.
 lstNstCon = [['bright_square_sst_pe',
-              'kanizsa_rotated_sst_pe',
-              'kanizsa_sst_pe']]
+              'kanizsa_sst_pe',
+              'kanizsa_rotated_sst_pe']]
 
 # Condition labels:
 lstNstConLbl = lstNstCon

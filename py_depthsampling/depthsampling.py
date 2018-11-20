@@ -203,10 +203,6 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                     varNumLblY = 5
                     tplPadY = (0.0, 0.0)
 
-                # Limits of y-axis for ACROSS SUBJECT PLOTS:
-                varAcrSubsYmin = -2.0
-                varAcrSubsYmax = 4.0
-
                 # Title for mean plot:
                 strTitle = lstRoi[idxRoi].upper()
 

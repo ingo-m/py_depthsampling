@@ -125,7 +125,7 @@ strPthPrfOt = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/{}
 strPthPltOt = '/home/john/PhD/Surface_Plots/deconv/{}_{}_{}_deconv_model_{}_'
 
 # File type suffix for plot:
-strFlTp = '.png'
+strFlTp = '.svg'
 
 # Figure scaling factor:
 varDpi = 100.0
@@ -185,11 +185,29 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                 # Limits of axes need to be adjusted based on ROI,
                 # condition, hemisphere.
 
-                # Limits of y-axis for across subject plot:
-                varAcrSubsYmin01 = -2.0
-                varAcrSubsYmax01 = 2.0
-                varAcrSubsYmin02 = -2.0
-                varAcrSubsYmax02 = 2.0
+                if lstMetaCon[idxMtaCn] == 'background':
+                    varAcrSubsYmin01 = -2.0
+                    varAcrSubsYmax01 = 0.0
+                    varAcrSubsYmin02 = -2.0
+                    varAcrSubsYmax02 = 0.0
+                    tplPadY = (0.1, 0.2)
+                    varNumLblY = 3
+
+                if lstMetaCon[idxMtaCn] == 'centre':
+                    varAcrSubsYmin01 = -0.25
+                    varAcrSubsYmax01 = 0.25
+                    varAcrSubsYmin02 = -0.25
+                    varAcrSubsYmax02 = 0.25
+                    tplPadY = (0.2, 0.1)
+                    varNumLblY = 3
+
+                if lstMetaCon[idxMtaCn] == 'edge':
+                    varAcrSubsYmin01 = 0.0
+                    varAcrSubsYmax01 = 2.0
+                    varAcrSubsYmin02 = 0.0
+                    varAcrSubsYmax02 = 2.0
+                    tplPadY = (0.01, 0.1)
+                    varNumLblY = 3
 
                 # Call drain model function:
                 drain_model(lstMdl[idxMdl], lstRoi[idxRoi], None,
@@ -204,5 +222,6 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                             varNumIt, varCnfLw, varCnfUp, varNseRndSd,
                             varNseSys, lstFctr, varAcrSubsYmin01,
                             varAcrSubsYmax01, varAcrSubsYmin02,
-                            varAcrSubsYmax02)
+                            varAcrSubsYmax02, tplPadY=tplPadY,
+                            varNumLblY=varNumLblY)
 # -----------------------------------------------------------------------------

@@ -40,6 +40,7 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
                            strErr='conf95',
                            vecX=None,
                            vecWghts=None,
+                           varNumLblY=5,
                            tplPadY=(0.0, 0.0)):
     """
     Calculate & plot across-subjects mean depth profiles.
@@ -102,6 +103,8 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
         non-weighted average is calculate (i.e. the 'normal' average with equal
         weights per subject). NOTE: Weighted error bars are not implemented for
         the option `strErr = prct95`.
+    varNumLblY : int
+        Number of labels on y-axis.
     tplPadY : tuple
         Padding around labelled values on y.
     """
@@ -274,7 +277,7 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
     # varAcrSubsYmax = (np.floor(varAcrSubsYmax * 0.01) / 0.01)
     vecYlbl = np.linspace(np.ceil(varAcrSubsYmin),
                           np.floor(varAcrSubsYmax),
-                          num=5,
+                          num=varNumLblY,
                           endpoint=True)
 
     # Round:

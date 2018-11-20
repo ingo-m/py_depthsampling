@@ -181,8 +181,27 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
 
                 # Limits of y-axis for SINGLE SUBJECT PLOTS (list of tuples,
                 # [(Ymin, Ymax)]):
-                lstLimY = [(-2.0, 4.0)] * len(lstSubIds)
-                lstLimY = [(-2.0, 4.0)] * len(lstSubIds)
+                lstLimY = [(-2.0, 2.0)] * len(lstSubIds)
+                lstLimY = [(-2.0, 2.0)] * len(lstSubIds)
+
+                # Adjust layout:
+                if 'background' in lstMetaCon[idxMtaCn]:
+                    varAcrSubsYmin = -2.0
+                    varAcrSubsYmax = 0.0
+                    varNumLblY = 3
+                    tplPadY = (0.5, 0.5)
+
+                if 'centre' in lstMetaCon[idxMtaCn]:
+                    varAcrSubsYmin = -1.0
+                    varAcrSubsYmax = 1.0
+                    varNumLblY = 3
+                    tplPadY = (0.0, 0.0)
+
+                if 'edge' in lstMetaCon[idxMtaCn]:
+                    varAcrSubsYmin = 0.0
+                    varAcrSubsYmax = 5.0
+                    varNumLblY = 5
+                    tplPadY = (0.0, 0.0)
 
                 # Limits of y-axis for ACROSS SUBJECT PLOTS:
                 varAcrSubsYmin = -2.0
@@ -206,5 +225,5 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                         lstNstCon[idxCon][0]), varDpi, varNormIdx, lgcNormDiv,
                         strDpthMeans.format(lstMetaCon[idxMtaCn],
                         lstRoi[idxRoi], lstHmsph[idxHmsph], '{}'),
-                        strMetaCon=lstMetaCon[idxMtaCn])
+                        strMetaCon=lstMetaCon[idxMtaCn], varNumLblY=varNumLblY)
 # *****************************************************************************

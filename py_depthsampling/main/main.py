@@ -30,7 +30,8 @@ def ds_main(strRoi, strHmsph, lstSubIds, lstCon, lstConLbl, strVtkDpth01,
             strVtkSlct04, tplThrSlct04, varNumDpth, strPrcdData, varNumLne,
             strTitle, lstLimY, varAcrSubsYmin, varAcrSubsYmax, strXlabel,
             strYlabel, strPltOtPre, strPltOtSuf, varDpi, varNormIdx,
-            lgcNormDiv, strDpthMeans, strMetaCon=''):
+            lgcNormDiv, strDpthMeans, strMetaCon='', varNumLblY=5,
+            tplPadY=(0.0, 0.0)):
     """Main routine for analysis & visualisation of depth sampling results."""
     # *************************************************************************
     # *** Plot and retrieve single subject data
@@ -195,5 +196,7 @@ def ds_main(strRoi, strHmsph, lstSubIds, lstCon, lstConLbl, strVtkDpth01,
                            strTitle,
                            strPltOtPre,
                            strPltOtSuf,
-                           vecWghts=vecNumInc)
+                           vecWghts=vecNumInc,
+                           varNumLblY=varNumLblY,
+                           tplPadY=tplPadY)
     # *************************************************************************

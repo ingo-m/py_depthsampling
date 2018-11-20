@@ -138,10 +138,10 @@ strXlabel = 'Cortical depth level'
 strYlabel = 'Signal change [%]'
 
 # Output path for plots - prefix:
-strPltOtPre = '/home/john/PhD/Surface_Plots/pe/{}/plots_{}/'
+strPltOtPre = '/home/john/PhD/Surface_Plots/pe/{}_{}_'
 
 # Output path for plots - suffix:
-strPltOtSuf = '_{}_{}_{}_20181029.png'
+strPltOtSuf = '_{}{}_{}_20181029.png'
 
 # Figure scaling factor:
 varDpi = 100.0
@@ -157,7 +157,7 @@ varNormIdx = 0
 lgcNormDiv = False
 
 # Output path for depth samling results (within subject means):
-strDpthMeans = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}_20181029.npz'  #noqa
+strDpthMeans = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/{}_{}_20181029.npz'  #noqa
 
 # Maximum number of processes to run in parallel: *** NOT IMPLEMENTED
 # varPar = 10
@@ -170,38 +170,50 @@ strDpthMeans = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/{
 # Loop through ROIs, hemispheres, and conditions to create plots:
 for idxMtaCn in range(len(lstMetaCon)):  #noqa
     for idxRoi in range(len(lstRoi)):
-        for idxHmsph in range(len(lstHmsph)):
-            for idxCon in range(len(lstNstCon)):
+        for idxCon in range(len(lstNstCon)):
 
-                # Limits of axes need to be adjusted based on ROI, condition,
-                # hemisphere.
+            # Limits of axes need to be adjusted based on ROI, condition,
+            # hemisphere.
 
-                # Limits of y-axis for SINGLE SUBJECT PLOTS (list of tuples,
-                # [(Ymin, Ymax)]):
-                lstLimY = [(-2.0, 4.0)] * len(lstSubIds)
-                lstLimY = [(-2.0, 4.0)] * len(lstSubIds)
+            # Limits of y-axis for SINGLE SUBJECT PLOTS (list of tuples,
+            # [(Ymin, Ymax)]):
+            lstLimY = [(-2.0, 2.0)] * len(lstSubIds)
+            lstLimY = [(-2.0, 2.0)] * len(lstSubIds)
 
-                # Limits of y-axis for ACROSS SUBJECT PLOTS:
+            # Adjust layout:
+            if 'background' in lstMetaCon[idxMtaCn]:
                 varAcrSubsYmin = -2.0
-                varAcrSubsYmax = 4.0
+                varAcrSubsYmax = 0.0
+                varNumLblY = 3
+                tplPadY = (0.5, 0.5)
 
-                # Title for mean plot:
-                strTitle = lstRoi[idxRoi].upper()
+            if 'centre' in lstMetaCon[idxMtaCn]:
+                varAcrSubsYmin = -1.0
+                varAcrSubsYmax = 1.0
+                varNumLblY = 3
+                tplPadY = (0.0, 0.0)
 
-                # Call main function:
-                ds_main(lstRoi[idxRoi], lstHmsph[idxHmsph], lstSubIds,
-                        lstNstCon[idxCon], lstNstConLbl[idxCon], strVtkDpth01,
-                        lgcSlct01, strCsvRoi, varNumHdrRoi, lgcSlct02,
-                        strVtkSlct02, varThrSlct02, lgcSlct03, strVtkSlct03,
-                        varThrSlct03, lgcSlct04, strVtkSlct04,
-                        lstThrSlct04[idxMtaCn], varNumDpth, strPrcdData,
-                        varNumLne, strTitle, lstLimY, varAcrSubsYmin,
-                        varAcrSubsYmax, strXlabel, strYlabel,
-                        strPltOtPre.format(lstMetaCon[idxMtaCn],
-                        lstRoi[idxRoi]), strPltOtSuf.format(
-                        lstHmsph[idxHmsph], lstRoi[idxRoi],
-                        lstNstCon[idxCon][0]), varDpi, varNormIdx, lgcNormDiv,
-                        strDpthMeans.format(lstMetaCon[idxMtaCn],
-                        lstRoi[idxRoi], lstHmsph[idxHmsph], '{}'),
-                        strMetaCon=lstMetaCon[idxMtaCn])
+            if 'edge' in lstMetaCon[idxMtaCn]:
+                varAcrSubsYmin = 0.0
+                varAcrSubsYmax = 5.0
+                varNumLblY = 5
+                tplPadY = (0.0, 0.0)
+
+            # Title for mean plot:
+            strTitle = lstRoi[idxRoi].upper()
+
+            # Call main function:
+            ds_main(lstRoi[idxRoi], lstHmsph, lstSubIds, lstNstCon[idxCon],
+                    lstNstConLbl[idxCon], strVtkDpth01, lgcSlct01, strCsvRoi,
+                    varNumHdrRoi, lgcSlct02, strVtkSlct02, varThrSlct02,
+                    lgcSlct03, strVtkSlct03, varThrSlct03, lgcSlct04,
+                    strVtkSlct04, lstThrSlct04[idxMtaCn], varNumDpth,
+                    strPrcdData, varNumLne, strTitle, lstLimY, varAcrSubsYmin,
+                    varAcrSubsYmax, strXlabel, strYlabel,
+                    strPltOtPre.format(lstMetaCon[idxMtaCn], lstRoi[idxRoi]),
+                    strPltOtSuf.format('{}', lstRoi[idxRoi],
+                    lstNstCon[idxCon][0]), varDpi, varNormIdx, lgcNormDiv,
+                    strDpthMeans.format(lstMetaCon[idxMtaCn], lstRoi[idxRoi],
+                    '{}'), strMetaCon=lstMetaCon[idxMtaCn],
+                    varNumLblY=varNumLblY)
 # *****************************************************************************

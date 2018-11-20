@@ -24,7 +24,7 @@ from py_depthsampling.get_data.acr_subs_get_data import acr_subs_get_data
 from py_depthsampling.plot.plt_dpth_prfl_acr_subs import plt_dpth_prfl_acr_subs
 
 
-def ds_main(strRoi, strHmsph, lstSubIds, lstCon, lstConLbl, strVtkDpth01,
+def ds_main(strRoi, lstHmsph, lstSubIds, lstCon, lstConLbl, strVtkDpth01,
             lgcSlct01, strCsvRoi, varNumHdrRoi, lgcSlct02, strVtkSlct02,
             varThrSlct02, lgcSlct03, strVtkSlct03, varThrSlct03, lgcSlct04,
             strVtkSlct04, tplThrSlct04, varNumDpth, strPrcdData, varNumLne,
@@ -32,7 +32,11 @@ def ds_main(strRoi, strHmsph, lstSubIds, lstCon, lstConLbl, strVtkDpth01,
             strYlabel, strPltOtPre, strPltOtSuf, varDpi, varNormIdx,
             lgcNormDiv, strDpthMeans, strMetaCon='', varNumLblY=5,
             tplPadY=(0.0, 0.0)):
-    """Main routine for analysis & visualisation of depth sampling results."""
+    """
+    Delineate ROIs and create cortical depth profiles from VTK meshes.
+
+    Main routine for analysis & visualisation of depth sampling results.
+    """
     # *************************************************************************
     # *** Plot and retrieve single subject data
 
@@ -40,8 +44,11 @@ def ds_main(strRoi, strHmsph, lstSubIds, lstCon, lstConLbl, strVtkDpth01,
 
     print('---Plotting & retrieving single subject data')
 
-    print(('   ROI: ' + strRoi + ' Hemisphere: ' + strHmsph + ' Condition: '
-           + lstCon[0]))
+    print(('   ROI: ' + strRoi + ' Condition: ' + lstCon[0]
+           + ' Metacondition: ' + strMetaCon))
+
+    # Number of hemispheres:
+    varNumHmsph = len(lstHmsph)
 
     # Number of subjects:
     varNumSubs = len(lstSubIds)
@@ -49,110 +56,142 @@ def ds_main(strRoi, strHmsph, lstSubIds, lstCon, lstConLbl, strVtkDpth01,
     # Number of conditions (i.e. number of data vtk files per subject):
     varNumCon = len(lstCon)
 
-    # List for single subject data (mean PE over depth levels):
-    lstSubData01 = [None] * varNumSubs
+    # Array for single-subject depth sampling results:
+    arySubDpthMns = np.zeros((varNumSubs, varNumHmsph, varNumCon, varNumDpth))
 
-    # Empty list to collect results from parallelised function:
-    lstParResult = [None] * varNumSubs
+    # Vector for number of vertices contained in the ROI:
+    vecNumInc = np.zeros((varNumSubs, varNumHmsph))
 
-    # Empty list for processes:
-    lstPrcs = [None] * varNumSubs
+    # Loop through hemispheres:
+    for idxHmsph in range(varNumHmsph):
 
-    # Create a queue to put the results in:
-    queOut = mp.Queue()
+        # List for single subject data (mean PE over depth levels):
+        lstSubData01 = [None] * varNumSubs
 
-    # Loop through subjects:
-    for idxSub in range(0, varNumSubs):
+        # Empty list to collect results from parallelised function:
+        lstParResult = [None] * varNumSubs
 
-        # Create list with complete file names for the data to be
-        # depth-sampled:
-        lstVtkDpth01 = [strVtkDpth01.format(lstSubIds[idxSub],
-                                            strHmsph,
-                                            strTmp) for strTmp in lstCon]
+        # Empty list for processes:
+        lstPrcs = [None] * varNumSubs
 
-        # Complete file paths:
-        strCsvRoiTmp = strCsvRoi.format(lstSubIds[idxSub], strHmsph, strRoi)
-        strVtkSlct02Tmp = strVtkSlct02.format(lstSubIds[idxSub], strHmsph)
-        strVtkSlct03Tmp = strVtkSlct03.format(lstSubIds[idxSub], strHmsph)
-        strVtkSlct04Tmp = strVtkSlct04.format(lstSubIds[idxSub], strHmsph,
-                                              strMetaCon)
+        # Create a queue to put the results in:
+        queOut = mp.Queue()
 
-        # Prepare processes that plot & return single subject data:
-        lstPrcs[idxSub] = \
-            mp.Process(target=acr_subs_get_data,
-                       args=(idxSub,             # Process ID
-                             lstSubIds[idxSub],  # Data struc - Subject ID
-                             lstVtkDpth01,       # Data struc - Pth vtk I
-                             varNumDpth,         # Data struc - Num depth lvls
-                             strPrcdData,        # Data struc - Str prcd VTK
-                             varNumLne,          # Data struc - Lns prcd VTK
-                             lgcSlct01,          # Criterion 1 - Yes or no?
-                             strCsvRoiTmp,       # Criterion 1 - CSV path
-                             varNumHdrRoi,       # Criterion 1 - Header lines
-                             lgcSlct02,          # Criterion 2 - Yes or no?
-                             strVtkSlct02Tmp,    # Criterion 2 - VTK path
-                             varThrSlct02,       # Criterion 2 - Threshold
-                             lgcSlct03,          # Criterion 3 - Yes or no?
-                             strVtkSlct03Tmp,    # Criterion 3 - VTK path
-                             varThrSlct03,       # Criterion 3 - Threshold
-                             lgcSlct04,          # Criterion 4 - Yes or no?
-                             strVtkSlct04Tmp,    # Criterion 4 - VTK path
-                             tplThrSlct04,       # Criterion 4 - Threshold
-                             lgcNormDiv,         # Normalisation - Yes or no?
-                             varNormIdx,         # Normalisation - Reference
-                             varDpi,             # Plot - dots per inch
-                             lstLimY[idxSub][0],  # Plot - Minimum of Y axis
-                             lstLimY[idxSub][1],  # Plot - Maximum of Y axis
-                             lstConLbl,           # Plot - Condition labels
-                             strXlabel,           # Plot - X axis label
-                             strYlabel,           # Plot - Y axis label
-                             strTitle,            # Plot - Title
-                             strPltOtPre,   # Plot - Output file path prefix
-                             strPltOtSuf,   # Plot - Output file path suffix
-                             strMetaCon,    # Metacondition (stim/periphery)
-                             queOut))       # Queue for output list
+        # Loop through subjects:
+        for idxSub in range(varNumSubs):
+
+            # Current hemisphere:
+            strHmsph = lstHmsph[idxHmsph]
+
+            # Create list with complete file names for the data to be
+            # depth-sampled:
+            lstVtkDpth01 = [strVtkDpth01.format(lstSubIds[idxSub],
+                                                strHmsph,
+                                                strTmp) for strTmp in lstCon]
+
+            # Complete file paths:
+            strCsvRoiTmp = strCsvRoi.format(lstSubIds[idxSub], strHmsph,
+                                            strRoi)
+            strVtkSlct02Tmp = strVtkSlct02.format(lstSubIds[idxSub], strHmsph)
+            strVtkSlct03Tmp = strVtkSlct03.format(lstSubIds[idxSub], strHmsph)
+            strVtkSlct04Tmp = strVtkSlct04.format(lstSubIds[idxSub], strHmsph,
+                                                  strMetaCon)
+            strPltOtSufTmp = strPltOtSuf.format(('_' + strHmsph))
+
+            # Prepare processes that plot & return single subject data:
+            lstPrcs[idxSub] = \
+                mp.Process(
+                    target=acr_subs_get_data,
+                    args=(idxSub,              # Process ID
+                          lstSubIds[idxSub],   # Data struc - Subject ID
+                          lstVtkDpth01,        # Data struc - Pth vtk I
+                          varNumDpth,          # Data struc - Num depth lvls
+                          strPrcdData,         # Data struc - Str prcd VTK
+                          varNumLne,           # Data struc - Lns prcd VTK
+                          lgcSlct01,           # Criterion 1 - Yes or no?
+                          strCsvRoiTmp,        # Criterion 1 - CSV path
+                          varNumHdrRoi,        # Criterion 1 - Header lines
+                          lgcSlct02,           # Criterion 2 - Yes or no?
+                          strVtkSlct02Tmp,     # Criterion 2 - VTK path
+                          varThrSlct02,        # Criterion 2 - Threshold
+                          lgcSlct03,           # Criterion 3 - Yes or no?
+                          strVtkSlct03Tmp,     # Criterion 3 - VTK path
+                          varThrSlct03,        # Criterion 3 - Threshold
+                          lgcSlct04,           # Criterion 4 - Yes or no?
+                          strVtkSlct04Tmp,     # Criterion 4 - VTK path
+                          tplThrSlct04,        # Criterion 4 - Threshold
+                          lgcNormDiv,          # Normalisation - Yes or no?
+                          varNormIdx,          # Normalisation - Reference
+                          varDpi,              # Plot - dots per inch
+                          lstLimY[idxSub][0],  # Plot - Minimum of Y axis
+                          lstLimY[idxSub][1],  # Plot - Maximum of Y axis
+                          lstConLbl,           # Plot - Condition labels
+                          strXlabel,           # Plot - X axis label
+                          strYlabel,           # Plot - Y axis label
+                          strTitle,            # Plot - Title
+                          strPltOtPre,      # Plot - Output file path prefix
+                          strPltOtSufTmp,   # Plot - Output file path suffix
+                          strMetaCon,       # Metacondition (stim/periphery)
+                          queOut))          # Queue for output list
 
         # Daemon (kills processes when exiting):
         lstPrcs[idxSub].Daemon = True
 
-    # Start processes:
-    for idxSub in range(0, varNumSubs):
-        lstPrcs[idxSub].start()
+        # Start processes:
+        for idxSub in range(0, varNumSubs):
+            lstPrcs[idxSub].start()
 
-    # Collect results from queue:
-    for idxSub in range(0, varNumSubs):
-        lstParResult[idxSub] = queOut.get(True)
+        # Collect results from queue:
+        for idxSub in range(0, varNumSubs):
+            lstParResult[idxSub] = queOut.get(True)
 
-    # Join processes:
-    for idxSub in range(0, varNumSubs):
-        lstPrcs[idxSub].join()
+        # Join processes:
+        for idxSub in range(0, varNumSubs):
+            lstPrcs[idxSub].join()
 
-    # Create list  to put the function output into the correct order (not
-    # really necessary here, but kept for consistency).
+        # List for arrays with depth profiles.
+        lstSubData01 = [None] * varNumSubs
 
-    # List for arrays with depth profiles.
-    lstSubData01 = [None] * varNumSubs
+        # Put output into correct order:
+        for idxRes in range(varNumSubs):
 
-    # Vector for number of vertices contained in the ROI:
-    vecNumInc = np.zeros((varNumSubs))
+            # Index of results (first item in output list):
+            varTmpIdx = lstParResult[idxRes][0]
 
-    # Put output into correct order:
-    for idxRes in range(0, varNumSubs):
+            # Put fitting results into list, in correct order:
+            lstSubData01[varTmpIdx] = lstParResult[idxRes][1]
+            vecNumInc[varTmpIdx, idxHmsph] = lstParResult[idxRes][2]
 
-        # Index of results (first item in output list):
-        varTmpIdx = lstParResult[idxRes][0]
+        # Retrieve single-subject data from list:
+        for idxSub in range(varNumSubs):
+            arySubDpthMns[idxSub, idxHmsph, :, :] = np.copy(
+                lstSubData01[idxSub])
 
-        # Put fitting results into list, in correct order:
-        lstSubData01[varTmpIdx] = lstParResult[idxRes][1]
-        vecNumInc[varTmpIdx] = lstParResult[idxRes][2]
+    # Array for single-subject depth sampling results, averaged over
+    # hemispheres:
+    arySubDpthMns02 = np.zeros((varNumSubs, varNumCon, varNumDpth))
 
-    # Array with single-subject depth sampling results, of the form
-    # aryDpthMeans[idxSub, idxCondition, idxDpth].
-    arySubDpthMns = np.zeros((varNumSubs, varNumCon, varNumDpth))
+    # Average across hemispheres. Because the function used for weighted
+    # averaging does not work with broadcasting, we have to loop through
+    # subjects.
+    for idxSub in range(varNumSubs):
 
-    # Retrieve single-subject data from list:
-    for idxSub in range(0, varNumSubs):
-        arySubDpthMns[idxSub, :, :] = lstSubData01[idxSub]
+        # Get array for current subject:
+        aryTmp = np.copy(arySubDpthMns[idxSub, :, :, :])
+
+        # Replace nan by zero (in case of empty depth profile - these will be
+        # weighted with zero in the across hemispheres averaging anyway.
+        aryTmp = np.nan_to_num(aryTmp)
+
+        # Average across hemispheres:
+        arySubDpthMns02[idxSub, :, :] = np.average(
+            aryTmp, axis=0, weights=vecNumInc[idxSub, :])
+
+    del(arySubDpthMns)
+    arySubDpthMns = arySubDpthMns02
+
+    # Add number of vertices over hemispheres:
+    vecNumInc = np.sum(vecNumInc, axis=1)
     # *************************************************************************
 
     # *************************************************************************
@@ -195,7 +234,8 @@ def ds_main(strRoi, strHmsph, lstSubIds, lstCon, lstConLbl, strVtkDpth01,
                            strYlabel,
                            strTitle,
                            strPltOtPre,
-                           strPltOtSuf,
+                           strPltOtSuf.format(''),
+                           strErr='sem',
                            vecWghts=vecNumInc,
                            varNumLblY=varNumLblY,
                            tplPadY=tplPadY)

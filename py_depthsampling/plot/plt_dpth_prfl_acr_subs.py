@@ -275,8 +275,12 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
     # Which y values to label with ticks:
     # varAcrSubsYmin = (np.ceil(varAcrSubsYmin * 0.01) / 0.01)
     # varAcrSubsYmax = (np.floor(varAcrSubsYmax * 0.01) / 0.01)
-    vecYlbl = np.linspace(np.ceil(varAcrSubsYmin),
-                          np.floor(varAcrSubsYmax),
+    # vecYlbl = np.linspace(np.ceil(varAcrSubsYmin),
+    #                       np.floor(varAcrSubsYmax),
+    #                       num=varNumLblY,
+    #                       endpoint=True)
+    vecYlbl = np.linspace(np.around(varAcrSubsYmin, decimals=2),
+                          np.around(varAcrSubsYmax, decimals=2),
                           num=varNumLblY,
                           endpoint=True)
 

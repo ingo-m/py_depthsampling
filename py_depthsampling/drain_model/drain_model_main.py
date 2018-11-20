@@ -36,7 +36,7 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
                 strFlTp, varDpi, strXlabel, strYlabel, lstCon, lstConLbl,
                 varNumIt, varCnfLw, varCnfUp, varNseRndSd, varNseSys, lstFctr,
                 varAcrSubsYmin01, varAcrSubsYmax01, varAcrSubsYmin02,
-                varAcrSubsYmax02):
+                varAcrSubsYmax02, tplPadY=(0.4, 0.1), varNumLblY=5):
     """Model-based correction of draining effect."""
     # -------------------------------------------------------------------------
     # *** Load depth profile from disk
@@ -482,7 +482,8 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
                                strErr='sem',
                                vecX=vecPosEmp,
                                vecWghts=vecNumInc,
-                               tplPadY=(0.4, 0.1))
+                               varNumLblY=varNumLblY,
+                               tplPadY=tplPadY)
 
         # Across-subjects mean after deconvolution:
         strTmpTtl = '{} after deconvolution'.format(strRoi.upper())
@@ -503,7 +504,8 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
                                strErr='sem',
                                vecX=vecIntpEqui,
                                vecWghts=vecNumInc,
-                               tplPadY=(0.4, 0.1))
+                               varNumLblY=varNumLblY,
+                               tplPadY=tplPadY)
 
     elif varMdl == 4:
 

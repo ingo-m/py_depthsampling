@@ -31,8 +31,8 @@ from py_depthsampling.project.plot import plot
 
 # Paths of visual field projections (second VFP will be subtracted from first
 # VFP).
-strPth01 = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/project/v2_feat_level_2_kanizsa_rotated_sst_pe_allGM.npy'
-strPth02 = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/project/v2_feat_level_2_kanizsa_sst_pe_allGM.npy'
+strPth01 = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/project/v1_feat_level_2_kanizsa_rotated_sst_pe_allGM.npy'
+strPth02 = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/project/v1_feat_level_2_kanizsa_sst_pe_allGM.npy'
 
 # Figure title:
 strTtl = 'Kanizsa - Kanizsa rotated'

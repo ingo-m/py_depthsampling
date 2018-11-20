@@ -20,6 +20,7 @@
 import numpy as np  # noqa
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
+from matplotlib.ticker import FormatStrFormatter
 
 
 def plt_dpth_prfl_acr_subs(arySubDpthMns,
@@ -289,6 +290,10 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
 
     # Set ticks:
     axs01.set_yticks(vecYlbl)
+
+    # Configure number of decimal points for y axis labels (for consistent
+    # size of axes across plots):
+    axs01.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
 
     # Set x & y tick font size:
     axs01.tick_params(labelsize=36,

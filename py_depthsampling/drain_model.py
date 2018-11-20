@@ -128,7 +128,7 @@ strPthPltOt = '/home/john/PhD/Surface_Plots/deconv/{}_{}_{}_deconv_model_{}_'
 strFlTp = '.svg'
 
 # Figure scaling factor:
-varDpi = 100.0
+varDpi = 110.0
 
 # Label for axes:
 strXlabel = 'Cortical depth level'

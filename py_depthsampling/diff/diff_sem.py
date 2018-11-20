@@ -272,9 +272,12 @@ def diff_sem(objDpth, strPath, lstCon, lstConLbl, strTtl='', varYmin=0.0,  #noqa
         lstDiffLbl = [None] * varNumCon
         for idxDiff in range(varNumCon):
             lstDiffLbl[idxDiff] = ((lstConLbl[lstDiff[idxDiff][0]])
-                                   + ' minus '
+                                   + ' - '
                                    + (lstConLbl[lstDiff[idxDiff][1]]))
         lstConLbl = lstDiffLbl
+
+        # Remove '_sst_pe' substring for better layout fit:
+        lstConLbl = [s.replace('_sst_pe', '') for s in lstConLbl]
 
     # ------------------------------------------------------------------------
     # *** Plot results
@@ -299,7 +302,7 @@ def diff_sem(objDpth, strPath, lstCon, lstConLbl, strTtl='', varYmin=0.0,  #noqa
         for idxCon in range(varNumCon):
             aryClr[idxCon, :] = objCmap(objClrNorm(varNumCon + 2 - idxCon))
 
-    plt_dpth_prfl(aryEmpMne, arySem, varNumDpth, varNumCon, 80.0, varYmin,
+    plt_dpth_prfl(aryEmpMne, arySem, varNumDpth, varNumCon, 110.0, varYmin,
                   varYmax, False, lstConLbl, strXlabel, strYlabel, strTtl,
                   lgcLgnd, strPath, varSizeX=1800.0, varSizeY=1600.0,
                   varNumLblY=varNumLblY, tplPadY=tplPadY, aryClr=aryClr)

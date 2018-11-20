@@ -35,22 +35,18 @@ strParam = 'mean'
 lstMdl = ['', '_deconv_model_1']
 
 # Meta-condition (within or outside of retinotopic stimulus area):
-lstMetaCon = ['stimulus']
-# lstMetaCon = ['periphery']
+lstMetaCon = ['centre', 'edge', 'background']
 
 # ROI ('v1', 'v2', or 'v3'):
-lstRoi = ['v1', 'v2', 'v3']
+lstRoi = ['v1', 'v2']
 
-# Hemisphere ('rh' or 'lh'):
-lstHmsph = ['rh']
+# Path of corrected depth-profiles (meta-condition, ROI, condition, and model
+# index left open):
+strPthData = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/{}_{}{}.npz'  #noqa
 
-# Path of corrected depth-profiles (meta-condition, ROI, hemisphere,
-# condition, and model index left open):
-strPthData = '/Users/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npz'  #noqa
-
-# Output path & prefix for plots (meta-condition, ROI, hemisphere, and
-# model index left open):
-strPthPltOt = '/Users/john/Dropbox/PacMan_Plots/diff/{}_{}_{}{}_SEM'  #noqa
+# Output path & prefix for plots (meta-condition, ROI, and model index left
+# open):
+strPthPltOt = '/home/john/PhD/Surface_Plots/diff/{}_{}{}_SEM'  #noqa
 
 # Output path for single subject plot, (ROI, metacondition, hemisphere, drain
 # model, and condition left open):
@@ -67,20 +63,19 @@ strXlabel = 'Cortical depth level'
 strYlabel = 'Signal change [%]'
 
 # Condition levels (used to complete file names):
-lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
-# lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst', 'Ps_sst_plus_Cd_sst']
-# lstCon = ['Pd_trn', 'Ps_trn', 'Cd_trn']
-# lstCon = ['Pd_trn', 'Ps_trn', 'Cd_trn', 'Ps_trn_plus_Cd_trn']
+lstCon = ['bright_square_sst_pe',
+          'kanizsa_rotated_sst_pe',
+          'kanizsa_sst_pe']
 
 # Condition labels:
 lstConLbl = lstCon
 
 # Which conditions to compare (list of tuples with condition indices):
-lstDiff = [(0, 1), (0, 2), (1, 2)]
+lstDiff = [(0, 1), (0, 2), (2, 1)]
 # lstDiff = [(0, 3)]
 
 # Padding around labelled values on y:
-tplPadY = (0.03, 0.03)
+tplPadY = (0.0, 0.05)
 # -----------------------------------------------------------------------------
 
 
@@ -91,58 +86,55 @@ tplPadY = (0.03, 0.03)
 for idxMtaCn in range(len(lstMetaCon)):  #noqa
     for idxMdl in range(len(lstMdl)):  #noqa
         for idxRoi in range(len(lstRoi)):
-            for idxHmsph in range(len(lstHmsph)):
 
-                # Limits of axes can be adjusted based on ROI, condition,
-                # hemisphere, deconvolution model.
+            # Limits of axes can be adjusted based on ROI, condition,
+            # hemisphere, deconvolution model.
 
-                if lstMdl[idxMdl] == '':
-                    varYmin = -0.6
-                    varYmax = 0.8
-                    varNumLblY = 8
-                if lstMdl[idxMdl] == '_deconv_model_1':
-                    varYmin = -0.25
-                    varYmax = 0.5
-                    varNumLblY = 4
+            if lstMdl[idxMdl] == '':
+                varYmin = -0.5
+                varYmax = 0.5
+                varNumLblY = 3
+            if lstMdl[idxMdl] == '_deconv_model_1':
+                varYmin = -0.25
+                varYmax = 0.5
+                varNumLblY = 4
 
-                # Create average plots:
-                diff_sem(strPthData.format(lstMetaCon[idxMtaCn],
-                                           lstRoi[idxRoi],
-                                           lstHmsph[idxHmsph],
-                                           '{}',
-                                           lstMdl[idxMdl]),
-                         (strPthPltOt.format(lstMetaCon[idxMtaCn],
-                                             lstRoi[idxRoi],
-                                             lstHmsph[idxHmsph],
-                                             lstMdl[idxMdl])
-                          + strFlTp),
-                         lstCon,
-                         lstConLbl,
-                         varYmin=varYmin,
-                         varYmax=varYmax,
-                         tplPadY=tplPadY,
-                         varNumLblY=varNumLblY,
-                         strXlabel=strXlabel,
-                         strYlabel=strYlabel,
-                         lgcLgnd=True,
-                         lstDiff=lstDiff,
-                         strParam=strParam)
+            # Create average plots:
+            diff_sem(strPthData.format(lstMetaCon[idxMtaCn],
+                                       lstRoi[idxRoi],
+                                       '{}',
+                                       lstMdl[idxMdl]),
+                     (strPthPltOt.format(lstMetaCon[idxMtaCn],
+                                         lstRoi[idxRoi],
+                                         lstMdl[idxMdl])
+                      + strFlTp),
+                     lstCon,
+                     lstConLbl,
+                     varYmin=varYmin,
+                     varYmax=varYmax,
+                     tplPadY=tplPadY,
+                     varNumLblY=varNumLblY,
+                     strXlabel=strXlabel,
+                     strYlabel=strYlabel,
+                     lgcLgnd=True,
+                     lstDiff=lstDiff,
+                     strParam=strParam)
 
-            # Create single subject plot(s):
-            # boot_plot_sngl(strPthData.format(lstMetaCon[idxMtaCn],
-            #                                  lstRoi[idxRoi],
-            #                                  lstHmsph[idxHmsph],
-            #                                  '{}',
-            #                                  lstMdl[idxMdl]),
-            #                (strPthPtlSnglOt.format(lstRoi[idxRoi],
-            #                                        lstMetaCon[idxMtaCn],
-            #                                        lstHmsph[idxHmsph],
-            #                                        lstMdl[idxMdl],
-            #                                        '{}')
-            #                 + strFlTp),
-            #                lstCon,
-            #                lstConLbl,
-            #                strXlabel='Cortical depth level (equivolume)',
-            #                strYlabel='Subject',
-            #                lstDiff=lstDiff)
+        # Create single subject plot(s):
+        # boot_plot_sngl(strPthData.format(lstMetaCon[idxMtaCn],
+        #                                  lstRoi[idxRoi],
+        #                                  lstHmsph[idxHmsph],
+        #                                  '{}',
+        #                                  lstMdl[idxMdl]),
+        #                (strPthPtlSnglOt.format(lstRoi[idxRoi],
+        #                                        lstMetaCon[idxMtaCn],
+        #                                        lstHmsph[idxHmsph],
+        #                                        lstMdl[idxMdl],
+        #                                        '{}')
+        #                 + strFlTp),
+        #                lstCon,
+        #                lstConLbl,
+        #                strXlabel='Cortical depth level (equivolume)',
+        #                strYlabel='Subject',
+        #                lstDiff=lstDiff)
 # -----------------------------------------------------------------------------

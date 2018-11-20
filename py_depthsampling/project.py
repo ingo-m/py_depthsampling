@@ -57,8 +57,8 @@ lstRoi = ['v1', 'v2', 'v3']
 strPthPltOt = '/home/john/PhD/Surface_Plots/project/{}_{}_{}'  #noqa
 
 # File type suffix for plot:
-# strFlTp = '.svg'
-strFlTp = '.png'
+strFlTp = '.svg'
+# strFlTp = '.png'
 
 # Figure scaling factor:
 varDpi = 80.0
@@ -164,6 +164,16 @@ for idxDpth in range(len(lstDpth)):  #noqa
             else:
                 lstSubIds = lstSubIds01
 
+            # Adjust colour bar:
+            if '_pe' in lstCon[idxCon]:
+                # Fixed colour bar for GLM parameter estimates:
+                varMin = -4.0
+                varMax = 4.0
+            else:
+                # Adjust colour bars based on data range:
+                varMin = None
+                varMax = None
+
             # Number of subjects:
             varNumSub = len(lstSubIds)
 
@@ -172,5 +182,6 @@ for idxDpth in range(len(lstDpth)):  #noqa
                     lstSubIds, strPthData, strPthMneEpi, strPthR2, strPthX,
                     strPthY, strPthSd, strCsvRoi, varNumDpth, varThrR2,
                     varNumX, varNumY, varExtXmin, varExtXmax, varExtYmin,
-                    varExtYmax, strPthPltOt, strFlTp, varMin=None, varMax=None)
+                    varExtYmax, strPthPltOt, strFlTp, varMin=varMin,
+                    varMax=varMax)
 # -----------------------------------------------------------------------------

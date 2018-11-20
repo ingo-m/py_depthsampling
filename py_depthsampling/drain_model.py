@@ -104,28 +104,28 @@ from py_depthsampling.drain_model.drain_model_main import drain_model
 lstMdl = [1]
 
 # Meta-condition (within or outside of retinotopic stimulus area):
-lstMetaCon = ['stimulus', 'periphery']
+lstMetaCon = ['centre', 'edge', 'background']
 
 # ROI ('v1', 'v2' or 'v3'):
-lstRoi = ['v1', 'v2', 'v3']
+lstRoi = ['v1', 'v2']
 
 # Hemisphere ('rh' or 'lh'):
 lstHmsph = ['rh']  # ['lh', 'rh']
 
-# Path of depth-profile to correct (meta-condition, ROI, hemisphere, and
-# condition left open):
-strPthPrf = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}.npz'  #noqa
+# Path of depth-profile to correct (meta-condition, ROI, and condition left
+# open):
+strPthPrf = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/{}_{}.npz'  #noqa
 
-# Output path for corrected depth-profiles (meta-condition, ROI, hemisphere,
-# condition, and model index left open):
-strPthPrfOt = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}_deconv_model_{}.npz'  #noqa
+# Output path for corrected depth-profiles (meta-condition, ROI, condition, and
+# model index left open):
+strPthPrfOt = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/{}_{}_deconv_model_{}.npz'  #noqa
 
-# Output path & prefix for plots (meta-condition, ROI, ROI, hemisphere,
-# condition, and model index left open):
-strPthPltOt = '/home/john/Dropbox/PacMan_Plots/deconv/{}/{}/{}_{}_{}_deconv_model_{}_'  #noqa
+# Output path & prefix for plots (meta-condition, ROI, condition, and model
+# index left open):
+strPthPltOt = '/home/john/PhD/Surface_Plots/deconv/{}_{}_{}_deconv_model_{}_'
 
 # File type suffix for plot:
-strFlTp = '.svg'
+strFlTp = '.png'
 
 # Figure scaling factor:
 varDpi = 100.0
@@ -135,20 +135,13 @@ strXlabel = 'Cortical depth level'
 strYlabel = 'fMRI signal change [%]'
 
 # Condition levels (used to complete file names) - nested list:
-# lstNstCon = [['Pd', 'Cd', 'Ps'],
-#              ['Pd_min_Ps'],
-#              ['Pd_min_Cd']]
 # NOTE: Higher level contrast should be calculated again after deconvolution.
-lstNstCon = [['Pd_sst', 'Ps_sst', 'Cd_sst'],
-             ['Pd_trn', 'Ps_trn', 'Cd_trn']]
+lstNstCon = [['bright_square_sst_pe',
+              'kanizsa_rotated_sst_pe',
+              'kanizsa_sst_pe']]
 
 # Condition labels:
-lstNstConLbl = [['PacMan Dynamic Sustained',
-                 'PacMan Static Sustained',
-                 'Control Dynamic Sustained'],
-                ['PacMan Dynamic Transient',
-                 'PacMan Static Transient',
-                 'Control Dynamic Transient']]
+lstNstConLbl = lstNstCon
 
 # Number of resampling iterations for peak finding (for models 1, 2, and 3) or
 # random noise samples (models 4 and 5):
@@ -187,59 +180,29 @@ lstFctr = [0.0, 0.25, 0.5, 0.75]
 for idxMtaCn in range(len(lstMetaCon)):  #noqa
     for idxMdl in range(len(lstMdl)):  #noqa
         for idxRoi in range(len(lstRoi)):
-            for idxHmsph in range(len(lstHmsph)):
-                for idxCon in range(len(lstNstCon)):
+            for idxCon in range(len(lstNstCon)):
 
-                    # Limits of axes need to be adjusted based on ROI,
-                    # condition, hemisphere.
+                # Limits of axes need to be adjusted based on ROI,
+                # condition, hemisphere.
 
-                    # Limits of y-axis for ACROSS SUBJECT PLOTS:
+                # Limits of y-axis for across subject plot:
+                varAcrSubsYmin01 = -2.0
+                varAcrSubsYmax01 = 2.0
+                varAcrSubsYmin02 = -2.0
+                varAcrSubsYmax02 = 2.0
 
-                    if idxRoi == 0:  # v1
-                        if idxCon == 0:  # v1 simple contrasts
-                            if lstMetaCon[idxMtaCn] == 'stimulus':
-                                # Limits of y-axis for across subject plot:
-                                varAcrSubsYmin01 = -5.0
-                                varAcrSubsYmax01 = 0.0
-                                varAcrSubsYmin02 = -5.0
-                                varAcrSubsYmax02 = 0.0
-                            if lstMetaCon[idxMtaCn] == 'periphery':
-                                # Limits of y-axis for across subject plot:
-                                varAcrSubsYmin01 = 0.0
-                                varAcrSubsYmax01 = 6.0
-                                varAcrSubsYmin02 = 0.0
-                                varAcrSubsYmax02 = 6.0
-
-                    elif idxRoi == 1:  # v2
-                        if idxCon == 0:  # v2 simple contrasts
-                            if lstMetaCon[idxMtaCn] == 'stimulus':
-                                # Limits of y-axis for across subject plot:
-                                varAcrSubsYmin01 = -5.0
-                                varAcrSubsYmax01 = 0.0
-                                varAcrSubsYmin02 = -5.0
-                                varAcrSubsYmax02 = 0.0
-                            if lstMetaCon[idxMtaCn] == 'periphery':
-                                # Limits of y-axis for across subject plot:
-                                varAcrSubsYmin01 = 0.0
-                                varAcrSubsYmax01 = 6.0
-                                varAcrSubsYmin02 = 0.0
-                                varAcrSubsYmax02 = 6.0
-
-                    # Call drain model function:
-                    drain_model(lstMdl[idxMdl], lstRoi[idxRoi],
-                                lstHmsph[idxHmsph],
-                                strPthPrf.format(lstMetaCon[idxMtaCn],
-                                lstRoi[idxRoi], lstHmsph[idxHmsph], '{}'),
-                                strPthPrfOt.format(lstMetaCon[idxMtaCn],
-                                lstRoi[idxRoi], lstHmsph[idxHmsph], {},
-                                lstMdl[idxMdl]),
-                                strPthPltOt.format(lstMetaCon[idxMtaCn],
-                                lstRoi[idxRoi], lstRoi[idxRoi],
-                                lstHmsph[idxHmsph], lstNstCon[idxCon][0],
-                                str(lstMdl[idxMdl])), strFlTp, varDpi,
-                                strXlabel, strYlabel, lstNstCon[idxCon],
-                                lstNstConLbl[idxCon], varNumIt, varCnfLw,
-                                varCnfUp, varNseRndSd, varNseSys, lstFctr,
-                                varAcrSubsYmin01, varAcrSubsYmax01,
-                                varAcrSubsYmin02, varAcrSubsYmax02)
+                # Call drain model function:
+                drain_model(lstMdl[idxMdl], lstRoi[idxRoi], None,
+                            strPthPrf.format(lstMetaCon[idxMtaCn],
+                            lstRoi[idxRoi], '{}'),
+                            strPthPrfOt.format(lstMetaCon[idxMtaCn],
+                            lstRoi[idxRoi], '{}', lstMdl[idxMdl]),
+                            strPthPltOt.format(lstMetaCon[idxMtaCn],
+                            lstRoi[idxRoi], lstNstCon[idxCon][0],
+                            str(lstMdl[idxMdl])), strFlTp, varDpi, strXlabel,
+                            strYlabel, lstNstCon[idxCon], lstNstConLbl[idxCon],
+                            varNumIt, varCnfLw, varCnfUp, varNseRndSd,
+                            varNseSys, lstFctr, varAcrSubsYmin01,
+                            varAcrSubsYmax01, varAcrSubsYmin02,
+                            varAcrSubsYmax02)
 # -----------------------------------------------------------------------------

@@ -112,11 +112,11 @@ for idxMtaCn in range(len(lstMtaCn)):
     if lstMtaCn[idxMtaCn] == 'centre':
         # Limits of y-axis:
         varAcrSubsYmin = -0.005
-        varAcrSubsYmax = 0.01
+        varAcrSubsYmax = 0.005
         # Number of labels on y-axis:
-        varYnum = 4
+        varYnum = 3
         # Padding around labelled values on y:
-        tplPadY = (0.003, 0.003)
+        tplPadY = (0.003, 0.004)
 
     if lstMtaCn[idxMtaCn] == 'background':
         # Limits of y-axis:

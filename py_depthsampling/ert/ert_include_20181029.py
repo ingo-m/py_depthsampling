@@ -69,7 +69,6 @@ lstRoi = ['centre/era_v1',
 # which stimulus was on):
 varStimStrt = 5
 
-
 # Volume TR:
 varTr01 = 2.079
 
@@ -167,7 +166,7 @@ for idxRoi in lstRoi:
     strSesId01 = '20181108'
 
     # Get 'kanizsa_rotated' condition from matching session:
-    aryMtch = dicRoiErt01[strSesId01][0][2]
+    aryMtch = dicRoiErt01[strSesId01][0][2, :, :]
 
     # Array for matched ERT (pilot session):
     aryErtMtch02 = np.zeros(((varNumCon02 + 1), varNumDpth, varNumVol))

@@ -61,24 +61,22 @@ from py_depthsampling.permutation.peak_pos_perm_diff import peak_diff
 # *** Define parameters
 
 # Which draining model to load ('' for none):
-lstMdl = ['', '_deconv_model_1']
+lstMdl = ['_deconv_model_1']
 
 # Meta-condition (within or outside of retinotopic stimulus area):
-lstMetaCon = ['stimulus']
+lstMetaCon = ['centre']
 
 # ROI ('v1', 'v2', or 'v3'):
-lstRoi = ['v1', 'v2', 'v3']
+lstRoi = ['v1', 'v2']
 
-# Hemisphere ('rh' or 'lh'):
-lstHmsph = ['rh']
-
-# Path of depth-profiles (meta-condition, ROI, hemisphere, condition, and model
-# index left open):
-strPthData = '/Users/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npz'  #noqa
+# Path of depth-profile to load (meta-condition, ROI, condition, and
+# deconvolution suffix left open):
+strPthData = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/{}_{}{}.npz'  #noqa
 
 # Condition levels (used to complete file names):
-lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
-# lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst', 'Ps_sst_plus_Cd_sst']
+lstCon = ['bright_square_sst_pe',
+          'kanizsa_rotated_sst_pe',
+          'kanizsa_sst_pe']
 
 # Which conditions to compare (nested list of tuples with condition indices):
 lstDiff = [[(0, 1), (0, 2)],
@@ -94,13 +92,12 @@ varNumIt = 100000
 # *** Preparations
 
 # List of features for dataframe:
-lstFtr = ['ROI', 'Deconvolution', 'pRF-position', 'Hemisphere', 'Contrast',
+lstFtr = ['ROI', 'Deconvolution', 'pRF-position', 'Contrast',
           'Emp.-peak-pos.-diff.', 'Emp.-peak-A?', 'Emp.-peak-pos-A',
           'Emp.-peak-B?', 'Emp.-peak-pos-B', 'Perm.-peak-ratio[%]', 'p-value']
 
 # Number of samples:
-varNumSmpl = (len(lstMetaCon) * len(lstMdl) * len(lstRoi) * len(lstHmsph)
-              * len(lstDiff))
+varNumSmpl = (len(lstMetaCon) * len(lstMdl) * len(lstRoi) * len(lstDiff))
 
 # Create dataframe:
 objDf = pd.DataFrame(None, index=np.arange(varNumSmpl), columns=lstFtr)
@@ -109,7 +106,6 @@ objDf = pd.DataFrame(None, index=np.arange(varNumSmpl), columns=lstFtr)
 dicType = {'ROI': str,
            'Deconvolution': str,
            'pRF-position': str,
-           'Hemisphere': str,
            'Contrast': str,
            'Emp.-peak-A?': np.bool,
            'Emp.-peak-pos-A': np.float64,
@@ -135,49 +131,46 @@ idxSmpl = 0
 for idxMtaCn in range(len(lstMetaCon)):
     for idxMdl in range(len(lstMdl)):
         for idxRoi in range(len(lstRoi)):
-            for idxHmsph in range(len(lstHmsph)):
-                for idxDiff in range(len(lstDiff)):
+            for idxDiff in range(len(lstDiff)):
 
-                    # Permutation test:
-                    varTmpP, varTmpDiff, lgcTmpA, lgcTmpB, varEmpPeaksA, \
-                        varEmpPeaksB, varTmpRatioPeak = \
-                        peak_diff(strPthData.format(lstMetaCon[idxMtaCn],
-                                                    lstRoi[idxRoi],
-                                                    lstHmsph[idxHmsph],
-                                                    '{}',
-                                                    lstMdl[idxMdl]),
-                                  lstDiff[idxDiff],
-                                  lstCon,
-                                  varNumIt=varNumIt)
+                # Permutation test:
+                varTmpP, varTmpDiff, lgcTmpA, lgcTmpB, varEmpPeaksA, \
+                    varEmpPeaksB, varTmpRatioPeak = \
+                    peak_diff(strPthData.format(lstMetaCon[idxMtaCn],
+                                                lstRoi[idxRoi],
+                                                '{}',
+                                                lstMdl[idxMdl]),
+                              lstDiff[idxDiff],
+                              lstCon,
+                              varNumIt=varNumIt)
 
-                    # Current comparison:
-                    strTmp = (lstCon[lstDiff[idxDiff][0][0]]
-                              + '-'
-                              + lstCon[lstDiff[idxDiff][0][1]]
-                              + '_vs_'
-                              + lstCon[lstDiff[idxDiff][1][0]]
-                              + '-'
-                              + lstCon[lstDiff[idxDiff][1][1]])
+                # Current comparison:
+                strTmp = (lstCon[lstDiff[idxDiff][0][0]]
+                          + '-'
+                          + lstCon[lstDiff[idxDiff][0][1]]
+                          + '_vs_'
+                          + lstCon[lstDiff[idxDiff][1][0]]
+                          + '-'
+                          + lstCon[lstDiff[idxDiff][1][1]])
 
-                    # Result to data frame:
-                    objDf.at[idxSmpl, 'ROI'] = lstRoi[idxRoi].upper()
-                    if lstMdl[idxMdl] == '':
-                        objDf.at[idxSmpl, 'Deconvolution'] = 'No'
-                    else:
-                        objDf.at[idxSmpl, 'Deconvolution'] = 'Yes'
-                    objDf.at[idxSmpl, 'pRF-position'] = lstMetaCon[idxMtaCn]
-                    objDf.at[idxSmpl, 'Hemisphere'] = lstHmsph[idxHmsph]
-                    objDf.at[idxSmpl, 'Contrast'] = strTmp
-                    objDf.at[idxSmpl, 'Emp.-peak-pos.-diff.'] = varTmpDiff
-                    objDf.at[idxSmpl, 'Emp.-peak-A?'] = lgcTmpA
-                    objDf.at[idxSmpl, 'Emp.-peak-pos-A'] = varEmpPeaksA
-                    objDf.at[idxSmpl, 'Emp.-peak-B?'] = lgcTmpB
-                    objDf.at[idxSmpl, 'Emp.-peak-pos-B'] = varEmpPeaksB
-                    objDf.at[idxSmpl, 'Perm.-peak-ratio[%]'] = varTmpRatioPeak
-                    objDf.at[idxSmpl, 'p-value'] = varTmpP
+                # Result to data frame:
+                objDf.at[idxSmpl, 'ROI'] = lstRoi[idxRoi].upper()
+                if lstMdl[idxMdl] == '':
+                    objDf.at[idxSmpl, 'Deconvolution'] = 'No'
+                else:
+                    objDf.at[idxSmpl, 'Deconvolution'] = 'Yes'
+                objDf.at[idxSmpl, 'pRF-position'] = lstMetaCon[idxMtaCn]
+                objDf.at[idxSmpl, 'Contrast'] = strTmp
+                objDf.at[idxSmpl, 'Emp.-peak-pos.-diff.'] = varTmpDiff
+                objDf.at[idxSmpl, 'Emp.-peak-A?'] = lgcTmpA
+                objDf.at[idxSmpl, 'Emp.-peak-pos-A'] = varEmpPeaksA
+                objDf.at[idxSmpl, 'Emp.-peak-B?'] = lgcTmpB
+                objDf.at[idxSmpl, 'Emp.-peak-pos-B'] = varEmpPeaksB
+                objDf.at[idxSmpl, 'Perm.-peak-ratio[%]'] = varTmpRatioPeak
+                objDf.at[idxSmpl, 'p-value'] = varTmpP
 
-                    # Increment counter:
-                    idxSmpl += 1
+                # Increment counter:
+                idxSmpl += 1
 
 print(' ')
 print(objDf)

@@ -31,7 +31,7 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, lstHmsph, strRoi,
              strYlabel='Percent signal change', varAcrSubsYmin=-0.06,
              varAcrSubsYmax=0.04, tplPadY=(0.001, 0.001), lgcCnvPrct=True,
              lgcLgnd01=True, lgcLgnd02=True, varTmeScl=1.0, varXlbl=5,
-             varYnum=6, varDpi=70.0):
+             varYnum=6, varDpi=100.0):
     """
     Plot event-related timecourses sampled across cortical depth levels.
 
@@ -217,8 +217,8 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, lstHmsph, strRoi,
                 aryRoiErt = np.zeros((varNumCon, varNumDpth, varNumVol),
                                      dtype=np.float16)
 
-                # lstCon = ['bright_square', 'kanizsa_rotated', 'kanizsa']
-                # lstMtaCn = ['centre', 'edge', 'diamond', 'background']
+                # lstCon = ['bright_square', 'kanizsa', 'kanizsa_rotated']
+                # lstMtaCn = ['centre', 'edge', 'background']
 
                 # Number of vertices:
                 varNumVrtc = 0
@@ -337,46 +337,44 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, lstHmsph, strRoi,
             # the number of vertices contained in this ROI).
             aryRoiErt = lstItem[0]
 
-            # Loop through depth levels (we only create plots for three depth
-            # levels):
-            for idxDpth in [0, 5, 10]:
+            # Calculate mean across depth (within subjects):
+            aryRoiErt = np.mean(aryRoiErt, axis=1)
 
-                # Title for plot:
-                strTmpTtl = (strSubID + ' ERA, depth level ' + str(idxDpth))
+            # Title for plot:
+            strTmpTtl = strSubID
 
-                # Output filename:
-                strTmpPth = (strPltOtPre + strSubID + '_dpth_' + str(idxDpth)
-                             + strPltOtSuf)
+            # Output filename:
+            strTmpPth = (strPltOtPre + strSubID + strPltOtSuf)
 
-                # We don't have the variances across trials (within subjects),
-                # therefore we create an empty array as a placeholder. NOTE:
-                # This should be replaced by between-trial variance once the
-                # depth sampling is fully scriptable.
-                aryDummy = np.zeros(aryRoiErt[:, idxDpth, :].shape)
+            # We don't have the variances across trials (within subjects),
+            # therefore we create an empty array as a placeholder. NOTE:
+            # This should be replaced by between-trial variance once the
+            # depth sampling is fully scriptable.
+            aryDummy = np.zeros(aryRoiErt.shape)
 
-                # We create one plot per depth-level.
-                ert_plt(aryRoiErt[:, idxDpth, :],
-                        aryDummy,
-                        varNumDpth,
-                        varNumCon,
-                        varNumVol,
-                        varDpi,
-                        varAcrSubsYmin,
-                        varAcrSubsYmax,
-                        varStimStrt,
-                        varStimEnd,
-                        varTr,
-                        lstConLbl,
-                        lgcLgnd01,
-                        strXlabel,
-                        strYlabel,
-                        lgcCnvPrct,
-                        strTmpTtl,
-                        strTmpPth,
-                        varTmeScl=varTmeScl,
-                        varXlbl=varXlbl,
-                        varYnum=varYnum,
-                        tplPadY=tplPadY)
+            # Plot single subject ERT (mean over depth levels):
+            ert_plt(aryRoiErt,
+                    aryDummy,
+                    1,  # varNumDpth
+                    varNumCon,
+                    varNumVol,
+                    varDpi,
+                    varAcrSubsYmin,
+                    varAcrSubsYmax,
+                    varStimStrt,
+                    varStimEnd,
+                    varTr,
+                    lstConLbl,
+                    lgcLgnd01,
+                    strXlabel,
+                    strYlabel,
+                    lgcCnvPrct,
+                    strTmpTtl,
+                    strTmpPth,
+                    varTmeScl=varTmeScl,
+                    varXlbl=varXlbl,
+                    varYnum=varYnum,
+                    tplPadY=tplPadY)
 
     # *************************************************************************
     # *** Plot across-subjects average

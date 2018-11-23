@@ -164,8 +164,8 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
 
                 # Abbreviate condition labels:
                 strTmp = strTmp.replace('bright_square_sst_pe', 'BS')
-                strTmp = strTmp.replace('kanizsa_sst_pe', 'KR')
-                strTmp = strTmp.replace('kanizsa_rotated_sst_pe', 'KS')
+                strTmp = strTmp.replace('kanizsa_sst_pe', 'KS')
+                strTmp = strTmp.replace('kanizsa_rotated_sst_pe', 'KR')
 
                 # Column label for dataframe:
                 lstLbls[idxDiff] = strTmp

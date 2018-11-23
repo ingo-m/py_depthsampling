@@ -5,7 +5,7 @@ Permutation test for conditions differences in event-related timecourses.
 Compares event-related timecourses from two different conditions. Prints
 results of permutation test.
 
-Inputs are picle files containing event-related timecourses for each subject.
+Inputs are pickle files containing event-related timecourses for each subject.
 """
 
 # Part of py_depthsampling library
@@ -55,7 +55,7 @@ lstDiff = [(0, 1), (0, 2), (2, 1)]
 varNumIt = 10000
 
 # Time window within which to compare timecourses (volume indices):
-tplCmp = (7, 13)
+tplCmp = (7, 11)
 # -----------------------------------------------------------------------------
 
 
@@ -85,7 +85,7 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
             # Indices of conditions to compare on this iteration:
             varIdxCon01 = lstDiff[idxDiff][0]
             varIdxCon02 = lstDiff[idxDiff][1]
-            
+
             # Condition names:
             strTmpCon01 = lstCon[varIdxCon01]
             strTmpCon02 = lstCon[varIdxCon02]
@@ -129,7 +129,7 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                 # Access condition to compare (new shape
                 # aryErtTmp[depth, time]).
                 aryErtTmp = aryErtTmp[varIdxCon01]
-                
+
                 # Mean over depth levels:
                 # aryErt01[idxSub] = np.mean(aryErtTmp, axis=0)
                 # Mean over time window:
@@ -149,7 +149,7 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                 # Access condition to compare (new shape
                 # aryErtTmp[depth, time]).
                 aryErtTmp = aryErtTmp[varIdxCon02]
-                
+
                 # Mean over depth levels:
                 # aryErt02[idxSub] = np.mean(aryErtTmp, axis=0)
                 # Mean over time window:

@@ -55,7 +55,7 @@ lstDiff = [(0, 1), (0, 2), (2, 1)]
 varNumIt = 10000
 
 # Time window within which to compare timecourses (volume indices):
-tplCmp = (8, 9)
+tplCmp = (7, 13)
 # -----------------------------------------------------------------------------
 
 
@@ -100,15 +100,20 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
             # Get subject IDs:
             lstSubIds = list(dicAllSubsRoiErt.keys())
 
-            # Get number of timepoitns:
+            # Get number of volumes:
             varNumVol = dicAllSubsRoiErt[lstSubIds[0]][0].shape[2]
+
+            # Get number of depth levels:
+            varNumDpth = dicAllSubsRoiErt[lstSubIds[0]][0].shape[1]
 
             # Number of subjects:
             varNumSub = len(lstSubIds)
 
             # Arrays for single-subject timecourses for both conditions:
-            aryErt01 = np.zeros((varNumSub, varNumVol))
-            aryErt02 = np.zeros((varNumSub, varNumVol))
+            # aryErt01 = np.zeros((varNumSub, varNumVol))
+            # aryErt02 = np.zeros((varNumSub, varNumVol))
+            aryErt01 = np.zeros((varNumSub, varNumDpth))
+            aryErt02 = np.zeros((varNumSub, varNumDpth))
 
             # Vector for number of vertices per subject (for weighter
             # averaging across subjects):
@@ -126,7 +131,10 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                 aryErtTmp = aryErtTmp[varIdxCon01]
                 
                 # Mean over depth levels:
-                aryErt01[idxSub] = np.mean(aryErtTmp, axis=0)
+                # aryErt01[idxSub] = np.mean(aryErtTmp, axis=0)
+                # Mean over time window:
+                aryErt01[idxSub] = np.mean(aryErtTmp[:, tplCmp[0]:tplCmp[1]],
+                                           axis=1)
 
                 # Number of vertices for current subject:
                 vecNumInc[idxSub] = dicAllSubsRoiErt[lstSubIds[idxSub]][1]
@@ -143,12 +151,14 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                 aryErtTmp = aryErtTmp[varIdxCon02]
                 
                 # Mean over depth levels:
-                aryErt02[idxSub] = np.mean(aryErtTmp, axis=0)
-
+                # aryErt02[idxSub] = np.mean(aryErtTmp, axis=0)
+                # Mean over time window:
+                aryErt02[idxSub] = np.mean(aryErtTmp[:, tplCmp[0]:tplCmp[1]],
+                                           axis=1)
 
             # Access time window for comparison:
-            aryErt01 = aryErt01[:, tplCmp[0]:tplCmp[1]]
-            aryErt02 = aryErt02[:, tplCmp[0]:tplCmp[1]]
+            # aryErt01 = aryErt01[:, tplCmp[0]:tplCmp[1]]
+            # aryErt02 = aryErt02[:, tplCmp[0]:tplCmp[1]]
 
             # Run permutation test:
             varP = permute_max(aryErt01,

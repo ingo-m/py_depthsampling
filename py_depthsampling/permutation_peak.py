@@ -153,6 +153,11 @@ for idxMtaCn in range(len(lstMetaCon)):
                           + '-'
                           + lstCon[lstDiff[idxDiff][1][1]])
 
+                # Abbreviate condition labels:
+                strTmp = strTmp.replace('bright_square_sst_pe', 'BS')
+                strTmp = strTmp.replace('kanizsa_rotated_sst_pe', 'KR')
+                strTmp = strTmp.replace('kanizsa_sst_pe', 'KS')
+
                 # Result to data frame:
                 objDf.at[idxSmpl, 'ROI'] = lstRoi[idxRoi].upper()
                 if lstMdl[idxMdl] == '':

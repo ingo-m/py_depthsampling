@@ -58,7 +58,7 @@ strYlabel = 'fMRI signal change [a.u.]'
 lstCon = ['bright_square_sst_pe',
           'kanizsa_rotated_sst_pe',
           'kanizsa_sst_pe',
-          'kanizsa_rotated_sst_pe_plus_kanizsa_sst_pe']
+          'kanizsa_sst_pe_plus_kanizsa_rotated_sst_pe']
 
 # Which conditions to compare (list of tuples with condition indices):
 lstDiff = [(0, 1), (0, 2), (2, 1), (0, 3)]
@@ -159,8 +159,16 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
 
                 print(strMsg)
 
+                # Comparison label:
+                strTmp = (strTmpCon01 + '-' + strTmpCon02)
+
+                # Abbreviate condition labels:
+                strTmp = strTmp.replace('bright_square_sst_pe', 'BS')
+                strTmp = strTmp.replace('kanizsa_sst_pe', 'KR')
+                strTmp = strTmp.replace('kanizsa_rotated_sst_pe', 'KS')
+
                 # Column label for dataframe:
-                lstLbls[idxDiff] = (strTmpCon01 + '-' + strTmpCon02)
+                lstLbls[idxDiff] = strTmp
 
         # p-values into dataframe:
         dfData = pd.DataFrame(data=aryData,

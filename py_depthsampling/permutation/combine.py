@@ -53,8 +53,8 @@ strXlabel = 'Cortical depth level'
 strYlabel = 'fMRI signal change [a.u.]'
 
 # Condition levels (used to complete file names):
-lstCon = ['kanizsa_rotated_sst_pe',
-          'kanizsa_sst_pe']
+lstCon = ['kanizsa_sst_pe',
+          'kanizsa_rotated_sst_pe']
 
 # Which conditions to combine (list of tuples with condition indices):
 lstDiff = [(0, 1)]

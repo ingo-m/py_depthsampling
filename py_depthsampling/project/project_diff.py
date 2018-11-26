@@ -29,16 +29,17 @@ from py_depthsampling.project.plot import plot
 # -----------------------------------------------------------------------------
 # ### Parameters
 
-# Paths of visual field projections (second VFP will be subtracted from first
-# VFP).
-strPth01 = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/project/v1_feat_level_2_kanizsa_rotated_sst_pe_allGM.npy'
-strPth02 = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/project/v1_feat_level_2_kanizsa_sst_pe_allGM.npy'
+# Paths of visual field projections (first VFP minus second VFP).
+# strPth01 = '/Users/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/project/v1_feat_level_2_bright_square_sst_pe_allGM.npy'
+strPth01 = '/Users/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/project/v2_feat_level_2_kanizsa_sst_pe_allGM.npy'
+strPth02 = '/Users/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/project/v2_feat_level_2_kanizsa_rotated_sst_pe_allGM.npy'
 
 # Figure title:
 strTtl = 'Kanizsa - Kanizsa rotated'
+# strTtl = 'Real square - Kanizsa'
 
 # Figure output path:
-strPathOut = '/home/john/Desktop/v2_project_diff_pe.png'
+strPathOut = '/Users/john/Desktop/v2_project_diff_pe_KS_minus_KR.svg'
 
 # Extent of visual space (for axes labels):
 varExtXmin = -8.3
@@ -56,7 +57,7 @@ ary01 = np.load(strPth01)
 ary02 = np.load(strPth02)
 
 # Subtract visual field projections:
-aryDiff = np.subtract(ary02, ary01)
+aryDiff = np.subtract(ary01, ary02)
 
 plot(aryDiff,
      strTtl,
@@ -65,6 +66,6 @@ plot(aryDiff,
      strPathOut,
      tpleLimX=(varExtXmin, varExtXmax, 3.0),
      tpleLimY=(varExtYmin, varExtYmax, 3.0),
-     varMin=None,
-     varMax=None)
+     varMin=-2.0,
+     varMax=2.0)
 # -----------------------------------------------------------------------------

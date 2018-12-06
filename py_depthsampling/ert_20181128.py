@@ -24,13 +24,11 @@ from py_depthsampling.ert.ert_main_surface import ert_main
 
 # Load data from previously prepared pickle? If 'False', data is loaded from
 # vtk meshes and saved as pickle.
-lgcPic = True
+lgcPic = False
 
 # Meta-condition (within or outside of retinotopic stimulus area):
-lstMtaCn = ['pacman_centre',
-            'pacman_edge',
-            'square_centre',
-            'square_edge',
+lstMtaCn = ['centre',
+            'edge',
             'background']
 
 # Region of interest ('v1' or 'v2'):

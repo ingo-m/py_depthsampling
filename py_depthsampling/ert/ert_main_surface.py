@@ -203,6 +203,7 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, lstHmsph, strRoi,
 
                 # -------------------------------------------------------------
                 # --- Makeshift solution for asymmetrical ROIs ---
+
                 # In the surface experiment, the central ROI needs to be
                 # slightly different for the 'Kanizsa' condition than for the
                 # 'Kanizsa rotated' condition. In the 'Kanizsa' condition, the
@@ -212,6 +213,10 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, lstHmsph, strRoi,
                 # avoids the rotated Kanizsa inducer (which extends further
                 # towards the centre of the field of view, because the 'mouth'
                 # of the inducer is oriented away from the centre).
+
+                # Similarly, in the texture/uniform background control
+                # experiment, the ROI needs to be ajusted according for the
+                # square vs. Pac-Man stimulus.
 
                 # Array for event-related timecourses:
                 aryRoiErt = np.zeros((varNumCon, varNumDpth, varNumVol),
@@ -229,19 +234,47 @@ def ert_main(lstSubId, lstCon, lstConLbl, strMtaCn, lstHmsph, strRoi,
                     # Current condition:
                     strTmpCon = lstCon[idxCon]
 
+                    # ROI for background or square-centre conditions, without
+                    # adjustments. Will be replaced for other condition/ROI
+                    # combinations.
+                    strMtaCnTmp = strMtaCn
+
+                    # *** Main surface experiment ***
                     # If processing the central ROI for the 'Kanizsa rotated'
                     # condition, don't use the square ROI mask, but use the
                     # diamond ROI instead.
-                    lgcTmp = ((strTmpCon == 'kanizsa_rotated')
-                              and (strMtaCn == 'centre'))
-                    if lgcTmp:
+                    lgcTmp01 = ((strTmpCon == 'kanizsa_rotated')
+                                and (strMtaCn == 'centre'))
+
+                    if lgcTmp01:
                         print(('------Using diamond ROI (instead of square '
                                + 'ROI) for Kanizsa rotated condition.'))
                         # Use diamond ROI:
                         strMtaCnTmp = 'diamond'
-                    else:
-                        # Use square ROI:
-                        strMtaCnTmp = strMtaCn
+
+                    # *** Uniform/texture background control experiment ***
+                    # The Pac-Man stimulus and the square stimulus have
+                    # different ROIs.
+
+                    # 'Bright square' stimulus:
+                    elif 'bright_square_' in strTmpCon:
+                        print(('------Using square ROI.'))
+                        if strMtaCn == 'centre':
+                            # Centre ROI:
+                            strMtaCnTmp = 'square_centre'
+                        elif strMtaCn == 'edge':
+                            # Edge ROI:
+                            strMtaCnTmp = 'square_edge'
+
+                    # 'Pac-Man' stimulus:
+                    elif 'pacman_static_' in strTmpCon:
+                        print(('------Using Pac-Man ROI.'))
+                        if strMtaCn == 'centre':
+                            # Centre ROI:
+                            strMtaCnTmp = 'pacman_centre'
+                        elif strMtaCn == 'edge':
+                            # Edge ROI:
+                            strMtaCnTmp = 'pacman_edge'
 
                     # Complete file path of vertex inclusion mask for current
                     # subject:

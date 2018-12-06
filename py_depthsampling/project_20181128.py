@@ -49,8 +49,8 @@ lstRoi = ['v1', 'v2', 'v3']
 strPthPltOt = '/Users/john/Dropbox/Surface_Plots/project/{}_{}_{}'  #noqa
 
 # File type suffix for plot:
-# strFlTp = '.svg'
-strFlTp = '.png'
+strFlTp = '.svg'
+# strFlTp = '.png'
 
 # Figure scaling factor:
 varDpi = 80.0

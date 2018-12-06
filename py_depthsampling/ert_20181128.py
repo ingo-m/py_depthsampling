@@ -100,7 +100,7 @@ lgcLgnd02 = True
 # Output path for plots - prfix (metacondition and ROI left open):
 strPltOtPre = '/Users/john/Dropbox/Surface_Plots/ert/{}_{}_'
 # Output path for plots - suffix:
-strPltOtSuf = '_ert.png'
+strPltOtSuf = '_ert.svg'
 
 # Figure scaling factor:
 varDpi = 100.0

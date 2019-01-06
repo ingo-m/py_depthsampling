@@ -14,6 +14,7 @@ from statsmodels.stats.anova import AnovaRM
 
 # Path of npz files with cortical depth profiles (ROI and condition left open):
 strNpz = '/Users/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/{}_rh_{}_sst.npz'
+# strNpz = '/Users/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/periphery/{}_rh_{}_sst.npz'
 
 # List of ROIs:
 lstRoi = ['v1', 'v2', 'v3']
@@ -22,7 +23,7 @@ lstRoi = ['v1', 'v2', 'v3']
 lstCon = ['Pd', 'Ps', 'Cd']
 
 # Output path for data csv file:
-strCsv = '/Users/john/Desktop/anovarm.csv'
+# strCsv = '/Users/john/Desktop/anovarm.csv'
 
 # -----------------------------------------------------------------------------
 # *** Preparations
@@ -103,11 +104,11 @@ objAnov = AnovaRM(objDf,
 objResult = objAnov.fit()
 
 # Print results:
-objResult.anova_table
-objResult.summary()
+# print(objResult.anova_table)
+print(objResult.summary())
 
 # -----------------------------------------------------------------------------
 # *** Save data to csv
 
-objDf.to_csv(strCsv, sep=';', index=False)
+# objDf.to_csv(strCsv, sep=';', index=False)
 # -----------------------------------------------------------------------------

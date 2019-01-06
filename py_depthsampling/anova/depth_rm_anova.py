@@ -21,6 +21,9 @@ lstRoi = ['v1', 'v2', 'v3']
 # List of conditions:
 lstCon = ['Pd', 'Ps', 'Cd']
 
+# Output path for data csv file:
+strCsv = '/Users/john/Desktop/anovarm.csv'
+
 # -----------------------------------------------------------------------------
 # *** Preparations
 
@@ -71,7 +74,7 @@ for idxRoi in lstRoi:
         # print(strNpz.format(idxRoi, idxCon))
         objNpz01 = np.load(strNpz.format(idxRoi, idxCon))
         ary01 = objNpz01['arySubDpthMns']
-        
+
         for idxSub in range(varNumSub):
             for idxDpth in range(varNumDpth):
 
@@ -102,4 +105,9 @@ objResult = objAnov.fit()
 # Print results:
 objResult.anova_table
 objResult.summary()
+
+# -----------------------------------------------------------------------------
+# *** Save data to csv
+
+objDf.to_csv(strCsv, sep=';', index=False)
 # -----------------------------------------------------------------------------

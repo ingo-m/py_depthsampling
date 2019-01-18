@@ -22,6 +22,7 @@ Function of the depth sampling pipeline.
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import itertools
 import numpy as np
 
 
@@ -41,8 +42,10 @@ def permute_max(aryDpth01, aryDpth02, vecNumInc=None, varNumIt=10000):
         1D array with number of vertices per subject, used for weighted
         averaging across subjects. If `None`, number of vertices is assumed to
         be equal across subjects.
-    varNumIt : int
-        Number of resampling iterations.
+    varNumIt : int or None
+        Number of resampling iterations. Set to `None` in case of small enough
+        sample size for exact test (i.e. all possible resamples), otherwise
+        Monte Carlo resampling is performed.
 
     Returns
     -------
@@ -74,6 +77,7 @@ def permute_max(aryDpth01, aryDpth02, vecNumInc=None, varNumIt=10000):
       distribution of maxima is the null distribution.
     - The empirical maximum of the difference between conditions can be
       compared agains this null distribution.
+
     """
     # -------------------------------------------------------------------------
     # *** Preparations
@@ -104,7 +108,16 @@ def permute_max(aryDpth01, aryDpth02, vecNumInc=None, varNumIt=10000):
     # permuted 'PacMan Static' group. 'One' means that the labels are switched,
     # i.e. the actual 'PacMan Dynamic' value get assignet to the 'PacMan
     # Static' group, and vice versa.
-    aryRnd = np.random.randint(0, high=2, size=(varNumIt, varNumSubs))
+    if not(varNumIt is None):
+        # Monte Carlo resampling:
+        aryRnd = np.random.randint(0, high=2, size=(varNumIt, varNumSubs))
+    else:
+        # In case of tractable number of permutations, create a list of all
+        # possible permutations (Bernoulli sequence).
+        lstBnl = list(itertools.product([0, 1], repeat=varNumSubs))
+        aryRnd = np.array(lstBnl)
+        # Number of resampling cases:
+        varNumIt = len(lstBnl)
 
     # We need two versions of the randomisation array, one for sampling from
     # the first input array (e.g. 'PacMan Dynamic'), and a second version to

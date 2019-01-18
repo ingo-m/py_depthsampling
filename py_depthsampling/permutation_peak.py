@@ -83,8 +83,9 @@ lstDiff = [[(0, 1), (0, 2)],
            [(0, 1), (1, 2)],
            [(0, 2), (1, 2)]]
 
-# Number of resampling iterations:
-varNumIt = 100000
+# Number of resampling iterations (set to `None` in case of small enough sample
+# size for exact test, otherwise Monte Carlo resampling is performed):
+varNumIt = None
 # -----------------------------------------------------------------------------
 
 

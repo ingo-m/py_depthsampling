@@ -43,9 +43,9 @@ Function of the depth sampling pipeline.
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import itertools
 import numpy as np
 from py_depthsampling.main.find_peak import find_peak
-
 
 
 # ----------------------------------------------------------------------------
@@ -65,8 +65,9 @@ if strCrct == 'corrected':
 # Stimulus luminance contrast levels (only needed for visualisation):
 # vecEmpX = np.array([0.025, 0.061, 0.163, 0.72])
 
-# Number of resampling iterations:
-varNumIt = 500000
+# Number of resampling iterations (set to `None` in case of small enough sample
+# size for exact test, otherwise Monte Carlo resampling is performed):
+varNumIt = None
 
 
 # ----------------------------------------------------------------------------
@@ -76,7 +77,8 @@ print('-Peak position permutation test')
 
 print(('--') + strCrct.upper() + ' depth profiles.')
 
-print(('--Resampling iterations: ' + str(varNumIt)))
+if not(varNumIt is None):
+    print(('--Resampling iterations: ' + str(varNumIt)))
 
 # Load depth profiles from npy files:
 aryDpth01 = np.load(objDpth01)
@@ -130,7 +132,16 @@ print('---Create permutation samples')
 # to the permuted 'V1' group and the actual V2 value gets assigned to the
 # permuted 'V2' group. 'One' means that the labels are switched, i.e. the
 # actual V1 label get assignet to the 'V2' group and vice versa.
-aryRnd = np.random.randint(0, high=2, size=(varNumIt, varNumSubs))
+if not(varNumIt is None):
+    # Monte Carlo resampling:
+    aryRnd = np.random.randint(0, high=2, size=(varNumIt, varNumSubs))
+else:
+    # In case of tractable number of permutations, create a list of all
+    # possible permutations (Bernoulli sequence).
+    lstBnl = list(itertools.product([0, 1], repeat=varNumSubs))
+    aryRnd = np.array(lstBnl)
+    # Number of resampling cases:
+    varNumIt = len(lstBnl)
 
 # We need two versions of the randomisation array, one for sampling from the
 # first input array (e.g. V1), and a second version to sample from the second

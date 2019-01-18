@@ -73,8 +73,9 @@ lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
 # Which conditions to compare (list of tuples with condition indices):
 lstDiff = [(0, 1), (0, 2), (1, 2)]
 
-# Number of resampling iterations:
-varNumIt = 1000000
+# Number of resampling iterations (set to `None` in case of small enough sample
+# size for exact test, otherwise Monte Carlo resampling is performed):
+varNumIt = None
 
 # Upper and lower bound of confidence interval of permutation null
 # distribution (for plot):

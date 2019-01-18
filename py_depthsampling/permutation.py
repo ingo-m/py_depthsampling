@@ -3,7 +3,7 @@
 Permutation test for difference between conditions in depth profiles.
 
 Compares cortical depth profiles from two different conditions (e.g. PacMan
-dynamic vs. PacMan statis). Tests whether the difference between the two
+dynamic vs. PacMan static). Tests whether the difference between the two
 conditions is significant *separately at each* cortical depth.
 
 Creates plots of empirical condition differences and permutation null
@@ -51,14 +51,14 @@ lstHmsph = ['rh']
 
 # Path of depth-profile to load (meta-condition, ROI, hemisphere, condition,
 # and deconvolution suffix left open):
-strPthPrf = '/Users/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npz'  #noqa
+strPthPrf = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npz'  #noqa
 
 # Output path & prefix for plots (meta-condition, ROI, hemisphere, condition,
 # and deconvolution suffix left open):
-strPthPltOt = '/Users/john/Dropbox/PacMan_Plots/permutation/{}_{}_{}_{}{}_'  #noqa
+strPthPltOt = '/home/john/PhD/PacMan_Plots/permutation/new/{}_{}_{}_{}{}_'  #noqa
 
 # File type suffix for plot:
-strFlTp = '.svg'
+strFlTp = '.png'
 
 # Label for axes:
 strXlabel = 'Cortical depth level'
@@ -69,12 +69,12 @@ strYlabel = 'fMRI signal change [a.u.]'
 #           'Pd_trn', 'Cd_trn', 'Ps_trn']
 lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
 
-
 # Which conditions to compare (list of tuples with condition indices):
 lstDiff = [(0, 1), (0, 2), (1, 2)]
 
-# Number of resampling iterations:
-varNumIt = 1000000
+# Number of resampling iterations (set to `None` in case of small enough sample
+# size for exact test, otherwise Monte Carlo resampling is performed):
+varNumIt = None
 
 # Upper and lower bound of confidence interval of permutation null
 # distribution (for plot):

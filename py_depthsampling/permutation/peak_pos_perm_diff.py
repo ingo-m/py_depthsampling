@@ -26,7 +26,7 @@ from py_depthsampling.main.find_peak import find_peak
 
 def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000, varThr=0.05):
     """
-    Plot across-subject cortical depth profiles with SEM.
+    Permutation test for condition differences on depth profiles.
 
     Parameters
     ----------

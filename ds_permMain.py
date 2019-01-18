@@ -56,7 +56,7 @@ from ds_crfParBoot02 import crf_par_02
 strSwitch = 'create'
 
 # Corrected or  uncorrected depth profiles?
-strCrct = 'uncorrected'
+strCrct = 'corrected'
 
 # Which CRF to use ('power' for power function or 'hyper' for hyperbolic ratio
 # function).
@@ -84,8 +84,9 @@ vecEmpX = np.array([0.025, 0.061, 0.163, 0.72])
 # fit:
 varNumX = 1000
 
-# Number of resampling iterations:
-varNumIt = 10000
+# Number of resampling iterations (set to `None` in case of small enough sample
+# size for exact test, otherwise Monte Carlo resampling is performed):
+varNumIt = None
 
 # Number of processes to run in parallel:
 varPar = 11

@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License along with
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import itertools
 import numpy as np
 import multiprocessing as mp
 from ds_crfParPerm02 import crf_par_perm_02
@@ -44,8 +45,10 @@ def crf_par_perm_01(aryDpth01, aryDpth02, vecEmpX, strFunc='power',
     strFunc : str
         Which contrast response function to fit. 'power' for power function, or
         'hyper' for hyperbolic ratio function.
-    varNumIt : int
-        Number of bootstrapping iterations (i.e. how many times to sample).
+    varNumIt : int or None
+        Number of resampling iterations. Set to `None` in case of small enough
+        sample size for exact test (i.e. all possible resamples), otherwise
+        Monte Carlo resampling is performed.
     varPar : int
         Number of process to run in parallel.
     varNumX : int
@@ -91,7 +94,16 @@ def crf_par_perm_01(aryDpth01, aryDpth02, vecEmpX, strFunc='power',
     # assigned to the permuted 'V2' group. 'One' means that the labels are
     # switched, i.e. the actual V1 label get assignet to the 'V2' group and
     # vice versa.
-    aryRnd = np.random.randint(0, high=2, size=(varNumIt, varNumSub))
+    if not(varNumIt is None):
+        # Monte Carlo resampling:
+        aryRnd = np.random.randint(0, high=2, size=(varNumIt, varNumSub))
+    else:
+        # In case of tractable number of permutations, create a list of all
+        # possible permutations (Bernoulli sequence).
+        lstBnl = list(itertools.product([0, 1], repeat=varNumSub))
+        aryRnd = np.array(lstBnl)
+        # Number of resampling cases:
+        varNumIt = len(lstBnl)
 
     # ------------------------------------------------------------------------
     # *** Parallelised CRF fitting

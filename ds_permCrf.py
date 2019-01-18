@@ -49,8 +49,10 @@ def perm_hlf_max_peak(objDpth01,
     strFunc : str
         Which contrast response function to fit. 'power' for power function, or
         'hyper' for hyperbolic ratio function.
-    varNumIt : int
-        Number of resampling iterations.
+    varNumIt : int or None
+        Number of resampling iterations. Set to `None` in case of small enough
+        sample size for exact test (i.e. all possible resamples), otherwise
+        Monte Carlo resampling is performed.
     varPar : int
         Number of process to run in parallel.
 
@@ -122,7 +124,6 @@ def perm_hlf_max_peak(objDpth01,
         print(('---Error in bootPlot: input needs to be numpy array or path '
                + 'to numpy array.'))
 
-
     # ------------------------------------------------------------------------
     # *** Parallelised resampling & CRF fitting
 
@@ -137,4 +138,3 @@ def perm_hlf_max_peak(objDpth01,
     # ------------------------------------------------------------------------
     # *** Return
     return aryDpth01, aryDpth02, aryMdlY, aryHlfMax, arySemi, aryRes
-

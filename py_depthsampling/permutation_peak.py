@@ -74,7 +74,7 @@ lstHmsph = ['rh']
 
 # Path of depth-profiles (meta-condition, ROI, hemisphere, condition, and model
 # index left open):
-strPthData = '/Users/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npz'  #noqa
+strPthData = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npz'  #noqa
 
 # Condition levels (used to complete file names):
 lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
@@ -85,8 +85,9 @@ lstDiff = [[(0, 1), (0, 2)],
            [(0, 1), (1, 2)],
            [(0, 2), (1, 2)]]
 
-# Number of resampling iterations:
-varNumIt = 100000
+# Number of resampling iterations (set to `None` in case of small enough sample
+# size for exact test, otherwise Monte Carlo resampling is performed):
+varNumIt = None
 # -----------------------------------------------------------------------------
 
 

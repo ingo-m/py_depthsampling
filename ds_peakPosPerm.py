@@ -159,7 +159,7 @@ aryDpthRnd02 = np.zeros((varNumIt, varNumSubs, varNumCon, varNumDpt))
 
 # Loop through iterations:
 for idxIt in range(0, varNumIt):
-    
+
     # Assign values from original group 1 to permutation group 1:
     aryDpthRnd01[idxIt, aryRnd01[idxIt, :], :, :] = \
         aryDpth01[aryRnd01[idxIt, :], :, :]

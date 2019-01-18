@@ -20,6 +20,7 @@
 import numpy as np  # noqa
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
+from matplotlib.ticker import FormatStrFormatter
 
 
 def plt_dpth_prfl_acr_subs(arySubDpthMns,
@@ -40,6 +41,7 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
                            strErr='conf95',
                            vecX=None,
                            vecWghts=None,
+                           varNumLblY=5,
                            tplPadY=(0.0, 0.0)):
     """
     Calculate & plot across-subjects mean depth profiles.
@@ -102,6 +104,8 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
         non-weighted average is calculate (i.e. the 'normal' average with equal
         weights per subject). NOTE: Weighted error bars are not implemented for
         the option `strErr = prct95`.
+    varNumLblY : int
+        Number of labels on y-axis.
     tplPadY : tuple
         Padding around labelled values on y.
     """
@@ -272,9 +276,13 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
     # Which y values to label with ticks:
     # varAcrSubsYmin = (np.ceil(varAcrSubsYmin * 0.01) / 0.01)
     # varAcrSubsYmax = (np.floor(varAcrSubsYmax * 0.01) / 0.01)
-    vecYlbl = np.linspace(np.ceil(varAcrSubsYmin),
-                          np.floor(varAcrSubsYmax),
-                          num=5,
+    # vecYlbl = np.linspace(np.ceil(varAcrSubsYmin),
+    #                       np.floor(varAcrSubsYmax),
+    #                       num=varNumLblY,
+    #                       endpoint=True)
+    vecYlbl = np.linspace(np.around(varAcrSubsYmin, decimals=2),
+                          np.around(varAcrSubsYmax, decimals=2),
+                          num=varNumLblY,
                           endpoint=True)
 
     # Round:
@@ -282,6 +290,10 @@ def plt_dpth_prfl_acr_subs(arySubDpthMns,
 
     # Set ticks:
     axs01.set_yticks(vecYlbl)
+
+    # Configure number of decimal points for y axis labels (for consistent
+    # size of axes across plots):
+    axs01.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
 
     # Set x & y tick font size:
     axs01.tick_params(labelsize=36,

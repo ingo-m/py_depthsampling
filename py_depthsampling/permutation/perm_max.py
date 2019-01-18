@@ -69,7 +69,7 @@ def permute_max(aryDpth01, aryDpth02, vecNumInc=None, varNumIt=10000):
       assignments) are calculated, separately for each subject. The result is
       one depth profile per subject (with the difference between randomly
       assigned conditions).
-    - The average difference across subejcts is calculated.
+    - The average difference across subjects is calculated.
     - We take the maximum of the difference across cortical depth. The
       distribution of maxima is the null distribution.
     - The empirical maximum of the difference between conditions can be

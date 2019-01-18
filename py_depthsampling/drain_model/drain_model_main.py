@@ -36,7 +36,7 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
                 strFlTp, varDpi, strXlabel, strYlabel, lstCon, lstConLbl,
                 varNumIt, varCnfLw, varCnfUp, varNseRndSd, varNseSys, lstFctr,
                 varAcrSubsYmin01, varAcrSubsYmax01, varAcrSubsYmin02,
-                varAcrSubsYmax02):
+                varAcrSubsYmax02, tplPadY=(0.4, 0.1), varNumLblY=5):
     """Model-based correction of draining effect."""
     # -------------------------------------------------------------------------
     # *** Load depth profile from disk
@@ -62,8 +62,48 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
 
     # Load single-condition arrays from disk:
     for idxCon in range(varNumCon):
-        objNpz = np.load(strPthPrf.format(lstCon[idxCon]))
+
+        # ---------------------------------------------------------------------
+        # --- Makeshift solution for asymmetrical ROIs ---
+        # In the surface experiment, the central ROI needs to be slightly
+        # different for the 'Kanizsa' condition than for the 'Kanizsa rotated'
+        # condition. In the 'Kanizsa' condition, the central ROI is a square
+        # (avoiding the illusory contours). In the 'Kanizsa roated' condition,
+        # the central ROI is a diamond of the size than the square (rotated by
+        # 45 deg). The diamond avoids the rotated Kanizsa inducer (which
+        # extends further towards the centre of the field of view, because the
+        # 'mouth' of the inducer is oriented away from the centre).
+
+        # Current condition:
+        strTmpCon = lstCon[idxCon]
+
+        # If processing the central ROI for the 'Kanizsa rotated' condition,
+        # don't use the square ROI mask, but use the diamond ROI instead.
+        lgcTmp = (('kanizsa_rotated' in strTmpCon)
+                  and ('centre' in strPthPrf))
+
+        if lgcTmp:
+            print(('------Using diamond ROI (instead of square ROI) for '
+                   + 'Kanizsa rotated condition.'))
+
+            # Use depth profiles from diamond ROI:
+            strPthPrfTmp = strPthPrf.replace('centre', 'diamond')
+
+        else:
+            # Use square ROI:
+            strPthPrfTmp = strPthPrf
+
+        # Load depth profiles from disk:
+        objNpz = np.load(strPthPrfTmp.format(strTmpCon))
+
+        # --- End of makeshift solution ---
+        # ---------------------------------------------------------------------
+
+        # objNpz = np.load(strPthPrf.format(lstCon[idxCon]))
+
+        # Get array from npz object:
         aryEmpSnSb[:, idxCon, :] = objNpz['arySubDpthMns']
+
     # Array with number of vertices (for weighted averaging across subjects;
     # since the deconvolution is done separately for each subject, this vector
     # is only loaded to be passed on to the file with the deconvolved depth
@@ -442,7 +482,8 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
                                strErr='sem',
                                vecX=vecPosEmp,
                                vecWghts=vecNumInc,
-                               tplPadY=(0.4, 0.1))
+                               varNumLblY=varNumLblY,
+                               tplPadY=tplPadY)
 
         # Across-subjects mean after deconvolution:
         strTmpTtl = '{} after deconvolution'.format(strRoi.upper())
@@ -463,7 +504,8 @@ def drain_model(varMdl, strRoi, strHmsph, strPthPrf, strPthPrfOt, strPthPltOt,  
                                strErr='sem',
                                vecX=vecIntpEqui,
                                vecWghts=vecNumInc,
-                               tplPadY=(0.4, 0.1))
+                               varNumLblY=varNumLblY,
+                               tplPadY=tplPadY)
 
     elif varMdl == 4:
 

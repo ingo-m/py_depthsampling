@@ -163,7 +163,7 @@ def project(strRoi, strCon, strDpth, strDpthLbl, strPthNpy, varNumSub,
         # of filtered_func_data)."
 
         # Only perform scaling if the data is from an FSL cope file:
-        if 'cope' in strPthData:
+        if (('cope' in strCon) or ('_pe' in strCon)):
             print('--Convert cope to percent signal change.')
 
             # The peak-peak height depends on the predictor (i.e.
@@ -172,6 +172,8 @@ def project(strRoi, strCon, strDpth, strDpthLbl, strPthNpy, varNumSub,
                 varPpheight = 1.268049
             elif 'trn' in strCon:
                 varPpheight = 0.2269044
+            elif 'target' in strCon:
+                varPpheight = 0.2261552
 
             # In order to avoid division by zero, avoid zero-voxels:
             lgcTmp = np.not_equal(vecData, 0.0)
@@ -194,7 +196,7 @@ def project(strRoi, strCon, strDpth, strDpthLbl, strPthNpy, varNumSub,
         print('--Project data into visual space')
 
         # Number of processes to run in parallel:
-        varPar = 11
+        varPar = 4
 
         # Split data into chunks:
         lstData = np.array_split(vecData, varPar)

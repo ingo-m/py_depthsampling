@@ -26,18 +26,10 @@ from py_depthsampling.project.project_main import project
 
 # Load/save existing projection from/to (ROI, condition, depth level label left
 # open):
-strPthNpy = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/project/{}_{}_{}.npy'  #noqa
+strPthNpy = '/Users/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/project/{}_{}_{}_20181128.npy'  #noqa
 
-# List of subject identifiers. In the first pilot session ('20181029'), there
-# was no 'Kanizsa rotated' condition. Thus, we have to skip this session for
-# the respective condition.
-lstSubIds01 = ['20181029',
-               '20181105',
-               '20181107',
-               '20181108']
-lstSubIds02 = ['20181105',
-               '20181107',
-               '20181108']
+# List of subject identifiers.
+lstSubIds = ['20181128']
 
 # Nested list with depth levels to average over. For instance, if `lstDpth =
 # [[0, 1, 2], [3, 4, 5]]`, on a first iteration, the average over the first
@@ -54,7 +46,7 @@ lstDpthLbl = ['allGM']
 lstRoi = ['v1', 'v2', 'v3']
 
 # Output path & prefix for plots (ROI, condition, depth level label left open):
-strPthPltOt = '/home/john/PhD/Surface_Plots/project/{}_{}_{}'  #noqa
+strPthPltOt = '/Users/john/Dropbox/Surface_Plots/project/{}_{}_{}'  #noqa
 
 # File type suffix for plot:
 strFlTp = '.svg'
@@ -64,27 +56,32 @@ strFlTp = '.svg'
 varDpi = 80.0
 
 # Condition levels (used to complete file names):
-lstCon = ['feat_level_2_bright_square_sst_pe',
-          'feat_level_2_bright_square_sst_zstat',
-          'feat_level_2_kanizsa_rotated_sst_pe',
-          'feat_level_2_kanizsa_rotated_sst_zstat',
-          'feat_level_2_kanizsa_sst_pe',
-          'feat_level_2_kanizsa_sst_zstat',
+lstCon = ['feat_level_2_bright_square_txtr_sst_pe',
+          'feat_level_2_bright_square_uni_sst_pe',
+          'feat_level_2_pacman_static_txtr_sst_pe',
+          'feat_level_2_pacman_static_uni_sst_pe',
+          'feat_level_2_target_pe',
           'pRF_results_eccentricity',
           'pRF_results_ovrlp_ctnr_background',
-          'pRF_results_ovrlp_ctnr_centre',
-          'pRF_results_ovrlp_ctnr_edge',
           'pRF_results_ovrlp_ctnr_diamond',
+          'pRF_results_ovrlp_ctnr_pacman_centre',
+          'pRF_results_ovrlp_ctnr_pacman_edge',
+          'pRF_results_ovrlp_ctnr_square_centre',
+          'pRF_results_ovrlp_ctnr_square_edge',
           'pRF_results_ovrlp_ratio_background',
-          'pRF_results_ovrlp_ratio_centre',
-          'pRF_results_ovrlp_ratio_edge',
           'pRF_results_ovrlp_ratio_diamond',
+          'pRF_results_ovrlp_ratio_pacman_centre',
+          'pRF_results_ovrlp_ratio_pacman_edge',
+          'pRF_results_ovrlp_ratio_square_centre',
+          'pRF_results_ovrlp_ratio_square_edge',
           'pRF_results_PE_01',
           'pRF_results_polar_angle',
           'pRF_results_R2',
           'pRF_results_SD',
           'pRF_results_x_pos',
-          'pRF_results_y_pos']
+          'pRF_results_y_pos',
+          'combined_mean',
+          'combined_mean_tSNR']
 
 # Path of vtk mesh with data to project into visual space (e.g. parameter
 # estimates; subject ID, hemisphere, and contion level left open).
@@ -112,7 +109,7 @@ strPthY = '/media/sf_D_DRIVE/MRI_Data_PhD/09_surface/{}/cbs/{}/pRF_results_y_pos
 
 # Path of csv file with ROI definition (subject ID, hemisphere, and ROI left
 # open).
-strCsvRoi = '/home/john/PhD/GitLab/surface/analysis/{}/08_depthsampling/{}/{}.csv'  #noqa
+strCsvRoi = '/Users/john/1_PhD/GitLab/surface/analysis/{}/08_depthsampling/{}/{}.csv'  #noqa
 
 # Number of cortical depths.
 varNumDpth = 11
@@ -156,19 +153,11 @@ for idxDpth in range(len(lstDpth)):  #noqa
     for idxRoi in range(len(lstRoi)):
         for idxCon in range(len(lstCon)):
 
-            # Skip first subject for 'kanizsa_rotated' condition (pilot session
-            # did not include this condition).
-            if (('kanizsa_rotated' in lstCon[idxCon])
-                    or ('diamond' in lstCon[idxCon])):
-                lstSubIds = lstSubIds02
-            else:
-                lstSubIds = lstSubIds01
-
             # Adjust colour bar:
             if '_pe' in lstCon[idxCon]:
                 # Fixed colour bar for GLM parameter estimates:
-                varMin = -4.0
-                varMax = 4.0
+                varMin = -3.0
+                varMax = 3.0
             else:
                 # Adjust colour bars based on data range:
                 varMin = None

@@ -25,6 +25,7 @@ lstCon = ['Pd', 'Ps', 'Cd']
 # Output path for data csv file:
 strCsv = '/home/john/Desktop/anovarm.csv'
 
+
 # -----------------------------------------------------------------------------
 # *** Preparations
 
@@ -110,5 +111,9 @@ print(objResult.summary())
 # -----------------------------------------------------------------------------
 # *** Save data to csv
 
+<<<<<<< HEAD
 objDf.to_csv(strCsv, sep=';', index=False)
+=======
+# objDf.to_csv(strCsv, sep=';', index=False)
+>>>>>>> surface
 # -----------------------------------------------------------------------------

@@ -150,11 +150,25 @@ def ert_get_sub_data(strSubId,
           + str(np.sum(vecInc)))
     print('------------Based on vtk mask: ' + strVtkMsk)
 
-    # Apply selection to timecourses:
-    aryErt = aryErt[:, :, :, vecInc]
+    # Are there any vertices in the mask?
+    if np.greater(np.sum(vecInc), 0):
 
-    # Get number of vertices (for weighted across-subjects averaging):
-    varNumVrtc = aryErt.shape[3]
+        # Apply selection to timecourses:
+        aryErt = aryErt[:, :, :, vecInc]
+
+        # Get number of vertices (for weighted across-subjects averaging):
+        varNumVrtc = aryErt.shape[3]
+
+    else:
+
+        print('------------Empty mask - will create dummy array.')
+
+        # If no vertices are included in the mask (for current subject), create
+        # dummy array (so that weighted across-subjects averaging will work).
+        aryErt = np.zeros((varNumCon, varNumDpth, varNumVol, 1),
+                          dtype=np.float16)
+
+        varNumVrtc = 0
 
     # Average across vertices:
     aryErt = np.mean(aryErt, axis=3)

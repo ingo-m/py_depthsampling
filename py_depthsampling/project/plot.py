@@ -58,7 +58,7 @@ def plot(aryVslSpc, strTtl, strXlabel, strYlabel, strPathOut, tpleLimX=None,
         varMin = np.multiply(-1.0, np.absolute(varMax))
 
     # Create main figure:
-    fig01 = plt.figure(figsize=(4.0, 3.0),
+    fig01 = plt.figure(figsize=(6.5, 3.0),
                        dpi=200.0,
                        facecolor=([1.0, 1.0, 1.0]),
                        edgecolor=([1.0, 1.0, 1.0]))
@@ -139,18 +139,22 @@ def plot(aryVslSpc, strTtl, strXlabel, strYlabel, strPathOut, tpleLimX=None,
 
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+    # Array needs to be transposed for image coordinate conventions.
+    aryVslSpc = aryVslSpc.T
+
     # Create plot:
-    pltTmpCorr = plt.imshow(aryVslSpc.T,
+    pltTmpCorr = plt.imshow(aryVslSpc,
                             interpolation='none',  # 'bicubic',
                             origin='lower',
                             norm=objClrNorm,
-                            cmap=objCustClrMp)
+                            cmap=objCustClrMp,
+                            aspect='equal')
 
     if not (tpleLimX is None):
 
         # Position of x labels:
         vecPosLblX = np.linspace(0.0,
-                                 (aryVslSpc.shape[0] - 1),
+                                 (aryVslSpc.shape[1] - 1),
                                  num=int(tpleLimX[2]),
                                  endpoint=True)
         vecPosLblX = np.around(vecPosLblX, decimals=2)

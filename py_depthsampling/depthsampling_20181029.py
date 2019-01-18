@@ -43,33 +43,36 @@ from py_depthsampling.main.main import ds_main
 # *** Define parameters
 
 # Meta-condition (within or outside of retinotopic stimulus area):
-lstMetaCon = ['periphery']
+lstMetaCon = ['centre', 'edge', 'diamond', 'background']
 
 # Region of interest ('v1' or 'v2'):
 lstRoi = ['v1', 'v2', 'v3']
 
 # Hemispheres ('lh' or 'rh'):
-lstHmsph = ['rh'] #, 'lh']
+lstHmsph = ['rh', 'lh']
 
 # List of subject identifiers:
-lstSubIds = ['20171023',  # '20171109',
-             '20171204_01',
-             '20171204_02',
-             '20171211',
-             '20171213',
-             '20180111',
-             '20180118']
+lstSubIds = ['20181029']
 
 # Condition levels (used to complete file names) - nested list:
-lstNstCon = [['SD']]
+lstNstCon = [['bright_square_sst_pe',
+              'kanizsa_sst_pe']]
+#             ['bright_square_sst_zstat',
+#              'kanizsa_rotated_sst_zstat',
+#              'kanizsa_sst_zstat'],
+#             ['bright_square_trn_pe',
+#              'kanizsa_rotated_trn_pe',
+#              'kanizsa_trn_pe'],
+#             ['bright_square_trn_zstat',
+#              'kanizsa_rotated_trn_zstat',
+#              'kanizsa_trn_zstat']]
 
 # Condition labels:
 lstNstConLbl = lstNstCon
 
 # Base path of vtk files with depth-sampled data, e.g. parameter estimates
 # (with subject ID, hemisphere, and stimulus level left open):
-# strVtkDpth01 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/feat_level_2_{}_zstat.vtk'  #noqa
-strVtkDpth01 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_{}.vtk'  #noqa
+strVtkDpth01 = '/media/sf_D_DRIVE/MRI_Data_PhD/09_surface/{}/cbs/{}/feat_level_2_{}.vtk'  #noqa
 
 # (1)
 # Restrict vertex selection to region of interest (ROI)?
@@ -81,7 +84,7 @@ lgcSlct01 = True
 # by the funtion `py_depthsampling.misc.fix_roi_csv.fix_roi_csv` in order to
 # ensure that the indices of the ROI definition and the vtk meshes are
 # congruent.
-strCsvRoi = '/home/john/PhD/GitLab/PacMan/analysis/{}/08_depthsampling/{}/{}_mod.csv'  #noqa
+strCsvRoi = '/home/john/PhD/GitLab/surface/analysis/{}/08_depthsampling/{}/{}.csv'  #noqa
 # Number of header lines in ROI CSV file:
 varNumHdrRoi = 1
 
@@ -92,7 +95,7 @@ lgcSlct02 = True
 # Path of vtk files with for vertex selection criterion. This vtk file is
 # supposed to contain one set of data values for each depth level. (With
 # subject ID and hemisphere left open.)
-strVtkSlct02 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_R2.vtk'  #noqa
+strVtkSlct02 = '/media/sf_D_DRIVE/MRI_Data_PhD/09_surface/{}/cbs/{}/pRF_results_R2.vtk'  #noqa
 # Threshold for vertex selection:
 varThrSlct02 = 0.15
 
@@ -103,7 +106,7 @@ lgcSlct03 = True
 # Path of vtk files with for vertex selection criterion. This vtk file is
 # supposed to contain one set of data values for each depth level. (With
 # subject ID and hemisphere left open.)
-strVtkSlct03 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/combined_mean.vtk'  #noqa
+strVtkSlct03 = '/media/sf_D_DRIVE/MRI_Data_PhD/09_surface/{}/cbs/{}/combined_mean.vtk'  #noqa
 # Threshold for vertex selection:
 varThrSlct03 = 7000.0
 
@@ -113,11 +116,11 @@ varThrSlct03 = 7000.0
 lgcSlct04 = True
 # Path of vtk files with for vertex selection criterion. This vtk file is
 # supposed to contain one set of data values for each depth level. (With
-# subject ID and hemisphere left open.)
-strVtkSlct04 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_eccentricity.vtk'  #noqa
+# subject ID, hemisphere, and meta-condition left open.)
+strVtkSlct04 = '/media/sf_D_DRIVE/MRI_Data_PhD/09_surface/{}/cbs/{}/pRF_results_ovrlp_ctnr_{}.vtk'  #noqa
 # Threshold for vertex selection - list of tuples (interval per meta-condition,
 # e.g. within & outside stimulus area):
-lstThrSlct04 = [(3.5, 4.0)]
+lstThrSlct04 = [(0.5, 1000.0), (0.5, 1000.0), (0.5, 1000.0), (0.5, 1000.0)]
 
 # Number of cortical depths:
 varNumDpth = 11
@@ -132,14 +135,13 @@ varNumLne = 2
 # Label for axes:
 strXlabel = 'Cortical depth level'
 # strYlabel = 'z-value'
-strYlabel = 'SD [deg]'
+strYlabel = 'Signal change [%]'
 
 # Output path for plots - prefix:
-# strPltOtPre = '/home/john/Dropbox/PacMan_Plots/z/{}/plots_{}/'
-strPltOtPre = '/home/john/Dropbox/PacMan_Plots/SD/SD_{}_{}_'
+strPltOtPre = '/home/john/PhD/Surface_Plots/pe/{}_{}_'
 
 # Output path for plots - suffix:
-strPltOtSuf = '_{}_{}_{}.png'
+strPltOtSuf = '_{}{}_{}_20181029.png'
 
 # Figure scaling factor:
 varDpi = 100.0
@@ -155,8 +157,7 @@ varNormIdx = 0
 lgcNormDiv = False
 
 # Output path for depth samling results (within subject means):
-# strDpthMeans = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}_zstat.npz'  #noqa
-strDpthMeans = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}.npz'  #noqa
+strDpthMeans = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/{}_{}_20181029.npz'  #noqa
 
 # Maximum number of processes to run in parallel: *** NOT IMPLEMENTED
 # varPar = 10
@@ -169,70 +170,50 @@ strDpthMeans = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}
 # Loop through ROIs, hemispheres, and conditions to create plots:
 for idxMtaCn in range(len(lstMetaCon)):  #noqa
     for idxRoi in range(len(lstRoi)):
-        for idxHmsph in range(len(lstHmsph)):
-            for idxCon in range(len(lstNstCon)):
+        for idxCon in range(len(lstNstCon)):
 
-                # Limits of axes need to be adjusted based on ROI, condition,
-                # hemisphere.
+            # Limits of axes need to be adjusted based on ROI, condition,
+            # hemisphere.
 
-                # Limits of y-axis for SINGLE SUBJECT PLOTS (list of tuples,
-                # [(Ymin, Ymax)]):
+            # Limits of y-axis for SINGLE SUBJECT PLOTS (list of tuples,
+            # [(Ymin, Ymax)]):
+            lstLimY = [(-2.0, 2.0)] * len(lstSubIds)
+            lstLimY = [(-2.0, 2.0)] * len(lstSubIds)
 
-                if idxRoi == 0:  # v1
-                    if (idxCon == 0) or (idxCon == 4):  # Simple contrasts
-                        lstLimY = [(-4.0, 2.0)] * len(lstSubIds)
-                    else:  # Differential contrasts
-                        lstLimY = [(-1.0, 1.0)] * len(lstSubIds)
+            # Adjust layout:
+            if 'background' in lstMetaCon[idxMtaCn]:
+                varAcrSubsYmin = -2.0
+                varAcrSubsYmax = 0.0
+                varNumLblY = 3
+                tplPadY = (0.5, 0.5)
 
-                elif (idxRoi == 1) or (idxRoi == 2):  # v2 & v3
-                    if (idxCon == 0) or (idxCon == 4):  # Simple contrasts
-                        lstLimY = [(-4.0, 2.0)] * len(lstSubIds)
-                    else:  # Differential contrasts
-                        lstLimY = [(-1.0, 1.0)] * len(lstSubIds)
+            if 'centre' in lstMetaCon[idxMtaCn]:
+                varAcrSubsYmin = -1.0
+                varAcrSubsYmax = 1.0
+                varNumLblY = 3
+                tplPadY = (0.0, 0.0)
 
-                # Limits of y-axis for ACROSS SUBJECT PLOTS:
+            if 'edge' in lstMetaCon[idxMtaCn]:
+                varAcrSubsYmin = 0.0
+                varAcrSubsYmax = 5.0
+                varNumLblY = 5
+                tplPadY = (0.0, 0.0)
 
-                # Stimulus:
-                if lstMetaCon[idxMtaCn] == 'stimulus':
+            # Title for mean plot:
+            strTitle = lstRoi[idxRoi].upper()
 
-                    if (idxCon == 0) or (idxCon == 4):  # Simple contrasts
-                        # Limits of y-axis for across subject plot:
-                        varAcrSubsYmin = -5.0
-                        varAcrSubsYmax = 1.0
-                    else:  # Differential contrasts
-                        # Limits of y-axis for across subject plot:
-                        varAcrSubsYmin = -1.0
-                        varAcrSubsYmax = 1.0
-
-                # Periphery:
-                if lstMetaCon[idxMtaCn] == 'periphery':
-
-                    if (idxCon == 0) or (idxCon == 4):  # Simple contrasts
-                        # Limits of y-axis for across subject plot:
-                        varAcrSubsYmin = 0.0
-                        varAcrSubsYmax = 2.0
-                    else:  # Differential contrasts
-                        # Limits of y-axis for across subject plot:
-                        varAcrSubsYmin = -1.0
-                        varAcrSubsYmax = 1.0
-
-                # Title for mean plot:
-                strTitle = lstRoi[idxRoi].upper()
-
-                # Call main function:
-                ds_main(lstRoi[idxRoi], lstHmsph[idxHmsph], lstSubIds,
-                        lstNstCon[idxCon], lstNstConLbl[idxCon], strVtkDpth01,
-                        lgcSlct01, strCsvRoi, varNumHdrRoi, lgcSlct02,
-                        strVtkSlct02, varThrSlct02, lgcSlct03, strVtkSlct03,
-                        varThrSlct03, lgcSlct04, strVtkSlct04,
-                        lstThrSlct04[idxMtaCn], varNumDpth, strPrcdData,
-                        varNumLne, strTitle, lstLimY, varAcrSubsYmin,
-                        varAcrSubsYmax, strXlabel, strYlabel,
-                        strPltOtPre.format(lstMetaCon[idxMtaCn],
-                        lstRoi[idxRoi]), strPltOtSuf.format(
-                        lstHmsph[idxHmsph], lstRoi[idxRoi],
-                        lstNstCon[idxCon][0]), varDpi, varNormIdx, lgcNormDiv,
-                        strDpthMeans.format(lstMetaCon[idxMtaCn],
-                        lstRoi[idxRoi], lstHmsph[idxHmsph], '{}'),
-                        strMetaCon=lstMetaCon[idxMtaCn])
+            # Call main function:
+            ds_main(lstRoi[idxRoi], lstHmsph, lstSubIds, lstNstCon[idxCon],
+                    lstNstConLbl[idxCon], strVtkDpth01, lgcSlct01, strCsvRoi,
+                    varNumHdrRoi, lgcSlct02, strVtkSlct02, varThrSlct02,
+                    lgcSlct03, strVtkSlct03, varThrSlct03, lgcSlct04,
+                    strVtkSlct04, lstThrSlct04[idxMtaCn], varNumDpth,
+                    strPrcdData, varNumLne, strTitle, lstLimY, varAcrSubsYmin,
+                    varAcrSubsYmax, strXlabel, strYlabel,
+                    strPltOtPre.format(lstMetaCon[idxMtaCn], lstRoi[idxRoi]),
+                    strPltOtSuf.format('{}', lstRoi[idxRoi],
+                    lstNstCon[idxCon][0]), varDpi, varNormIdx, lgcNormDiv,
+                    strDpthMeans.format(lstMetaCon[idxMtaCn], lstRoi[idxRoi],
+                    '{}'), strMetaCon=lstMetaCon[idxMtaCn],
+                    varNumLblY=varNumLblY)
 # *****************************************************************************

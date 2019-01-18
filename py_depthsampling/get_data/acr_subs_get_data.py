@@ -161,8 +161,9 @@ def acr_subs_get_data(idxPrc,              # Process ID  #noqa
     # is obtained from `design.mat`.
 
     # Only perform scaling if the data is from an FSL cope file:
-    if 'cope' in lstVtkDpth01[0]:
-        print('---------Convert cope to percent signal change.')
+    if (('cope' in lstVtkDpth01[0]) or ('_pe' in lstVtkDpth01[0])):
+        if idxPrc == 0:
+            print('---------Convert cope to percent signal change.')
 
         # The peak-peak height depends on the predictor (i.e. condition).
         if 'sst' in lstVtkDpth01[0]:
@@ -170,8 +171,10 @@ def acr_subs_get_data(idxPrc,              # Process ID  #noqa
         elif 'trn' in lstVtkDpth01[0]:
             varPpheight = 0.2269044
         else:
-            print(('------------WARNING: Cannot determine condition from file '
-                   + 'name, peak-peak height of the regressor ist set to 1.'))
+            if idxPrc == 0:
+                print(('------------WARNING: Cannot determine condition from '
+                       + 'file name, peak-peak height of the regressor is set '
+                       + 'to 1.'))
             varPpheight = 1.0
 
         # Loop through input data files:
@@ -252,12 +255,22 @@ def acr_subs_get_data(idxPrc,              # Process ID  #noqa
         # Loop through depth levels:
         for idxDpth in range(0, varNumDpth):
 
-            # Retrieve all vertex data for current input file & current depth
-            # level:
-            aryTmp = lstDpthData01[idxIn][:, idxDpth]
+            # Avoid warning in case of empty array (i.e. no vertices included
+            # in ROI for current ROI/subject/hemisphere):
+            if np.greater(np.sum(vecInc), 0):
 
-            # Calculate mean over vertices:
-            varTmp = np.mean(aryTmp)
+                # Retrieve all vertex data for current input file & current
+                # depth level:
+                aryTmp = lstDpthData01[idxIn][:, idxDpth]
+
+                # Calculate mean over vertices:
+                varTmp = np.mean(aryTmp)
+
+            else:
+
+                # No vertices in ROI:
+                varTmp = 0.0
+
             # Place mean in array:
             aryDpthMean[idxIn, idxDpth] = varTmp
 

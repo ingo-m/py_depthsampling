@@ -24,7 +24,7 @@ from py_depthsampling.ert.ert_main_surface import ert_main
 
 # Load data from previously prepared pickle? If 'False', data is loaded from
 # vtk meshes and saved as pickle.
-lgcPic = True
+lgcPic = False
 
 # Meta-condition (within or outside of retinotopic stimulus area):
 lstMtaCn = ['centre', 'edge', 'background']
@@ -36,20 +36,17 @@ lstRoi = ['v1', 'v2', 'v3']
 lstHmsph = ['lh', 'rh']
 
 # List of subject identifiers:
-lstSubIds = ['20181029',
-             '20181105',
-             '20181107',
-             '20181108']
+lstSubIds = ['20181029']
 
 # Name of pickle file from which to load time course data or save time course
 # data to (metacondition and ROI left open):
-strPthPic = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/era_{}.pickle'  #noqa
+strPthPic = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/era_{}_20181029.pickle'  #noqa
 
 # Condition levels (used to complete file names):
-lstCon = ['bright_square', 'kanizsa', 'kanizsa_rotated']
+lstCon = ['bright_square', 'kanizsa']
 
 # Condition labels (for plot legend):
-lstConLbl = ['Bright square', 'Kanizsa', 'Kanizsa rotated']
+lstConLbl = ['Bright square', 'Kanizsa']
 
 # Base name of vertex inclusion masks (subject ID, hemisphere, subject ID,
 # ROI, and metacondition left open):
@@ -86,7 +83,7 @@ varStimStrt = 5
 # which stimulus was on - for the plot):
 varStimEnd = 11
 # Volume TR (in seconds, for the plot):
-varTr = 2.079
+varTr = 1.947
 
 # Plot legend - single subject plots:
 lgcLgnd01 = True
@@ -94,9 +91,9 @@ lgcLgnd01 = True
 lgcLgnd02 = True
 
 # Output path for plots - prfix (metacondition and ROI left open):
-strPltOtPre = '/home/john/PhD/Surface_Plots/era/{}_{}_'
+strPltOtPre = '/home/john/PhD/Surface_Plots/era/{}_{}_20181029_'
 # Output path for plots - suffix:
-strPltOtSuf = '_ert.svg'
+strPltOtSuf = '_ert_20181029.png'
 
 # Figure scaling factor:
 varDpi = 100.0
@@ -111,30 +108,24 @@ for idxMtaCn in range(len(lstMtaCn)):
 
     if lstMtaCn[idxMtaCn] == 'centre':
         # Limits of y-axis:
-        varAcrSubsYmin = -0.005
-        varAcrSubsYmax = 0.005
+        varAcrSubsYmin = -0.01
+        varAcrSubsYmax = 0.02
         # Number of labels on y-axis:
-        varYnum = 3
-        # Padding around labelled values on y:
-        tplPadY = (0.003, 0.004)
+        varYnum = 4
+
+    if lstMtaCn[idxMtaCn] == 'edge':
+        # Limits of y-axis:
+        varAcrSubsYmin = -0.01
+        varAcrSubsYmax = 0.03
+        # Number of labels on y-axis:
+        varYnum = 5
 
     if lstMtaCn[idxMtaCn] == 'background':
         # Limits of y-axis:
         varAcrSubsYmin = -0.01
-        varAcrSubsYmax = 0.01
-        # Number of labels on y-axis:
-        varYnum = 3
-        # Padding around labelled values on y:
-        tplPadY = (0.005, 0.005)
-
-    if lstMtaCn[idxMtaCn] == 'edge':
-        # Limits of y-axis:
-        varAcrSubsYmin = -0.0
-        varAcrSubsYmax = 0.03
+        varAcrSubsYmax = 0.02
         # Number of labels on y-axis:
         varYnum = 4
-        # Padding around labelled values on y:
-        tplPadY = (0.006, 0.006)
 
     for idxRoi in range(len(lstRoi)):
 
@@ -144,6 +135,6 @@ for idxMtaCn in range(len(lstMtaCn)):
                      varNumDpth, varNumVol, varStimStrt, varStimEnd, strPthPic,
                      lgcPic, strPltOtPre, strPltOtSuf,
                      varAcrSubsYmin=varAcrSubsYmin,
-                     varAcrSubsYmax=varAcrSubsYmax, tplPadY=tplPadY,
-                     varYnum=varYnum, strXlabel=strXlabel, strYlabel=strYlabel)
+                     varAcrSubsYmax=varAcrSubsYmax, varYnum=varYnum,
+                     strXlabel=strXlabel, strYlabel=strYlabel)
 # *****************************************************************************

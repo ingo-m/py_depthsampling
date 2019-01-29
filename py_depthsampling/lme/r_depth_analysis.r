@@ -6,21 +6,6 @@ objDf <- read.csv(file='/home/john/PhD/GitLab/py_depthsampling/py_depthsampling/
 
 head(objDf)
 
-# lme(PSC~ROI+Condition+Depth, objDf, random=~Depth|Subject)
-
-# objLme = lme(PSC ~ ROI + Condition + Depth,
-#              objDf,
-#              random=(~1|Subject),
-#              method='ML',
-#              correlation=corCAR1(form=(~1|Depth)))
-
-# Linear mixed-effects model:
-mdl_lme = lme(PSC ~ ROI * Condition * Depth,
-              objDf,
-              random=(~1|Subject),
-              correlation=corCAR1(form=(~1|Subject/Depth)),
-              method='ML')
-
 # # Linear model using generalised least squares:
 # mdl_gls = gls(PSC ~ ROI * Condition * Depth * Subject,
 #               objDf,
@@ -31,6 +16,7 @@ mdl_lme = lme(PSC ~ ROI * Condition * Depth,
 # 
 # nlme:::summary.gls(mdl_gls)$tTable
 
+# Null model:
 mdlNull = lme(PSC ~ ROI + Condition + Depth +
               ROI:Condition +
               ROI:Depth +
@@ -40,16 +26,18 @@ mdlNull = lme(PSC ~ ROI + Condition + Depth +
               correlation=corCAR1(form=(~1|Subject/Depth)),
               method='ML')
 
+# Full model:
 mdlFull = lme(PSC ~ ROI + Condition + Depth +
               ROI:Condition +
               ROI:Depth +
               Condition:Depth +
-              Condition:Depth:ROI,
+              Condition:Depth:ROI,  # Effect of interest
               objDf,
               random=(~1|Subject),
               correlation=corCAR1(form=(~1|Subject/Depth)),
               method='ML')
 
+# Model comparison:
 anova(mdlNull, mdlFull)
 
 #library(ggplot2)

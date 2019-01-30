@@ -251,7 +251,8 @@ def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000, varThr=0.05):
     vecPermPeaksB, vecLgcB = find_peak(aryDpthRndB, varThr=varThr)
 
     # Ratio of iterations with peak:
-    varRatioPeak = (np.sum(vecLgcA) + np.sum(vecLgcB)) / (2.0 * varNumIt)
+    varRatioPeak = (float(np.sum(vecLgcA) + np.sum(vecLgcB))
+                    / float(2.0 * varNumIt))
     print(('------Percentage of permutation samples with peak: '
           + str(np.around(varRatioPeak, decimals=3))))
 

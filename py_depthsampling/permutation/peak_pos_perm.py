@@ -96,7 +96,8 @@ elif '.npz' in objDpth01:
 
     # Array with number of vertices (for weighted averaging across subjects),
     # shape: vecNumInc[subjects].
-    vecNumInc = objNpz01['vecNumInc']
+    vecNumIncRoi01 = objNpz01['vecNumInc']
+    vecNumIncRoi02 = objNpz02['vecNumInc']
 
     # Number of subject:
     varNumSubs = aryDpth01.shape[0]
@@ -129,8 +130,8 @@ if '.npy' in objDpth01:
 elif '.npz' in objDpth01:
 
     # Weighted mean across subjects:
-    aryDpthMne01 = np.average(aryDpth01, axis=0, weights=vecNumInc)
-    aryDpthMne02 = np.average(aryDpth02, axis=0, weights=vecNumInc)
+    aryDpthMne01 = np.average(aryDpth01, axis=0, weights=vecNumIncRoi01)
+    aryDpthMne02 = np.average(aryDpth02, axis=0, weights=vecNumIncRoi02)
 
 # Peak positions in empirical depth profiles:
 vecEmpPeaks01 = find_peak(aryDpthMne01, lgcStat=False)
@@ -179,9 +180,13 @@ aryRnd01 = np.equal(aryRnd, 1)
 aryRnd02 = np.equal(aryRnd, 0)
 del(aryRnd)
 
-# Arrays with permuted depth profiles for the two randomised groups:
+# Arrays for permuted depth profiles for the two randomised groups:
 aryDpthRnd01 = np.zeros((varNumIt, varNumSubs, varNumCon, varNumDpt))
 aryDpthRnd02 = np.zeros((varNumIt, varNumSubs, varNumCon, varNumDpt))
+
+# Arrays for number of vertices for randomised groups:
+aryNumIncRnd01 = np.zeros((varNumIt, varNumSubs, varNumCon, varNumDpt))
+aryNumIncRnd02 = np.zeros((varNumIt, varNumSubs, varNumCon, varNumDpt))
 
 # Loop through iterations:
 for idxIt in range(0, varNumIt):
@@ -202,9 +207,35 @@ for idxIt in range(0, varNumIt):
     aryDpthRnd02[idxIt, aryRnd01[idxIt, :], :, :] = \
         aryDpth02[aryRnd01[idxIt, :], :, :]
 
-# Take mean across subjects in permutation samples:
-aryDpthRnd01 = np.mean(aryDpthRnd01, axis=1)
-aryDpthRnd02 = np.mean(aryDpthRnd02, axis=1)
+    if '.npz' in objDpth01:
+
+        # Number of vertices from original group 1 to permutation group 1:
+        aryNumIncRnd01[idxIt, aryRnd01[idxIt, :], :, :] = \
+            vecNumIncRoi01[aryRnd01[idxIt, :], None, None]
+
+        # Number of vertices from original group 2 to permutation group 1:
+        aryNumIncRnd01[idxIt, aryRnd02[idxIt, :], :, :] = \
+            vecNumIncRoi02[aryRnd02[idxIt, :], None, None]
+
+        # Number of vertices from original group 1 to permutation group 2:
+        aryNumIncRnd02[idxIt, aryRnd02[idxIt, :], :, :] = \
+            vecNumIncRoi01[aryRnd02[idxIt, :], None, None]
+
+        # Number of vertices from original group 2 to permutation group 2:
+        aryNumIncRnd02[idxIt, aryRnd01[idxIt, :], :, :] = \
+            vecNumIncRoi02[aryRnd01[idxIt, :], None, None]
+
+if '.npy' in objDpth01:
+
+    # Take mean across subjects in permutation samples:
+    aryDpthRnd01 = np.mean(aryDpthRnd01, axis=1)
+    aryDpthRnd02 = np.mean(aryDpthRnd02, axis=1)
+
+elif '.npz' in objDpth01:
+
+    # Weighted mean across subjects:
+    aryDpthRnd01 = np.average(aryDpthRnd01, axis=1, weights=vecNumIncRoi01)
+    aryDpthRnd02 = np.average(aryDpthRnd02, axis=1, weights=vecNumIncRoi02)
 
 
 # ----------------------------------------------------------------------------

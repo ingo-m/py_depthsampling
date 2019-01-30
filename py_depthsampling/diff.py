@@ -46,18 +46,18 @@ lstHmsph = ['rh']
 
 # Path of corrected depth-profiles (meta-condition, ROI, hemisphere,
 # condition, and model index left open):
-strPthData = '/Users/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npz'  #noqa
+strPthData = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npz'  #noqa
 
 # Output path & prefix for plots (meta-condition, ROI, hemisphere, and
 # model index left open):
-strPthPltOt = '/Users/john/Dropbox/PacMan_Plots/diff/{}_{}_{}{}_SEM'  #noqa
+strPthPltOt = '/home/john/PhD/PacMan_Plots/diff/{}_{}_{}{}_SEM'  #noqa
 
 # Output path for single subject plot, (ROI, metacondition, hemisphere, drain
 # model, and condition left open):
 # strPthPtlSnglOt = '/Users/john/Dropbox/PacMan_Plots/diff_sngle/{}_{}_{}{}_{}'
 
 # File type suffix for plot:
-strFlTp = '.svg'
+strFlTp = '.png'
 
 # Figure scaling factor:
 varDpi = 100.0
@@ -122,6 +122,7 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                          varYmax=varYmax,
                          tplPadY=tplPadY,
                          varNumLblY=varNumLblY,
+                         varDpi=varDpi,
                          strXlabel=strXlabel,
                          strYlabel=strYlabel,
                          lgcLgnd=True,

@@ -9,8 +9,9 @@ specifically, the equality of distributions of the peak positions is tested
 the shape of the distribution).
 
 Because ROI/condition labels are permuted within subjects, single subject depth
-profiles need to be provided (i.e. the input depth profiles have three
-dimensions, corresponding to subjects, conditions, depth levels).
+profiles need to be provided. The input can be npy files with three dimensions
+(corresponding to subjects, conditions, depth levels), or npz files witth two
+dimensions (subject and depth levels).
 
 The procedure is as follow:
 - Condition labels are permuted within subjects for each permutation data set
@@ -51,16 +52,9 @@ from py_depthsampling.main.find_peak import find_peak
 # ----------------------------------------------------------------------------
 # *** Define parameters
 
-# Corrected or  uncorrected depth profiles?
-strCrct = 'corrected'
-
 # Path of depth-profiles:
-if strCrct == 'uncorrected':
-    objDpth01 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy'  #noqa
-    objDpth02 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2.npy'  #noqa
-if strCrct == 'corrected':
-    objDpth01 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected_model_1.npy'  #noqa
-    objDpth02 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2_corrected_model_1.npy'  #noqa
+objDpth01 = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/periphery/v1_rh_Pd_min_Cd_Ps_sst.npz'  #noqa
+objDpth02 = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/periphery/v2_rh_Pd_min_Cd_Ps_sst.npz'  #noqa
 
 # Stimulus luminance contrast levels (only needed for visualisation):
 # vecEmpX = np.array([0.025, 0.061, 0.163, 0.72])
@@ -69,29 +63,53 @@ if strCrct == 'corrected':
 # size for exact test, otherwise Monte Carlo resampling is performed):
 varNumIt = None
 
-
 # ----------------------------------------------------------------------------
 # *** Load depth profiles
 
 print('-Peak position permutation test')
 
-print(('--') + strCrct.upper() + ' depth profiles.')
-
 if not(varNumIt is None):
     print(('--Resampling iterations: ' + str(varNumIt)))
 
-# Load depth profiles from npy files:
-aryDpth01 = np.load(objDpth01)
-aryDpth02 = np.load(objDpth02)
+if '.npy' in objDpth01:
 
-# Number of subject:
-varNumSubs = aryDpth01.shape[0]
+    # Load multi-condition depth profiles from npy files:
+    aryDpth01 = np.load(objDpth01)
+    aryDpth02 = np.load(objDpth02)
 
-# Number of conditions:
-varNumCon = aryDpth01.shape[1]
+    # Number of subject:
+    varNumSubs = aryDpth01.shape[0]
 
-# Number of depth levels:
-varNumDpt = aryDpth01.shape[2]
+    # Number of conditions:
+    varNumCon = aryDpth01.shape[1]
+
+    # Number of depth levels:
+    varNumDpt = aryDpth01.shape[2]
+
+elif '.npz' in objDpth01:
+
+    # Load single-condition depth profiles from npz files:
+    objNpz01 = np.load(objDpth01)
+    aryDpth01 = objNpz01['arySubDpthMns']
+    objNpz02 = np.load(objDpth02)
+    aryDpth02 = objNpz02['arySubDpthMns']
+
+    # Array with number of vertices (for weighted averaging across subjects),
+    # shape: vecNumInc[subjects].
+    vecNumInc = objNpz01['vecNumInc']
+
+    # Number of subject:
+    varNumSubs = aryDpth01.shape[0]
+
+    # Number of conditions:
+    varNumCon = 1
+
+    # Number of depth levels:
+    varNumDpt = aryDpth01.shape[1]
+
+    # Reshape (dummy condition dimension):
+    aryDpth01 = np.reshape(aryDpth01, (varNumSubs, 1, varNumDpt))
+    aryDpth02 = np.reshape(aryDpth02, (varNumSubs, 1, varNumDpt))
 
 
 # ----------------------------------------------------------------------------
@@ -102,9 +120,17 @@ print('---Find peaks in empirical depth profiles')
 # The peak difference on the full profile needs to be calculated for comparison
 # with the null distribution.
 
-# Mean depth profiles (mean across subjects):
-aryDpthMne01 = np.mean(aryDpth01, axis=0)
-aryDpthMne02 = np.mean(aryDpth02, axis=0)
+if '.npy' in objDpth01:
+
+    # Mean depth profiles (mean across subjects):
+    aryDpthMne01 = np.mean(aryDpth01, axis=0)
+    aryDpthMne02 = np.mean(aryDpth02, axis=0)
+
+elif '.npz' in objDpth01:
+
+    # Weighted mean across subjects:
+    aryDpthMne01 = np.average(aryDpth01, axis=0, weights=vecNumInc)
+    aryDpthMne02 = np.average(aryDpth02, axis=0, weights=vecNumInc)
 
 # Peak positions in empirical depth profiles:
 vecEmpPeaks01 = find_peak(aryDpthMne01, lgcStat=False)

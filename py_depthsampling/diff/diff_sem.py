@@ -299,7 +299,8 @@ def diff_sem(objDpth, strPath, lstCon, lstConLbl, strTtl='', varYmin=0.0,  #noqa
     # single condition plots).
     else:
         for idxCon in range(varNumCon):
-            aryClr[idxCon, :] = objCmap(objClrNorm(varNumCon + 2 - idxCon))
+            aryClr[idxCon, :] = \
+                objCmap(objClrNorm(varNumCon + 2 - idxCon))[0:3]
 
     plt_dpth_prfl(aryEmpMne, arySem, varNumDpth, varNumCon, varDpi, varYmin,
                   varYmax, False, lstConLbl, strXlabel, strYlabel, strTtl,

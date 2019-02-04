@@ -49,7 +49,7 @@ lstMetaCon = ['stimulus', 'periphery']
 lstRoi = ['v1', 'v2', 'v3']
 
 # Hemispheres ('lh' or 'rh'):
-lstHmsph = ['rh'] #, 'lh']
+lstHmsph = ['rh']  # , 'lh']
 
 # List of subject identifiers:
 lstSubIds = ['20171023',  # '20171109',
@@ -71,6 +71,7 @@ lstNstCon = [['Pd_sst', 'Ps_sst', 'Cd_sst'],
              ['Pd_min_Cd_trn'],
              ['Cd_min_Ps_trn'],
              ['Pd_min_Cd_Ps_trn']]
+#lstNstCon = [['Pd_sst', 'Ps_sst', 'Cd_sst']]
 
 # Condition labels:
 lstNstConLbl = lstNstCon
@@ -114,7 +115,7 @@ lgcSlct03 = True
 # subject ID and hemisphere left open.)
 strVtkSlct03 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/combined_mean.vtk'  #noqa
 # Threshold for vertex selection:
-varThrSlct03 = 7000.0
+varThrSlct03 = 5000.0
 
 # (4)
 # Use vertex selection criterion 4 (vertices that are WITHIN INTERVAL are
@@ -126,7 +127,8 @@ lgcSlct04 = True
 strVtkSlct04 = '/media/sf_D_DRIVE/MRI_Data_PhD/05_PacMan/{}/cbs/{}/pRF_results_eccentricity.vtk'  #noqa
 # Threshold for vertex selection - list of tuples (interval per meta-condition,
 # e.g. within & outside stimulus area):
-lstThrSlct04 = [(0.75, 3.0), (3.5, 4.0)]
+# lstThrSlct04 = [(0.75, 3.0), (3.5, 4.0)]
+lstThrSlct04 = [(1.0, 3.0), (3.5, 4.0)]
 
 # Number of cortical depths:
 varNumDpth = 11
@@ -145,7 +147,7 @@ strYlabel = 'Signal change [%]'
 
 # Output path for plots - prefix:
 # strPltOtPre = '/home/john/Dropbox/PacMan_Plots/z/{}/plots_{}/'
-strPltOtPre = '/home/john/Dropbox/PacMan_Plots/pe/{}/plots_{}/'
+strPltOtPre = '/home/john/PhD/PacMan_Plots/pe/{}/plots_{}/'
 
 # Output path for plots - suffix:
 strPltOtSuf = '_{}_{}_{}.png'

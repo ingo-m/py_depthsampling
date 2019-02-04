@@ -122,10 +122,10 @@ strPthPrfOt = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_
 
 # Output path & prefix for plots (meta-condition, ROI, ROI, hemisphere,
 # condition, and model index left open):
-strPthPltOt = '/home/john/Dropbox/PacMan_Plots/deconv/{}/{}/{}_{}_{}_deconv_model_{}_'  #noqa
+strPthPltOt = '/home/john/PhD/PacMan_Plots/deconv/{}/{}/{}_{}_{}_deconv_model_{}_'  #noqa
 
 # File type suffix for plot:
-strFlTp = '.svg'
+strFlTp = '.png'
 
 # Figure scaling factor:
 varDpi = 100.0

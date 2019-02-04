@@ -56,7 +56,7 @@ strPthPltOt = '/home/john/PhD/Surface_Plots/diff/{}_{}{}_SEM'  #noqa
 strFlTp = '.svg'
 
 # Figure scaling factor:
-varDpi = 100.0
+varDpi = 120.0
 
 # Label for axes:
 strXlabel = 'Cortical depth level'
@@ -114,6 +114,7 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                      varYmax=varYmax,
                      tplPadY=tplPadY,
                      varNumLblY=varNumLblY,
+                     varDpi=varDpi,
                      strXlabel=strXlabel,
                      strYlabel=strYlabel,
                      lgcLgnd=True,

@@ -57,10 +57,10 @@ strPthPltOt = '/home/john/PhD/PacMan_Plots/diff/{}_{}_{}{}_SEM'  #noqa
 # strPthPtlSnglOt = '/Users/john/Dropbox/PacMan_Plots/diff_sngle/{}_{}_{}{}_{}'
 
 # File type suffix for plot:
-strFlTp = '.png'
+strFlTp = '.svg'
 
 # Figure scaling factor:
-varDpi = 100.0
+varDpi = 120.0
 
 # Label for axes:
 strXlabel = 'Cortical depth level'
@@ -68,7 +68,8 @@ strYlabel = 'Signal change [%]'
 
 # Condition levels (used to complete file names):
 lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
-# lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst', 'Ps_sst_plus_Cd_sst']
+# lstCon = ['Pd_sst', 'Cd_sst']
+# lstCon = ['Pd_sst', 'Ps_sst_plus_Cd_sst']
 # lstCon = ['Pd_trn', 'Ps_trn', 'Cd_trn']
 # lstCon = ['Pd_trn', 'Ps_trn', 'Cd_trn', 'Ps_trn_plus_Cd_trn']
 
@@ -77,10 +78,10 @@ lstConLbl = lstCon
 
 # Which conditions to compare (list of tuples with condition indices):
 lstDiff = [(0, 1), (0, 2), (1, 2)]
-# lstDiff = [(0, 3)]
+# lstDiff = [(0, 1)]
 
 # Padding around labelled values on y:
-tplPadY = (0.03, 0.03)
+tplPadY = (0.0, 0.0)  # (0.05, 0.05)
 # -----------------------------------------------------------------------------
 
 
@@ -101,8 +102,8 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                     varYmax = 0.8
                     varNumLblY = 8
                 if lstMdl[idxMdl] == '_deconv_model_1':
-                    varYmin = -0.25
-                    varYmax = 0.5
+                    varYmin = -0.2  # -0.25
+                    varYmax = 0.4  # 0.5
                     varNumLblY = 4
 
                 # Create average plots:

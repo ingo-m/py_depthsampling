@@ -89,6 +89,7 @@ def permute(aryDpth01, aryDpth02, vecNumInc=None, varNumIt=10000, varLow=2.5,
       depth level`. This distribution is the null distribution.
     - The empirical difference between conditions can be compared agains this
       null distribution.
+
     """
     # -------------------------------------------------------------------------
     # *** Preparations

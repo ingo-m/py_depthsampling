@@ -125,7 +125,7 @@ strPthPrfOt = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/{}
 strPthPltOt = '/home/john/PhD/Surface_Plots/deconv/{}_{}_{}_deconv_model_{}_'
 
 # File type suffix for plot:
-strFlTp = '.svg'
+strFlTp = '.png'
 
 # Figure scaling factor:
 varDpi = 110.0

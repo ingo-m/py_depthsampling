@@ -111,7 +111,7 @@ lgcSlct03 = True
 # subject ID and hemisphere left open.)
 strVtkSlct03 = '/media/sf_D_DRIVE/MRI_Data_PhD/09_surface/{}/cbs/{}/combined_mean.vtk'  #noqa
 # Threshold for vertex selection:
-varThrSlct03 = 7000.0
+varThrSlct03 = 5000.0
 
 # (4)
 # Use vertex selection criterion 4 (vertices that are WITHIN INTERVAL are

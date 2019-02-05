@@ -32,11 +32,11 @@ from py_depthsampling.diff.diff_sem import diff_sem
 strParam = 'mean'
 
 # Which draining model to plot ('' for none):
-lstMdl = ['', '_deconv_model_1']
+lstMdl = ['_deconv_model_1']
 
 # Meta-condition (within or outside of retinotopic stimulus area):
-lstMetaCon = ['stimulus']
-# lstMetaCon = ['periphery']
+# lstMetaCon = ['stimulus']
+lstMetaCon = ['periphery']
 
 # ROI ('v1', 'v2', or 'v3'):
 lstRoi = ['v1', 'v2', 'v3']
@@ -67,18 +67,18 @@ strXlabel = 'Cortical depth level'
 strYlabel = 'Signal change [%]'
 
 # Condition levels (used to complete file names):
-lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
+# lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
 # lstCon = ['Pd_sst', 'Cd_sst']
 # lstCon = ['Pd_sst', 'Ps_sst_plus_Cd_sst']
-# lstCon = ['Pd_trn', 'Ps_trn', 'Cd_trn']
+lstCon = ['Pd_trn', 'Ps_trn', 'Cd_trn']
 # lstCon = ['Pd_trn', 'Ps_trn', 'Cd_trn', 'Ps_trn_plus_Cd_trn']
 
 # Condition labels:
 lstConLbl = lstCon
 
 # Which conditions to compare (list of tuples with condition indices):
-lstDiff = [(0, 1), (0, 2), (1, 2)]
-# lstDiff = [(0, 1)]
+# lstDiff = [(0, 1), (0, 2), (1, 2)]
+lstDiff = [(0, 2)]
 # -----------------------------------------------------------------------------
 
 
@@ -95,10 +95,10 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                 # hemisphere, deconvolution model.
 
                 if lstMetaCon[idxMtaCn] == 'periphery':
-                    varYmin = -0.2
-                    varYmax = 0.4
-                    varNumLblY = 4
-                    tplPadY = (0.0, 0.1)
+                    varYmin = -0.25
+                    varYmax = 0.25
+                    varNumLblY = 3
+                    tplPadY = (0.1, 0.1)
                 if lstMetaCon[idxMtaCn] == 'stimulus':
                     varYmin = -0.2  # -0.25
                     varYmax = 0.4  # 0.5

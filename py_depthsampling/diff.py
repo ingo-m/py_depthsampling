@@ -79,9 +79,6 @@ lstConLbl = lstCon
 # Which conditions to compare (list of tuples with condition indices):
 lstDiff = [(0, 1), (0, 2), (1, 2)]
 # lstDiff = [(0, 1)]
-
-# Padding around labelled values on y:
-tplPadY = (0.0, 0.0)  # (0.05, 0.05)
 # -----------------------------------------------------------------------------
 
 
@@ -97,14 +94,16 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                 # Limits of axes can be adjusted based on ROI, condition,
                 # hemisphere, deconvolution model.
 
-                if lstMdl[idxMdl] == '':
-                    varYmin = -0.6
-                    varYmax = 0.8
-                    varNumLblY = 8
-                if lstMdl[idxMdl] == '_deconv_model_1':
+                if lstMetaCon[idxMtaCn] == 'periphery':
+                    varYmin = -0.2
+                    varYmax = 0.4
+                    varNumLblY = 4
+                    tplPadY = (0.0, 0.1)
+                if lstMetaCon[idxMtaCn] == 'stimulus':
                     varYmin = -0.2  # -0.25
                     varYmax = 0.4  # 0.5
                     varNumLblY = 4
+                    tplPadY = (0.0, 0.0)
 
                 # Create average plots:
                 diff_sem(strPthData.format(lstMetaCon[idxMtaCn],

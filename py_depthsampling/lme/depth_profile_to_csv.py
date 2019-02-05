@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Save cortical depth profiles to csv file.
-"""
+"""Save cortical depth profiles to csv file."""
 
 
 import numpy as np
@@ -14,7 +12,7 @@ import pandas as pd
 
 # Path of npz files with cortical depth profiles (ROI and condition left open):
 # strNpz = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/{}_rh_{}_sst_deconv_model_1.npz'  #noqa
-strNpz = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/periphery/{}_rh_{}_sst_deconv_model_1.npz'  #noqa
+strNpz = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/periphery/{}_rh_{}_trn_deconv_model_1.npz'  #noqa
 
 # List of ROIs:
 lstRoi = ['v1', 'v2', 'v3']

@@ -2,7 +2,8 @@
 library(nlme)
 
 # Read CSV into R
-objDf <- read.csv(file='/home/john/PhD/GitLab/py_depthsampling/py_depthsampling/lme/depth_data.csv', header=TRUE, sep=';')
+# objDf <- read.csv(file='/home/john/PhD/GitLab/py_depthsampling/py_depthsampling/lme/depth_data_stimulus.csv', header=TRUE, sep=';')
+objDf <- read.csv(file='/home/john/PhD/GitLab/py_depthsampling/py_depthsampling/lme/depth_data_periphery.csv', header=TRUE, sep=';')
 
 head(objDf)
 

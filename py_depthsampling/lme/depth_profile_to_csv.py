@@ -13,8 +13,8 @@ import pandas as pd
 # *** Define parameters
 
 # Path of npz files with cortical depth profiles (ROI and condition left open):
-# strNpz = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/{}_rh_{}_sst.npz'  #noqa
-strNpz = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/periphery/{}_rh_{}_sst.npz'  #noqa
+# strNpz = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/{}_rh_{}_sst_deconv_model_1.npz'  #noqa
+strNpz = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/periphery/{}_rh_{}_sst_deconv_model_1.npz'  #noqa
 
 # List of ROIs:
 lstRoi = ['v1', 'v2', 'v3']

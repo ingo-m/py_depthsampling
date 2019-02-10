@@ -56,7 +56,7 @@ lstRoi = ['v1', 'v2', 'v3']
 lstHmsph = ['rh', 'lh']
 
 # List of subject identifiers:
-lstSubIds = ['20181128']
+lstSubIds = ['20181128', '20190207']
 
 # Condition levels (used to complete file names) - nested list:
 lstNstCon = [['bright_square_txtr_sst_pe',
@@ -81,7 +81,7 @@ lgcSlct01 = True
 # by the funtion `py_depthsampling.misc.fix_roi_csv.fix_roi_csv` in order to
 # ensure that the indices of the ROI definition and the vtk meshes are
 # congruent.
-strCsvRoi = '/Users/john/1_PhD/GitLab/surface/analysis/{}/08_depthsampling/{}/{}.csv'  #noqa
+strCsvRoi = '/home/john/PhD/GitLab/surface/analysis/{}/08_depthsampling/{}/{}.csv'  #noqa
 # Number of header lines in ROI CSV file:
 varNumHdrRoi = 1
 
@@ -135,7 +135,7 @@ strXlabel = 'Cortical depth level'
 strYlabel = 'Signal change [%]'
 
 # Output path for plots - prefix:
-strPltOtPre = '/Users/john/Dropbox/Surface_Plots/pe/{}_{}_'
+strPltOtPre = '/home/john/Dropbox/Texture_Plots/pe/{}_{}_'
 
 # Output path for plots - suffix:
 strPltOtSuf = '_{}{}_{}.png'
@@ -154,7 +154,7 @@ varNormIdx = 0
 lgcNormDiv = False
 
 # Output path for depth samling results (within subject means):
-strDpthMeans = '/Users/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/{}_{}_20181128.npz'  #noqa
+strDpthMeans = '/home/john/Dropbox/Texture_Depth_Data/Higher_Level_Analysis/{}/{}_{}.npz'  #noqa
 
 # Maximum number of processes to run in parallel: *** NOT IMPLEMENTED
 # varPar = 10

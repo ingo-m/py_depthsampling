@@ -127,7 +127,7 @@ for idxMtaCn in range(len(lstMtaCn)):
         # Number of labels on y-axis:
         varYnum = 3
         # Padding around labelled values on y:
-        tplPadY = (0.006, 0.006)
+        tplPadY = (0.006, 0.002)
 
     if 'edge' in lstMtaCn[idxMtaCn]:
         # Limits of y-axis:

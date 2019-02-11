@@ -196,7 +196,7 @@ def project(strRoi, strCon, strDpth, strDpthLbl, strPthNpy, varNumSub,
         print('--Project data into visual space')
 
         # Number of processes to run in parallel:
-        varPar = 4
+        varPar = 10
 
         # Split data into chunks:
         lstData = np.array_split(vecData, varPar)

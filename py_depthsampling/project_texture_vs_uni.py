@@ -49,41 +49,39 @@ lstRoi = ['v1', 'v2', 'v3']
 strPthPltOt = '/home/john/Dropbox/Texture_Plots/project/{}_{}_{}'  #noqa
 
 # File type suffix for plot:
-# strFlTp = '.svg'
-strFlTp = '.png'
+strFlTp = '.svg'
+# strFlTp = '.png'
 
 # Figure scaling factor:
 varDpi = 80.0
 
 # Condition levels (used to complete file names):
 lstCon = ['feat_level_2_bright_square_txtr_sst_pe',
-          'feat_level_2_bright_square_uni_sst_pe']
-#lstCon = ['feat_level_2_bright_square_txtr_sst_pe',
-#          'feat_level_2_bright_square_uni_sst_pe',
-#          'feat_level_2_pacman_static_txtr_sst_pe',
-#          'feat_level_2_pacman_static_uni_sst_pe',
-#          'feat_level_2_target_pe',
-#          'pRF_results_eccentricity',
-#          'pRF_results_ovrlp_ctnr_background',
-#          'pRF_results_ovrlp_ctnr_diamond',
-#          'pRF_results_ovrlp_ctnr_pacman_centre',
-#          'pRF_results_ovrlp_ctnr_pacman_edge',
-#          'pRF_results_ovrlp_ctnr_square_centre',
-#          'pRF_results_ovrlp_ctnr_square_edge',
-#          'pRF_results_ovrlp_ratio_background',
-#          'pRF_results_ovrlp_ratio_diamond',
-#          'pRF_results_ovrlp_ratio_pacman_centre',
-#          'pRF_results_ovrlp_ratio_pacman_edge',
-#          'pRF_results_ovrlp_ratio_square_centre',
-#          'pRF_results_ovrlp_ratio_square_edge',
-#          'pRF_results_PE_01',
-#          'pRF_results_polar_angle',
-#          'pRF_results_R2',
-#          'pRF_results_SD',
-#          'pRF_results_x_pos',
-#          'pRF_results_y_pos',
-#          'combined_mean',
-#          'combined_mean_tSNR']
+          'feat_level_2_bright_square_uni_sst_pe',
+          'feat_level_2_pacman_static_txtr_sst_pe',
+          'feat_level_2_pacman_static_uni_sst_pe',
+          'feat_level_2_target_pe',
+          'pRF_results_eccentricity',
+          'pRF_results_ovrlp_ctnr_background',
+          'pRF_results_ovrlp_ctnr_diamond',
+          'pRF_results_ovrlp_ctnr_pacman_centre',
+          'pRF_results_ovrlp_ctnr_pacman_edge',
+          'pRF_results_ovrlp_ctnr_square_centre',
+          'pRF_results_ovrlp_ctnr_square_edge',
+          'pRF_results_ovrlp_ratio_background',
+          'pRF_results_ovrlp_ratio_diamond',
+          'pRF_results_ovrlp_ratio_pacman_centre',
+          'pRF_results_ovrlp_ratio_pacman_edge',
+          'pRF_results_ovrlp_ratio_square_centre',
+          'pRF_results_ovrlp_ratio_square_edge',
+          'pRF_results_PE_01',
+          'pRF_results_polar_angle',
+          'pRF_results_R2',
+          'pRF_results_SD',
+          'pRF_results_x_pos',
+          'pRF_results_y_pos',
+          'combined_mean',
+          'combined_mean_tSNR']
 
 # Path of vtk mesh with data to project into visual space (e.g. parameter
 # estimates; subject ID, hemisphere, and contion level left open).

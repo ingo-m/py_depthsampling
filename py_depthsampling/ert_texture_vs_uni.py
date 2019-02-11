@@ -38,11 +38,11 @@ lstRoi = ['v1', 'v2']
 lstHmsph = ['lh', 'rh']
 
 # List of subject identifiers:
-lstSubIds = ['20181128']
+lstSubIds = ['20181128', '20190207']
 
 # Name of pickle file from which to load time course data or save time course
 # data to (metacondition and ROI left open):
-strPthPic = '/Users/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/era_{}_20181128.pickle'  #noqa
+strPthPic = '/home/john/Dropbox/Texture_Depth_Data/Higher_Level_Analysis/{}/era_{}.pickle'  #noqa
 
 # Condition levels (used to complete file names):
 lstCon = ['bright_square_txtr',
@@ -96,7 +96,7 @@ lgcLgnd01 = True
 lgcLgnd02 = True
 
 # Output path for plots - prfix (metacondition and ROI left open):
-strPltOtPre = '/Users/john/Dropbox/Surface_Plots/ert/{}_{}_'
+strPltOtPre = '/home/john/Dropbox/Texture_Plots/ert/{}_{}_'
 # Output path for plots - suffix:
 strPltOtSuf = '_ert.svg'
 

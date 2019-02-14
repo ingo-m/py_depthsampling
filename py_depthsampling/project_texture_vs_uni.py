@@ -26,10 +26,10 @@ from py_depthsampling.project.project_main import project
 
 # Load/save existing projection from/to (ROI, condition, depth level label left
 # open):
-strPthNpy = '/Users/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/project/{}_{}_{}_20181128.npy'  #noqa
+strPthNpy = '/home/john/Dropbox/Texture_Depth_Data/Higher_Level_Analysis/project/{}_{}_{}.npy'  #noqa
 
 # List of subject identifiers.
-lstSubIds = ['20181128']
+lstSubIds = ['20181128', '20190207']
 
 # Nested list with depth levels to average over. For instance, if `lstDpth =
 # [[0, 1, 2], [3, 4, 5]]`, on a first iteration, the average over the first
@@ -46,7 +46,7 @@ lstDpthLbl = ['allGM']
 lstRoi = ['v1', 'v2', 'v3']
 
 # Output path & prefix for plots (ROI, condition, depth level label left open):
-strPthPltOt = '/Users/john/Dropbox/Surface_Plots/project/{}_{}_{}'  #noqa
+strPthPltOt = '/home/john/Dropbox/Texture_Plots/project/{}_{}_{}'  #noqa
 
 # File type suffix for plot:
 strFlTp = '.svg'
@@ -109,7 +109,7 @@ strPthY = '/media/sf_D_DRIVE/MRI_Data_PhD/09_surface/{}/cbs/{}/pRF_results_y_pos
 
 # Path of csv file with ROI definition (subject ID, hemisphere, and ROI left
 # open).
-strCsvRoi = '/Users/john/1_PhD/GitLab/surface/analysis/{}/08_depthsampling/{}/{}.csv'  #noqa
+strCsvRoi = '/home/john/PhD/GitLab/surface/analysis/{}/08_depthsampling/{}/{}.csv'  #noqa
 
 # Number of cortical depths.
 varNumDpth = 11

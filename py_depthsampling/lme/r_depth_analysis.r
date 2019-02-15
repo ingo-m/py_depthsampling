@@ -102,7 +102,7 @@ objDfKonly <- objDf[objDf$Condition!='BRIGHT_SQUARE',]
 
 # Null model:
 mdlNull = lme(PSC ~ ROI + Depth,
-              objDf,
+              objDfKonly,
               random=(~1|Subject),
               correlation=corCAR1(form=(~1|Subject/Depth)),
               weights=(~1/Vertices),
@@ -110,7 +110,7 @@ mdlNull = lme(PSC ~ ROI + Depth,
 
 # Full model:
 mdlFull = lme(PSC ~ ROI + Condition + Depth,  # Effect of interest = Condition
-              objDf,
+              objDfKonly,
               random=(~1|Subject),
               correlation=corCAR1(form=(~1|Subject/Depth)),
               weights=(~1/Vertices),

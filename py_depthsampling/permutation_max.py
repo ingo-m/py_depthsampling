@@ -50,10 +50,6 @@ lstRoi = ['v1', 'v2']
 # deconvolution suffix left open):
 strPthPrf = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/{}_{}{}.npz'  #noqa
 
-# Label for axes:
-strXlabel = 'Cortical depth level'
-strYlabel = 'fMRI signal change [a.u.]'
-
 # Condition levels (used to complete file names):
 lstCon = ['bright_square_sst_pe',
           'kanizsa_rotated_sst_pe',

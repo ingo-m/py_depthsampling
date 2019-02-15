@@ -45,7 +45,7 @@ varNumSub = ary01.shape[0]
 varNumDpth = ary01.shape[1]
 
 # List of features for dataframe:
-lstFtr = ['ROI', 'Condition', 'Subject', 'Depth', 'PSC']
+lstFtr = ['ROI', 'Condition', 'Subject', 'Depth', 'Vertices', 'PSC']
 
 # Number of samples:
 varNumSmpl = (varNumRoi * varNumCon * varNumSub * varNumDpth)
@@ -58,6 +58,7 @@ dicType = {'ROI': str,
            'Condition': str,
            'Subject': np.int16,
            'Depth': np.int16,
+           'Vertices': np.int32,
            'PSC': np.float64}
 
 # Set datatype:
@@ -76,7 +77,12 @@ for idxRoi in lstRoi:
 
         # Load npz file:
         objNpz01 = np.load(strNpz.format(idxRoi, idxCon))
+
+        # Depth profiles:
         ary01 = objNpz01['arySubDpthMns']
+
+        # Numebr of vertices:
+        vecNumInc = objNpz01['vecNumInc']
 
         for idxSub in range(varNumSub):
             for idxDpth in range(varNumDpth):
@@ -86,6 +92,7 @@ for idxRoi in lstRoi:
                 objDf.at[idxSmpl, 'Condition'] = idxCon.upper()
                 objDf.at[idxSmpl, 'Subject'] = idxSub
                 objDf.at[idxSmpl, 'Depth'] = idxDpth
+                objDf.at[idxSmpl, 'Vertices'] = vecNumInc[idxSub]
                 objDf.at[idxSmpl, 'PSC'] = ary01[idxSub, idxDpth]
 
                 # Increment counter:

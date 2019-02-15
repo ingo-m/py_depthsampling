@@ -13,18 +13,18 @@ import pandas as pd
 # *** Define parameters
 
 # Path of npz files with cortical depth profiles (ROI and condition left open):
-# strNpz = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/{}_rh_{}_sst.npz'  #noqa
-strNpz = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/periphery/{}_rh_{}_sst.npz'  #noqa
+strNpz = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/centre/{}_{}_sst_pe_deconv_model_1.npz'  #noqa
 
 # List of ROIs:
-lstRoi = ['v1', 'v2', 'v3']
+lstRoi = ['v1', 'v2']
 
 # List of conditions:
-lstCon = ['Pd', 'Ps', 'Cd']
+lstCon = ['kanizsa',
+          'kanizsa_rotated',
+          'bright_square']
 
 # Output path for data csv file:
-# strCsv = '/home/john/PhD/GitLab/py_depthsampling/py_depthsampling/lme/depth_data_stimulus.csv'  #noqa
-strCsv = '/home/john/PhD/GitLab/py_depthsampling/py_depthsampling/lme/depth_data_periphery.csv'  #noqa
+strCsv = '/home/john/PhD/GitLab/py_depthsampling/py_depthsampling/lme/surface_depth_data_centre.csv'  #noqa
 
 
 # -----------------------------------------------------------------------------

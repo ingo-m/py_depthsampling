@@ -93,7 +93,7 @@ mdlFull = lme(PSC ~ ROI + Condition + Depth +
 # Model comparison:
 anova(mdlNull, mdlFull)
 
-# (4)
+# (4) ‘Kanizsa’ vs ‘Kanizsa rotated’
 # Is there a difference in activation between conditions 'Kanizsa' and 'Kanizsa
 # rotated'?
 

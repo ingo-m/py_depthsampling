@@ -69,9 +69,9 @@ lstMetaCon = ['centre']
 # ROI ('v1', 'v2', or 'v3'):
 lstRoi = ['v1', 'v2']
 
-# Path of depth-profiles (meta-condition, ROI, hemisphere, condition, and model
+# Path of depth-profiles (meta-condition, ROI, condition, and model
 # index left open):
-strPthData = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/{}_{}_{}{}.npz'  #noqa
+strPthData = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/{}_{}{}.npz'  #noqa
 
 # Condition levels (used to complete file names):
 lstCon = ['bright_square_sst_pe',

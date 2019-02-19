@@ -53,7 +53,7 @@ varDpi = 80.0
 varFctr = 0.75
 
 # Output folder:
-strPthOt = '/home/john/Desktop/tmp/ttt/'  #noqa
+strPthOt = '/home/john/Dropbox/Thesis/Chapters/General_Discussion/Figures/Figure_X_Normalisation/elements/'  #noqa
 
 # Figure output file type:
 strFleTyp = '.svg'
@@ -103,10 +103,9 @@ arySin02 = np.array((vecSin02a, vecSin02b))
 
 # (3)
 # Scenario 3: Positive and negative activation peaks.
-vecSin03a = np.add(np.multiply(arySin, 1.0), 0.01)
-vecSin03b = np.add(np.multiply(arySin, -1.0), -0.01)
+vecSin03a = np.add(np.multiply(arySin, -1.0), -0.01)
+vecSin03b = np.add(np.multiply(arySin, 1.0), 0.01)
 arySin03 = np.array((vecSin03a, vecSin03b))
-
 
 # Number of conditions:
 varNumCon = arySin01.shape[0]
@@ -363,8 +362,8 @@ plt_dpth_prfl(vecNormSub03.reshape(1, varNumDpth),
               varNumDpth,
               1,
               (varDpi * 1.8),
-              -8.0,
               0.0,
+              8.0,
               False,
               ['1', '2'],
               strXlabel,

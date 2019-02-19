@@ -182,7 +182,8 @@ plt_dpth_prfl(np.array((vecSin01a, vecSin01b)),
               False,
               (strPthOt + 'scenario_01_components' + strFleTyp),
               tplPadY=(0.01, 0.01),
-              varNumLblY=4)
+              varNumLblY=4,
+              varRound=0)
 
 # Plot hypothetical fMRI signal profile (with draining vein effect):
 plt_dpth_prfl(arySin01,
@@ -200,7 +201,8 @@ plt_dpth_prfl(arySin01,
               False,
               (strPthOt + 'scenario_01_fMRI' + strFleTyp),
               tplPadY=(0.1, 0.1),
-              varNumLblY=5)
+              varNumLblY=5,
+              varRound=0)
 
 # Plot subtractive normalisation:
 plt_dpth_prfl(vecNormSub01.reshape(1, varNumDpth),
@@ -218,7 +220,8 @@ plt_dpth_prfl(vecNormSub01.reshape(1, varNumDpth),
               False,
               (strPthOt + 'scenario_01_sub' + strFleTyp),
               tplPadY=(0.1, 0.1),
-              varNumLblY=3)
+              varNumLblY=3,
+              varRound=0)
 
 # Plot divisive normalisation:
 plt_dpth_prfl(vecNormDiv01.reshape(1, varNumDpth),
@@ -236,7 +239,8 @@ plt_dpth_prfl(vecNormDiv01.reshape(1, varNumDpth),
               False,
               (strPthOt + 'scenario_01_div' + strFleTyp),
               tplPadY=(0.1, 0.1),
-              varNumLblY=3)
+              varNumLblY=3,
+              varRound=0)
 # -----------------------------------------------------------------------------
 
 
@@ -259,7 +263,8 @@ plt_dpth_prfl(np.array((vecSin02a, vecSin02b)),
               False,
               (strPthOt + 'scenario_02_components' + strFleTyp),
               tplPadY=(0.01, 0.01),
-              varNumLblY=4)
+              varNumLblY=4,
+              varRound=0)
 
 # Plot hypothetical fMRI signal profile (with draining vein effect):
 plt_dpth_prfl(arySin02,
@@ -277,7 +282,8 @@ plt_dpth_prfl(arySin02,
               False,
               (strPthOt + 'scenario_02_fMRI' + strFleTyp),
               tplPadY=(0.1, 0.1),
-              varNumLblY=5)
+              varNumLblY=5,
+              varRound=0)
 
 # Plot subtractive normalisation:
 plt_dpth_prfl(vecNormSub02.reshape(1, varNumDpth),
@@ -295,7 +301,8 @@ plt_dpth_prfl(vecNormSub02.reshape(1, varNumDpth),
               False,
               (strPthOt + 'scenario_02_sub' + strFleTyp),
               tplPadY=(0.1, 0.1),
-              varNumLblY=5)
+              varNumLblY=5,
+              varRound=0)
 
 # Plot divisive normalisation:
 plt_dpth_prfl(vecNormDiv02.reshape(1, varNumDpth),
@@ -313,7 +320,8 @@ plt_dpth_prfl(vecNormDiv02.reshape(1, varNumDpth),
               False,
               (strPthOt + 'scenario_02_div' + strFleTyp),
               tplPadY=(0.1, 0.1),
-              varNumLblY=4)
+              varNumLblY=4,
+              varRound=0)
 # -----------------------------------------------------------------------------
 
 
@@ -336,7 +344,8 @@ plt_dpth_prfl(np.array((vecSin03a, vecSin03b)),
               False,
               (strPthOt + 'scenario_03_components' + strFleTyp),
               tplPadY=(0.01, 0.01),
-              varNumLblY=3)
+              varNumLblY=3,
+              varRound=0)
 
 # Plot hypothetical fMRI signal profile (with draining vein effect):
 plt_dpth_prfl(arySin03,
@@ -354,7 +363,8 @@ plt_dpth_prfl(arySin03,
               False,
               (strPthOt + 'scenario_03_fMRI' + strFleTyp),
               tplPadY=(0.15, 0.15),
-              varNumLblY=5)
+              varNumLblY=5,
+              varRound=0)
 
 # Plot subtractive normalisation:
 plt_dpth_prfl(vecNormSub03.reshape(1, varNumDpth),
@@ -372,7 +382,8 @@ plt_dpth_prfl(vecNormSub03.reshape(1, varNumDpth),
               False,
               (strPthOt + 'scenario_03_sub' + strFleTyp),
               tplPadY=(0.15, 0.15),
-              varNumLblY=5)
+              varNumLblY=5,
+              varRound=0)
 
 # Plot divisive normalisation:
 plt_dpth_prfl(vecNormDiv03.reshape(1, varNumDpth),
@@ -390,7 +401,8 @@ plt_dpth_prfl(vecNormDiv03.reshape(1, varNumDpth),
               False,
               (strPthOt + 'scenario_03_div' + strFleTyp),
               tplPadY=(0.1, 0.1),
-              varNumLblY=3)
+              varNumLblY=3,
+              varRound=0)
 # -----------------------------------------------------------------------------
 
 
@@ -412,5 +424,6 @@ plt_dpth_prfl(vecDcy.reshape(1, varNumDpth),
               False,
               (strPthOt + 'convolution_term' + strFleTyp),
               tplPadY=(0.1, 0.1),
-              varNumLblY=3)
+              varNumLblY=3,
+              varRound=0)
 # -----------------------------------------------------------------------------

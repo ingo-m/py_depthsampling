@@ -392,3 +392,25 @@ plt_dpth_prfl(vecNormDiv03.reshape(1, varNumDpth),
               tplPadY=(0.1, 0.1),
               varNumLblY=3)
 # -----------------------------------------------------------------------------
+
+
+# -----------------------------------------------------------------------------
+# *** Plot convolution term
+
+plt_dpth_prfl(vecDcy.reshape(1, varNumDpth),
+              aryError,
+              varNumDpth,
+              1,
+              (varDpi * 1.8),
+              0.0,
+              1.0,
+              False,
+              ['1'],
+              strXlabel,
+              'Signal spread',
+              '',
+              False,
+              (strPthOt + 'convolution_term' + strFleTyp),
+              tplPadY=(0.1, 0.1),
+              varNumLblY=3)
+# -----------------------------------------------------------------------------

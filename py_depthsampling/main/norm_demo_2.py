@@ -66,7 +66,7 @@ strFleTyp = '.svg'
 # Linear datapoints:
 vecLin = np.linspace(1.0, 0.0, varNumDpth, endpoint=True)
 
-# Cubid decay:
+# Quadratic decay:
 vecDcy = np.power(vecLin, 2.0)
 
 # Sinusoidal datapoints:

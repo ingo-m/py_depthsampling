@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 """
 Function of the depth sampling library.
@@ -28,8 +29,11 @@ subtractive and divisive normalisation is demonstrated for three scenarios:
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
-from py_depthsampling.plot.plt_dpth_prfl import plt_dpth_prfl
 from scipy.signal import fftconvolve
+from scipy.interpolate import griddata
+from scipy.ndimage.filters import gaussian_filter1d
+from py_depthsampling.plot.plt_dpth_prfl import plt_dpth_prfl
+from py_depthsampling.drain_model.drain_model_decon_01 import deconv_01
 
 
 # -----------------------------------------------------------------------------
@@ -49,25 +53,25 @@ varBumpWidth = 20.0
 # Figure scaling factor:
 varDpi = 80.0
 
-# Draining vein factor (higher value --> more unidirectional signal spread):
-varFctr = 0.75
-
 # Output folder:
-strPthOt = '/home/john/Dropbox/Thesis/Chapters/General_Discussion/Figures/Figure_X_Normalisation/elements/'  #noqa
+strPthOt = '/home/john/Dropbox/Thesis/Chapters/General_Discussion/Figures/Figure_5_1_Normalisation/elements/test/'  #noqa
 
 # Figure output file type:
-strFleTyp = '.svg'
+strFleTyp = '.png'
 # -----------------------------------------------------------------------------
 
 
 # -----------------------------------------------------------------------------
 # *** Create profile templates
 
-# Linear datapoints:
-vecLin = np.linspace(1.0, 0.0, varNumDpth, endpoint=True)
+# Linear datapoints (not all the way to zero to avoid division by zero):
+vecLin = np.linspace(1.0, 0.0, varNumDpth, endpoint=False)
 
-# Quadratic decay:
-vecDcy = np.power(vecLin, 2.0)
+# Decay term:
+# vecDcy = np.power(vecLin, 1.0)
+vecDcy = np.exp(vecLin)
+# vecDcy = np.subtract(vecDcy, 1.0)
+# vecDcy = np.divide(vecDcy, (np.exp(1.0) - 1.0))
 
 # Sinusoidal datapoints:
 arySin = np.sin(np.linspace((0.15 * np.pi),
@@ -92,53 +96,151 @@ arySin = np.multiply(arySin, varBumpAmp)
 # Scenario 1: Two positive activation peaks at mid-grey matter.
 vecSin01a = np.add(np.multiply(arySin, 0.5), 0.01)
 vecSin01b = np.add(np.multiply(arySin, 1.0), 0.01)
-arySin01 = np.array((vecSin01a, vecSin01b))
+aryScn01 = np.array((vecSin01a, vecSin01b))
+# Keep copy original array:
+aryScnCpy01 = np.copy(aryScn01)
 
 # (2)
 # Scenario 2: One positive activation peak at mid-grey matter, no activation in
 # control condition.
 vecSin02a = np.add(np.multiply(arySin, 0.0), 0.01)
 vecSin02b = np.add(np.multiply(arySin, 1.0), 0.01)
-arySin02 = np.array((vecSin02a, vecSin02b))
+aryScn02 = np.array((vecSin02a, vecSin02b))
+# Keep copy original array:
+aryScnCpy02 = np.copy(aryScn02)
 
 # (3)
 # Scenario 3: Positive and negative activation peaks.
 vecSin03a = np.add(np.multiply(arySin, -1.0), -0.01)
 vecSin03b = np.add(np.multiply(arySin, 1.0), 0.01)
-arySin03 = np.array((vecSin03a, vecSin03b))
+aryScn03 = np.array((vecSin03a, vecSin03b))
+# Keep copy original array:
+aryScnCpy03 = np.copy(aryScn03)
+
+# List of original arrays (needed for plots):
+lstScnCpy = [aryScnCpy01, aryScnCpy02, aryScnCpy03]
 
 # Number of conditions:
-varNumCon = arySin01.shape[0]
+varNumCon = 2
+
+# List for results from scenarios:
+lstScn = [aryScn01, aryScn02, aryScn03]
+
+# Number of scenarios:
+varNumScn = len(lstScn)
+
+# Subtraction of original model activation ("ground truth"):
+aryTrth = np.zeros((varNumScn, varNumDpth))
+for idxSnc in range(varNumScn):
+    aryTrth[idxSnc, :] = np.subtract(lstScn[idxSnc][1, :],
+                                     lstScn[idxSnc][0, :])
+
+# Scale "truth":
+aryTrth = np.multiply(aryTrth, 15.0)
 
 # Model draining vein effect:
-for idxCon in range(varNumCon):
-    arySin01[idxCon, :] = fftconvolve(arySin01[idxCon, :],
-                                      vecDcy,
-                                      mode='full')[0:varNumDpth]
-    arySin02[idxCon, :] = fftconvolve(arySin02[idxCon, :],
-                                      vecDcy,
-                                      mode='full')[0:varNumDpth]
-    arySin03[idxCon, :] = fftconvolve(arySin03[idxCon, :],
-                                      vecDcy,
-                                      mode='full')[0:varNumDpth]
+for idxSnc in range(varNumScn):
+    for idxCon in range(varNumCon):
+        lstScn[idxSnc][idxCon, :] = fftconvolve(lstScn[idxSnc][idxCon, :],
+                                                vecDcy,
+                                                mode='full')[0:varNumDpth]
+        lstScn[idxSnc][idxCon, :] = np.multiply(lstScn[idxSnc][idxCon, :],
+                                                0.3)
 # -----------------------------------------------------------------------------
 
 
 # -----------------------------------------------------------------------------
 # *** Normalisation by subtraction
 
-vecNormSub01 = np.subtract(arySin01[1, :], arySin01[0, :])
-vecNormSub02 = np.subtract(arySin02[1, :], arySin02[0, :])
-vecNormSub03 = np.subtract(arySin03[1, :], arySin03[0, :])
+# List for results:
+lstSub = [None] * varNumScn
+
+for idxSnc in range(varNumScn):
+    lstSub[idxSnc] = np.subtract(lstScn[idxSnc][1, :], lstScn[idxSnc][0, :])
 # -----------------------------------------------------------------------------
 
 
 # -----------------------------------------------------------------------------
 # *** Normalisation by division
 
-vecNormDiv01 = np.divide(arySin01[1, :], arySin01[0, :])
-vecNormDiv02 = np.divide(arySin02[1, :], arySin02[0, :])
-vecNormDiv03 = np.divide(arySin03[1, :], arySin03[0, :])
+# List for results:
+lstDiv = [None] * varNumScn
+
+for idxSnc in range(varNumScn):
+    lstDiv[idxSnc] = np.divide(lstScn[idxSnc][1, :], lstScn[idxSnc][0, :])
+# -----------------------------------------------------------------------------
+
+
+# -----------------------------------------------------------------------------
+# *** Normalised difference
+#
+# vecNormDiv01 = np.divide(
+#                          np.subtract(arySin01[1, :], arySin01[0, :]),
+#                          np.add(arySin01[1, :], arySin01[0, :])
+#                          )
+#
+# vecNormDiv02 = np.divide(
+#                          np.subtract(arySin02[1, :], arySin02[0, :]),
+#                          np.add(arySin02[1, :], arySin02[0, :])
+#                          )
+#
+# vecNormDiv03 = np.divide(
+#                          np.subtract(arySin03[1, :], arySin03[0, :]),
+#                          np.add(arySin03[1, :], arySin03[0, :])
+#                          )
+# -----------------------------------------------------------------------------
+
+
+# -----------------------------------------------------------------------------
+# *** Spatial deconvolution
+
+# Vector for downsampled empirical depth profiles:
+aryEmp5 = np.zeros((varNumScn, varNumCon, 5))
+
+# Position of sample points (for spatial interpolation, because deconvolution
+# is defined at a limited number of depth levels):
+vecPosMdl = np.linspace(0.0, 1.0, num=5)
+vecPosEmp = np.linspace(0.0, 1.0, num=varNumDpth)
+
+# Loop through conditions and downsample the depth profiles:
+for idxSnc in range(varNumScn):
+    for idxCon in range(varNumCon):
+        # Interpolation:
+        aryEmp5[idxSnc, idxCon, :] = griddata(vecPosEmp,
+                                              lstScn[idxSnc][idxCon, :],
+                                              vecPosMdl,
+                                              method='linear')
+
+# Array for deconvolution result in model space (5 depth levels):
+aryDecon5 = np.zeros((varNumScn, varNumCon, 5))
+
+# Deconvolution based on Markuerkiaga et al. (2016):
+for idxSnc in range(varNumScn):
+    aryDecon5[idxSnc, :, :] = deconv_01(varNumCon, aryEmp5[idxSnc, :, :])
+
+# Array for deconvolution results:
+aryDecon = np.zeros((varNumScn, varNumCon, varNumDpth))
+
+# Interpolation back into equi-volume space:
+for idxSnc in range(varNumScn):
+    for idxCon in range(varNumCon):
+        # Interpolation:
+        aryDecon[idxSnc, idxCon, :] = griddata(vecPosMdl,
+                                               aryDecon5[idxSnc, idxCon, :],
+                                               vecPosEmp,
+                                               method='linear')
+
+aryDecon = gaussian_filter1d(aryDecon,
+                             (0.1 * float(varNumDpth)),
+                             axis=2,
+                             mode='nearest')
+# -----------------------------------------------------------------------------
+
+
+# -----------------------------------------------------------------------------
+# *** Subtraction on deconvolved profiles
+
+aryDeconSub = np.subtract(aryDecon[:, 1, :], aryDecon[:, 0, :])
 # -----------------------------------------------------------------------------
 
 
@@ -164,245 +266,235 @@ strYlabel = 'Signal change [%]'
 
 
 # -----------------------------------------------------------------------------
-# *** Create plots - Scenario 1
+# *** Create plots
 
-# Plot components without draining vein effect:
-plt_dpth_prfl(np.array((vecSin01a, vecSin01b)),
-              aryError,
-              varNumDpth,
-              varNumCon,
-              (varDpi * 1.8),
-              0.0,
-              0.3,
-              False,
-              ['1', '2'],
-              strXlabel,
-              strYlabel,
-              '',
-              False,
-              (strPthOt + 'scenario_01_components' + strFleTyp),
-              tplPadY=(0.01, 0.01),
-              varNumLblY=4,
-              varRound=0)
+for idxScn in range(varNumScn):
 
-# Plot hypothetical fMRI signal profile (with draining vein effect):
-plt_dpth_prfl(arySin01,
-              aryError,
-              varNumDpth,
-              varNumCon,
-              (varDpi * 1.8),
-              0.0,
-              4.0,
-              False,
-              ['1', '2'],
-              strXlabel,
-              strYlabel,
-              '',
-              False,
-              (strPthOt + 'scenario_01_fMRI' + strFleTyp),
-              tplPadY=(0.1, 0.1),
-              varNumLblY=5,
-              varRound=0)
+    # Layout, depending on scenario:
+    if (idxScn == 0) or (idxScn == 1):
+        varMinY = 0.0
+        varMaxY = 0.3
+        varNumLblY = 4
+    elif idxScn == 2:
+        varMinY = -0.3
+        varMaxY = 0.3
+        varNumLblY = 3
 
-# Plot subtractive normalisation:
-plt_dpth_prfl(vecNormSub01.reshape(1, varNumDpth),
-              aryError,
-              varNumDpth,
-              1,
-              (varDpi * 1.8),
-              0.0,
-              2.0,
-              False,
-              ['1', '2'],
-              strXlabel,
-              'Difference',
-              '',
-              False,
-              (strPthOt + 'scenario_01_sub' + strFleTyp),
-              tplPadY=(0.1, 0.1),
-              varNumLblY=3,
-              varRound=0)
+    # Plot components without draining vein effect:
+    plt_dpth_prfl(lstScnCpy[idxScn],
+                  aryError,
+                  varNumDpth,
+                  varNumCon,
+                  (varDpi * 1.8),
+                  varMinY,
+                  varMaxY,
+                  False,
+                  ['1', '2'],
+                  strXlabel,
+                  strYlabel,
+                  '',
+                  False,
+                  (strPthOt
+                   + 'scenario_'
+                   + str(idxScn).zfill(2)
+                   + '_components'
+                   + strFleTyp),
+                  tplPadY=(0.01, 0.01),
+                  varNumLblY=varNumLblY,
+                  varRound=1)
 
-# Plot divisive normalisation:
-plt_dpth_prfl(vecNormDiv01.reshape(1, varNumDpth),
-              aryError,
-              varNumDpth,
-              1,
-              (varDpi * 1.8),
-              0.0,
-              2.0,
-              False,
-              ['1', '2'],
-              strXlabel,
-              'Ratio',
-              '',
-              False,
-              (strPthOt + 'scenario_01_div' + strFleTyp),
-              tplPadY=(0.1, 0.1),
-              varNumLblY=3,
-              varRound=0)
-# -----------------------------------------------------------------------------
+    # Layout, depending on scenario:
+    if (idxScn == 0) or (idxScn == 1):
+        varMinY = 0.0
+        varMaxY = 4.0
+        varNumLblY = 5
+    elif idxScn == 2:
+        varMinY = -4.0
+        varMaxY = 4.0
+        varNumLblY = 5
 
+    # Plot hypothetical fMRI signal profile (with draining vein effect):
+    plt_dpth_prfl(lstScn[idxScn],
+                  aryError,
+                  varNumDpth,
+                  varNumCon,
+                  (varDpi * 1.8),
+                  varMinY,
+                  varMaxY,
+                  False,
+                  ['1', '2'],
+                  strXlabel,
+                  strYlabel,
+                  '',
+                  False,
+                  (strPthOt
+                   + 'scenario_'
+                   + str(idxScn).zfill(2)
+                   + '_fMRI'
+                   + strFleTyp),
+                  tplPadY=(0.1, 0.1),
+                  varNumLblY=varNumLblY,
+                  varRound=0)
 
-# -----------------------------------------------------------------------------
-# *** Create plots - Scenario 2
+    # Layout, depending on scenario:
+    if idxScn == 0:
+        varMinY = 0.0
+        varMaxY = 2.0
+        varNumLblY = 3
+        tplPadY = (0.1, 0.1)
+    elif idxScn == 1:
+        varMinY = 0.0
+        varMaxY = 4.0
+        varNumLblY = 5
+        tplPadY = (0.1, 0.1)
+    elif idxScn == 2:
+        varMinY = 0.0
+        varMaxY = 8.0
+        varNumLblY = 5
+        tplPadY = (0.15, 0.15)
 
-# Plot components without draining vein effect:
-plt_dpth_prfl(np.array((vecSin02a, vecSin02b)),
-              aryError,
-              varNumDpth,
-              varNumCon,
-              (varDpi * 1.8),
-              0.0,
-              0.3,
-              False,
-              ['1', '2'],
-              strXlabel,
-              strYlabel,
-              '',
-              False,
-              (strPthOt + 'scenario_02_components' + strFleTyp),
-              tplPadY=(0.01, 0.01),
-              varNumLblY=4,
-              varRound=0)
+    # Plot subtractive normalisation:
+    plt_dpth_prfl(lstSub[idxScn].reshape(1, varNumDpth),
+                  aryError,
+                  varNumDpth,
+                  1,
+                  (varDpi * 1.8),
+                  varMinY,
+                  varMaxY,
+                  False,
+                  ['1'],
+                  strXlabel,
+                  'Difference',
+                  '',
+                  False,
+                  (strPthOt
+                   + 'scenario_'
+                   + str(idxScn).zfill(2)
+                   + '_sub'
+                   + strFleTyp),
+                  tplPadY=tplPadY,
+                  varNumLblY=varNumLblY,
+                  varRound=0)
 
-# Plot hypothetical fMRI signal profile (with draining vein effect):
-plt_dpth_prfl(arySin02,
-              aryError,
-              varNumDpth,
-              varNumCon,
-              (varDpi * 1.8),
-              0.0,
-              4.0,
-              False,
-              ['1', '2'],
-              strXlabel,
-              strYlabel,
-              '',
-              False,
-              (strPthOt + 'scenario_02_fMRI' + strFleTyp),
-              tplPadY=(0.1, 0.1),
-              varNumLblY=5,
-              varRound=0)
+    # Layout, depending on scenario:
+    if idxScn == 0:
+        varMinY = 0.0
+        varMaxY = 2.0
+        varNumLblY = 3
+        tplPadY = (0.1, 0.1)
+    elif idxScn == 1:
+        varMinY = 0.0
+        varMaxY = 10.0
+        varNumLblY = 3
+        tplPadY = (0.1, 2.0)
+    elif idxScn == 2:
+        varMinY = -1.0
+        varMaxY = 1.0
+        varNumLblY = 3
+        tplPadY = (0.1, 0.1)
 
-# Plot subtractive normalisation:
-plt_dpth_prfl(vecNormSub02.reshape(1, varNumDpth),
-              aryError,
-              varNumDpth,
-              1,
-              (varDpi * 1.8),
-              0.0,
-              4.0,
-              False,
-              ['1', '2'],
-              strXlabel,
-              'Difference',
-              '',
-              False,
-              (strPthOt + 'scenario_02_sub' + strFleTyp),
-              tplPadY=(0.1, 0.1),
-              varNumLblY=5,
-              varRound=0)
+    # Plot divisive normalisation:
+    plt_dpth_prfl(lstDiv[idxScn].reshape(1, varNumDpth),
+                  aryError,
+                  varNumDpth,
+                  1,
+                  (varDpi * 1.8),
+                  varMinY,
+                  varMaxY,
+                  False,
+                  ['1'],
+                  strXlabel,
+                  'Ratio',
+                  '',
+                  False,
+                  (strPthOt
+                   + 'scenario_'
+                   + str(idxScn).zfill(2)
+                   + '_div'
+                   + strFleTyp),
+                  tplPadY=tplPadY,
+                  varNumLblY=varNumLblY,
+                  varRound=0)
 
-# Plot divisive normalisation:
-plt_dpth_prfl(vecNormDiv02.reshape(1, varNumDpth),
-              aryError,
-              varNumDpth,
-              1,
-              (varDpi * 1.8),
-              0.0,
-              15.0,
-              False,
-              ['1', '2'],
-              strXlabel,
-              'Ratio',
-              '',
-              False,
-              (strPthOt + 'scenario_02_div' + strFleTyp),
-              tplPadY=(0.1, 0.1),
-              varNumLblY=4,
-              varRound=0)
-# -----------------------------------------------------------------------------
+    # Layout, depending on scenario:
+    if idxScn == 0:
+        varMinY = 0.0
+        varMaxY = 1.0
+        varNumLblY = 2
+        tplPadY = (0.1, 0.3)
+    elif idxScn == 1:
+        varMinY = 0.0
+        varMaxY = 2.0
+        varNumLblY = 3
+        tplPadY = (0.1, 0.5)
+    elif idxScn == 2:
+        varMinY = 0.0
+        varMaxY = 5.0
+        varNumLblY = 2
+        tplPadY = (0.1, 0.6)
 
+    # Plot subtraction of deconvolved profiles:
+    plt_dpth_prfl(aryDeconSub[idxScn, :].reshape(1, varNumDpth),
+                  aryError,
+                  varNumDpth,
+                  1,
+                  (varDpi * 1.8),
+                  varMinY,
+                  varMaxY,
+                  False,
+                  ['1'],
+                  strXlabel,
+                  'Difference',
+                  '',
+                  False,
+                  (strPthOt
+                   + 'scenario_'
+                   + str(idxScn).zfill(2)
+                   + '_deconv_sub'
+                   + strFleTyp),
+                  tplPadY=tplPadY,
+                  varNumLblY=varNumLblY,
+                  varRound=0)
 
-# -----------------------------------------------------------------------------
-# *** Create plots - Scenario 3
+    # Layout, depending on scenario:
+    if idxScn == 0:
+        varMinY = 0.0
+        varMaxY = 2.0
+        varNumLblY = 3
+        tplPadY = (0.1, 0.1)
+    elif idxScn == 1:
+        varMinY = 0.0
+        varMaxY = 4.0
+        varNumLblY = 5
+        tplPadY = (0.1, 0.1)
+    elif idxScn == 2:
+        varMinY = 0.0
+        varMaxY = 8.0
+        varNumLblY = 5
+        tplPadY = (0.15, 0.15)
 
-# Plot components without draining vein effect:
-plt_dpth_prfl(np.array((vecSin03a, vecSin03b)),
-              aryError,
-              varNumDpth,
-              varNumCon,
-              (varDpi * 1.8),
-              -0.3,
-              0.3,
-              False,
-              ['1', '2'],
-              strXlabel,
-              strYlabel,
-              '',
-              False,
-              (strPthOt + 'scenario_03_components' + strFleTyp),
-              tplPadY=(0.01, 0.01),
-              varNumLblY=3,
-              varRound=0)
-
-# Plot hypothetical fMRI signal profile (with draining vein effect):
-plt_dpth_prfl(arySin03,
-              aryError,
-              varNumDpth,
-              varNumCon,
-              (varDpi * 1.8),
-              -4.0,
-              4.0,
-              False,
-              ['1', '2'],
-              strXlabel,
-              strYlabel,
-              '',
-              False,
-              (strPthOt + 'scenario_03_fMRI' + strFleTyp),
-              tplPadY=(0.15, 0.15),
-              varNumLblY=5,
-              varRound=0)
-
-# Plot subtractive normalisation:
-plt_dpth_prfl(vecNormSub03.reshape(1, varNumDpth),
-              aryError,
-              varNumDpth,
-              1,
-              (varDpi * 1.8),
-              0.0,
-              8.0,
-              False,
-              ['1', '2'],
-              strXlabel,
-              'Difference',
-              '',
-              False,
-              (strPthOt + 'scenario_03_sub' + strFleTyp),
-              tplPadY=(0.15, 0.15),
-              varNumLblY=5,
-              varRound=0)
-
-# Plot divisive normalisation:
-plt_dpth_prfl(vecNormDiv03.reshape(1, varNumDpth),
-              aryError,
-              varNumDpth,
-              1,
-              (varDpi * 1.8),
-              -1.0,
-              1.0,
-              False,
-              ['1', '2'],
-              strXlabel,
-              'Ratio',
-              '',
-              False,
-              (strPthOt + 'scenario_03_div' + strFleTyp),
-              tplPadY=(0.1, 0.1),
-              varNumLblY=3,
-              varRound=0)
+    # Plot "ground truth":
+    plt_dpth_prfl(aryTrth[idxScn, :].reshape(1, varNumDpth),
+                  aryError,
+                  varNumDpth,
+                  1,
+                  (varDpi * 1.8),
+                  varMinY,
+                  varMaxY,
+                  False,
+                  ['1'],
+                  strXlabel,
+                  'Difference',
+                  '',
+                  False,
+                  (strPthOt
+                   + 'scenario_'
+                   + str(idxScn).zfill(2)
+                   + '_truth'
+                   + strFleTyp),
+                  tplPadY=tplPadY,
+                  varNumLblY=varNumLblY,
+                  varRound=0)
 # -----------------------------------------------------------------------------
 
 
@@ -415,7 +507,7 @@ plt_dpth_prfl(vecDcy.reshape(1, varNumDpth),
               1,
               (varDpi * 1.8),
               0.0,
-              1.0,
+              3.0,
               False,
               ['1'],
               strXlabel,
@@ -424,6 +516,6 @@ plt_dpth_prfl(vecDcy.reshape(1, varNumDpth),
               False,
               (strPthOt + 'convolution_term' + strFleTyp),
               tplPadY=(0.1, 0.1),
-              varNumLblY=3,
+              varNumLblY=4,
               varRound=0)
 # -----------------------------------------------------------------------------

@@ -54,10 +54,10 @@ varBumpWidth = 20.0
 varDpi = 80.0
 
 # Output folder:
-strPthOt = '/home/john/Dropbox/Thesis/Chapters/General_Discussion/Figures/Figure_5_1_Normalisation/elements/test/'  #noqa
+strPthOt = '/home/john/Dropbox/Thesis/Chapters/General_Discussion/Figures/Figure_5_1_Normalisation/Version_02_exp/elements/'  #noqa
 
 # Figure output file type:
-strFleTyp = '.png'
+strFleTyp = '.svg'
 # -----------------------------------------------------------------------------
 
 
@@ -346,7 +346,7 @@ for idxScn in range(varNumScn):
         varMinY = 0.0
         varMaxY = 4.0
         varNumLblY = 5
-        tplPadY = (0.1, 0.1)
+        tplPadY = (0.2, 0.1)
     elif idxScn == 2:
         varMinY = 0.0
         varMaxY = 8.0
@@ -466,7 +466,7 @@ for idxScn in range(varNumScn):
         varMinY = 0.0
         varMaxY = 4.0
         varNumLblY = 5
-        tplPadY = (0.1, 0.1)
+        tplPadY = (0.2, 0.1)
     elif idxScn == 2:
         varMinY = 0.0
         varMaxY = 8.0

@@ -332,7 +332,7 @@ for idxScn in range(varNumScn):
                    + str(idxScn).zfill(2)
                    + '_fMRI'
                    + strFleTyp),
-                  tplPadY=(0.1, 0.1),
+                  tplPadY=(0.15, 0.1),
                   varNumLblY=varNumLblY,
                   varRound=0)
 
@@ -351,7 +351,7 @@ for idxScn in range(varNumScn):
         varMinY = 0.0
         varMaxY = 8.0
         varNumLblY = 5
-        tplPadY = (0.15, 0.15)
+        tplPadY = (0.5, 0.1)
 
     # Plot subtractive normalisation:
     plt_dpth_prfl(lstSub[idxScn].reshape(1, varNumDpth),

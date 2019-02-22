@@ -230,8 +230,9 @@ for idxSnc in range(varNumScn):
                                                vecPosEmp,
                                                method='linear')
 
+# Slight gaussian filtering:
 aryDecon = gaussian_filter1d(aryDecon,
-                             (0.1 * float(varNumDpth)),
+                             (0.05 * float(varNumDpth)),
                              axis=2,
                              mode='nearest')
 # -----------------------------------------------------------------------------
@@ -421,17 +422,17 @@ for idxScn in range(varNumScn):
         varMinY = 0.0
         varMaxY = 1.0
         varNumLblY = 2
-        tplPadY = (0.1, 0.3)
+        tplPadY = (0.1, 0.5)
     elif idxScn == 1:
         varMinY = 0.0
-        varMaxY = 2.0
-        varNumLblY = 3
-        tplPadY = (0.1, 0.5)
+        varMaxY = 3.0
+        varNumLblY = 4
+        tplPadY = (0.1, 0.0)
     elif idxScn == 2:
         varMinY = 0.0
-        varMaxY = 5.0
-        varNumLblY = 2
-        tplPadY = (0.1, 0.6)
+        varMaxY = 6.0
+        varNumLblY = 3
+        tplPadY = (0.3, 0.5)
 
     # Plot subtraction of deconvolved profiles:
     plt_dpth_prfl(aryDeconSub[idxScn, :].reshape(1, varNumDpth),

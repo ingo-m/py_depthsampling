@@ -24,9 +24,9 @@ lstRoi = ['v1', 'v2']
 lstMta = ['centre', 'edge', 'background']
 
 # List of conditions:
-lstCon = ['kanizsa',
-          'kanizsa_rotated',
-          'bright_square']
+lstCon = ['bright_square',
+          'kanizsa',
+          'kanizsa_rotated']
 
 # Output path for data csv file (metacondition left open):
 strCsv = '/Users/john/1_PhD/GitLab/py_depthsampling/py_depthsampling/lme/ert_{}.csv'  #noqa

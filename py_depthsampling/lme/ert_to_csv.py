@@ -15,21 +15,24 @@ import pandas as pd
 
 # Path of npz files with cortical depth profiles (metacondition and ROI left
 # open):
-strPckl = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/era_{}.pickle'  #noqa
+strPckl = '/Users/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/era_{}.pickle'  #noqa
 
 # List of ROIs:
-lstRoi = ['v1']
+lstRoi = ['v1', 'v2']
 
 # List of metaconditions:
-lstMta = ['centre']
+lstMta = ['centre', 'edge', 'background']
 
 # List of conditions:
 lstCon = ['kanizsa',
           'kanizsa_rotated',
           'bright_square']
 
-# Output path for data csv file:
-strCsv = '/home/john/PhD/GitLab/py_depthsampling/py_depthsampling/lme/ert.csv'  #noqa
+# Output path for data csv file (metacondition left open):
+strCsv = '/Users/john/1_PhD/GitLab/py_depthsampling/py_depthsampling/lme/ert_{}.csv'  #noqa
+
+# Crop ERT (start & end time point), do not crop if 'None'.
+tplCrp = (5, 16)
 
 
 # -----------------------------------------------------------------------------
@@ -44,7 +47,6 @@ varNumMta = len(lstMta)
 # Number of ROIs:
 varNumRoi = len(lstRoi)
 
-
 # List of features for dataframe:
 lstFtr = ['ROI', 'Condition', 'Subject', 'Volume', 'Vertices', 'PSC']
 
@@ -57,8 +59,8 @@ for idxMta in lstMta:
     for idxRoi in lstRoi:
 
         # *********************************************************************
-        # *** Load data from disk        
-        
+        # *** Load data from disk
+
         # Path of current input pickle file:
         strPcklTmp = strPckl.format(idxMta, idxRoi)
 
@@ -94,8 +96,8 @@ for idxMta in lstMta:
             # Subtract baseline mean:
             aryRoiErt = np.subtract(aryRoiErt, 1.0)
             # Is this line necessary (hard copy)?
-            dicAllSubsRoiErt[strSubID] = [aryRoiErt, lstItem[1]] 
-            
+            dicAllSubsRoiErt[strSubID] = [aryRoiErt, lstItem[1]]
+
         # *********************************************************************
         # *** Create group level ERT
 
@@ -132,6 +134,15 @@ for idxMta in lstMta:
 
         # New shape:
         # aryAllSubsRoiErt[varNumSub, varNumCon, varNumVol]
+
+        # *********************************************************************
+        # *** Crop time course
+
+        if not tplCrp is None:
+            # Crop time course:
+            aryAllSubsRoiErt = aryAllSubsRoiErt[:, :, tplCrp[0]:tplCrp[1]]
+            # Update number of volumes:
+            varNumVol = aryAllSubsRoiErt.shape[2]
 
     # *************************************************************************
     # *** Put samples into dataframe
@@ -171,16 +182,16 @@ for idxMta in lstMta:
                     objDf.at[idxSmpl, 'PSC'] = aryAllSubsRoiErt[idxSub,
                                                                 idxCon,
                                                                 idxVol]
-    
+
                     # Increment counter:
                     idxSmpl += 1
 
 
-# -----------------------------------------------------------------------------
-# *** Save data to csv
+    # *************************************************************************
+    # *** Save data to csv
 
-objDf.to_csv(strCsv, sep=';', index=False)
-# -----------------------------------------------------------------------------
+    objDf.to_csv(strCsv.format(idxMta), sep=';', index=False)
+    # *************************************************************************
 
 
 # -----------------------------------------------------------------------------

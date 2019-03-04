@@ -24,7 +24,7 @@ lstCon = ['kanizsa',
           'bright_square']
 
 # Output path for data csv file:
-strCsv = '/home/john/PhD/GitLab/py_depthsampling/py_depthsampling/lme/surface_depth_data_centre.csv'  #noqa
+strCsv = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/centre/depth_data_lme.csv'  #noqa
 
 
 # -----------------------------------------------------------------------------

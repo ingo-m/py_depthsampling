@@ -192,5 +192,8 @@ mdlFull = lme(PSC ~ ROI + Condition + Volume +
 anova(mdlNull, mdlFull)
 
 #library(ggplot2)
-#ggplot(data=objDf, aes(x=Volume, y=PSC, group=ROI, color=ROI)) +
-#  geom_line()
+#objDfTmp <- objDfKonly[objDfKonly$ROI=='V1',]
+#objDfTmp <- aggregate(PSC ~ Volume/Condition, objDfKonly, mean)
+#ggplot(data=objDfTmp, aes(x=Volume, y=PSC, group=Condition, color=Condition)) +
+#  geom_line() +
+#  geom_point()

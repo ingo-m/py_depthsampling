@@ -15,7 +15,7 @@ import pandas as pd
 
 # Path of npz files with cortical depth profiles (metacondition and ROI left
 # open):
-strPckl = '/Users/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/era_{}.pickle'  #noqa
+strPckl = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/era_{}.pickle'  #noqa
 
 # List of ROIs:
 lstRoi = ['v1', 'v2']
@@ -29,7 +29,7 @@ lstCon = ['bright_square',
           'kanizsa_rotated']
 
 # Output path for data csv file (metacondition left open):
-strCsv = '/Users/john/1_PhD/GitLab/py_depthsampling/py_depthsampling/lme/ert_{}.csv'  #noqa
+strCsv = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/ert_lme.csv'  #noqa
 
 # Crop ERT (start & end time point), do not crop if 'None'.
 tplCrp = (5, 16)
@@ -42,7 +42,7 @@ tplCrp = (5, 16)
 varNumMta = len(lstMta)
 
 # Number of conditions:
-#varNumCon = len(lstCon)
+# varNumCon = len(lstCon)
 
 # Number of ROIs:
 varNumRoi = len(lstRoi)
@@ -79,7 +79,6 @@ for idxMta in lstMta:
         # On first iteration, initialise vector for number of vertices per
         # subject:
         # if idxRoi == 0:
-
 
         # *********************************************************************
         # *** Subtract baseline mean
@@ -138,7 +137,7 @@ for idxMta in lstMta:
         # *********************************************************************
         # *** Crop time course
 
-        if not tplCrp is None:
+        if tplCrp is not None:
             # Crop time course:
             aryAllSubsRoiErt = aryAllSubsRoiErt[:, :, tplCrp[0]:tplCrp[1]]
             # Update number of volumes:
@@ -185,7 +184,6 @@ for idxMta in lstMta:
 
                     # Increment counter:
                     idxSmpl += 1
-
 
     # *************************************************************************
     # *** Save data to csv

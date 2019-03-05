@@ -99,6 +99,7 @@ def ert_plt(aryRoiErtMeanDpth,  #noqa
     # objCmap = plt.cm.winter
     objClrNorm = colors.Normalize(vmin=0, vmax=9)
     objCmap = plt.cm.tab10
+    # objCmap = plt.cm.Set1
 
     # Plot vertical lines (e.g. representing response onset):
     if lstVrt is not None:

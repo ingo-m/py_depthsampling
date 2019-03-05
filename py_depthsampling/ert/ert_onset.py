@@ -160,7 +160,12 @@ def ert_onset(lstPthPic, strPthPlt, lstConLbl, strTitle=' ', varSkip=2,
 
             # Average over conditions and over all depth levels within subject.
             # New shape: aryMneWthn[varNumSub, varNumVol].
-            aryMneWthn = np.mean(aryAllSubsRoiErt, axis=(1, 2))
+            # aryMneWthn = np.mean(aryAllSubsRoiErt, axis=(1, 2))
+
+            # NOTE: Makeshift solution for surface project - only plot one
+            # condition ('Kanizsa square').
+            aryMneWthn = np.mean(aryAllSubsRoiErt, axis=(2))
+            aryMneWthn = aryMneWthn[:, 1, :]
 
         elif len(lstDpth) == 1:
 
@@ -238,7 +243,7 @@ def ert_onset(lstPthPic, strPthPlt, lstConLbl, strTitle=' ', varSkip=2,
     # *** Create plot
 
     # Limits of axes:
-    varYmin = -0.04
+    varYmin = -0.01
     varYmax = 0.02
 
     # Number of labels on y-axis:
@@ -257,7 +262,7 @@ def ert_onset(lstPthPic, strPthPlt, lstConLbl, strTitle=' ', varSkip=2,
 
     # Volume index of end of stimulus period (i.e. index of last volume during
     # which stimulus was on - for the plot):
-    varStimEnd = 10
+    varStimEnd = 11
 
     # Volume TR (in seconds, for the plot):
     varTr = 2.079
@@ -293,7 +298,7 @@ def ert_onset(lstPthPic, strPthPlt, lstConLbl, strTitle=' ', varSkip=2,
             varTmeScl=1.0,
             varXlbl=5,
             varYnum=varYnum,
-            tplPadY=(0.001, 0.001),
+            tplPadY=(0.002, 0.006),
             lstVrt=lstOnset)
     # *************************************************************************
 
@@ -304,34 +309,35 @@ if __name__ == "__main__":
     # *** Define parameters
 
     # Meta-condition (within or outside of retinotopic stimulus area):
-    lstMtaCn = ['stimulus', 'periphery']
+    lstMtaCn = ['centre', 'edge', 'background']
 
     # Condition label:
     lstConLbl = lstMtaCn
 
     # Region of interest ('v1' or 'v2'):
-    lstRoi = ['v1', 'v2', 'v3']
+    lstRoi = ['v1', 'v2']
 
     # Hemispheres ('lh' or 'rh'):
-    lstHmsph = ['rh']
+    lstHmsph = ['']
 
     # Nested list with depth levels to average over. For instance, if `lstDpth
     # = [[0, 1, 2], [3, 4, 5]]`, on a first iteration, the average over the
     # first three depth levels is calculated, and on a second iteration the
     # average over the subsequent three depth levels is calculated. If
     # 1lstDpth= [[None]]1, average over all depth levels.
-    lstDpth = [None, [0, 1, 2], [4, 5, 6], [8, 9, 10]]
+    lstDpth = [None]
     # lstDpth = [[x] for x in range(11)]
     # Depth level condition labels (output file will contain this label):
-    lstDpthLbl = ['allGM', 'deepGM', 'midGM', 'superficialGM']
+    lstDpthLbl = ['allGM']
     # lstDpthLbl = [str(x) for x in range(11)]
 
     # Output path for plots. ROI,hemisphere, and depth level left open):
-    strPlt = '/home/john/Dropbox/PacMan_Plots/era_onset/{}_{}_{}.svg'
+    strPlt = '/home/john/Dropbox/Surface_Plots/ert_onset/{}_{}_{}.svg'
 
     # Name of pickle file from which to load time course data (metacondition,
     # ROI, and hemisphere left open):
-    strPthPic = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/era_{}_{}.pickle'  #noqa
+    strPthPic = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/era_{}{}.pickle'  #noqa
+
 
     # *************************************************************************
     # *** Create plots
@@ -341,15 +347,17 @@ if __name__ == "__main__":
         for idxHmsph in range(len(lstHmsph)):
             for idxDpth in range(len(lstDpth)):
 
-                # Complete path of input pickle (stimulus centre):
-                strPthPic01 = strPthPic.format(lstMtaCn[0], lstRoi[idxRoi],
-                                               lstHmsph[idxHmsph])
+                # List for input paths (pickle files):
+                lstPthPic = [None] * len(lstMtaCn)
 
-                # Complete path of input pickle (stimulus edge):
-                strPthPic02 = strPthPic.format(lstMtaCn[1], lstRoi[idxRoi],
-                                               lstHmsph[idxHmsph])
+                for idxMta in range(len(lstMtaCn)):
 
-                lstPthPic = [strPthPic01, strPthPic02]
+                    # Complete path of input pickle:
+                    strPthPicTmp = strPthPic.format(lstMtaCn[idxMta],
+                                                    lstRoi[idxRoi],
+                                                    lstHmsph[idxHmsph])
+
+                    lstPthPic[idxMta] = strPthPicTmp
 
                 strTitleTmp = lstRoi[idxRoi].upper()
 
@@ -357,5 +365,6 @@ if __name__ == "__main__":
                                           lstDpthLbl[idxDpth])
 
                 ert_onset(lstPthPic, strPltTmp, lstConLbl,
-                          strTitle=strTitleTmp, lstDpth=lstDpth[idxDpth])
+                          strTitle=strTitleTmp, lstDpth=lstDpth[idxDpth],
+                          varSkip=5)
     # *************************************************************************

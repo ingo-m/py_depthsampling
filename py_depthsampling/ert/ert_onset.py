@@ -239,6 +239,24 @@ def ert_onset(lstPthPic, strPthPlt, lstConLbl, strTitle=' ', varSkip=2,
         aryGrndMne[idxRoi, :] = np.copy(aryMneTmp)
         aryGrndSem[idxRoi, :] = np.copy(arySem)
 
+        # *********************************************************************
+        # *** Compute onset time based on absolute threshold
+
+        # NOTE: Makeshift solution for absolute onset time.
+
+        # Amplitude threshold for onset time:
+        # varOnThr = 0.003
+
+        # Where does timecourse exceed threshold?
+        # vecLgc = np.greater(np.absolute(aryMneTmp), varOnThr)
+
+        # Set volumes before baseline to false:
+        # vecLgc[:varSkip] = False
+
+        # Find first volume over threshold:
+        # varFirst = np.argmax(vecLgc)
+        # lstOnset[idxRoi] = varFirst
+
     # *************************************************************************
     # *** Create plot
 

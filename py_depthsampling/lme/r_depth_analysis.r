@@ -7,6 +7,10 @@ objDf <- read.csv(file='/home/john/PhD/GitLab/py_depthsampling/py_depthsampling/
 
 # head(objDf)
 
+# Test only PacMan dynamic and control dynamic conditions, exclude PacMan static
+# condition:
+# objDf <- objDf[objDf$Condition!='PS',]
+
 # (1)
 # Do the stimuli differentially activate the ROIs (i.e. does activation differ
 # between ROIs as a function of condition)?

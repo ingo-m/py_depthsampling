@@ -22,10 +22,10 @@ objDf <- objDf[objDf$Condition!='PS',]
 objDf <- objDf[objDf$ROI!='V3',]
 
 # Test only the deepest cortical depth levels:
-objDf <- objDf[objDf$Depth<3,]
+objDf <- objDf[objDf$Depth<2,]
 
 # Dimensionality reduction - mean over depth levels:
-objDf <- aggregate(PSC ~ ROI + Condition + Subject, objDf, mean)
+objDf <- aggregate(PSC ~ ROI + Condition + Subject + Vertices, objDf, mean)
 
 # Fit ANOVA model:
 objAov <-  aov(PSC ~ ROI * Condition + Subject,
@@ -42,12 +42,14 @@ mdlFull = lme(PSC ~ ROI + Condition +
               ROI:Condition,  # Effect of interest
               objDf,
               random=(~1|Subject),
+              weights=(~1/Vertices),
               method='ML')
 
 # Null model:
 mdlNull = lme(PSC ~ ROI + Condition,
               objDf,
               random=(~1|Subject),
+              weights=(~1/Vertices),
               method='ML')
 
 # Model comparison:

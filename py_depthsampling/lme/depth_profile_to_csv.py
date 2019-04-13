@@ -11,8 +11,8 @@ import pandas as pd
 # *** Define parameters
 
 # Path of npz files with cortical depth profiles (ROI and condition left open):
-# strNpz = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/{}_rh_{}_sst_deconv_model_1.npz'  #noqa
-strNpz = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/periphery/{}_rh_{}_trn_deconv_model_1.npz'  #noqa
+strNpz = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/{}_rh_{}_sst_deconv_model_1.npz'  #noqa
+# strNpz = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/periphery/{}_rh_{}_trn_deconv_model_1.npz'  #noqa
 
 # List of ROIs:
 lstRoi = ['v1', 'v2', 'v3']
@@ -21,8 +21,8 @@ lstRoi = ['v1', 'v2', 'v3']
 lstCon = ['Pd', 'Ps', 'Cd']
 
 # Output path for data csv file:
-# strCsv = '/home/john/PhD/GitLab/py_depthsampling/py_depthsampling/lme/depth_data_stimulus.csv'  #noqa
-strCsv = '/home/john/PhD/GitLab/py_depthsampling/py_depthsampling/lme/depth_data_periphery.csv'  #noqa
+strCsv = '/home/john/PhD/GitLab/py_depthsampling/py_depthsampling/lme/depth_data_stimulus_nvertices.csv'  #noqa
+# strCsv = '/home/john/PhD/GitLab/py_depthsampling/py_depthsampling/lme/depth_data_periphery_nvertices.csv'  #noqa
 
 
 # -----------------------------------------------------------------------------
@@ -43,7 +43,7 @@ varNumSub = ary01.shape[0]
 varNumDpth = ary01.shape[1]
 
 # List of features for dataframe:
-lstFtr = ['ROI', 'Condition', 'Subject', 'Depth', 'PSC']
+lstFtr = ['ROI', 'Condition', 'Subject', 'Depth', 'Vertices', 'PSC']
 
 # Number of samples:
 varNumSmpl = (varNumRoi * varNumCon * varNumSub * varNumDpth)
@@ -56,6 +56,7 @@ dicType = {'ROI': str,
            'Condition': str,
            'Subject': np.int16,
            'Depth': np.int16,
+           'Vertices': np.int32,
            'PSC': np.float64}
 
 # Set datatype:
@@ -74,7 +75,12 @@ for idxRoi in lstRoi:
 
         # Load npz file:
         objNpz01 = np.load(strNpz.format(idxRoi, idxCon))
+
+        # Depth profiles:
         ary01 = objNpz01['arySubDpthMns']
+
+        # Numebr of vertices:
+        vecNumInc = objNpz01['vecNumInc']
 
         for idxSub in range(varNumSub):
             for idxDpth in range(varNumDpth):
@@ -84,6 +90,7 @@ for idxRoi in lstRoi:
                 objDf.at[idxSmpl, 'Condition'] = idxCon.upper()
                 objDf.at[idxSmpl, 'Subject'] = idxSub
                 objDf.at[idxSmpl, 'Depth'] = idxDpth
+                objDf.at[idxSmpl, 'Vertices'] = vecNumInc[idxSub]
                 objDf.at[idxSmpl, 'PSC'] = ary01[idxSub, idxDpth]
 
                 # Increment counter:

@@ -43,7 +43,7 @@ from py_depthsampling.main.main import ds_main
 # *** Define parameters
 
 # Meta-condition (within or outside of retinotopic stimulus area):
-lstMetaCon = ['centre', 'edge', 'diamond', 'background']
+lstMetaCon = ['square_centre', 'square_edge', 'background', 'fullscreen']
 
 # Region of interest ('v1' or 'v2'):
 lstRoi = ['v1', 'v2', 'v3']
@@ -52,30 +52,18 @@ lstRoi = ['v1', 'v2', 'v3']
 lstHmsph = ['rh', 'lh']
 
 # List of subject identifiers:
-lstSubIds = ['20181105',
-             '20181107',
-             '20181108']
+lstSubIds = ['20190502']
 
 # Condition levels (used to complete file names) - nested list:
-lstNstCon = [['bright_square_sst_pe',
-              'kanizsa_rotated_sst_pe',
-              'kanizsa_sst_pe']]
-#             ['bright_square_sst_zstat',
-#              'kanizsa_rotated_sst_zstat',
-#              'kanizsa_sst_zstat'],
-#             ['bright_square_trn_pe',
-#              'kanizsa_rotated_trn_pe',
-#              'kanizsa_trn_pe'],
-#             ['bright_square_trn_zstat',
-#              'kanizsa_rotated_trn_zstat',
-#              'kanizsa_trn_zstat']]
+lstNstCon = [['bright_square_txtr_sst_pe',
+              'full_screen_txtr_sst_pe']]
 
 # Condition labels:
 lstNstConLbl = lstNstCon
 
 # Base path of vtk files with depth-sampled data, e.g. parameter estimates
 # (with subject ID, hemisphere, and stimulus level left open):
-strVtkDpth01 = '/media/sf_D_DRIVE/MRI_Data_PhD/09_surface/{}/cbs/{}/feat_level_2_{}.vtk'  #noqa
+strVtkDpth01 = '/media/sf_D_DRIVE/MRI_Data_PhD/11_texture/{}/cbs/{}/feat_level_2_{}.vtk'
 
 # (1)
 # Restrict vertex selection to region of interest (ROI)?
@@ -87,7 +75,7 @@ lgcSlct01 = True
 # by the funtion `py_depthsampling.misc.fix_roi_csv.fix_roi_csv` in order to
 # ensure that the indices of the ROI definition and the vtk meshes are
 # congruent.
-strCsvRoi = '/home/john/PhD/GitLab/surface/analysis/{}/08_depthsampling/{}/{}.csv'  #noqa
+strCsvRoi = '/home/john/PhD/GitLab/texture/analysis/{}/08_depthsampling/{}/{}.csv'  #noqa
 # Number of header lines in ROI CSV file:
 varNumHdrRoi = 1
 
@@ -98,7 +86,7 @@ lgcSlct02 = True
 # Path of vtk files with for vertex selection criterion. This vtk file is
 # supposed to contain one set of data values for each depth level. (With
 # subject ID and hemisphere left open.)
-strVtkSlct02 = '/media/sf_D_DRIVE/MRI_Data_PhD/09_surface/{}/cbs/{}/pRF_results_R2.vtk'  #noqa
+strVtkSlct02 = '/media/sf_D_DRIVE/MRI_Data_PhD/11_texture/{}/cbs/{}/pRF_results_R2.vtk'  #noqa
 # Threshold for vertex selection:
 varThrSlct02 = 0.15
 
@@ -109,7 +97,7 @@ lgcSlct03 = True
 # Path of vtk files with for vertex selection criterion. This vtk file is
 # supposed to contain one set of data values for each depth level. (With
 # subject ID and hemisphere left open.)
-strVtkSlct03 = '/media/sf_D_DRIVE/MRI_Data_PhD/09_surface/{}/cbs/{}/combined_mean.vtk'  #noqa
+strVtkSlct03 = '/media/sf_D_DRIVE/MRI_Data_PhD/11_texture/{}/cbs/{}/combined_mean.vtk'  #noqa
 # Threshold for vertex selection:
 varThrSlct03 = 5000.0
 
@@ -120,7 +108,7 @@ lgcSlct04 = True
 # Path of vtk files with for vertex selection criterion. This vtk file is
 # supposed to contain one set of data values for each depth level. (With
 # subject ID, hemisphere, and meta-condition left open.)
-strVtkSlct04 = '/media/sf_D_DRIVE/MRI_Data_PhD/09_surface/{}/cbs/{}/pRF_results_ovrlp_ctnr_{}.vtk'  #noqa
+strVtkSlct04 = '/media/sf_D_DRIVE/MRI_Data_PhD/11_texture/{}/cbs/{}/pRF_results_ovrlp_ctnr_{}.vtk'  #noqa
 # Threshold for vertex selection - list of tuples (interval per meta-condition,
 # e.g. within & outside stimulus area):
 lstThrSlct04 = [(0.5, 1000.0), (0.5, 1000.0), (0.5, 1000.0), (0.5, 1000.0)]
@@ -141,7 +129,7 @@ strXlabel = 'Cortical depth level'
 strYlabel = 'Signal change [%]'
 
 # Output path for plots - prefix:
-strPltOtPre = '/home/john/PhD/Surface_Plots/pe/{}_{}_'
+strPltOtPre = '/home/john/Dropbox/Texture_Plots_02/pe/{}_{}_'
 
 # Output path for plots - suffix:
 strPltOtSuf = '_{}{}_{}.png'
@@ -160,7 +148,7 @@ varNormIdx = 0
 lgcNormDiv = False
 
 # Output path for depth samling results (within subject means):
-strDpthMeans = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/{}_{}.npz'  #noqa
+strDpthMeans = '/home/john/Dropbox/Texture_Depth_Data_02/Higher_Level_Analysis/{}/{}_{}.npz'
 
 # Maximum number of processes to run in parallel: *** NOT IMPLEMENTED
 # varPar = 10

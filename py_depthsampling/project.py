@@ -56,27 +56,27 @@ strFlTp = '.png'
 varDpi = 80.0
 
 # Condition levels (used to complete file names):
-lstCon = ['feat_level_2_bright_square_txtr_sst_pe.vtk',
-          'feat_level_2_bright_square_txtr_sst_zstat.vtk',
-          'feat_level_2_full_screen_txtr_sst_pe.vtk',
-          'feat_level_2_full_screen_txtr_sst_zstat.vtk',
-          'feat_level_2_target_pe.vtk',
-          'feat_level_2_target_zstat.vtk',
-          'pRF_results_eccentricity.vtk',
-          'pRF_results_ovrlp_ctnr_background.vtk',
-          'pRF_results_ovrlp_ctnr_fullscreen.vtk',
-          'pRF_results_ovrlp_ctnr_square_centre.vtk',
-          'pRF_results_ovrlp_ctnr_square_edge.vtk',
-          'pRF_results_ovrlp_ratio_background.vtk',
-          'pRF_results_ovrlp_ratio_fullscreen.vtk',
-          'pRF_results_ovrlp_ratio_square_centre.vtk',
-          'pRF_results_ovrlp_ratio_square_edge.vtk',
-          'pRF_results_PE_01.vtk',
-          'pRF_results_polar_angle.vtk',
-          'pRF_results_R2.vtk',
-          'pRF_results_SD.vtk',
-          'pRF_results_x_pos.vtk',
-          'pRF_results_y_pos.vtk']
+lstCon = ['feat_level_2_bright_square_txtr_sst_pe',
+          'feat_level_2_bright_square_txtr_sst_zstat',
+          'feat_level_2_full_screen_txtr_sst_pe',
+          'feat_level_2_full_screen_txtr_sst_zstat',
+          'feat_level_2_target_pe',
+          'feat_level_2_target_zstat',
+          'pRF_results_eccentricity',
+          'pRF_results_ovrlp_ctnr_background',
+          'pRF_results_ovrlp_ctnr_fullscreen',
+          'pRF_results_ovrlp_ctnr_square_centre',
+          'pRF_results_ovrlp_ctnr_square_edge',
+          'pRF_results_ovrlp_ratio_background',
+          'pRF_results_ovrlp_ratio_fullscreen',
+          'pRF_results_ovrlp_ratio_square_centre',
+          'pRF_results_ovrlp_ratio_square_edge',
+          'pRF_results_PE_01',
+          'pRF_results_polar_angle',
+          'pRF_results_R2',
+          'pRF_results_SD',
+          'pRF_results_x_pos',
+          'pRF_results_y_pos']
 
 # Path of vtk mesh with data to project into visual space (e.g. parameter
 # estimates; subject ID, hemisphere, and contion level left open).

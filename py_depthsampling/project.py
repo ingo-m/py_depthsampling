@@ -151,8 +151,8 @@ for idxDpth in range(len(lstDpth)):  #noqa
             # Adjust colour bar:
             if '_pe' in lstCon[idxCon]:
                 # Fixed colour bar for GLM parameter estimates:
-                varMin = -4.0
-                varMax = 4.0
+                varMin = -2.0
+                varMax = 2.0
             else:
                 # Adjust colour bars based on data range:
                 varMin = None

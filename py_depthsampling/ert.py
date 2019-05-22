@@ -93,7 +93,7 @@ lgcLgnd02 = True
 # Output path for plots - prfix (metacondition and ROI left open):
 strPltOtPre = '/home/john/Dropbox/Texture_Plots_02/ert/{}_{}_'
 # Output path for plots - suffix:
-strPltOtSuf = '_ert.png'
+strPltOtSuf = '_ert.svg'
 
 # Figure scaling factor:
 varDpi = 100.0
@@ -106,41 +106,41 @@ varDpi = 100.0
 # Loop through ROIs, hemispheres, and conditions to create plots:
 for idxMtaCn in range(len(lstMtaCn)):
 
-    if lstMtaCn[idxMtaCn] == 'square_edge':
-        # Limits of y-axis:
-        varAcrSubsYmin = -0.05
-        varAcrSubsYmax = 0.05
-        # Number of labels on y-axis:
-        varYnum = 3
-        # Padding around labelled values on y:
-        tplPadY = (0.001, 0.001)
-
-    elif lstMtaCn[idxMtaCn] == 'square_centre':
+    if lstMtaCn[idxMtaCn] == 'square_centre':
         # Limits of y-axis:
         varAcrSubsYmin = -0.02
-        varAcrSubsYmax = 0.04
+        varAcrSubsYmax = 0.03
         # Number of labels on y-axis:
-        varYnum = 4
+        varYnum = 6
         # Padding around labelled values on y:
-        tplPadY = (0.003, 0.003)
+        tplPadY = (0.0, 0.005)
 
     elif lstMtaCn[idxMtaCn] == 'background':
         # Limits of y-axis:
-        varAcrSubsYmin = -0.05
-        varAcrSubsYmax = 0.05
+        varAcrSubsYmin = -0.01
+        varAcrSubsYmax = 0.02
         # Number of labels on y-axis:
-        varYnum = 3
+        varYnum = 4
         # Padding around labelled values on y:
-        tplPadY = (0.001, 0.001)
+        tplPadY = (0.007, 0.005)
 
     elif lstMtaCn[idxMtaCn] == 'fullscreen':
         # Limits of y-axis:
-        varAcrSubsYmin = -0.05
-        varAcrSubsYmax = 0.05
+        varAcrSubsYmin = -0.01
+        varAcrSubsYmax = 0.03
         # Number of labels on y-axis:
-        varYnum = 3
+        varYnum = 5
         # Padding around labelled values on y:
-        tplPadY = (0.001, 0.001)
+        tplPadY = (0.005, 0.005)
+
+    elif lstMtaCn[idxMtaCn] == 'square_edge':
+        # Limits of y-axis:
+        varAcrSubsYmin = -0.01
+        varAcrSubsYmax = 0.04
+        # Number of labels on y-axis:
+        varYnum = 6
+        # Padding around labelled values on y:
+        tplPadY = (0.005, 0.0)
 
     for idxRoi in range(len(lstRoi)):
 

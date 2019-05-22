@@ -58,7 +58,7 @@ def plot(aryVslSpc, strTtl, strXlabel, strYlabel, strPathOut, tpleLimX=None,
         varMin = np.multiply(-1.0, np.absolute(varMax))
 
     # Create main figure:
-    fig01 = plt.figure(figsize=(6.5, 3.0),
+    fig01 = plt.figure(figsize=(5.0, 3.0),
                        dpi=200.0,
                        facecolor=([1.0, 1.0, 1.0]),
                        edgecolor=([1.0, 1.0, 1.0]))

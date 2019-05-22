@@ -108,21 +108,21 @@ for idxMtaCn in range(len(lstMtaCn)):
 
     if lstMtaCn[idxMtaCn] == 'square_centre':
         # Limits of y-axis:
-        varAcrSubsYmin = -0.02
-        varAcrSubsYmax = 0.03
+        varAcrSubsYmin = -0.015
+        varAcrSubsYmax = 0.005
         # Number of labels on y-axis:
-        varYnum = 6
+        varYnum = 5
         # Padding around labelled values on y:
-        tplPadY = (0.0, 0.005)
+        tplPadY = (0.002, 0.0)
 
     elif lstMtaCn[idxMtaCn] == 'background':
         # Limits of y-axis:
-        varAcrSubsYmin = -0.01
-        varAcrSubsYmax = 0.02
+        varAcrSubsYmin = -0.01  # -0.01
+        varAcrSubsYmax = 0.0  # 0.02
         # Number of labels on y-axis:
-        varYnum = 4
+        varYnum = 3  # 4
         # Padding around labelled values on y:
-        tplPadY = (0.007, 0.005)
+        tplPadY = (0.003, 0.002)
 
     elif lstMtaCn[idxMtaCn] == 'fullscreen':
         # Limits of y-axis:
@@ -131,16 +131,16 @@ for idxMtaCn in range(len(lstMtaCn)):
         # Number of labels on y-axis:
         varYnum = 5
         # Padding around labelled values on y:
-        tplPadY = (0.005, 0.005)
+        tplPadY = (0.002, 0.002)
 
     elif lstMtaCn[idxMtaCn] == 'square_edge':
         # Limits of y-axis:
-        varAcrSubsYmin = -0.01
-        varAcrSubsYmax = 0.04
+        varAcrSubsYmin = 0.0
+        varAcrSubsYmax = 0.01
         # Number of labels on y-axis:
-        varYnum = 6
+        varYnum = 3
         # Padding around labelled values on y:
-        tplPadY = (0.005, 0.0)
+        tplPadY = (0.003, 0.0005)
 
     for idxRoi in range(len(lstRoi)):
 

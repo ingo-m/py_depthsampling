@@ -26,7 +26,7 @@ from py_depthsampling.plot.plt_dpth_prfl import plt_dpth_prfl
 
 
 def diff_sem(objDpth, strPath, lstCon, lstConLbl, strTtl='', varYmin=0.0,  #noqa
-             varYmax=2.0, tplPadY=(0.0, 0.0), varNumLblY=5,
+             varYmax=2.0, tplPadY=(0.0, 0.0), varNumLblY=5, varDpi=80.0,
              strXlabel='Cortical depth level (equivolume)',
              strYlabel='fMRI signal change [arbitrary units]',
              lgcLgnd=False, lstDiff=None, vecNumInc=None, strParam='mean'):
@@ -56,6 +56,8 @@ def diff_sem(objDpth, strPath, lstCon, lstConLbl, strTtl='', varYmin=0.0,  #noqa
         Padding around labelled values on y.
     varNumLblY : int
         Number of labels on y axis.
+    varDpi : float
+        Resolution of the output figure.
     strXlabel : str
         Label for x axis.
     strYlabel : str
@@ -300,9 +302,10 @@ def diff_sem(objDpth, strPath, lstCon, lstConLbl, strTtl='', varYmin=0.0,  #noqa
     # single condition plots).
     else:
         for idxCon in range(varNumCon):
-            aryClr[idxCon, :] = objCmap(objClrNorm(varNumCon + 2 - idxCon))
+            aryClr[idxCon, :] = \
+                objCmap(objClrNorm(varNumCon + 2 - idxCon))[0:3]
 
-    plt_dpth_prfl(aryEmpMne, arySem, varNumDpth, varNumCon, 110.0, varYmin,
+    plt_dpth_prfl(aryEmpMne, arySem, varNumDpth, varNumCon, varDpi, varYmin,
                   varYmax, False, lstConLbl, strXlabel, strYlabel, strTtl,
                   lgcLgnd, strPath, varSizeX=1800.0, varSizeY=1600.0,
                   varNumLblY=varNumLblY, tplPadY=tplPadY, aryClr=aryClr)

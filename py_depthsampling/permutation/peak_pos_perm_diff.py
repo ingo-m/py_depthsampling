@@ -19,13 +19,14 @@
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import itertools
 import numpy as np
 from py_depthsampling.main.find_peak import find_peak
 
 
 def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000, varThr=0.05):
     """
-    Plot across-subject cortical depth profiles with SEM.
+    Permutation test for condition differences on depth profiles.
 
     Parameters
     ----------
@@ -36,8 +37,10 @@ def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000, varThr=0.05):
         with respect to `lstCon`).
     lstCon : list
         Condition levels (list of strings, used to complete file names).
-    varNumIt : int
-        Number of resampling iterations.
+    varNumIt : int or None
+        Number of resampling iterations. Set to `None` in case of small enough
+        sample size for exact test (i.e. all possible resamples), otherwise
+        Monte Carlo resampling is performed.
     varThr : float
         Amplitude threshold for peak identification. For example, if `varThr =
         0.05`, peaks with an absolute amplitude that is greater than the mean
@@ -185,7 +188,16 @@ def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000, varThr=0.05):
     # the form aryRnd[idxIteration, idxSub]. For each iteration and subject,
     # there is either a zero or a one. 'Zero' means that the actual label gets
     # assigned to the permuted group. 'One' means that the labels are switched.
-    aryRnd = np.random.randint(0, high=2, size=(varNumIt, varNumSub))
+    if not(varNumIt is None):
+        # Monte Carlo resampling:
+        aryRnd = np.random.randint(0, high=2, size=(varNumIt, varNumSub))
+    else:
+        # In case of tractable number of permutations, create a list of all
+        # possible permutations (Bernoulli sequence).
+        lstBnl = list(itertools.product([0, 1], repeat=varNumSub))
+        aryRnd = np.array(lstBnl)
+        # Number of resampling cases:
+        varNumIt = len(lstBnl)
 
     # We need two versions of the randomisation array, one for sampling from
     # the first input array, and a second version to sample from the second
@@ -239,7 +251,8 @@ def peak_diff(strPthData, lstDiff, lstCon, varNumIt=1000, varThr=0.05):
     vecPermPeaksB, vecLgcB = find_peak(aryDpthRndB, varThr=varThr)
 
     # Ratio of iterations with peak:
-    varRatioPeak = (np.sum(vecLgcA) + np.sum(vecLgcB)) / (2.0 * varNumIt)
+    varRatioPeak = (float(np.sum(vecLgcA) + np.sum(vecLgcB))
+                    / float(2.0 * varNumIt))
     print(('------Percentage of permutation samples with peak: '
           + str(np.around(varRatioPeak, decimals=3))))
 

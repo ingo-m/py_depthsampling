@@ -9,8 +9,9 @@ specifically, the equality of distributions of the peak positions is tested
 the shape of the distribution).
 
 Because ROI/condition labels are permuted within subjects, single subject depth
-profiles need to be provided (i.e. the input depth profiles have three
-dimensions, corresponding to subjects, conditions, depth levels).
+profiles need to be provided. The input can be npy files with three dimensions
+(corresponding to subjects, conditions, depth levels), or npz files witth two
+dimensions (subject and depth levels).
 
 The procedure is as follow:
 - Condition labels are permuted within subjects for each permutation data set
@@ -43,30 +44,24 @@ Function of the depth sampling pipeline.
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import itertools
 import numpy as np
 from py_depthsampling.main.find_peak import find_peak
-
 
 
 # ----------------------------------------------------------------------------
 # *** Define parameters
 
-# Corrected or  uncorrected depth profiles?
-strCrct = 'corrected'
-
 # Path of depth-profiles:
-if strCrct == 'uncorrected':
-    objDpth01 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1.npy'  #noqa
-    objDpth02 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2.npy'  #noqa
-if strCrct == 'corrected':
-    objDpth01 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v1_corrected_model_1.npy'  #noqa
-    objDpth02 = '/home/john/PhD/ParCon_Depth_Data/Higher_Level_Analysis/v2_corrected_model_1.npy'  #noqa
+objDpth01 = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/periphery/v1_rh_Pd_min_Cd_Ps_sst.npz'  #noqa
+objDpth02 = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/periphery/v2_rh_Pd_min_Cd_Ps_sst.npz'  #noqa
 
 # Stimulus luminance contrast levels (only needed for visualisation):
 # vecEmpX = np.array([0.025, 0.061, 0.163, 0.72])
 
-# Number of resampling iterations:
-varNumIt = 500000
+# Number of resampling iterations (set to `None` in case of small enough sample
+# size for exact test, otherwise Monte Carlo resampling is performed):
+varNumIt = None
 
 
 # ----------------------------------------------------------------------------
@@ -74,22 +69,49 @@ varNumIt = 500000
 
 print('-Peak position permutation test')
 
-print(('--') + strCrct.upper() + ' depth profiles.')
+if not(varNumIt is None):
+    print(('--Resampling iterations: ' + str(varNumIt)))
 
-print(('--Resampling iterations: ' + str(varNumIt)))
+if '.npy' in objDpth01:
 
-# Load depth profiles from npy files:
-aryDpth01 = np.load(objDpth01)
-aryDpth02 = np.load(objDpth02)
+    # Load multi-condition depth profiles from npy files:
+    aryDpth01 = np.load(objDpth01)
+    aryDpth02 = np.load(objDpth02)
 
-# Number of subject:
-varNumSubs = aryDpth01.shape[0]
+    # Number of subject:
+    varNumSubs = aryDpth01.shape[0]
 
-# Number of conditions:
-varNumCon = aryDpth01.shape[1]
+    # Number of conditions:
+    varNumCon = aryDpth01.shape[1]
 
-# Number of depth levels:
-varNumDpt = aryDpth01.shape[2]
+    # Number of depth levels:
+    varNumDpt = aryDpth01.shape[2]
+
+elif '.npz' in objDpth01:
+
+    # Load single-condition depth profiles from npz files:
+    objNpz01 = np.load(objDpth01)
+    aryDpth01 = objNpz01['arySubDpthMns']
+    objNpz02 = np.load(objDpth02)
+    aryDpth02 = objNpz02['arySubDpthMns']
+
+    # Array with number of vertices (for weighted averaging across subjects),
+    # shape: vecNumInc[subjects].
+    vecNumIncRoi01 = objNpz01['vecNumInc']
+    vecNumIncRoi02 = objNpz02['vecNumInc']
+
+    # Number of subject:
+    varNumSubs = aryDpth01.shape[0]
+
+    # Number of conditions:
+    varNumCon = 1
+
+    # Number of depth levels:
+    varNumDpt = aryDpth01.shape[1]
+
+    # Reshape (dummy condition dimension):
+    aryDpth01 = np.reshape(aryDpth01, (varNumSubs, 1, varNumDpt))
+    aryDpth02 = np.reshape(aryDpth02, (varNumSubs, 1, varNumDpt))
 
 
 # ----------------------------------------------------------------------------
@@ -100,9 +122,17 @@ print('---Find peaks in empirical depth profiles')
 # The peak difference on the full profile needs to be calculated for comparison
 # with the null distribution.
 
-# Mean depth profiles (mean across subjects):
-aryDpthMne01 = np.mean(aryDpth01, axis=0)
-aryDpthMne02 = np.mean(aryDpth02, axis=0)
+if '.npy' in objDpth01:
+
+    # Mean depth profiles (mean across subjects):
+    aryDpthMne01 = np.mean(aryDpth01, axis=0)
+    aryDpthMne02 = np.mean(aryDpth02, axis=0)
+
+elif '.npz' in objDpth01:
+
+    # Weighted mean across subjects:
+    aryDpthMne01 = np.average(aryDpth01, axis=0, weights=vecNumIncRoi01)
+    aryDpthMne02 = np.average(aryDpth02, axis=0, weights=vecNumIncRoi02)
 
 # Peak positions in empirical depth profiles:
 vecEmpPeaks01 = find_peak(aryDpthMne01, lgcStat=False)
@@ -130,7 +160,16 @@ print('---Create permutation samples')
 # to the permuted 'V1' group and the actual V2 value gets assigned to the
 # permuted 'V2' group. 'One' means that the labels are switched, i.e. the
 # actual V1 label get assignet to the 'V2' group and vice versa.
-aryRnd = np.random.randint(0, high=2, size=(varNumIt, varNumSubs))
+if not(varNumIt is None):
+    # Monte Carlo resampling:
+    aryRnd = np.random.randint(0, high=2, size=(varNumIt, varNumSubs))
+else:
+    # In case of tractable number of permutations, create a list of all
+    # possible permutations (Bernoulli sequence).
+    lstBnl = list(itertools.product([0, 1], repeat=varNumSubs))
+    aryRnd = np.array(lstBnl)
+    # Number of resampling cases:
+    varNumIt = len(lstBnl)
 
 # We need two versions of the randomisation array, one for sampling from the
 # first input array (e.g. V1), and a second version to sample from the second
@@ -140,9 +179,13 @@ aryRnd01 = np.equal(aryRnd, 1)
 aryRnd02 = np.equal(aryRnd, 0)
 del(aryRnd)
 
-# Arrays with permuted depth profiles for the two randomised groups:
+# Arrays for permuted depth profiles for the two randomised groups:
 aryDpthRnd01 = np.zeros((varNumIt, varNumSubs, varNumCon, varNumDpt))
 aryDpthRnd02 = np.zeros((varNumIt, varNumSubs, varNumCon, varNumDpt))
+
+# Arrays for number of vertices for randomised groups:
+aryNumIncRnd01 = np.zeros((varNumIt, varNumSubs, varNumCon, varNumDpt))
+aryNumIncRnd02 = np.zeros((varNumIt, varNumSubs, varNumCon, varNumDpt))
 
 # Loop through iterations:
 for idxIt in range(0, varNumIt):
@@ -163,9 +206,35 @@ for idxIt in range(0, varNumIt):
     aryDpthRnd02[idxIt, aryRnd01[idxIt, :], :, :] = \
         aryDpth02[aryRnd01[idxIt, :], :, :]
 
-# Take mean across subjects in permutation samples:
-aryDpthRnd01 = np.mean(aryDpthRnd01, axis=1)
-aryDpthRnd02 = np.mean(aryDpthRnd02, axis=1)
+    if '.npz' in objDpth01:
+
+        # Number of vertices from original group 1 to permutation group 1:
+        aryNumIncRnd01[idxIt, aryRnd01[idxIt, :], :, :] = \
+            vecNumIncRoi01[aryRnd01[idxIt, :], None, None]
+
+        # Number of vertices from original group 2 to permutation group 1:
+        aryNumIncRnd01[idxIt, aryRnd02[idxIt, :], :, :] = \
+            vecNumIncRoi02[aryRnd02[idxIt, :], None, None]
+
+        # Number of vertices from original group 1 to permutation group 2:
+        aryNumIncRnd02[idxIt, aryRnd02[idxIt, :], :, :] = \
+            vecNumIncRoi01[aryRnd02[idxIt, :], None, None]
+
+        # Number of vertices from original group 2 to permutation group 2:
+        aryNumIncRnd02[idxIt, aryRnd01[idxIt, :], :, :] = \
+            vecNumIncRoi02[aryRnd01[idxIt, :], None, None]
+
+if '.npy' in objDpth01:
+
+    # Take mean across subjects in permutation samples:
+    aryDpthRnd01 = np.mean(aryDpthRnd01, axis=1)
+    aryDpthRnd02 = np.mean(aryDpthRnd02, axis=1)
+
+elif '.npz' in objDpth01:
+
+    # Weighted mean across subjects:
+    aryDpthRnd01 = np.average(aryDpthRnd01, axis=1, weights=vecNumIncRoi01)
+    aryDpthRnd02 = np.average(aryDpthRnd02, axis=1, weights=vecNumIncRoi02)
 
 
 # ----------------------------------------------------------------------------

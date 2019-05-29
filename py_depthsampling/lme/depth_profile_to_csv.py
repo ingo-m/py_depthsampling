@@ -1,29 +1,30 @@
 # -*- coding: utf-8 -*-
 """
-Repeated measures anova on cortical depth profiles.
+Save cortical depth profiles to csv file.
 """
 
 
 import numpy as np
 import pandas as pd
-from statsmodels.stats.anova import AnovaRM
+# import seaborn as sns
 
 
 # -----------------------------------------------------------------------------
 # *** Define parameters
 
 # Path of npz files with cortical depth profiles (ROI and condition left open):
-strNpz = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/{}_rh_{}_sst.npz'
-# strNpz = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/periphery/{}_rh_{}_sst.npz'
+strNpz = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/centre/{}_{}_sst_pe_deconv_model_1.npz'  #noqa
 
 # List of ROIs:
-lstRoi = ['v1', 'v2', 'v3']
+lstRoi = ['v1', 'v2']
 
 # List of conditions:
-lstCon = ['Pd', 'Ps', 'Cd']
+lstCon = ['kanizsa',
+          'kanizsa_rotated',
+          'bright_square']
 
 # Output path for data csv file:
-strCsv = '/home/john/Desktop/anovarm.csv'
+strCsv = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/centre/depth_data_lme.csv'  #noqa
 
 
 # -----------------------------------------------------------------------------
@@ -44,7 +45,7 @@ varNumSub = ary01.shape[0]
 varNumDpth = ary01.shape[1]
 
 # List of features for dataframe:
-lstFtr = ['ROI', 'Condition', 'Subject', 'Depth', 'PSC']
+lstFtr = ['ROI', 'Condition', 'Subject', 'Depth', 'Vertices', 'PSC']
 
 # Number of samples:
 varNumSmpl = (varNumRoi * varNumCon * varNumSub * varNumDpth)
@@ -57,10 +58,12 @@ dicType = {'ROI': str,
            'Condition': str,
            'Subject': np.int16,
            'Depth': np.int16,
+           'Vertices': np.int32,
            'PSC': np.float64}
 
 # Set datatype:
 objDf.astype(dicType)
+
 
 # -----------------------------------------------------------------------------
 # *** Load data from disk
@@ -73,9 +76,13 @@ for idxRoi in lstRoi:
     for idxCon in lstCon:
 
         # Load npz file:
-        # print(strNpz.format(idxRoi, idxCon))
         objNpz01 = np.load(strNpz.format(idxRoi, idxCon))
+
+        # Depth profiles:
         ary01 = objNpz01['arySubDpthMns']
+
+        # Numebr of vertices:
+        vecNumInc = objNpz01['vecNumInc']
 
         for idxSub in range(varNumSub):
             for idxDpth in range(varNumDpth):
@@ -85,35 +92,28 @@ for idxRoi in lstRoi:
                 objDf.at[idxSmpl, 'Condition'] = idxCon.upper()
                 objDf.at[idxSmpl, 'Subject'] = idxSub
                 objDf.at[idxSmpl, 'Depth'] = idxDpth
+                objDf.at[idxSmpl, 'Vertices'] = vecNumInc[idxSub]
                 objDf.at[idxSmpl, 'PSC'] = ary01[idxSub, idxDpth]
 
                 # Increment counter:
                 idxSmpl += 1
 
-# -----------------------------------------------------------------------------
-# *** Fit repeated measures ANOVA
-
-# Create ANOVA object:
-objAnov = AnovaRM(objDf,
-                  'PSC',
-                  'Subject',
-                  within=['ROI', 'Condition', 'Depth'],
-                  between=None,
-                  aggregate_func=None)
-
-# Fit model:
-objResult = objAnov.fit()
-
-# Print results:
-# print(objResult.anova_table)
-print(objResult.summary())
 
 # -----------------------------------------------------------------------------
 # *** Save data to csv
 
-<<<<<<< HEAD
 objDf.to_csv(strCsv, sep=';', index=False)
-=======
-# objDf.to_csv(strCsv, sep=';', index=False)
->>>>>>> surface
+
+
+# -----------------------------------------------------------------------------
+# *** Create plot
+
+# Set datatype to float:
+# objDf = objDf.astype({"PSC": np.float64})
+
+# Create plot separately for conditions:
+# sns.lineplot(x="Depth",
+#              y="PSC",
+#              hue="Condition",
+#              data=objDf)
 # -----------------------------------------------------------------------------

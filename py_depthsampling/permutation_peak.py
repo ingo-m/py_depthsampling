@@ -69,8 +69,8 @@ lstMetaCon = ['centre']
 # ROI ('v1', 'v2', or 'v3'):
 lstRoi = ['v1', 'v2']
 
-# Path of depth-profile to load (meta-condition, ROI, condition, and
-# deconvolution suffix left open):
+# Path of depth-profiles (meta-condition, ROI, condition, and model
+# index left open):
 strPthData = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/{}_{}{}.npz'  #noqa
 
 # Condition levels (used to complete file names):
@@ -83,8 +83,9 @@ lstDiff = [[(0, 1), (0, 2)],
            [(0, 1), (1, 2)],
            [(0, 2), (1, 2)]]
 
-# Number of resampling iterations:
-varNumIt = 100000
+# Number of resampling iterations (set to `None` in case of small enough sample
+# size for exact test, otherwise Monte Carlo resampling is performed):
+varNumIt = None
 # -----------------------------------------------------------------------------
 
 

@@ -47,7 +47,7 @@ lstMetaCon = ['centre', 'edge', 'inducer', 'background', 'left_bckg',
               'right_bckg']
 
 # Region of interest ('v1' or 'v2'):
-lstRoi = ['v1', 'v2', 'v3']
+lstRoi = ['v1']  # , 'v2', 'v3']
 
 # Hemispheres ('lh' or 'rh'):
 lstHmsph = ['rh', 'lh']
@@ -151,7 +151,7 @@ varNormIdx = 0
 lgcNormDiv = False
 
 # Output path for depth samling results (within subject means):
-strDpthMeans = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/{}_{}.npz'  #noqa
+strDpthMeans = '/home/john/Dropbox/Kanizsa_Depth_Data/Higher_Level_Analysis/{}/{}_{}.npz'  #noqa
 
 # Maximum number of processes to run in parallel: *** NOT IMPLEMENTED
 # varPar = 10

@@ -114,7 +114,7 @@ lgcSlct04 = True
 strVtkSlct04 = '/media/sf_D_DRIVE/MRI_Data_PhD/10_kanizsa/{}/cbs/{}/pRF_results_ovrlp_ctnr_{}.vtk'  #noqa
 # Threshold for vertex selection - list of tuples (interval per meta-condition,
 # e.g. within & outside stimulus area):
-lstThrSlct04 = [(0.5, 1000.0), (0.5, 1000.0), (0.5, 1000.0), (0.5, 1000.0)]
+lstThrSlct04 = [(0.5, 1000.0)] * len(lstMetaCon)
 
 # Number of cortical depths:
 varNumDpth = 11
@@ -176,38 +176,38 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
 
             # Adjust layout:
             if 'centre' in lstMetaCon[idxMtaCn]:
-                varAcrSubsYmin = -3.0
-                varAcrSubsYmax = 3.0
+                varAcrSubsYmin = -1.0
+                varAcrSubsYmax = 1.0
                 varNumLblY = 3
                 tplPadY = (0.1, 0.1)
 
             if 'edge' in lstMetaCon[idxMtaCn]:
-                varAcrSubsYmin = -3.0
-                varAcrSubsYmax = 3.0
+                varAcrSubsYmin = 0.0
+                varAcrSubsYmax = 2.0
                 varNumLblY = 3
                 tplPadY = (0.1, 0.1)
 
             if 'inducer' in lstMetaCon[idxMtaCn]:
-                varAcrSubsYmin = -3.0
-                varAcrSubsYmax = 3.0
+                varAcrSubsYmin = 0.0
+                varAcrSubsYmax = 6.0
                 varNumLblY = 3
                 tplPadY = (0.1, 0.1)
 
             if 'background' in lstMetaCon[idxMtaCn]:
-                varAcrSubsYmin = -3.0
-                varAcrSubsYmax = 3.0
+                varAcrSubsYmin = -1.0
+                varAcrSubsYmax = 0.0
                 varNumLblY = 3
                 tplPadY = (0.1, 0.1)
 
             if 'left_bckg' in lstMetaCon[idxMtaCn]:
-                varAcrSubsYmin = -3.0
-                varAcrSubsYmax = 3.0
+                varAcrSubsYmin = -1.0
+                varAcrSubsYmax = 0.0
                 varNumLblY = 3
                 tplPadY = (0.1, 0.1)
 
             if 'right_bckg' in lstMetaCon[idxMtaCn]:
-                varAcrSubsYmin = -3.0
-                varAcrSubsYmax = 3.0
+                varAcrSubsYmin = -1.0
+                varAcrSubsYmax = 0.0
                 varNumLblY = 3
                 tplPadY = (0.1, 0.1)
 

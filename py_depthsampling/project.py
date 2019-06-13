@@ -156,14 +156,6 @@ for idxDpth in range(len(lstDpth)):  #noqa
     for idxRoi in range(len(lstRoi)):
         for idxCon in range(len(lstCon)):
 
-            # Skip first subject for 'kanizsa_rotated' condition (pilot session
-            # did not include this condition).
-            if (('kanizsa_rotated' in lstCon[idxCon])
-                    or ('diamond' in lstCon[idxCon])):
-                lstSubIds = lstSubIds02
-            else:
-                lstSubIds = lstSubIds01
-
             # Adjust colour bar:
             if '_pe' in lstCon[idxCon]:
                 # Fixed colour bar for GLM parameter estimates:

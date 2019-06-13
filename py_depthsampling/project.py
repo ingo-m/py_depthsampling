@@ -26,18 +26,10 @@ from py_depthsampling.project.project_main import project
 
 # Load/save existing projection from/to (ROI, condition, depth level label left
 # open):
-strPthNpy = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/project/{}_{}_{}.npy'  #noqa
+strPthNpy = '/home/john/Dropbox/Kanizsa_Depth_Data/Higher_Level_Analysis/project/{}_{}_{}.npy'  #noqa
 
-# List of subject identifiers. In the first pilot session ('20181029'), there
-# was no 'Kanizsa rotated' condition. Thus, we have to skip this session for
-# the respective condition.
-lstSubIds01 = ['20181029',
-               '20181105',
-               '20181107',
-               '20181108']
-lstSubIds02 = ['20181105',
-               '20181107',
-               '20181108']
+# List of subject identifiers:
+lstSubIds = ['20190221']
 
 # Nested list with depth levels to average over. For instance, if `lstDpth =
 # [[0, 1, 2], [3, 4, 5]]`, on a first iteration, the average over the first
@@ -51,34 +43,42 @@ lstDpthLbl = ['allGM']
 # lstDpthLbl = [str(x) for x in range(11)]
 
 # ROI ('v1' or 'v2'):
-lstRoi = ['v1', 'v2', 'v3']
+lstRoi = ['v1']  #, 'v2', 'v3']
 
 # Output path & prefix for plots (ROI, condition, depth level label left open):
-strPthPltOt = '/home/john/PhD/Surface_Plots/project/{}_{}_{}'  #noqa
+strPthPltOt = '/home/john/Dropbox/Kanizsa_Project/Plots/project/{}_{}_{}'  #noqa
 
 # File type suffix for plot:
-strFlTp = '.svg'
-# strFlTp = '.png'
+# strFlTp = '.svg'
+strFlTp = '.png'
 
 # Figure scaling factor:
 varDpi = 80.0
 
 # Condition levels (used to complete file names):
-lstCon = ['feat_level_2_bright_square_sst_pe',
-          'feat_level_2_bright_square_sst_zstat',
-          'feat_level_2_kanizsa_rotated_sst_pe',
-          'feat_level_2_kanizsa_rotated_sst_zstat',
-          'feat_level_2_kanizsa_sst_pe',
-          'feat_level_2_kanizsa_sst_zstat',
+lstCon = ['feat_level_2_kanizsa_flicker_sst_pe',
+          'feat_level_2_kanizsa_flicker_sst_zstat',
+          'feat_level_2_kanizsa_static_sst_pe',
+          'feat_level_2_kanizsa_static_sst_zstat',
+          'feat_level_2_rotated_flicker_sst_pe',
+          'feat_level_2_rotated_flicker_sst_zstat',
+          'feat_level_2_rotated_static_sst_pe',
+          'feat_level_2_rotated_static_sst_zstat',
+          'feat_level_2_target_pe',
+          'feat_level_2_target_zstat',
           'pRF_results_eccentricity',
           'pRF_results_ovrlp_ctnr_background',
           'pRF_results_ovrlp_ctnr_centre',
           'pRF_results_ovrlp_ctnr_edge',
-          'pRF_results_ovrlp_ctnr_diamond',
+          'pRF_results_ovrlp_ctnr_inducer',
+          'pRF_results_ovrlp_ctnr_left_bckg',
+          'pRF_results_ovrlp_ctnr_right_bckg',
           'pRF_results_ovrlp_ratio_background',
           'pRF_results_ovrlp_ratio_centre',
           'pRF_results_ovrlp_ratio_edge',
-          'pRF_results_ovrlp_ratio_diamond',
+          'pRF_results_ovrlp_ratio_inducer',
+          'pRF_results_ovrlp_ratio_left_bckg',
+          'pRF_results_ovrlp_ratio_right_bckg',
           'pRF_results_PE_01',
           'pRF_results_polar_angle',
           'pRF_results_R2',
@@ -88,31 +88,31 @@ lstCon = ['feat_level_2_bright_square_sst_pe',
 
 # Path of vtk mesh with data to project into visual space (e.g. parameter
 # estimates; subject ID, hemisphere, and contion level left open).
-strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/09_surface/{}/cbs/{}/{}.vtk'  #noqa
+strPthData = '/media/sf_D_DRIVE/MRI_Data_PhD/10_kanizsa/{}/cbs/{}/{}.vtk'  #noqa
 
 # Path of mean EPI (for scaling to percent signal change; subject ID and
 # hemisphere left open):
-strPthMneEpi = '/media/sf_D_DRIVE/MRI_Data_PhD/09_surface/{}/cbs/{}/combined_mean.vtk'  #noqa
+strPthMneEpi = '/media/sf_D_DRIVE/MRI_Data_PhD/10_kanizsa/{}/cbs/{}/combined_mean.vtk'  #noqa
 
 # Path of vtk mesh with R2 values from pRF mapping (at multiple depth levels;
 # subject ID and hemisphere left open).
-strPthR2 = '/media/sf_D_DRIVE/MRI_Data_PhD/09_surface/{}/cbs/{}/pRF_results_R2.vtk'  #noqa
+strPthR2 = '/media/sf_D_DRIVE/MRI_Data_PhD/10_kanizsa/{}/cbs/{}/pRF_results_R2.vtk'  #noqa
 
 # Path of vtk mesh with pRF sizes (at multiple depth levels; subject ID and
 # hemisphere left open).
-strPthSd = '/media/sf_D_DRIVE/MRI_Data_PhD/09_surface/{}/cbs/{}/pRF_results_SD.vtk'  #noqa
+strPthSd = '/media/sf_D_DRIVE/MRI_Data_PhD/10_kanizsa/{}/cbs/{}/pRF_results_SD.vtk'  #noqa
 
 # Path of vtk mesh with pRF x positions at multiple depth levels; subject ID
 # and hemisphere left open).
-strPthX = '/media/sf_D_DRIVE/MRI_Data_PhD/09_surface/{}/cbs/{}/pRF_results_x_pos.vtk'  #noqa
+strPthX = '/media/sf_D_DRIVE/MRI_Data_PhD/10_kanizsa/{}/cbs/{}/pRF_results_x_pos.vtk'  #noqa
 
 # Path of vtk mesh with pRF y positions at multiple depth levels; subject ID
 # and hemisphere left open).
-strPthY = '/media/sf_D_DRIVE/MRI_Data_PhD/09_surface/{}/cbs/{}/pRF_results_y_pos.vtk'  #noqa
+strPthY = '/media/sf_D_DRIVE/MRI_Data_PhD/10_kanizsa/{}/cbs/{}/pRF_results_y_pos.vtk'  #noqa
 
 # Path of csv file with ROI definition (subject ID, hemisphere, and ROI left
 # open).
-strCsvRoi = '/home/john/PhD/GitLab/surface/analysis/{}/08_depthsampling/{}/{}.csv'  #noqa
+strCsvRoi = '/home/john/PhD/GitLab/kanizsa/analysis/{}/08_depthsampling/{}/{}.csv'  #noqa
 
 # Number of cortical depths.
 varNumDpth = 11

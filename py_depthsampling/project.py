@@ -29,7 +29,11 @@ from py_depthsampling.project.project_main import project
 strPthNpy = '/home/john/Dropbox/Kanizsa_Depth_Data/Higher_Level_Analysis/project/{}_{}_{}.npy'  #noqa
 
 # List of subject identifiers:
-lstSubIds = ['20190221']
+lstSubIds = ['20190213',
+             '20190218_01',
+             '20190218_02',
+             '20190221',
+             '20190225_02']
 
 # Nested list with depth levels to average over. For instance, if `lstDpth =
 # [[0, 1, 2], [3, 4, 5]]`, on a first iteration, the average over the first
@@ -43,7 +47,7 @@ lstDpthLbl = ['allGM']
 # lstDpthLbl = [str(x) for x in range(11)]
 
 # ROI ('v1' or 'v2'):
-lstRoi = ['v1']  #, 'v2', 'v3']
+lstRoi = ['v1', 'v2', 'v3']
 
 # Output path & prefix for plots (ROI, condition, depth level label left open):
 strPthPltOt = '/home/john/Dropbox/Kanizsa_Project/Plots/project/{}_{}_{}'  #noqa

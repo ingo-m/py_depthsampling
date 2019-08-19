@@ -24,40 +24,49 @@ from py_depthsampling.ert.ert_main_surface import ert_main
 
 # Load data from previously prepared pickle? If 'False', data is loaded from
 # vtk meshes and saved as pickle.
-lgcPic = True
+lgcPic = False
 
 # Meta-condition (within or outside of retinotopic stimulus area):
-lstMtaCn = ['centre', 'edge', 'background']
+lstMtaCn = ['centre',
+            'edge',
+            'inducer',
+            'background',
+            'left_bckg',
+            'right_bckg']
 
 # Region of interest ('v1' or 'v2'):
-lstRoi = ['v1', 'v2', 'v3']
+lstRoi = ['v1', 'v2']
 
 # Hemispheres ('lh' or 'rh'):
 lstHmsph = ['lh', 'rh']
 
 # List of subject identifiers:
-lstSubIds = ['20181029',
-             '20181105',
-             '20181107',
-             '20181108']
+lstSubIds = ['20190213',
+             '20190218_01',
+             '20190218_02',
+             '20190221',
+             '20190225_02']
 
 # Name of pickle file from which to load time course data or save time course
 # data to (metacondition and ROI left open):
-strPthPic = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/era_{}.pickle'  #noqa
+strPthPic = '/home/john/Dropbox/Kanizsa_Depth_Data/Higher_Level_Analysis/{}/era_{}.pickle'  #noqa
 
 # Condition levels (used to complete file names):
-lstCon = ['bright_square', 'kanizsa', 'kanizsa_rotated']
+lstCon = ['kanizsa_flicker',
+          'kanizsa_static',
+          'rotated_flicker',
+          'rotated_static']
 
 # Condition labels (for plot legend):
-lstConLbl = ['Bright square', 'Kanizsa', 'Kanizsa rotated']
+lstConLbl = lstCon
 
 # Base name of vertex inclusion masks (subject ID, hemisphere, subject ID,
 # ROI, and metacondition left open):
-strVtkMsk = '/media/sf_D_DRIVE/MRI_Data_PhD/09_surface/{}/cbs/{}/{}_vertex_inclusion_mask_{}_{}.vtk'  #noqa
+strVtkMsk = '/media/sf_D_DRIVE/MRI_Data_PhD/10_kanizsa/{}/cbs/{}/{}_vertex_inclusion_mask_{}_{}.vtk'  #noqa
 
 # Base name of single-volume vtk meshes that together make up the timecourse
 # (subject ID, hemisphere, stimulus level, and volume index left open):
-strVtkPth = '/media/sf_D_DRIVE/MRI_Data_PhD/09_surface/{}/cbs/{}_era/{}/vol_{}.vtk'  #noqa
+strVtkPth = '/media/sf_D_DRIVE/MRI_Data_PhD/10_kanizsa/{}/cbs/{}_era/{}/vol_{}.vtk'  #noqa
 
 # Number of cortical depths:
 varNumDpth = 11
@@ -94,9 +103,9 @@ lgcLgnd01 = True
 lgcLgnd02 = True
 
 # Output path for plots - prfix (metacondition and ROI left open):
-strPltOtPre = '/home/john/PhD/Surface_Plots/era/{}_{}_'
+strPltOtPre = '/home/john/Dropbox/Kanizsa_Project/Plots/ert/{}_{}_'
 # Output path for plots - suffix:
-strPltOtSuf = '_ert.svg'
+strPltOtSuf = '_ert.png'
 
 # Figure scaling factor:
 varDpi = 100.0

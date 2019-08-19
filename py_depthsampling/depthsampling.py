@@ -47,13 +47,17 @@ lstMetaCon = ['centre', 'edge', 'inducer', 'background', 'left_bckg',
               'right_bckg']
 
 # Region of interest ('v1' or 'v2'):
-lstRoi = ['v1']  # , 'v2', 'v3']
+lstRoi = ['v1', 'v2']  # , 'v3']
 
 # Hemispheres ('lh' or 'rh'):
 lstHmsph = ['rh', 'lh']
 
 # List of subject identifiers:
-lstSubIds = ['20190221']
+lstSubIds = ['20190213',
+             '20190218_01',
+             '20190218_02',
+             '20190221',
+             '20190225_02']
 
 # Condition levels (used to complete file names) - nested list:
 lstNstCon = [['kanizsa_flicker_sst_pe',

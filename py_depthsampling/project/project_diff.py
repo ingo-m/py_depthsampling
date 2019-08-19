@@ -29,17 +29,24 @@ from py_depthsampling.project.plot import plot
 # -----------------------------------------------------------------------------
 # ### Parameters
 
-# Paths of visual field projections (first VFP minus second VFP).
-# strPth01 = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/project/v1_feat_level_2_bright_square_sst_pe_allGM.npy'
-strPth01 = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/project/v1_feat_level_2_kanizsa_sst_pe_allGM.npy'
-strPth02 = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/project/v1_feat_level_2_kanizsa_rotated_sst_pe_allGM.npy'
+# ROI:
+lstRoi = ['v1', 'v2']
 
-# Figure title:
-strTtl = 'Kanizsa - Kanizsa rotated'
-# strTtl = 'Real square - Kanizsa'
+# Parent path of visual field projections (ROI and condition name left open):
+strPthPrnt = '/home/john/Dropbox/Kanizsa_Depth_Data/Higher_Level_Analysis/project/{}_feat_level_2_{}_sst_pe_allGM.npy'
 
-# Figure output path:
-strPathOut = '/home/john/Desktop/v1_project_diff_pe.png'
+# Names of visual field projection condition (first VFP minus second VFP).
+lstPth01 = ['kanizsa_flicker',
+            'rotated_flicker',
+            'kanizsa_flicker',
+            'kanizsa_static']
+lstPth02 = ['kanizsa_static',
+            'rotated_static',
+            'rotated_flicker',
+            'rotated_static']
+
+# Figure output path (ROI and conditions left open):
+strPathOut = '/home/john/Dropbox/Kanizsa_Project/Plots/project_diff/{}_{}_minus_{}.png'
 
 # Extent of visual space (for axes labels):
 varExtXmin = -8.3
@@ -52,20 +59,40 @@ varExtYmax = 5.19
 # -----------------------------------------------------------------------------
 # ### Create VFP difference plot
 
-# Load visual field projections from disk:
-ary01 = np.load(strPth01)
-ary02 = np.load(strPth02)
+# Loop through ROIs:
+for strRoi  in lstRoi:
 
-# Subtract visual field projections:
-aryDiff = np.subtract(ary01, ary02)
+    # Loop through comparisons:
+    for idxCom in range(len(lstPth01)):
 
-plot(aryDiff,
-     strTtl,
-     'x-position',
-     'y-position',
-     strPathOut,
-     tpleLimX=(varExtXmin, varExtXmax, 3.0),
-     tpleLimY=(varExtYmin, varExtYmax, 3.0),
-     varMin=-2.0,
-     varMax=2.0)
+        # Path of VFP files:
+        strPth01 = strPthPrnt.format(strRoi, lstPth01[idxCom])
+        strPth02 = strPthPrnt.format(strRoi, lstPth02[idxCom])
+
+        # Figure title:
+        strTtl = (lstPth01[idxCom]
+                  + ' minus '
+                  + lstPth02[idxCom])
+
+        # Output file path:
+        strPathOutTmp = strPathOut.format(strRoi,
+                                          lstPth01[idxCom],
+                                          lstPth02[idxCom])
+
+        # Load visual field projections from disk:
+        ary01 = np.load(strPth01)
+        ary02 = np.load(strPth02)
+
+        # Subtract visual field projections:
+        aryDiff = np.subtract(ary01, ary02)
+
+        plot(aryDiff,
+             strTtl,
+             'x-position',
+             'y-position',
+             strPathOutTmp,
+             tpleLimX=(varExtXmin, varExtXmax, 3.0),
+             tpleLimY=(varExtYmin, varExtYmax, 3.0),
+             varMin=-2.0,
+             varMax=2.0)
 # -----------------------------------------------------------------------------

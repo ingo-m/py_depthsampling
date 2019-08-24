@@ -24,7 +24,7 @@ from py_depthsampling.ert.ert_main_surface import ert_main
 
 # Load data from previously prepared pickle? If 'False', data is loaded from
 # vtk meshes and saved as pickle.
-lgcPic = False
+lgcPic = True
 
 # Meta-condition (within or outside of retinotopic stimulus area):
 lstMtaCn = ['centre',
@@ -105,7 +105,7 @@ lgcLgnd02 = True
 # Output path for plots - prfix (metacondition and ROI left open):
 strPltOtPre = '/home/john/Dropbox/Kanizsa_Project/Plots/ert/{}_{}_'
 # Output path for plots - suffix:
-strPltOtSuf = '_ert.png'
+strPltOtSuf = '_ert.svg'
 
 # Figure scaling factor:
 varDpi = 100.0
@@ -120,12 +120,12 @@ for idxMtaCn in range(len(lstMtaCn)):
 
     if lstMtaCn[idxMtaCn] == 'centre':
         # Limits of y-axis:
-        varAcrSubsYmin = -0.005
-        varAcrSubsYmax = 0.005
+        varAcrSubsYmin = -0.01  # -0.005
+        varAcrSubsYmax = 0.01   # 0.005
         # Number of labels on y-axis:
         varYnum = 3
         # Padding around labelled values on y:
-        tplPadY = (0.003, 0.004)
+        tplPadY = (0.005, 0.005)
 
     if lstMtaCn[idxMtaCn] == 'background':
         # Limits of y-axis:
@@ -134,16 +134,16 @@ for idxMtaCn in range(len(lstMtaCn)):
         # Number of labels on y-axis:
         varYnum = 3
         # Padding around labelled values on y:
-        tplPadY = (0.005, 0.005)
+        tplPadY = (0.001, 0.001)
 
-    if lstMtaCn[idxMtaCn] == 'edge':
+    if lstMtaCn[idxMtaCn] == 'inducer':
         # Limits of y-axis:
         varAcrSubsYmin = -0.0
-        varAcrSubsYmax = 0.03
+        varAcrSubsYmax = 0.04
         # Number of labels on y-axis:
-        varYnum = 4
+        varYnum = 5
         # Padding around labelled values on y:
-        tplPadY = (0.006, 0.006)
+        tplPadY = (0.005, 0.005)
 
     for idxRoi in range(len(lstRoi)):
 

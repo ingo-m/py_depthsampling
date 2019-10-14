@@ -268,17 +268,13 @@ aryDpthRnd01 = np.average(aryDpthRnd01, axis=1, weights=aryNumIncRnd01)
 aryDpthRnd02 = np.average(aryDpthRnd02, axis=1, weights=aryNumIncRnd02)
 
 
-ary01 = aryDpthRnd01.T
-ary02 = aryDpthRnd02.T
-
-
 # ----------------------------------------------------------------------------
 # *** Find vertices in permutation samples
 
-print('---Find vertices in permutation samples')
+print('---Find vertices in permutation samples & create null distribution.')
 
-# Array for vertex differences in permutation samples:
-vecPermDiff = np.zeros(varNumIt)
+# Array for vertex differences in permutation samples - null distribution.
+vecNull = np.zeros(varNumIt)
 
 # Loop through iterations:
 for idxIt in range(varNumIt):
@@ -295,38 +291,8 @@ for idxIt in range(varNumIt):
     varEmpVertx01 = -vecPoly2ModelPar01[1] / (2.0 * vecPoly2ModelPar01[0])
     varEmpVertx02 = -vecPoly2ModelPar02[1] / (2.0 * vecPoly2ModelPar02[0])
 
-    # Absolute vertex difference:
-    vecPermDiff[idxIt] = np.absolute(np.subtract(varEmpVertx01, varEmpVertx02))
-
-
-# TODO
-
-
-
-    
-
-
-
-# -------------------------------------------------------------------------
-# *** Create null distribution
-
-print('---Create null distribution')
-
-# The mean difference in peak position between the two randomised groups is
-# the null distribution (vecNull[idxIteration]).
-vecNull = np.zeros((varNumIt))
-
-# If there is a peak in both profiles, calculate distance between peaks:
-lgcTmp = np.multiply(vecLgc01, vecLgc02)
-vecNull[lgcTmp] = np.subtract(vecPermPeaks01[lgcTmp], vecPermPeaks02[lgcTmp])
-
-# If only one profile has a peak, difference is maximal.
-lgcTmp = np.logical_xor(vecLgc01, vecLgc02)
-vecNull[lgcTmp] = 1.0
-
-# If both profiles don't have a peak, the difference is zero.
-lgcTmp = np.invert(np.multiply(vecLgc01, vecLgc02))
-vecNull[lgcTmp] = 0.0
+    # Difference in vertex position (along x-axis):
+    vecNull[idxIt] = np.subtract(varEmpVertx01, varEmpVertx02)
 
 
 # ----------------------------------------------------------------------------
@@ -341,7 +307,7 @@ vecNullAbs = np.absolute(vecNull)
 # Number of resampled cases with absolute peak position difference that is at
 # least as large as the empirical peak difference:
 varNumGe = np.sum(np.greater_equal(vecNullAbs,
-                                   varEmpPeakDiff),
+                                   varEmpVertxDiff),
                   axis=0)
 
 print('------Number of resampled cases with absolute peak position')

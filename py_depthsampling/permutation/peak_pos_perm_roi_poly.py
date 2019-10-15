@@ -173,6 +173,10 @@ vecFittedPoly02 = funcPoly2(vecInd,
                             vecPoly2ModelPar02[1],
                             vecPoly2ModelPar02[2])
 
+# Combine arrays for visualisation in ipython:
+# ary01 = np.array([vecDpthMne01, vecFittedPoly01]).T
+# ary02 = np.array([vecDpthMne02, vecFittedPoly02]).T
+
 # Vertex (maximum or minimum) of polynomial, analytical solution:
 varEmpVertx01 = -vecPoly2ModelPar01[1] / (2.0 * vecPoly2ModelPar01[0])
 varEmpVertx02 = -vecPoly2ModelPar02[1] / (2.0 * vecPoly2ModelPar02[0])

@@ -61,6 +61,9 @@ strPthIn = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/
 # Output path for plots
 strPthPlt = '/home/john/Dropbox/PacMan_Plots/poly/{}_and_{}_condition_{}_minus_{}_subject_{}.png'
 
+# Output path for csv file (can be read into R for lme test on peak positions):
+strCsv = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/poly/{}_and_{}_condition_{}_minus_{}.csv'.format(strRoi01, strRoi02, strCon01, strCon02)
+
 
 # ----------------------------------------------------------------------------
 # *** 2nd degree polynomial function
@@ -191,25 +194,27 @@ for idxSub in range(varNumSubs):
     vecPeak02[idxSub] = float(np.argmax(vecFitted02)) / float(varNumDptHd)
 
     # Populate dataframe:
-    df = pd.DataFrame(np.nan,
-                      index=list(range(varNumDptHd)),
-                      columns=['Cortical depth',
-                               ('Empirical ' + strRoi01),
-                               ('Prediction ' + strRoi01),
-                               ('Empirical ' + strRoi02),
-                               ('Prediction ' + strRoi02)])
-    df['Cortical depth'] = vecIndHd
-    df[('Prediction ' + strRoi01)] = vecFitted01
-    df[('Prediction ' + strRoi02)] = vecFitted02
-    df[('Empirical ' + strRoi01)][vecIdx] = aryCtrRoi01[idxSub, :]
-    df[('Empirical ' + strRoi02)][vecIdx] = aryCtrRoi02[idxSub, :]
-    df = df.melt('Cortical depth', var_name='ROI',  value_name='PSC')
+    objDfPsc = pd.DataFrame(np.nan,
+                            index=list(range(varNumDptHd)),
+                            columns=['Cortical depth',
+                                     ('Empirical ' + strRoi01),
+                                     ('Prediction ' + strRoi01),
+                                     ('Empirical ' + strRoi02),
+                                     ('Prediction ' + strRoi02)])
+    objDfPsc['Cortical depth'] = vecIndHd
+    objDfPsc[('Prediction ' + strRoi01)] = vecFitted01
+    objDfPsc[('Prediction ' + strRoi02)] = vecFitted02
+    objDfPsc[('Empirical ' + strRoi01)][vecIdx] = aryCtrRoi01[idxSub, :]
+    objDfPsc[('Empirical ' + strRoi02)][vecIdx] = aryCtrRoi02[idxSub, :]
+    objDfPsc = objDfPsc.melt('Cortical depth',
+                             var_name='ROI',
+                             value_name='PSC')
 
     # Plot the responses for different events and regions
     objPlt = sns.lineplot(x='Cortical depth',
                           y='PSC',
                           hue='ROI',
-                          data=df,
+                          data=objDfPsc,
                           palette=lstClr)
     objFig = objPlt.get_figure()
     objFig.savefig(strPthPlt.format(strRoi01,
@@ -221,10 +226,31 @@ for idxSub in range(varNumSubs):
 
 
 # ----------------------------------------------------------------------------
+# *** Create dataframe for R
+
+# Dataframe with peak position values:
+objDfPeak = pd.DataFrame(0.0,
+                         index=range(2 * varNumSubs),
+                         columns=['Subject',
+                                  'ROI',
+                                  'PeakPosition',
+                                  'Vertices'])
+objDfPeak['Subject'] = list(range(varNumSubs)) + list(range(varNumSubs))
+objDfPeak['ROI'] = [strRoi01] * varNumSubs + [strRoi02] * varNumSubs
+objDfPeak['PeakPosition'] = np.concatenate([vecPeak01, vecPeak02])
+objDfPeak['Vertices'] = np.concatenate([vecNumIncRoi01, vecNumIncRoi02])
+
+# Save dataframe to disk:
+objDfPeak.to_csv(strCsv, sep=';', index=False)
+
+
+# ----------------------------------------------------------------------------
 # ***  T-test
 
 # Test for difference in peak position between ROIs:
 varT, varP = ttest_rel(vecPeak01, vecPeak02)
+
+print('---P-value: ' + str(np.around(varP, 2)))
 
 print('-Done.')
 # ----------------------------------------------------------------------------

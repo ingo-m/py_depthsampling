@@ -23,6 +23,7 @@ Plot mean of between stimulus conditions difference, with SEM.
 
 
 from py_depthsampling.diff.diff_sem import diff_sem
+from py_depthsampling.diff.diff_sem_sngle import diff_sem_sngle
 
 
 # -----------------------------------------------------------------------------
@@ -35,8 +36,8 @@ strParam = 'mean'
 lstMdl = ['_deconv_model_1']
 
 # Meta-condition (within or outside of retinotopic stimulus area):
-# lstMetaCon = ['stimulus']
-lstMetaCon = ['periphery']
+lstMetaCon = ['stimulus']
+# lstMetaCon = ['periphery']
 
 # ROI ('v1', 'v2', or 'v3'):
 lstRoi = ['v1', 'v2', 'v3']
@@ -50,14 +51,14 @@ strPthData = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{
 
 # Output path & prefix for plots (meta-condition, ROI, hemisphere, and
 # model index left open):
-strPthPltOt = '/home/john/PhD/PacMan_Plots/diff/{}_{}_{}{}_SEM'  #noqa
+strPthPltOt = '/home/john/Dropbox/PacMan_Plots/diff/{}_{}_{}{}_SEM'  #noqa
 
 # Output path for single subject plot, (ROI, metacondition, hemisphere, drain
 # model, and condition left open):
-# strPthPtlSnglOt = '/Users/john/Dropbox/PacMan_Plots/diff_sngle/{}_{}_{}{}_{}'
+strPthPtlSnglOt = '/home/john/Dropbox/PacMan_Plots/diff_sngle/{}_{}_{}{}_{}'
 
 # File type suffix for plot:
-strFlTp = '.svg'
+strFlTp = '.png'
 
 # Figure scaling factor:
 varDpi = 120.0
@@ -68,9 +69,9 @@ strYlabel = 'Signal change [%]'
 
 # Condition levels (used to complete file names):
 # lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
-# lstCon = ['Pd_sst', 'Cd_sst']
+lstCon = ['Pd_sst', 'Cd_sst']
 # lstCon = ['Pd_sst', 'Ps_sst_plus_Cd_sst']
-lstCon = ['Pd_trn', 'Ps_trn', 'Cd_trn']
+# lstCon = ['Pd_trn', 'Ps_trn', 'Cd_trn']
 # lstCon = ['Pd_trn', 'Ps_trn', 'Cd_trn', 'Ps_trn_plus_Cd_trn']
 
 # Condition labels:
@@ -78,7 +79,7 @@ lstConLbl = lstCon
 
 # Which conditions to compare (list of tuples with condition indices):
 # lstDiff = [(0, 1), (0, 2), (1, 2)]
-lstDiff = [(0, 2)]
+lstDiff = [(0, 1)]
 # -----------------------------------------------------------------------------
 
 
@@ -129,21 +130,21 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                          lstDiff=lstDiff,
                          strParam=strParam)
 
-            # Create single subject plot(s):
-            # boot_plot_sngl(strPthData.format(lstMetaCon[idxMtaCn],
-            #                                  lstRoi[idxRoi],
-            #                                  lstHmsph[idxHmsph],
-            #                                  '{}',
-            #                                  lstMdl[idxMdl]),
-            #                (strPthPtlSnglOt.format(lstRoi[idxRoi],
-            #                                        lstMetaCon[idxMtaCn],
-            #                                        lstHmsph[idxHmsph],
-            #                                        lstMdl[idxMdl],
-            #                                        '{}')
-            #                 + strFlTp),
-            #                lstCon,
-            #                lstConLbl,
-            #                strXlabel='Cortical depth level (equivolume)',
-            #                strYlabel='Subject',
-            #                lstDiff=lstDiff)
+                # Create single subject plot(s):
+                diff_sem_sngle(strPthData.format(lstMetaCon[idxMtaCn],
+                                                 lstRoi[idxRoi],
+                                                 lstHmsph[idxHmsph],
+                                                 '{}',
+                                                 lstMdl[idxMdl]),
+                               (strPthPtlSnglOt.format(lstRoi[idxRoi],
+                                                       lstMetaCon[idxMtaCn],
+                                                       lstHmsph[idxHmsph],
+                                                       lstMdl[idxMdl],
+                                                       '{}')
+                                + strFlTp),
+                               lstCon,
+                               lstConLbl,
+                               strXlabel='Cortical depth level (equivolume)',
+                               strYlabel='Subject',
+                               lstDiff=lstDiff)
 # -----------------------------------------------------------------------------

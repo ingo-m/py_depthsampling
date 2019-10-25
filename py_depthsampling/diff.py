@@ -51,14 +51,14 @@ strPthData = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{
 
 # Output path & prefix for plots (meta-condition, ROI, hemisphere, and
 # model index left open):
-strPthPltOt = '/home/john/Dropbox/PacMan_Plots/diff/{}_{}_{}{}_SEM'  #noqa
+strPthPltOt = '/home/john/Dropbox/PacMan_Plots/diff/{}_{}_{}{}_SEM'
 
-# Output path for single subject plot, (ROI, metacondition, hemisphere, drain
-# model, and condition left open):
-strPthPtlSnglOt = '/home/john/Dropbox/PacMan_Plots/diff_sngle/{}_{}_{}{}_{}'
+# Output path for single subject plot, (meta-condition, ROI, hemisphere, and
+# model index left open):
+strPthPtlSnglOt = '/home/john/Dropbox/PacMan_Plots/diff_sngle/{}_{}_{}{}_SEM'
 
 # File type suffix for plot:
-strFlTp = '.png'
+strFlTp = '.svg'
 
 # Figure scaling factor:
 varDpi = 120.0
@@ -130,21 +130,37 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                          lstDiff=lstDiff,
                          strParam=strParam)
 
+                # Note: single-subject plotting function is only makeshift
+                # solution, will not work for most combinations of conditions /
+                # comparisons.
+
+                if lstMetaCon[idxMtaCn] == 'stimulus':
+                    varYmin = -0.5
+                    varYmax = 0.5
+                    varNumLblY = 3
+                    tplPadY = (0.25, 0.35)
+
                 # Create single subject plot(s):
                 diff_sem_sngle(strPthData.format(lstMetaCon[idxMtaCn],
                                                  lstRoi[idxRoi],
                                                  lstHmsph[idxHmsph],
                                                  '{}',
                                                  lstMdl[idxMdl]),
-                               (strPthPtlSnglOt.format(lstRoi[idxRoi],
-                                                       lstMetaCon[idxMtaCn],
+                               (strPthPtlSnglOt.format(lstMetaCon[idxMtaCn],
+                                                       lstRoi[idxRoi],
                                                        lstHmsph[idxHmsph],
-                                                       lstMdl[idxMdl],
-                                                       '{}')
+                                                       lstMdl[idxMdl])
                                 + strFlTp),
                                lstCon,
                                lstConLbl,
-                               strXlabel='Cortical depth level (equivolume)',
-                               strYlabel='Subject',
-                               lstDiff=lstDiff)
+                               varYmin=varYmin,
+                               varYmax=varYmax,
+                               tplPadY=tplPadY,
+                               varNumLblY=varNumLblY,
+                               varDpi=varDpi,
+                               strXlabel=strXlabel,
+                               strYlabel=strYlabel,
+                               lgcLgnd=True,
+                               lstDiff=lstDiff,
+                               strParam=strParam)
 # -----------------------------------------------------------------------------

@@ -29,7 +29,8 @@ def plt_dpth_prfl(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
                   strTitle, lgcLgnd, strPath, vecX=None, varXmin=None,
                   varXmax=None, varSizeX=1800.0, varSizeY=1600.0,
                   varNumLblY=5, tplPadY=(0.0, 0.0), aryClr=None,
-                  aryCnfLw=None, aryCnfUp=None, lstVrt=None, varRound=2):
+                  aryCnfLw=None, aryCnfUp=None, lstVrt=None, varRound=2,
+                  lstLneWdth=None):
     """
     Plot data across depth level for variable number of conditions.
 
@@ -108,6 +109,8 @@ def plt_dpth_prfl(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
     varRound : int
         Number of digits after decimal point for labels on y-axis (e.g. if
         `varRound=1`, labels may be '0.0, 1.0, ...').
+    lstLneWdth : None or list
+        Line width of cortical depth profile per condition.
 
     Returns
     -------
@@ -138,6 +141,10 @@ def plt_dpth_prfl(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
         objClrNorm = colors.Normalize(vmin=0, vmax=9)
         objCmap = plt.cm.tab10
 
+    # Line width:
+    if lstLneWdth is None:
+        lstLneWdth = [9.0] * varNumCon
+
     # Loop through conditions:
     for idxCon in range(0, varNumCon):
 
@@ -152,8 +159,8 @@ def plt_dpth_prfl(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
                            aryData[idxCon, :],
                            color=vecClrTmp,
                            alpha=0.9,
-                           label=(lstConLbl[idxCon]),
-                           linewidth=9.0,
+                           label=lstConLbl[idxCon],
+                           linewidth=lstLneWdth[idxCon],
                            antialiased=True)
 
         # If no confidence intervals have been supplied, plot SEM:
@@ -304,8 +311,7 @@ def plt_dpth_prfl(aryData, aryError, varNumDpth, varNumCon, varDpi, varYmin,
                   facecolor='w',
                   edgecolor='w',
                   orientation='landscape',
-                  transparent=False,
-                  frameon=None)
+                  transparent=False)
 
     # Close figure:
     plt.close(fgr01)

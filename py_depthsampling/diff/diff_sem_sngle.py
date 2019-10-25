@@ -85,6 +85,9 @@ def diff_sem_sngle(objDpth, strPath, lstCon, lstConLbl, strTtl='', varYmin=0.0,
 
     Notes
     -----
+    Single-subject plotting function is only makeshift solution, will not work
+    for most combinations of conditions / comparisons.
+
     Plot single-subject cortical depth profiles, together with across-subects
     mean.
 
@@ -93,6 +96,10 @@ def diff_sem_sngle(objDpth, strPath, lstCon, lstConLbl, strTtl='', varYmin=0.0,
     """
     # -------------------------------------------------------------------------
     # *** Load data
+    strMssg = ('Single-subject plotting function is only makeshift solution, '
+               + 'and will not work for most combinations of conditions / '
+               + 'comparisons.')
+    print(strMssg)
 
     # Test whether the input is a numpy array or a string (with the path to a
     # numpy array):
@@ -164,7 +171,8 @@ def diff_sem_sngle(objDpth, strPath, lstCon, lstConLbl, strTtl='', varYmin=0.0,
                               varSum
                               )
 
-        # aryDiffSngle[idxDiff, :, :] = ?
+        # Single subject data:
+        aryDiffSngle = aryDpth
 
     else:
 
@@ -172,7 +180,7 @@ def diff_sem_sngle(objDpth, strPath, lstCon, lstConLbl, strTtl='', varYmin=0.0,
         aryEmpMne = np.zeros((varNumCon, varNumDpth))
 
         # Array for single subject condition differences:
-        aryDiffSngle = np.zeros((varNumCon, varNumSub, varNumDpth))
+        aryDiffSngle = np.zeros((varNumSub, varNumCon, varNumDpth))
 
         for idxDiff in range(varNumCon):
 
@@ -185,7 +193,7 @@ def diff_sem_sngle(objDpth, strPath, lstCon, lstConLbl, strTtl='', varYmin=0.0,
                                   aryDpth[:, lstDiff[idxDiff][1], :])
 
             # Single subject condition differences:
-            aryDiffSngle[idxDiff, :, :] = np.copy(aryDiff)
+            aryDiffSngle[:, idxDiff, :] = np.copy(aryDiff)
 
             # Multiply depth profiles by weights (weights are broadcasted over
             # depth levels):
@@ -265,23 +273,41 @@ def diff_sem_sngle(objDpth, strPath, lstCon, lstConLbl, strTtl='', varYmin=0.0,
             aryClr[idxCon, :] = \
                 objCmap(objClrNorm(varNumCon + 2 - idxCon))[0:3]
 
-
-
-
+    # Array for all depth profiles to plot (mean and single-subject):
     aryPlt = np.zeros(((varNumCon * varNumSub + varNumCon), varNumDpth))
-    arySem = np.zeros(((varNumCon * varNumSub + varNumCon), varNumDpth))
-    aryClr = np.ones(((varNumCon * varNumSub + varNumCon), 3))
 
+    # Assign across-subjects mean(s) to array:
     aryPlt[0:varNumCon, :] = aryEmpMne
 
-    aryPlt[1:, :] = aryDiffSngle[0, :, :]
+    # Assign single-subject profiles to array:
+    aryPlt[varNumCon:, :] = aryDiffSngle[:, 0, :]
 
-    aryClr[0, :] = [0.0, 0.0, 0.0]
-    aryClr[1:, :] = np.multiply(aryClr[1:, :], 0.3)
+    # Total number of profiles to plot (across-subjects and single subject
+    # together):
+    varNumLne = aryPlt.shape[0]
 
+    # Colours. Across subject mean is black, single subject data is grey.
+    aryClr = np.zeros((varNumLne, 3))
+    # aryClr[0:varNumCon, :] = 0.0
+    aryClr[varNumCon:, :] = 0.5
 
-    plt_dpth_prfl(aryPlt, arySem, varNumDpth, varNumCon, varDpi, varYmin,
+    # Do not plot error shading (empty dummy array):
+    arySem = np.zeros(aryPlt.shape)
+
+    # Flip array so that mean profiles are plotted on top of single-subject
+    # data:
+    aryPlt = np.flip(aryPlt, axis=0)
+    aryClr = np.flip(aryClr, axis=0)
+
+    # Line widht:
+    lstLneWdth = [4.0] * (varNumCon * varNumSub) + [9.0] * varNumCon
+
+    lstConLbl = lstConLbl * varNumLne
+    lgcLgnd = False
+
+    plt_dpth_prfl(aryPlt, arySem, varNumDpth, varNumLne, varDpi, varYmin,
                   varYmax, False, lstConLbl, strXlabel, strYlabel, strTtl,
                   lgcLgnd, strPath, varSizeX=1800.0, varSizeY=1600.0,
-                  varNumLblY=varNumLblY, tplPadY=tplPadY, aryClr=aryClr)
+                  varNumLblY=varNumLblY, tplPadY=tplPadY, aryClr=aryClr,
+                  lstLneWdth=lstLneWdth)
     # ------------------------------------------------------------------------

@@ -33,7 +33,7 @@ from py_depthsampling.diff.diff_sem_sngle import diff_sem_sngle
 strParam = 'mean'
 
 # Which draining model to plot ('' for none):
-lstMdl = ['_deconv_model_1']
+lstMdl = ['', '_deconv_model_1']
 
 # Meta-condition (within or outside of retinotopic stimulus area):
 lstMetaCon = ['stimulus']
@@ -51,11 +51,11 @@ strPthData = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/{}/{}_{
 
 # Output path & prefix for plots (meta-condition, ROI, hemisphere, and
 # model index left open):
-strPthPltOt = '/home/john/Dropbox/PacMan_Plots/diff/{}_{}_{}{}_SEM'
+strPthPltOt = '/home/john/Dropbox/PacMan_Plots/diff_all_cond/{}_{}_{}{}_SEM'
 
 # Output path for single subject plot, (meta-condition, ROI, hemisphere, and
 # model index left open):
-strPthPtlSnglOt = '/home/john/Dropbox/PacMan_Plots/diff_sngle/{}_{}_{}{}_SEM'
+# strPthPtlSnglOt = '/home/john/Dropbox/PacMan_Plots/diff_sngle/{}_{}_{}{}_SEM'
 
 # File type suffix for plot:
 strFlTp = '.svg'
@@ -68,8 +68,8 @@ strXlabel = 'Cortical depth level'
 strYlabel = 'Signal change [%]'
 
 # Condition levels (used to complete file names):
-# lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
-lstCon = ['Pd_sst', 'Cd_sst']
+lstCon = ['Pd_sst', 'Ps_sst', 'Cd_sst']
+# lstCon = ['Pd_sst', 'Cd_sst']
 # lstCon = ['Pd_sst', 'Ps_sst_plus_Cd_sst']
 # lstCon = ['Pd_trn', 'Ps_trn', 'Cd_trn']
 # lstCon = ['Pd_trn', 'Ps_trn', 'Cd_trn', 'Ps_trn_plus_Cd_trn']
@@ -78,8 +78,8 @@ lstCon = ['Pd_sst', 'Cd_sst']
 lstConLbl = lstCon
 
 # Which conditions to compare (list of tuples with condition indices):
-# lstDiff = [(0, 1), (0, 2), (1, 2)]
-lstDiff = [(0, 1)]
+lstDiff = [(0, 1), (0, 2), (1, 2)]
+# lstDiff = [(0, 1)]
 # -----------------------------------------------------------------------------
 
 
@@ -101,10 +101,16 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                     varNumLblY = 3
                     tplPadY = (0.1, 0.1)
                 if lstMetaCon[idxMtaCn] == 'stimulus':
-                    varYmin = -0.2  # -0.25
-                    varYmax = 0.4  # 0.5
-                    varNumLblY = 4
-                    tplPadY = (0.0, 0.0)
+                    if lstMdl[idxMdl] == '_deconv_model_1':
+                        varYmin = -0.25
+                        varYmax = 0.5
+                        varNumLblY = 4
+                        tplPadY = (0.05, 0.05)
+                    elif lstMdl[idxMdl] == '':
+                        varYmin = -0.5
+                        varYmax = 0.5
+                        varNumLblY = 3
+                        tplPadY = (0.15, 0.40)
 
                 # Create average plots:
                 diff_sem(strPthData.format(lstMetaCon[idxMtaCn],
@@ -134,33 +140,35 @@ for idxMtaCn in range(len(lstMetaCon)):  #noqa
                 # solution, will not work for most combinations of conditions /
                 # comparisons.
 
-                if lstMetaCon[idxMtaCn] == 'stimulus':
-                    varYmin = -0.5
-                    varYmax = 0.5
-                    varNumLblY = 3
-                    tplPadY = (0.25, 0.35)
+                if False:
 
-                # Create single subject plot(s):
-                diff_sem_sngle(strPthData.format(lstMetaCon[idxMtaCn],
-                                                 lstRoi[idxRoi],
-                                                 lstHmsph[idxHmsph],
-                                                 '{}',
-                                                 lstMdl[idxMdl]),
-                               (strPthPtlSnglOt.format(lstMetaCon[idxMtaCn],
-                                                       lstRoi[idxRoi],
-                                                       lstHmsph[idxHmsph],
-                                                       lstMdl[idxMdl])
-                                + strFlTp),
-                               lstCon,
-                               lstConLbl,
-                               varYmin=varYmin,
-                               varYmax=varYmax,
-                               tplPadY=tplPadY,
-                               varNumLblY=varNumLblY,
-                               varDpi=varDpi,
-                               strXlabel=strXlabel,
-                               strYlabel=strYlabel,
-                               lgcLgnd=True,
-                               lstDiff=lstDiff,
-                               strParam=strParam)
+                    if lstMetaCon[idxMtaCn] == 'stimulus':
+                        varYmin = -0.5
+                        varYmax = 0.5
+                        varNumLblY = 3
+                        tplPadY = (0.25, 0.35)
+
+                    # Create single subject plot(s):
+                    diff_sem_sngle(strPthData.format(lstMetaCon[idxMtaCn],
+                                                     lstRoi[idxRoi],
+                                                     lstHmsph[idxHmsph],
+                                                     '{}',
+                                                     lstMdl[idxMdl]),
+                                   (strPthPtlSnglOt.format(lstMetaCon[idxMtaCn],
+                                                           lstRoi[idxRoi],
+                                                           lstHmsph[idxHmsph],
+                                                           lstMdl[idxMdl])
+                                    + strFlTp),
+                                   lstCon,
+                                   lstConLbl,
+                                   varYmin=varYmin,
+                                   varYmax=varYmax,
+                                   tplPadY=tplPadY,
+                                   varNumLblY=varNumLblY,
+                                   varDpi=varDpi,
+                                   strXlabel=strXlabel,
+                                   strYlabel=strYlabel,
+                                   lgcLgnd=True,
+                                   lstDiff=lstDiff,
+                                   strParam=strParam)
 # -----------------------------------------------------------------------------

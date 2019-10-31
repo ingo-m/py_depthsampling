@@ -350,11 +350,11 @@ if __name__ == "__main__":
     # lstDpthLbl = [str(x) for x in range(11)]
 
     # Output path for plots. ROI,hemisphere, and depth level left open):
-    strPlt = '/home/john/Dropbox/Surface_Plots/ert_onset/{}_{}_{}.svg'
+    strPlt = '/home/john/Dropbox/PacMan_Plots/era_onset_texture_control_experiment/onset_{}_{}_{}.svg'
 
     # Name of pickle file from which to load time course data (metacondition,
     # ROI, and hemisphere left open):
-    strPthPic = '/home/john/Dropbox/Surface_Depth_Data/Higher_Level_Analysis/{}/era_{}{}.pickle'  #noqa
+    strPthPic = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/txtr_uni_bckgr_cntrl_exp/era_{}_{}{}.pickle'
 
 
     # *************************************************************************

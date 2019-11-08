@@ -226,8 +226,8 @@ def ert_onset_sngle(lstPthPic, strPthPlt, lstConLbl, strTitle=' ',
 
     # RGB colours for two conditions - makeshift solution, will not work for
     # more than two conditions.
-    lstClr01 = [float(x)/255.0 for x  in [255, 127, 14]]
-    lstClr02 = [float(x)/255.0 for x  in [31, 119, 180]]
+    lstClr01 = [float(x)/255.0 for x  in [31, 119, 180]]
+    lstClr02 = [float(x)/255.0 for x  in [255, 127, 14]]
     lstClr = [[lstClr01] * varNumSub
               + [lstClr02] * varNumSub][0]
 

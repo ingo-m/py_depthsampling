@@ -48,7 +48,9 @@ def ert_plt(aryRoiErtMeanDpth,  #noqa
             varXlbl=2,
             varYnum=6,
             tplPadY=(0.001, 0.001),
-            lstVrt=None):
+            lstVrt=None,
+            lstClr=None,
+            lstLne=None):
     """Plot event-related timecourses."""
     # Create figure:
     fgr01 = plt.figure(figsize=(900.0/varDpi, 600.0/varDpi),
@@ -94,11 +96,12 @@ def ert_plt(aryRoiErtMeanDpth,  #noqa
     # Get index of time point zero (i.e. of stimulus onset):
     # varIdxZero = np.where((np.around(vecX, decimals=5) == 0.0))[0]
 
-    # Prepare colour map:
-    # objClrNorm = colors.Normalize(vmin=0, vmax=(varNumCon - 1))
-    # objCmap = plt.cm.winter
-    objClrNorm = colors.Normalize(vmin=0, vmax=9)
-    objCmap = plt.cm.tab10
+    if lstClr is None:
+        # Prepare colour map:
+        # objClrNorm = colors.Normalize(vmin=0, vmax=(varNumCon - 1))
+        # objCmap = plt.cm.winter
+        objClrNorm = colors.Normalize(vmin=0, vmax=9)
+        objCmap = plt.cm.tab10
 
     # Plot vertical lines (e.g. representing response onset):
     if lstVrt is not None:
@@ -112,7 +115,10 @@ def ert_plt(aryRoiErtMeanDpth,  #noqa
             if lstVrt[idxVrt] != 0:
 
                 # Adjust the colour of current line:
-                vecClrTmp = objCmap(objClrNorm(idxVrt))
+                if lstClr is None:
+                    vecClrTmp = objCmap(objClrNorm(idxVrt))
+                else:
+                    vecClrTmp = lstClr[idxVrt]
 
                 # Scale vertical position from array index to seconds:
                 varVrtTmp = np.multiply(
@@ -136,16 +142,32 @@ def ert_plt(aryRoiErtMeanDpth,  #noqa
     # for idxCon in [3, 2, 1, 0]:
     for idxCon in range(0, varNumCon):
 
-        # Adjust the colour of current line:
-        vecClrTmp = objCmap(objClrNorm(idxCon))
+        # Line colour:
+        if lstClr is None:
+            # Adjust the colour of current line:
+            vecClrTmp = objCmap(objClrNorm(idxCon))
+        else:
+            vecClrTmp = lstClr[idxCon]
+
+        # Line thickness:
+        if lstLne is None:
+            varLneTmp = 8.0
+        else:
+            varLneTmp = lstLne[idxCon]
+
+        # Condition label:
+        if lstConLbl is None:
+            objLblTmp = None
+        else:
+            objLblTmp = (lstConLbl[idxCon])
 
         # Plot timecourse for current condition:
         plt01 = axs01.plot(vecX,  #noqa
                            aryRoiErtMeanDpth[idxCon, :],
                            color=vecClrTmp,
                            alpha=0.9,
-                           label=(lstConLbl[idxCon]),
-                           linewidth=8.0,
+                           label=objLblTmp,
+                           linewidth=varLneTmp,
                            antialiased=True)
 
         # Plot error shading:

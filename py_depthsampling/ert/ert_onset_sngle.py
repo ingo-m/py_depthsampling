@@ -19,7 +19,6 @@
 
 import pickle
 import numpy as np
-from scipy.stats import ttest_1samp
 from py_depthsampling.ert.ert_plt import ert_plt
 
 
@@ -227,8 +226,8 @@ def ert_onset_sngle(lstPthPic, strPthPlt, lstConLbl, strTitle=' ',
 
     # RGB colours for two conditions - makeshift solution, will not work for
     # more than two conditions.
-    lstClr01 = [255, 127, 14]
-    lstClr02 = [31, 119, 180]
+    lstClr01 = [float(x)/255.0 for x  in [255, 127, 14]]
+    lstClr02 = [float(x)/255.0 for x  in [31, 119, 180]]
     lstClr = [[lstClr01] * varNumSub
               + [lstClr02] * varNumSub][0]
 
@@ -238,12 +237,12 @@ def ert_onset_sngle(lstPthPic, strPthPlt, lstConLbl, strTitle=' ',
     # Line thickness group averages:
     varLneGrp = 8.0
     # Line thickness single subject:
-    varLneSngl = 1.0
+    varLneSngl = 2.0
     # List with line thickness for all lines:
     lstLne = [varLneGrp] * varNumRoi + [varLneSngl] * (varNumRoi * varNumSub)
 
-    print('arySngle.shape')
-    print(arySngle.shape)
+    # Total number of lines:
+    varNumLne = len(lstLne)
 
     # *************************************************************************
     # *** Create plot
@@ -254,6 +253,9 @@ def ert_onset_sngle(lstPthPic, strPthPlt, lstConLbl, strTitle=' ',
 
     # Number of labels on y-axis:
     varYnum = 4
+
+    # Padding at x & y axis limits
+    tplPadY = (0.008, 0.005)
 
     # Convert y-axis values to percent (i.e. divide label values by 100)?
     lgcCnvPrct = True
@@ -286,7 +288,7 @@ def ert_onset_sngle(lstPthPic, strPthPlt, lstConLbl, strTitle=' ',
     ert_plt(aryConc,
             aryConcErr,
             1,
-            varNumRoi,
+            varNumLne,
             varNumVol,
             varDpi,
             varYmin,
@@ -294,7 +296,7 @@ def ert_onset_sngle(lstPthPic, strPthPlt, lstConLbl, strTitle=' ',
             varStimStrt,
             varStimEnd,
             varTr,
-            lstConLbl,
+            None,
             lgcLgnd,
             strXlabel,
             strYlabel,
@@ -304,7 +306,9 @@ def ert_onset_sngle(lstPthPic, strPthPlt, lstConLbl, strTitle=' ',
             varTmeScl=1.0,
             varXlbl=5,
             varYnum=varYnum,
-            tplPadY=(0.001, 0.001))
+            tplPadY=tplPadY,
+            lstLne=lstLne,
+            lstClr=lstClr)
     # *************************************************************************
 
 

@@ -39,12 +39,14 @@ strPath = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/'
 # or more) ROIs. First item from this list will be compared with first item of
 # second list (i.e. `lstCon02[0] - lstCon01[0]`, etc. for all items).
 lstCon01 = ['v1_rh_Pd_sst_deconv_model_1.npz',
-            'v2_rh_Pd_sst_deconv_model_1.npz']
+            'v2_rh_Pd_sst_deconv_model_1.npz',
+            'v3_rh_Pd_sst_deconv_model_1.npz']
 
 # List of file names of depth profiles, second condition, several ROIs (i.e. two
 # or more) ROIs.
-lstCon02 = ['v1_rh_Ps_sst_plus_Cd_sst_deconv_model_1.npz',
-            'v2_rh_Ps_sst_plus_Cd_sst_deconv_model_1.npz']
+lstCon02 = ['v1_rh_Cd_sst_deconv_model_1.npz',
+            'v2_rh_Cd_sst_deconv_model_1.npz',
+            'v3_rh_Cd_sst_deconv_model_1.npz']
 
 
 # ----------------------------------------------------------------------------
@@ -109,7 +111,7 @@ varNumDpt = lstCtr[0].shape[1]
 varNumIntp = 100
 
 # Amount of smoothing (relative to cortical depth):
-varSd = 0.05
+varSd = 0.01
 
 # Scale the standard deviation of the Gaussian kernel:
 varSdSc = np.float64(varNumIntp) * varSd
@@ -171,8 +173,15 @@ lstNumSuper = [np.sum(x) for x in lstLgcSuper]
 chi2stat, pval, _ = proportions_chisquare(lstNumSuper,
                                           [varNumSubs] * varNumRoi)
 
+# Pool the last two ROIs (i.e. V2 and V3):
+# lstDist = [lstNumSuper[0], np.sum(lstNumSuper[1:])]
+# lstN = [varNumSubs, ((varNumRoi - 1) * varNumSubs)]
+# chi2stat, pval, e = proportions_chisquare(lstDist,
+#                                           lstN)
+
 print('Chi-squared test for differences in depth profiles between ROIs')
 print('   Test the H0 that the number of superficial peaks in single subject')
 print('   cortical depth profiles does not differ between ROIs.')
 print('   chi-squared = ' + str(np.around(chi2stat, decimals = 2)))
-print('   p = ' + str(np.around(pval, decimals=2)))
+print('   p = ' + str(np.around(pval, decimals=4)))
+

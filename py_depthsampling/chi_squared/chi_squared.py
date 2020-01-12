@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Sign test on superficial vs. non-superficial peak in condition contrasts.
-
-Test whether 
+Chi-squared test on superficial vs. non-superficial peak in depth profiles.
 """
 
 # Part of py_depthsampling library
@@ -22,9 +20,9 @@ Test whether
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import itertools
 import numpy as np
-from py_depthsampling.main.find_peak import find_peak
+from scipy.interpolate import interp1d
+from scipy.ndimage.filters import gaussian_filter1d
 from statsmodels.stats.proportion import proportions_chisquare
 
 
@@ -95,18 +93,65 @@ varNumDpt = aryCtrRoi01.shape[1]
 
 
 # ----------------------------------------------------------------------------
-# ***
+# *** Upsample depth profiles
 
-# Find peaks in first & second ROI:
-# vecPeaks01 = find_peak(aryCtrRoi01, varNumIntp=100, varSd=0.1)
-# vecPeaks02 = find_peak(aryCtrRoi02, varNumIntp=100, varSd=0.1)
+# Upsample and slightly smooth depth profiles to get a more fine grained
+# estimate of the peak position.
 
-vecPeaks01 = np.argmax(aryCtrRoi01, axis=1).astype(np.float32)
-vecPeaks02 = np.argmax(aryCtrRoi02, axis=1).astype(np.float32)
+# Number of depth levels to upsample to:
+varNumIntp = 100
+
+# Amount of smoothing (relative to cortical depth):
+varSd = 0.05
+
+# Position of original datapoints (before interpolation):
+vecPosOrig = np.linspace(0, 1.0, num=varNumDpt, endpoint=True)
+
+# Positions at which to sample (interpolate) depth profiles:
+vecPosIntp = np.linspace(0, 1.0, num=varNumIntp, endpoint=True)
+
+# Create function for interpolation:
+func_interp_01 = interp1d(vecPosOrig,
+                          aryCtrRoi01,
+                          kind='linear',
+                          axis=1,
+                          fill_value='extrapolate')
+func_interp_02 = interp1d(vecPosOrig,
+                          aryCtrRoi02,
+                          kind='linear',
+                          axis=1,
+                          fill_value='extrapolate')
+
+# Apply interpolation function:
+aryCtrRoiInt01 = func_interp_01(vecPosIntp)
+aryCtrRoiInt02 = func_interp_02(vecPosIntp)
+
+# Scale the standard deviation of the Gaussian kernel:
+varSdSc = np.float64(varNumIntp) * varSd
+
+# Smooth interpolated depth profiles:
+aryCtrRoiSmth01 = gaussian_filter1d(aryCtrRoiInt01,
+                                    varSdSc,
+                                    axis=1,
+                                    order=0,
+                                    mode='nearest')
+aryCtrRoiSmth02 = gaussian_filter1d(aryCtrRoiInt02,
+                                    varSdSc,
+                                    axis=1,
+                                    order=0,
+                                    mode='nearest')
+
+
+# ----------------------------------------------------------------------------
+# *** Find peaks
+
+# Find peaks in cortical depth profiles of first & second ROI:
+vecPeaks01 = np.argmax(aryCtrRoiSmth01, axis=1).astype(np.float32)
+vecPeaks02 = np.argmax(aryCtrRoiSmth02, axis=1).astype(np.float32)
 
 # Scale to range (0, 1):
-vecPeaks01 = np.divide(vecPeaks01, varNumDpt)
-vecPeaks02 = np.divide(vecPeaks02, varNumDpt)
+vecPeaks01 = np.divide(vecPeaks01, varNumIntp)
+vecPeaks02 = np.divide(vecPeaks02, varNumIntp)
 
 # Are the peaks at superficial cortical depth? We define 'superficial' as
 # greater than 0.66 cortical depth.
@@ -117,29 +162,15 @@ vecLgcSuper02 = np.greater(vecPeaks02, 0.66)
 varSuper01 = np.sum(vecLgcSuper01)
 varSuper02 = np.sum(vecLgcSuper02)
 
-
-roi01 = aryCtrRoi01.T
-roi02 = aryCtrRoi02.T
-
-
-
-
-peak = argrelextrema(profile,
-                     np.greater,
-                     axis=0,
-                     order=3,
-                     mode='clip')
-
-
-chi2stat, p, _ = proportions_chisquare([varSuper01, varSuper02],
+# Chi-squared test:
+chi2stat, pval, _ = proportions_chisquare([varSuper01, varSuper02],
                                        [varNumSubs, varNumSubs])
 
-
-
-
-
-
-
+print('Chi-squared test for differences in depth profiles between ROIs')
+print('   Test the H0 that the number of superficial peaks in single subject')
+print('   cortical depth profiles does not differ between ROIs.')
+print('   chi-squared = ' + str(np.around(chi2stat, decimals = 2)))
+print('   p = ' + str(np.around(pval, decimals=2)))
 
 
 

@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 Chi-squared test on superficial vs. non-superficial peak in depth profiles.
+
+Test the H0 that the number of superficial peaks in single subject cortical
+depth profiles does not differ between ROIs.
 """
 
 # Part of py_depthsampling library
@@ -29,67 +32,71 @@ from statsmodels.stats.proportion import proportions_chisquare
 # ----------------------------------------------------------------------------
 # *** Define parameters
 
-## Path of depth-profiles - first ROI, first condition:
-#strRoi01Con01 = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/v1_rh_Pd_sst_deconv_model_1.npz'
-## Path of depth-profiles - first ROI, second condition:
-#strRoi01Con02 = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/v1_rh_Cd_sst_deconv_model_1.npz'
-## Path of depth-profiles - second ROI, first condition:
-#strRoi02Con01 = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/v2_rh_Pd_sst_deconv_model_1.npz'
-## Path of depth-profiles - second ROI, second condition:
-#strRoi02Con02 = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/v2_rh_Cd_sst_deconv_model_1.npz'
+# Directory with npz files containing cortical depth profiles:
+strPath = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/'
 
-# Path of depth-profiles - first ROI, first condition:
-strRoi01Con01 = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/v1_rh_Pd_sst_deconv_model_1.npz'
-# Path of depth-profiles - first ROI, second condition:
-strRoi01Con02 = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/v1_rh_Ps_sst_plus_Cd_sst_deconv_model_1.npz'
-# Path of depth-profiles - second ROI, first condition:
-strRoi02Con01 = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/v2_rh_Pd_sst_deconv_model_1.npz'
-# Path of depth-profiles - second ROI, second condition:
-strRoi02Con02 = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/v2_rh_Ps_sst_plus_Cd_sst_deconv_model_1.npz'
+# List of file names of depth profiles, first condition, several ROIs (i.e. two
+# or more) ROIs. First item from this list will be compared with first item of
+# second list (i.e. `lstCon02[0] - lstCon01[0]`, etc. for all items).
+lstCon01 = ['v1_rh_Pd_sst_deconv_model_1.npz',
+            'v2_rh_Pd_sst_deconv_model_1.npz']
+
+# List of file names of depth profiles, second condition, several ROIs (i.e. two
+# or more) ROIs.
+lstCon02 = ['v1_rh_Ps_sst_plus_Cd_sst_deconv_model_1.npz',
+            'v2_rh_Ps_sst_plus_Cd_sst_deconv_model_1.npz']
 
 
 # ----------------------------------------------------------------------------
 # *** Load depth profiles
 
-# Load single-condition depth profiles from npz files:
-objNpzTmp = np.load(strRoi01Con01)
-aryRoi01Con01 = objNpzTmp['arySubDpthMns']
+# Number of ROIs:
+varNumRoi = len(lstCon01)
 
-# Array with number of vertices (for weighted averaging across subjects),
-# shape: vecNumInc[subjects].
-vecNumIncRoi01 = objNpzTmp['vecNumInc']
+# List for single-condition depth profiles:
+lstDpthCon01 = [None] * varNumRoi
+lstDpthCon02 = [None] * varNumRoi
 
-# Load single-condition depth profiles from npz files:
-objNpzTmp = np.load(strRoi01Con02)
-aryRoi01Con02 = objNpzTmp['arySubDpthMns']
+# List for number of vertices per subject (only one value per ROI, same for
+# both conditions):
+lstNumInc = [None] * varNumRoi
 
-# Load single-condition depth profiles from npz files:
-objNpzTmp = np.load(strRoi02Con01)
-aryRoi02Con01 = objNpzTmp['arySubDpthMns']
+# Loop through ROIs and load profiles:
+for idxRoi in range(varNumRoi):
 
-# Array with number of vertices (for weighted averaging across subjects),
-# shape: vecNumInc[subjects].
-vecNumIncRoi02 = objNpzTmp['vecNumInc']
+    # First condition.
 
-# Load single-condition depth profiles from npz files:
-objNpzTmp = np.load(strRoi02Con02)
-aryRoi02Con02 = objNpzTmp['arySubDpthMns']
+    # Load single-condition depth profiles from npz files:
+    objNpzTmp = np.load((strPath + lstCon01[idxRoi]))
+    lstDpthCon01[idxRoi] = objNpzTmp['arySubDpthMns']
+
+    # Second condition.
+
+    # Load single-condition depth profiles from npz files:
+    objNpzTmp = np.load((strPath + lstCon02[idxRoi]))
+    lstDpthCon02[idxRoi] = objNpzTmp['arySubDpthMns']
+
+    # Array with number of vertices, shape: vecNumInc[subjects].
+    lstNumInc[idxRoi] = objNpzTmp['vecNumInc']
 
 
 # ----------------------------------------------------------------------------
 # *** Create condition contrasts
 
-# Within-subject condition contrast, first ROI:
-aryCtrRoi01 = np.subtract(aryRoi01Con01, aryRoi01Con02)
+# List for within-subject condition contrast:
+lstCtr = [None] * varNumRoi
 
-# Within-subject condition contrast, second ROI:
-aryCtrRoi02 = np.subtract(aryRoi02Con01, aryRoi02Con02)
+# Loop through ROIs and calculate condition contrast:
+for idxRoi in range(varNumRoi):
+
+    lstCtr[idxRoi] = np.subtract(lstDpthCon01[idxRoi],
+                                 lstDpthCon02[idxRoi])
 
 # Number of subject:
-varNumSubs = aryCtrRoi01.shape[0]
+varNumSubs = lstCtr[0].shape[0]
 
 # Number of depth levels:
-varNumDpt = aryCtrRoi01.shape[1]
+varNumDpt = lstCtr[0].shape[1]
 
 
 # ----------------------------------------------------------------------------
@@ -104,76 +111,68 @@ varNumIntp = 100
 # Amount of smoothing (relative to cortical depth):
 varSd = 0.05
 
+# Scale the standard deviation of the Gaussian kernel:
+varSdSc = np.float64(varNumIntp) * varSd
+
 # Position of original datapoints (before interpolation):
 vecPosOrig = np.linspace(0, 1.0, num=varNumDpt, endpoint=True)
 
 # Positions at which to sample (interpolate) depth profiles:
 vecPosIntp = np.linspace(0, 1.0, num=varNumIntp, endpoint=True)
 
-# Create function for interpolation:
-func_interp_01 = interp1d(vecPosOrig,
-                          aryCtrRoi01,
-                          kind='linear',
-                          axis=1,
-                          fill_value='extrapolate')
-func_interp_02 = interp1d(vecPosOrig,
-                          aryCtrRoi02,
-                          kind='linear',
-                          axis=1,
-                          fill_value='extrapolate')
+# List for upsampled depth profiles (condition contrast):
+lstCtrUp = [None] * varNumRoi
 
-# Apply interpolation function:
-aryCtrRoiInt01 = func_interp_01(vecPosIntp)
-aryCtrRoiInt02 = func_interp_02(vecPosIntp)
+# Loop through ROIs and upsample profiles:
+for idxRoi in range(varNumRoi):
 
-# Scale the standard deviation of the Gaussian kernel:
-varSdSc = np.float64(varNumIntp) * varSd
+    # Create function for interpolation:
+    func_interp = interp1d(vecPosOrig,
+                           lstCtr[idxRoi],
+                           kind='linear',
+                           axis=1,
+                           fill_value='extrapolate')
 
-# Smooth interpolated depth profiles:
-aryCtrRoiSmth01 = gaussian_filter1d(aryCtrRoiInt01,
-                                    varSdSc,
-                                    axis=1,
-                                    order=0,
-                                    mode='nearest')
-aryCtrRoiSmth02 = gaussian_filter1d(aryCtrRoiInt02,
-                                    varSdSc,
-                                    axis=1,
-                                    order=0,
-                                    mode='nearest')
+
+    # Apply interpolation function:
+    aryTmp = func_interp(vecPosIntp)
+
+    # Smooth interpolated depth profiles:
+    lstCtrUp[idxRoi] = gaussian_filter1d(aryTmp,
+                                         varSdSc,
+                                         axis=1,
+                                         order=0,
+                                         mode='nearest')
 
 
 # ----------------------------------------------------------------------------
 # *** Find peaks
 
-# Find peaks in cortical depth profiles of first & second ROI:
-vecPeaks01 = np.argmax(aryCtrRoiSmth01, axis=1).astype(np.float32)
-vecPeaks02 = np.argmax(aryCtrRoiSmth02, axis=1).astype(np.float32)
+# List for arrays with single-subject peak positions:
+lstPeaks = [None] * varNumRoi
 
-# Scale to range (0, 1):
-vecPeaks01 = np.divide(vecPeaks01, varNumIntp)
-vecPeaks02 = np.divide(vecPeaks02, varNumIntp)
+# Loop through ROIs and find peaks in cortical depth profiles:
+for idxRoi in range(varNumRoi):
+
+    # Vector with peak positions (one per subeject):
+    vecTmp = np.argmax(lstCtrUp[idxRoi], axis=1).astype(np.float32)
+
+    # Scale to range (0, 1):
+    lstPeaks[idxRoi] = np.divide(vecTmp, varNumIntp)
 
 # Are the peaks at superficial cortical depth? We define 'superficial' as
 # greater than 0.66 cortical depth.
-vecLgcSuper01 = np.greater(vecPeaks01, 0.66)
-vecLgcSuper02 = np.greater(vecPeaks02, 0.66)
+lstLgcSuper = [np.greater(x, 0.66) for x in lstPeaks]
 
 # Number of superficial peaks in each area:
-varSuper01 = np.sum(vecLgcSuper01)
-varSuper02 = np.sum(vecLgcSuper02)
+lstNumSuper = [np.sum(x) for x in lstLgcSuper]
 
 # Chi-squared test:
-chi2stat, pval, _ = proportions_chisquare([varSuper01, varSuper02],
-                                       [varNumSubs, varNumSubs])
+chi2stat, pval, _ = proportions_chisquare(lstNumSuper,
+                                          [varNumSubs] * varNumRoi)
 
 print('Chi-squared test for differences in depth profiles between ROIs')
 print('   Test the H0 that the number of superficial peaks in single subject')
 print('   cortical depth profiles does not differ between ROIs.')
 print('   chi-squared = ' + str(np.around(chi2stat, decimals = 2)))
 print('   p = ' + str(np.around(pval, decimals=2)))
-
-
-
-
-
-

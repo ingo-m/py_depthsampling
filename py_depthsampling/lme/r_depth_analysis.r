@@ -14,6 +14,9 @@ objDf <- read.csv(file='/home/john/PhD/GitLab/py_depthsampling/py_depthsampling/
 # Test only the deepest cortical depth levels:
 # objDf <- objDf[objDf$Depth<3,]
 
+# Test only V2 and V3:
+objDf <- objDf[objDf$ROI!='V1',]
+
 # (1)
 # Do the stimuli differentially activate the ROIs (i.e. does activation differ
 # between ROIs as a function of condition)?

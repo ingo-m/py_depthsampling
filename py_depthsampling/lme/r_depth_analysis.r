@@ -11,11 +11,17 @@ objDf <- read.csv(file='/home/john/PhD/GitLab/py_depthsampling/py_depthsampling/
 # condition:
 # objDf <- objDf[objDf$Condition!='PS',]
 
+# Compare control conditions (i.e. only dynamic and static control):
+objDf <- objDf[objDf$Condition!='PD',]
+
 # Test only the deepest cortical depth levels:
 # objDf <- objDf[objDf$Depth<3,]
 
 # Test only V2 and V3:
-objDf <- objDf[objDf$ROI!='V1',]
+# objDf <- objDf[objDf$ROI!='V1',]
+
+# Test only V3 (for comparison between conditions):
+objDf <- objDf[objDf$ROI=='V3',]
 
 # (1)
 # Do the stimuli differentially activate the ROIs (i.e. does activation differ
@@ -90,6 +96,27 @@ mdlFull = lme(PSC ~ ROI + Condition + Depth +
               ROI:Depth +
               Condition:Depth +
               Condition:Depth:ROI, # Effect of interest
+              objDf,
+              random=(~1|Subject),
+              correlation=corCAR1(form=(~1|Subject/Depth)),
+              method='ML')
+
+# Model comparison:
+anova(mdlNull, mdlFull)
+
+# (4)
+# Is there an effect of condition?
+
+# Null model:
+mdlNull = lme(PSC ~ Depth,
+              objDf,
+              random=(~1|Subject),
+              correlation=corCAR1(form=(~1|Subject/Depth)),
+              method='ML')
+
+# Full model:
+mdlFull = lme(PSC ~ Depth
+              + Condition,  # Effect of interest
               objDf,
               random=(~1|Subject),
               correlation=corCAR1(form=(~1|Subject/Depth)),

@@ -65,7 +65,7 @@ gaussian = norm.pdf(x_lin, mu, sigma)
 vecFmri01 = np.convolve(vecBox, gaussian)[:1200]
 
 # Normalise amplitude:
-y_max = 4.0
+y_max = 3.0
 vecFmri01 = np.divide(vecFmri01, np.max(vecFmri01)) * y_max
 
 # Make positive plateau a bit longer:
@@ -138,7 +138,7 @@ ert_plt(aryPlot01,
         varNumVol,  # Number of volumes
         70.0,  # DPI
         -1.0,  # y axis minimum
-        4.0,  # y axis maximum
+        3.0,  # y axis maximum
         srf_stim_onset_scl,  # Pre-stimulus interval
         srf_stim_dur_scl,  # Stimulu end
         1.0,  # TR
@@ -151,7 +151,7 @@ ert_plt(aryPlot01,
         strPthOutTmp,
         varTmeScl=varTmeScl,
         varXlbl=10,
-        varYnum=6,
+        varYnum=5,
         tplPadY=(0.5, 0.1),
         lstVrt=None,
         lstClr=None,
@@ -187,7 +187,7 @@ ert_plt(aryPlot02,
         1,  # Number of conditions
         varNumVol,  # Number of volumes
         70.0,  # DPI
-        -5.0,  # y axis minimum
+        -4.0,  # y axis minimum
         0.0,  # y axis maximum
         srf_stim_onset_scl,  # Pre-stimulus interval
         srf_stim_dur_scl,  # Stimulu end
@@ -201,7 +201,7 @@ ert_plt(aryPlot02,
         strPthOutTmp,
         varTmeScl=varTmeScl,
         varXlbl=10,
-        varYnum=6,
+        varYnum=5,
         tplPadY=(0.5, 0.1),
         lstVrt=None,
         lstClr=None,

@@ -28,13 +28,29 @@ Reviewer comment:
 
 import numpy as np
 from scipy.stats import norm
+from py_depthsampling.ert.ert_plt import ert_plt
+
+
+# -----------------------------------------------------------------------------
+# ***  Define parameters
+
+# Output path for plots (file name left open):
+strPthOut = '/home/john/Dropbox/University/PhD/PacMan_Project/Figures/F04_S04_Timecourse_simulation_REVISION_02/elements/{}.png'
 
 
 # -----------------------------------------------------------------------------
 # *** Create model of positive sustained response
 
+# Surface stimulus duration:
+srf_stim_dur = 400
+
+# Additional duration of texture background (texture background will be so much
+# longer than surface stimulus):
+txtr_stim_dur_add = 300
+
 # Boxcar timecourse:
-vecBox = np.concatenate([np.ones(400), (np.ones(400) * -0.3)])
+vecBox = np.concatenate([np.ones(srf_stim_dur),
+                         (np.ones(srf_stim_dur) * -0.3)])
 
 # Create 1D Gaussian:
 mu = 0.0
@@ -52,7 +68,7 @@ vecFmri01 = np.divide(vecFmri01, np.max(vecFmri01)) * y_max
 # Make positive plateau a bit longer:
 x_argmax = np.argmax(vecFmri01)
 vecFmri01 = np.concatenate([vecFmri01[:x_argmax],
-                            (np.ones(300) * y_max),
+                            (np.ones(txtr_stim_dur_add) * y_max),
                             vecFmri01[x_argmax:]])
 
 # -----------------------------------------------------------------------------
@@ -79,7 +95,72 @@ vecFmri02 = np.concatenate([np.zeros(srf_stim_onset),
 vecFmriSrf = np.concatenate([vecFmri02,
                              np.zeros(len(vecFmriTxtr) - len(vecFmri02))])
 
-aaa = np.array([vecFmriTxtr, vecFmriSrf]).T
+# -----------------------------------------------------------------------------
+# *** Plot 1 - texture & surface response separately
 
-aaa = np.add(vecFmriTxtr, vecFmriSrf)
+# Dummy TR and scaling factor (to account for high-resolution timecourse,
+# compared with empirical fMRI data).
+varTr = 0.01
+varTmeScl = 1.0 / float(varTr)
+
+# Stimulus onset and duration, scaled (for plot axis labels):
+srf_stim_onset_scl = float(srf_stim_onset) / varTmeScl
+srf_stim_dur_scl = (float(srf_stim_dur) + float(srf_stim_onset)) / varTmeScl
+
+# Plot labels:
+lstConLbl = ['Texture background', 'Surface stimulus']
+strXlabel = 'Time [s]'
+strYlabel = 'Percent signal change'
+strTitle = 'Schematic'
+
+# Plot output path:
+strPthOutTmp = strPthOut.format('plot_01_separate')
+
+# Merge arrays of texture and surface responses for plot:
+aryPlot01 = np.array([vecFmriTxtr, vecFmriSrf])
+
+# Dummy array for error shading:
+aryError01 = np.zeros(aryPlot01.shape)
+
+# Number of 'volumes' (needed for axis labels):
+varNumVol = aryPlot01.shape[1]
+
+# Create plot:
+ert_plt(aryPlot01,
+        aryError01,
+        None,  # Number of depth levels
+        2,  # Number of conditions
+        varNumVol,  # Number of volumes
+        70.0,  # DPI
+        -1.0,  # y axis minimum
+        4.0,  # y axis maximum
+        srf_stim_onset_scl,  # Pre-stimulus interval
+        srf_stim_dur_scl,  # Stimulu end
+        1.0,  # TR
+        lstConLbl,
+        True,  # Show legend?
+        strXlabel,
+        strYlabel,
+        False,  # Convert to percent?
+        strTitle,
+        strPthOutTmp,
+        varTmeScl=varTmeScl,
+        varXlbl=10,
+        varYnum=6,
+        tplPadY=(0.5, 0.1),
+        lstVrt=None,
+        lstClr=None,
+        lstLne=None)
+
+# TODO
+# - Stimulus duration (grey bar) is too short.
+# - Plot composite response
+
+# aaa = np.add(vecFmriTxtr, vecFmriSrf)
+
+
+
+
+
+
 

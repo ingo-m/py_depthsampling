@@ -6,6 +6,9 @@ Simulate composite positive and negative fMRI response.
 Simulation to address reviewer comment (2), second revision round, PacMan paper
 eLife submission.
 
+TODO
+- Stimulus duration (grey bar) is too short.
+
 Reviewer comment:
 
 > 2. Negative BOLD response due to stimulus with textured background.
@@ -35,7 +38,7 @@ from py_depthsampling.ert.ert_plt import ert_plt
 # ***  Define parameters
 
 # Output path for plots (file name left open):
-strPthOut = '/home/john/Dropbox/University/PhD/PacMan_Project/Figures/F04_S04_Timecourse_simulation_REVISION_02/elements/{}.png'
+strPthOut = '/home/john/Dropbox/University/PhD/PacMan_Project/Figures/F04_S04_Timecourse_simulation_REVISION_02/elements/{}.svg'
 
 
 # -----------------------------------------------------------------------------
@@ -71,6 +74,7 @@ vecFmri01 = np.concatenate([vecFmri01[:x_argmax],
                             (np.ones(txtr_stim_dur_add) * y_max),
                             vecFmri01[x_argmax:]])
 
+
 # -----------------------------------------------------------------------------
 # *** Response to texture background
 
@@ -95,12 +99,13 @@ vecFmri02 = np.concatenate([np.zeros(srf_stim_onset),
 vecFmriSrf = np.concatenate([vecFmri02,
                              np.zeros(len(vecFmriTxtr) - len(vecFmri02))])
 
+
 # -----------------------------------------------------------------------------
 # *** Plot 1 - texture & surface response separately
 
 # Dummy TR and scaling factor (to account for high-resolution timecourse,
 # compared with empirical fMRI data).
-varTr = 0.01
+varTr = 0.02
 varTmeScl = 1.0 / float(varTr)
 
 # Stimulus onset and duration, scaled (for plot axis labels):
@@ -152,15 +157,52 @@ ert_plt(aryPlot01,
         lstClr=None,
         lstLne=None)
 
-# TODO
-# - Stimulus duration (grey bar) is too short.
-# - Plot composite response
 
-# aaa = np.add(vecFmriTxtr, vecFmriSrf)
+# -----------------------------------------------------------------------------
+# *** Calculate composite response
+
+# Calculate composite response to texture and surface (as it would be observed
+# empirically), with an elevated baseline (i.e. texture response as baseline).
+
+# Add texture and surface responses:
+vecFmriComp = np.add(vecFmriTxtr, vecFmriSrf)
+
+# The pre-stimulus interval serves as baseline. Subtract the texture response
+# amplitude to make the pre-stimulus response zero.
+vecFmriComp = np.subtract(vecFmriComp, y_max)
 
 
+# -----------------------------------------------------------------------------
+# *** Plot composite response
 
+# First dimension needs to be 'condition' for plot function:
+aryPlot02 = np.array(vecFmriComp, ndmin=2)
 
+# Plot output path:
+strPthOutTmp = strPthOut.format('plot_02_composite')
 
-
-
+ert_plt(aryPlot02,
+        np.zeros(aryPlot02.shape),
+        None,  # Number of depth levels
+        1,  # Number of conditions
+        varNumVol,  # Number of volumes
+        70.0,  # DPI
+        -5.0,  # y axis minimum
+        0.0,  # y axis maximum
+        srf_stim_onset_scl,  # Pre-stimulus interval
+        srf_stim_dur_scl,  # Stimulu end
+        1.0,  # TR
+        lstConLbl,
+        True,  # Show legend?
+        strXlabel,
+        strYlabel,
+        False,  # Convert to percent?
+        strTitle,
+        strPthOutTmp,
+        varTmeScl=varTmeScl,
+        varXlbl=10,
+        varYnum=6,
+        tplPadY=(0.5, 0.1),
+        lstVrt=None,
+        lstClr=None,
+        lstLne=None)

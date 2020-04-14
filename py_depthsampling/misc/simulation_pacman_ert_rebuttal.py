@@ -38,7 +38,7 @@ from py_depthsampling.ert.ert_plt import ert_plt
 # ***  Define parameters
 
 # Output path for plots (file name left open):
-strPthOut = '/home/john/Dropbox/University/PhD/PacMan_Project/Figures/F04_S04_Timecourse_simulation_REVISION_02/elements/{}.svg'
+strPthOut = '/home/john/Dropbox/University/PhD/PacMan_Project/Figures/F04_S04_Timecourse_simulation_REVISION_02/elements/{}.png'
 
 
 # -----------------------------------------------------------------------------
@@ -202,7 +202,7 @@ ert_plt(aryPlot02,
         varTmeScl=varTmeScl,
         varXlbl=10,
         varYnum=5,
-        tplPadY=(0.5, 0.1),
+        tplPadY=(0.1, 0.1),
         lstVrt=None,
         lstClr=None,
         lstLne=None)

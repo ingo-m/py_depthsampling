@@ -30,6 +30,7 @@ Reviewer comment:
 
 
 import numpy as np
+from scipy.ndimage.filters import gaussian_filter1d
 from scipy.stats import norm
 from py_depthsampling.ert.ert_plt import ert_plt
 
@@ -54,7 +55,7 @@ y_min_txtr = -1.0
 dur_rise_txtr = 100
 
 # Duration of plateau of texture response:
-dur_max_txtr = 600
+dur_max_txtr = 620
 
 # Duration of fall from maximum to minimum (i.e. timepoints the signal takes to
 # fall from maximum positive amplitude to minimum post-stimulus undershoot).
@@ -95,60 +96,75 @@ vecFmriTxtr = np.concatenate([vecFmri01,
                               vecFmri05])
 
 
-# Surface stimulus duration:
-srf_stim_dur = 400
+# -----------------------------------------------------------------------------
+# *** Parameters of surface response
 
-# Additional duration of texture background (texture background will be so much
-# longer than surface stimulus):
-txtr_stim_dur_add = 300
+# Amplitude of surface response:
+y_max_srf = 1.0
 
-# Boxcar timecourse:
-vecBox = np.concatenate([np.ones(srf_stim_dur),
-                         (np.ones(srf_stim_dur) * -0.3)])
+# Amplitude of post-stimulus undershoot:
+y_min_srf = -0.25
 
-# Create 1D Gaussian:
-mu = 0.0
-sigma = 0.3
-x_lin = np.linspace(-1.0, 3.0, num=len(vecBox))
-gaussian = norm.pdf(x_lin, mu, sigma)
+# Number of timepoints from onset to maximum amplitude. Same slope as texture
+# response.
+dur_rise_srf = (y_max_srf / y_max_txtr) * float(dur_rise_txtr)
+dur_rise_srf = int(np.around(dur_rise_srf))
 
-# Sustained positive fmri response:
-vecFmri01 = np.convolve(vecBox, gaussian)[:1200]
+# Duration of plateau of surface response:
+dur_max_srf = 220
 
-# Normalise amplitude:
-y_max = 3.0
-vecFmri01 = np.divide(vecFmri01, np.max(vecFmri01)) * y_max
+# Duration of fall from maximum to minimum (i.e. timepoints the signal takes to
+# fall from maximum positive amplitude to minimum post-stimulus undershoot).
+dur_fall_srf = ((y_max_srf + y_min_srf) / y_max_srf) * float(dur_rise_srf)
+dur_fall_srf = int(np.around(dur_fall_srf))
 
-# Make positive plateau a bit longer:
-x_argmax = np.argmax(vecFmri01)
-vecFmri01 = np.concatenate([vecFmri01[:x_argmax],
-                            (np.ones(txtr_stim_dur_add) * y_max),
-                            vecFmri01[x_argmax:]])
+# Duration of post-stimulus undershoot of texture response:
+dur_pstundr_srf = int(np.around((0.25 * float(dur_max_srf))))
+
+# Duration of return to baseline after post-stimulus undershoot. Same slope as
+# texture response.
+dur_rtrn_srf = # TODO: IMPLEMENT SAME SLOPE
 
 
 # -----------------------------------------------------------------------------
-# *** Response to texture background
+# *** Construct surface response
 
-# The response to texture background has a positive amplitude of ~4%, and
-# causes an elevated baseline. Let's assume the surface stimulus onset is at
-# timepoint x, when the elevated baseline response is ~4%
-srf_stim_onset = 700
+# Response component 01 - rise:
+vecFmri01 = np.linspace(0.0, y_max_srf, num=dur_rise_srf, endpoint=True)
 
-# vecFmri01[srf_stim_onset]
+# Response component 02 - plateau:
+vecFmri02 = np.multiply(np.ones(dur_max_srf), y_max_srf)
 
-# Concatenate two background texture response (before and after surface
-# stimulus):
-vecFmriTxtr = np.concatenate([vecFmri01, vecFmri01])
+# Response component 03 - fall:
+vecFmri03 = np.linspace(y_max_srf, y_min_srf, num=dur_fall_srf,
+                        endpoint=True)
 
-# Let's assume that the response to the uniform surface has an amplitude of
-# ~2%, and onset at timepoint 670.
-vecFmri02 = vecFmri01 * 0.3
-vecFmri02 = np.concatenate([np.zeros(srf_stim_onset),
-                            vecFmri02])
-# Concatenate zeors to surface response to reach same length as texture
-# response:
-vecFmriSrf = np.concatenate([vecFmri02,
-                             np.zeros(len(vecFmriTxtr) - len(vecFmri02))])
+# Response component 04 - post-stimulus undershoot:
+vecFmri04 = np.multiply(np.ones(dur_pstundr_srf), y_min_srf)
+
+# Response component 05 - return to baseline:
+vecFmri05 = np.linspace(y_min_srf, 0.0, num=dur_rtrn_srf, endpoint=True)
+
+
+vecFmriSrf = np.concatenate([vecFmri01,
+                             vecFmri02,
+                             vecFmri03,
+                             vecFmri04,
+                             vecFmri05])
+
+
+
+
+
+
+
+
+
+sigma = 20.0
+
+aaa = gaussian_filter1d(vecFmriTxtr, sigma, mode='nearest')
+
+
 
 # TODO:
 # Surface timecourse as an inverted, shifted, scaled version of texture

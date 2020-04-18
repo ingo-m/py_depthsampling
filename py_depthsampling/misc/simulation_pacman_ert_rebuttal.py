@@ -52,21 +52,23 @@ y_max_txtr = 4.0
 y_min_txtr = -1.0
 
 # Number of timepoints from onset to maximum amplitude:
-dur_rise_txtr = 100
+dur_rise_txtr = 1000
+
+# Slope (used for all increasing/decreasing segments of response):
+slope = (y_max_txtr - 0.0) / float(dur_rise_txtr)
 
 # Duration of plateau of texture response:
-dur_max_txtr = 620
+dur_max_txtr = 6000
 
 # Duration of fall from maximum to minimum (i.e. timepoints the signal takes to
 # fall from maximum positive amplitude to minimum post-stimulus undershoot).
-dur_fall_txtr = ((y_max_txtr + y_min_txtr) / y_max_txtr) * float(dur_rise_txtr)
-dur_fall_txtr = int(np.around(dur_fall_txtr))
+dur_fall_txtr = int(np.around(((y_max_txtr - y_min_txtr) / slope)))
 
 # Duration of post-stimulus undershoot of texture response:
 dur_pstundr_txtr = int(np.around((0.25 * float(dur_max_txtr))))
 
 # Duration of return to baseline after post-stimulus undershoot:
-dur_rtrn_txtr = 50  # int(np.around((0.25 * float(dur_pstundr_txtr))))
+dur_rtrn_txtr = int(np.absolute(np.around(((y_min_txtr - 0.0) / slope))))
 
 
 # -----------------------------------------------------------------------------
@@ -88,7 +90,7 @@ vecFmri04 = np.multiply(np.ones(dur_pstundr_txtr), y_min_txtr)
 # Response component 05 - return to baseline:
 vecFmri05 = np.linspace(y_min_txtr, 0.0, num=dur_rtrn_txtr, endpoint=True)
 
-
+# Put together response components:
 vecFmriTxtr = np.concatenate([vecFmri01,
                               vecFmri02,
                               vecFmri03,
@@ -106,24 +108,21 @@ y_max_srf = 1.0
 y_min_srf = -0.25
 
 # Number of timepoints from onset to maximum amplitude. Same slope as texture
-# response.
-dur_rise_srf = (y_max_srf / y_max_txtr) * float(dur_rise_txtr)
-dur_rise_srf = int(np.around(dur_rise_srf))
+# response,
+dur_rise_srf = int(np.around(((y_max_srf - 0.0) / slope)))
 
 # Duration of plateau of surface response:
-dur_max_srf = 220
+dur_max_srf = 2000
 
 # Duration of fall from maximum to minimum (i.e. timepoints the signal takes to
 # fall from maximum positive amplitude to minimum post-stimulus undershoot).
-dur_fall_srf = ((y_max_srf + y_min_srf) / y_max_srf) * float(dur_rise_srf)
-dur_fall_srf = int(np.around(dur_fall_srf))
+dur_fall_srf = int(np.around(((y_max_srf - y_min_srf) / slope)))
 
 # Duration of post-stimulus undershoot of texture response:
 dur_pstundr_srf = int(np.around((0.25 * float(dur_max_srf))))
 
-# Duration of return to baseline after post-stimulus undershoot. Same slope as
-# texture response.
-dur_rtrn_srf = # TODO: IMPLEMENT SAME SLOPE
+# Duration of return to baseline after post-stimulus undershoot.
+dur_rtrn_srf = int(np.absolute(np.around(((y_min_srf - 0.0) / slope))))
 
 
 # -----------------------------------------------------------------------------
@@ -145,7 +144,7 @@ vecFmri04 = np.multiply(np.ones(dur_pstundr_srf), y_min_srf)
 # Response component 05 - return to baseline:
 vecFmri05 = np.linspace(y_min_srf, 0.0, num=dur_rtrn_srf, endpoint=True)
 
-
+# Put together response components:
 vecFmriSrf = np.concatenate([vecFmri01,
                              vecFmri02,
                              vecFmri03,
@@ -153,11 +152,25 @@ vecFmriSrf = np.concatenate([vecFmri01,
                              vecFmri05])
 
 
+# -----------------------------------------------------------------------------
+# *** Combine response components
+
+# The onset of the surface response should coincide with the moment the texture
+# response starts to decrease.
+onset_srf = (dur_rise_txtr + dur_max_txtr)
+
+# Prepend zeros to surface response, to match surface response onset to
+# beginning of texture response offset:
+vecFmriSrf = np.concatenate([np.zeros(onset_srf),
+                             vecFmriSrf])
 
 
 
+vecFmriTxtr = np.concatenate([vecFmriTxtr,
+                              np.zeros((len(vecFmriSrf) - len(vecFmriTxtr)))])
 
-
+# Check that slope of texture fall & surface rise match:
+# aaa = np.array([vecFmriTxtr, np.add(np.multiply(vecFmriSrf, -1.0), y_max_txtr)]).T
 
 
 sigma = 20.0

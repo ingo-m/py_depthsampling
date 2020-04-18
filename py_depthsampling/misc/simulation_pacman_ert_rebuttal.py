@@ -38,11 +38,62 @@ from py_depthsampling.ert.ert_plt import ert_plt
 # ***  Define parameters
 
 # Output path for plots (file name left open):
-strPthOut = '/home/john/Dropbox/University/PhD/PacMan_Project/Figures/F04_S04_Timecourse_simulation_REVISION_02/elements/{}.png'
+strPthOut = '/media/ssd_dropbox/Dropbox/University/PhD/PacMan_Project/Figures/F04_S04_Timecourse_simulation_REVISION_02/elements/{}.png'
 
 
 # -----------------------------------------------------------------------------
-# *** Create model of positive sustained response
+# *** Parameters of texture response
+
+# Amplitude of texture response:
+y_max_txtr = 4.0
+
+# Amplitude of post-stimulus undershoot:
+y_min_txtr = -1.0
+
+# Number of timepoints from onset to maximum amplitude:
+dur_rise_txtr = 100
+
+# Duration of plateau of texture response:
+dur_max_txtr = 600
+
+# Duration of fall from maximum to minimum (i.e. timepoints the signal takes to
+# fall from maximum positive amplitude to minimum post-stimulus undershoot).
+dur_fall_txtr = ((y_max_txtr + y_min_txtr) / y_max_txtr) * float(dur_rise_txtr)
+dur_fall_txtr = int(np.around(dur_fall_txtr))
+
+# Duration of post-stimulus undershoot of texture response:
+dur_pstundr_txtr = int(np.around((0.25 * float(dur_max_txtr))))
+
+# Duration of return to baseline after post-stimulus undershoot:
+dur_rtrn_txtr = 50  # int(np.around((0.25 * float(dur_pstundr_txtr))))
+
+
+# -----------------------------------------------------------------------------
+# *** Construct texture response
+
+# Response component 01 - rise:
+vecFmri01 = np.linspace(0.0, y_max_txtr, num=dur_rise_txtr, endpoint=True)
+
+# Response component 02 - plateau:
+vecFmri02 = np.multiply(np.ones(dur_max_txtr), y_max_txtr)
+
+# Response component 03 - fall:
+vecFmri03 = np.linspace(y_max_txtr, y_min_txtr, num=dur_fall_txtr,
+                        endpoint=True)
+
+# Response component 04 - post-stimulus undershoot:
+vecFmri04 = np.multiply(np.ones(dur_pstundr_txtr), y_min_txtr)
+
+# Response component 05 - return to baseline:
+vecFmri05 = np.linspace(y_min_txtr, 0.0, num=dur_rtrn_txtr, endpoint=True)
+
+
+vecFmriTxtr = np.concatenate([vecFmri01,
+                              vecFmri02,
+                              vecFmri03,
+                              vecFmri04,
+                              vecFmri05])
+
 
 # Surface stimulus duration:
 srf_stim_dur = 400
@@ -99,6 +150,10 @@ vecFmri02 = np.concatenate([np.zeros(srf_stim_onset),
 vecFmriSrf = np.concatenate([vecFmri02,
                              np.zeros(len(vecFmriTxtr) - len(vecFmri02))])
 
+# TODO:
+# Surface timecourse as an inverted, shifted, scaled version of texture
+# timecourse. Try manually creating shape, only use some smoothing for better
+# visual appeal.
 
 # -----------------------------------------------------------------------------
 # *** Plot 1 - texture & surface response separately

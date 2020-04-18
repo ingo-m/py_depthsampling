@@ -46,7 +46,7 @@ strPthOut = '/media/ssd_dropbox/Dropbox/University/PhD/PacMan_Project/Figures/F0
 # *** Parameters of texture response
 
 # Amplitude of texture response:
-y_max_txtr = 4.0
+y_max_txtr = 3.0
 
 # Amplitude of post-stimulus undershoot:
 y_min_txtr = -1.0
@@ -58,14 +58,14 @@ dur_rise_txtr = 1000
 slope = (y_max_txtr - 0.0) / float(dur_rise_txtr)
 
 # Duration of plateau of texture response:
-dur_max_txtr = 6000
+dur_max_txtr = 3000
 
 # Duration of fall from maximum to minimum (i.e. timepoints the signal takes to
 # fall from maximum positive amplitude to minimum post-stimulus undershoot).
 dur_fall_txtr = int(np.around(((y_max_txtr - y_min_txtr) / slope)))
 
 # Duration of post-stimulus undershoot of texture response:
-dur_pstundr_txtr = int(np.around((0.25 * float(dur_max_txtr))))
+dur_pstundr_txtr = int(np.around((0.15 * float(dur_max_txtr))))
 
 # Duration of return to baseline after post-stimulus undershoot:
 dur_rtrn_txtr = int(np.absolute(np.around(((y_min_txtr - 0.0) / slope))))
@@ -164,18 +164,31 @@ onset_srf = (dur_rise_txtr + dur_max_txtr)
 vecFmriSrf = np.concatenate([np.zeros(onset_srf),
                              vecFmriSrf])
 
-
-
-vecFmriTxtr = np.concatenate([vecFmriTxtr,
-                              np.zeros((len(vecFmriSrf) - len(vecFmriTxtr)))])
-
 # Check that slope of texture fall & surface rise match:
-# aaa = np.array([vecFmriTxtr, np.add(np.multiply(vecFmriSrf, -1.0), y_max_txtr)]).T
+# test = np.array([vecFmriTxtr, np.add(np.multiply(vecFmriSrf, -1.0),
+#                 y_max_txtr)]).T
 
+# The second texture response is supposed to start when the surface offset of
+# the surface response begins:
+onset_2nd_txtr = (onset_srf       # Beginning of surface response...
+                  + dur_rise_srf  # ...plus rise
+                  + dur_max_srf)  # ...and plateau of surface response
 
-sigma = 20.0
+# Append zeros to texture response to fill gap between end of first response
+# beginning of response, and subsequently append 2nd texture response:
+vecFmriTxtr = np.concatenate([vecFmriTxtr,
+                              np.zeros(onset_2nd_txtr - len(vecFmriTxtr)),
+                              vecFmriTxtr])
 
-aaa = gaussian_filter1d(vecFmriTxtr, sigma, mode='nearest')
+# Append more zeros to surface response to match full length of model
+# timecourse:
+vecFmriSrf = np.concatenate([vecFmriSrf,
+                             np.zeros((len(vecFmriTxtr) - len(vecFmriSrf)))])
+
+# aaa = np.array([vecFmriTxtr, vecFmriSrf]).T
+
+#sigma = 20.0
+#aaa = gaussian_filter1d(vecFmriTxtr, sigma, mode='nearest')
 
 
 
@@ -189,12 +202,13 @@ aaa = gaussian_filter1d(vecFmriTxtr, sigma, mode='nearest')
 
 # Dummy TR and scaling factor (to account for high-resolution timecourse,
 # compared with empirical fMRI data).
-varTr = 0.02
+varTr = 0.004
 varTmeScl = 1.0 / float(varTr)
 
 # Stimulus onset and duration, scaled (for plot axis labels):
-srf_stim_onset_scl = float(srf_stim_onset) / varTmeScl
-srf_stim_dur_scl = (float(srf_stim_dur) + float(srf_stim_onset)) / varTmeScl
+onset_srf_scl = float(onset_srf) / varTmeScl
+end_srf_scl = ((float(dur_rise_srf + dur_max_srf) + float(onset_srf))
+               / varTmeScl)
 
 # Plot labels:
 lstConLbl = ['Texture background', 'Surface stimulus']
@@ -223,8 +237,8 @@ ert_plt(aryPlot01,
         70.0,  # DPI
         -1.0,  # y axis minimum
         3.0,  # y axis maximum
-        srf_stim_onset_scl,  # Pre-stimulus interval
-        srf_stim_dur_scl,  # Stimulu end
+        onset_srf_scl,  # Pre-stimulus interval
+        end_srf_scl,  # Stimulu end
         1.0,  # TR
         lstConLbl,
         True,  # Show legend?
@@ -253,7 +267,7 @@ vecFmriComp = np.add(vecFmriTxtr, vecFmriSrf)
 
 # The pre-stimulus interval serves as baseline. Subtract the texture response
 # amplitude to make the pre-stimulus response zero.
-vecFmriComp = np.subtract(vecFmriComp, y_max)
+vecFmriComp = np.subtract(vecFmriComp, y_max_txtr)
 
 
 # -----------------------------------------------------------------------------
@@ -273,8 +287,8 @@ ert_plt(aryPlot02,
         70.0,  # DPI
         -4.0,  # y axis minimum
         0.0,  # y axis maximum
-        srf_stim_onset_scl,  # Pre-stimulus interval
-        srf_stim_dur_scl,  # Stimulu end
+        onset_srf_scl,  # Pre-stimulus interval
+        end_srf_scl,  # Stimulu end
         1.0,  # TR
         lstConLbl,
         True,  # Show legend?

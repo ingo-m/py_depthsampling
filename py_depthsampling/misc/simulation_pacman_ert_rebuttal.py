@@ -198,6 +198,20 @@ vecFmriSrf = gaussian_filter1d(vecFmriSrf, sigma, mode='nearest')
 
 
 # -----------------------------------------------------------------------------
+# *** Limit time window for plot
+
+# Limit time window for plot to the end of the 2nd texture response (i.e.
+# before the surface stimulus would appear again in the experiment).
+
+# Offset of 2nd texture response:
+offset_2nd_txtr = (onset_2nd_txtr + dur_rise_txtr + dur_max_txtr - 400)
+
+# Clip timecourses:
+vecFmriTxtr = vecFmriTxtr[:offset_2nd_txtr]
+vecFmriSrf = vecFmriSrf[:offset_2nd_txtr]
+
+
+# -----------------------------------------------------------------------------
 # *** Plot 1 - texture & surface response separately
 
 # Dummy TR and scaling factor (to account for high-resolution timecourse,
@@ -250,7 +264,7 @@ ert_plt(aryPlot01,
         varTmeScl=varTmeScl,
         varXlbl=10,
         varYnum=5,
-        tplPadY=(0.5, 0.1),
+        tplPadY=(0.1, 0.1),
         lstVrt=None,
         lstClr=None,
         lstLne=None)
@@ -285,7 +299,7 @@ ert_plt(aryPlot02,
         1,  # Number of conditions
         varNumVol,  # Number of volumes
         70.0,  # DPI
-        -4.0,  # y axis minimum
+        -3.0,  # y axis minimum
         0.0,  # y axis maximum
         onset_srf_scl,  # Pre-stimulus interval
         end_srf_scl,  # Stimulu end
@@ -299,7 +313,7 @@ ert_plt(aryPlot02,
         strPthOutTmp,
         varTmeScl=varTmeScl,
         varXlbl=10,
-        varYnum=5,
+        varYnum=4,
         tplPadY=(0.1, 0.1),
         lstVrt=None,
         lstClr=None,

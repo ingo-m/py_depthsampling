@@ -6,9 +6,6 @@ Simulate composite positive and negative fMRI response.
 Simulation to address reviewer comment (2), second revision round, PacMan paper
 eLife submission.
 
-TODO
-- Stimulus duration (grey bar) is too short.
-
 Reviewer comment:
 
 > 2. Negative BOLD response due to stimulus with textured background.
@@ -26,6 +23,7 @@ Reviewer comment:
 > the negative response shown in Fig4 should be seen as a combination of a
 > positive and a negative component, that summed together produce the
 > appearance of a delayed negative response.
+
 """
 
 
@@ -39,7 +37,7 @@ from py_depthsampling.ert.ert_plt import ert_plt
 # ***  Define parameters
 
 # Output path for plots (file name left open):
-strPthOut = '/media/ssd_dropbox/Dropbox/University/PhD/PacMan_Project/Figures/F04_S04_Timecourse_simulation_REVISION_02/elements/{}.png'
+strPthOut = '/media/ssd_dropbox/Dropbox/University/PhD/PacMan_Project/Figures/F04_S04_Timecourse_simulation_REVISION_02/elements/{}.svg'
 
 
 # -----------------------------------------------------------------------------
@@ -216,7 +214,7 @@ vecFmriSrf = vecFmriSrf[:offset_2nd_txtr]
 
 # Dummy TR and scaling factor (to account for high-resolution timecourse,
 # compared with empirical fMRI data).
-varTr = 0.004
+varTr = 0.005
 varTmeScl = 1.0 / float(varTr)
 
 # Stimulus onset and duration, scaled (for plot axis labels):
@@ -225,7 +223,7 @@ end_srf_scl = ((float(dur_rise_srf + dur_max_srf) + float(onset_srf))
                / varTmeScl)
 
 # Plot labels:
-lstConLbl = ['Texture background', 'Surface stimulus']
+lstConLbl = ['Surface stimulus', 'Texture background']
 strXlabel = 'Time [s]'
 strYlabel = 'Percent signal change'
 strTitle = 'Schematic'
@@ -234,7 +232,7 @@ strTitle = 'Schematic'
 strPthOutTmp = strPthOut.format('plot_01_separate')
 
 # Merge arrays of texture and surface responses for plot:
-aryPlot01 = np.array([vecFmriTxtr, vecFmriSrf])
+aryPlot01 = np.array([vecFmriSrf, vecFmriTxtr])
 
 # Dummy array for error shading:
 aryError01 = np.zeros(aryPlot01.shape)
@@ -316,5 +314,5 @@ ert_plt(aryPlot02,
         varYnum=4,
         tplPadY=(0.1, 0.1),
         lstVrt=None,
-        lstClr=None,
+        lstClr=[[float(x) / 255.0 for x in [53, 162, 56]]],
         lstLne=None)

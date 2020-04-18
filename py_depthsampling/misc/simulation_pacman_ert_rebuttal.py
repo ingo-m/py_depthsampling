@@ -105,7 +105,7 @@ vecFmriTxtr = np.concatenate([vecFmri01,
 y_max_srf = 1.0
 
 # Amplitude of post-stimulus undershoot:
-y_min_srf = -0.25
+y_min_srf = -0.5
 
 # Number of timepoints from onset to maximum amplitude. Same slope as texture
 # response,
@@ -185,17 +185,17 @@ vecFmriTxtr = np.concatenate([vecFmriTxtr,
 vecFmriSrf = np.concatenate([vecFmriSrf,
                              np.zeros((len(vecFmriTxtr) - len(vecFmriSrf)))])
 
-# aaa = np.array([vecFmriTxtr, vecFmriSrf]).T
 
-#sigma = 20.0
-#aaa = gaussian_filter1d(vecFmriTxtr, sigma, mode='nearest')
+# -----------------------------------------------------------------------------
+# *** Smooth responses:
 
+# Size of smoothing kernel:
+sigma = 200.0
 
+# Apply Gaussian smoothing:
+vecFmriTxtr = gaussian_filter1d(vecFmriTxtr, sigma, mode='nearest')
+vecFmriSrf = gaussian_filter1d(vecFmriSrf, sigma, mode='nearest')
 
-# TODO:
-# Surface timecourse as an inverted, shifted, scaled version of texture
-# timecourse. Try manually creating shape, only use some smoothing for better
-# visual appeal.
 
 # -----------------------------------------------------------------------------
 # *** Plot 1 - texture & surface response separately

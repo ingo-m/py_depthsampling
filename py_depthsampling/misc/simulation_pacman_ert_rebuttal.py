@@ -50,7 +50,7 @@ y_max_txtr = 3.0
 y_min_txtr = -1.0
 
 # Number of timepoints from onset to maximum amplitude:
-dur_rise_txtr = 1000
+dur_rise_txtr = 1100
 
 # Slope (used for all increasing/decreasing segments of response):
 slope = (y_max_txtr - 0.0) / float(dur_rise_txtr)
@@ -188,7 +188,7 @@ vecFmriSrf = np.concatenate([vecFmriSrf,
 # *** Smooth responses:
 
 # Size of smoothing kernel:
-sigma = 200.0
+sigma = 100.0
 
 # Apply Gaussian smoothing:
 vecFmriTxtr = gaussian_filter1d(vecFmriTxtr, sigma, mode='nearest')

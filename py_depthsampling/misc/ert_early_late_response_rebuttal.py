@@ -14,6 +14,7 @@ Reviewer comment:
 > the first and later parts of the response separately may be highly insightful
 > here.
 
+Note: Right hemisphere only.
 """
 
 
@@ -26,13 +27,14 @@ from py_depthsampling.drain_model.drain_model_main import drain_model
 # -----------------------------------------------------------------------------
 # *** Define parameters
 
-# Path of pickle files with event-related timecourses (ROI left open):
+# Path of pickle files with event-related timecourses (ROI and stimulus
+# conditionleft open):
 pathPic = '/media/ssd_dropbox/Dropbox/University/PhD/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/era_{}_rh.pickle'
 
 # Path for npz files with depth profiles (both for intermediate files to
 # perform draining correction, and corrected depth profiles; file name left
 # open):
-pathNpz = '/media/ssd_dropbox/Dropbox/University/PhD/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/{}_rh.npz'
+pathNpz = '/media/ssd_dropbox/Dropbox/University/PhD/PacMan_Depth_Data/Higher_Level_Analysis/stimulus/{}.npz'
 
 # List of ROIs:
 lstRois = ['v1', 'v2', 'v3']
@@ -44,6 +46,10 @@ lstRois = ['v1', 'v2', 'v3']
 # volume indices):
 lstTmeWins = [(5, 6, 7),
               (8, 9, 10)]
+
+# List of conditions (has to match whichever order of conditions was used to
+# create pickles with event related timecourses, see `ert.py`):
+lstCon = ['Pd', 'Ps', 'Cd']
 
 
 # -----------------------------------------------------------------------------
@@ -89,16 +95,70 @@ for strRoi in lstRois:
             # Number of vertices for current subject:
             vecNumInc[idxSub] = dicAllSubsRoiErt[strSub][1]
 
-        # Path for npz file:
+        # Loop through conditions, to save separate npz file for each condition
+        # (for compatibility with subsequent functions):
+        for idxCon, strCon in enumerate(lstCon):
+
+            # Path for npz file:
+            pathNpzTmp = pathNpz.format((strRoi
+                                         + '_rh_'
+                                         + strCon
+                                         + '_dpth_prfls_time_win_'
+                                         + str(idxTmeWin)))
+
+            # Save npz file with single-condition depth profiles of current
+            # time window to disk:
+            np.savez(pathNpzTmp,
+                     aryDpth=aryDpth[:, idxCon, :],
+                     vecNumInc=vecNumInc)
+
+# -----------------------------------------------------------------------------
+# *** Apply draining effect model
+
+# Loop through ROIs
+for strRoi in lstRois:
+
+    # Loop through time windows and construct arrays for drain model.
+    for idxTmeWin, tplTmeWin in enumerate(lstTmeWins):
+
+         # Path of npz file with un-corrected depth profiles:
         pathNpzTmp = pathNpz.format((strRoi
                                      + '_dpth_prfls_time_win_'
                                      + str(idxTmeWin)))
 
-        # Save npz file with depth profiles of current time window to disk:
-        np.savez(pathNpzTmp,
-                 aryDpth=aryDpth,
-                 vecNumInc=vecNumInc)
-
-
-
+        # Call drain model function:
+        drain_model(1,  # Which draining model to use
+                    strRoi,
+                    '',  # Deprecated
+                    strPthPrf.format(lstMetaCon[idxMtaCn],
+                                     lstRoi[idxRoi],
+                                     lstHmsph[idxHmsph],
+                                     '{}'),
+                    strPthPrfOt.format(lstMetaCon[idxMtaCn],
+                                       lstRoi[idxRoi],
+                                       lstHmsph[idxHmsph],
+                                       {},
+                                       lstMdl[idxMdl]),
+                    strPthPltOt.format(lstMetaCon[idxMtaCn],
+                                       lstRoi[idxRoi],
+                                       lstRoi[idxRoi],
+                                       lstHmsph[idxHmsph],
+                                       lstNstCon[idxCon][0],
+                                       str(lstMdl[idxMdl])),
+                    strFlTp,
+                    varDpi,
+                    strXlabel,
+                    strYlabel,
+                    lstNstCon[idxCon],
+                    lstNstConLbl[idxCon],
+                    varNumIt,
+                    varCnfLw,
+                    varCnfUp,
+                    varNseRndSd,
+                    varNseSys,
+                    lstFctr,
+                    varAcrSubsYmin01,
+                    varAcrSubsYmax01,
+                    varAcrSubsYmin02,
+                    varAcrSubsYmax02)
 

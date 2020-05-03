@@ -22,6 +22,7 @@ import pickle
 import numpy as np
 from py_depthsampling.diff.diff_sem import diff_sem
 from py_depthsampling.drain_model.drain_model_main import drain_model
+from py_depthsampling.diff.diff_sem import diff_sem
 
 
 # -----------------------------------------------------------------------------
@@ -45,20 +46,26 @@ lstRois = ['v1', 'v2', 'v3']
 # for which time windows to construct new depth profiles (list of tuples with
 # volume indices):
 lstTmeWins = [(6, 7),
-              (9, 10)]
+              (9, 10),
+              # (5, 6, 7, 8, 9, 10),
+              ]
 
 # List of conditions (has to match whichever order of conditions was used to
 # create pickles with event related timecourses, see `ert.py`):
 lstCon = ['Pd', 'Ps', 'Cd']
 
+# Which conditions to compare (list of tuples with condition indices):
+# lstDiff = [(0, 1), (0, 2), (1, 2)]
+lstDiff = [(0, 2)]
+
 # Output folder for figures:
 pathPlots = '/media/ssd_dropbox/Dropbox/University/PhD/PacMan_Project/Figures/F04_S05_Depth_profiles_early_later_REVISION_02/'
 
 # File type suffix for plot:
-strFlTp = '.png'
+strFlTp = '.svg'
 
 # Figure scaling factor:
-varDpi = 100.0
+varDpi = 120.0
 
 # Label for axes:
 strXlabel = 'Cortical depth level'
@@ -205,3 +212,49 @@ for strRoi in lstRois:
                     varAcrSubsYmax01,
                     varAcrSubsYmin02,
                     varAcrSubsYmax02)
+
+# -----------------------------------------------------------------------------
+# *** Plot difference between conditions
+
+# Loop through ROIs
+for strRoi in lstRois:
+
+    # Loop through time windows and construct arrays for drain model.
+    for idxTmeWin, tplTmeWin in enumerate(lstTmeWins):
+
+        # Path of npz file with corrected depth profiles to load (stimulus
+        # condition left open):
+        pathNpzTmp = pathNpz.format((strRoi
+                                     + '_rh_'
+                                     + '{}'
+                                     + '_dpth_prfls_deconv_model_1_time_win_'
+                                     + str(idxTmeWin)))
+
+        # Output path for figures:
+        pathPlotTmp = (pathPlots
+                       + 'diff_'
+                       + strRoi
+                       + '_time_win_'
+                       + str(idxTmeWin)
+                       + strFlTp)
+
+        # Axis limits:
+        varYmin = 0.0  # -0.25
+        varYmax = 0.5
+        varNumLblY = 3
+        tplPadY = (0.2, 0.05)
+
+        diff_sem(pathNpzTmp,
+                 pathPlotTmp,
+                 lstCon,
+                 lstCon,  # lstConLbl,
+                 varYmin=varYmin,
+                 varYmax=varYmax,
+                 tplPadY=tplPadY,
+                 varNumLblY=varNumLblY,
+                 varDpi=varDpi,
+                 strXlabel=strXlabel,
+                 strYlabel=strYlabel,
+                 lgcLgnd=True,
+                 lstDiff=lstDiff,
+                 strParam='mean')

@@ -44,8 +44,8 @@ lstRois = ['v1', 'v2', 'v3']
 # on is 5, and the last volume during which the stimulus was on is 10. Define
 # for which time windows to construct new depth profiles (list of tuples with
 # volume indices):
-lstTmeWins = [(5, 6, 7),
-              (8, 9, 10)]
+lstTmeWins = [(6, 7),
+              (9, 10)]
 
 # List of conditions (has to match whichever order of conditions was used to
 # create pickles with event related timecourses, see `ert.py`):
@@ -115,6 +115,14 @@ for strRoi in lstRois:
                                             [:, :, tplTmeWin],
                                             axis=2)
 
+            # The event-related timecourses are normalised to a pre-stimulus
+            # baseline signal intensity of `1.0`. Change the baseline to zero,
+            # and scale to percent signal change.
+            aryDpth[idxSub, :, :] = np.subtract(aryDpth[idxSub, :, :],
+                                                1.0)
+            aryDpth[idxSub, :, :] = np.multiply(aryDpth[idxSub, :, :],
+                                                100.0)
+
             # Number of vertices for current subject:
             vecNumInc[idxSub] = dicAllSubsRoiErt[strSub][1]
 
@@ -157,7 +165,7 @@ for strRoi in lstRois:
         pathNpzTmpOt = pathNpz.format((strRoi
                                        + '_rh_'
                                        + '{}'
-                                       + '_dpth_prfls_time_win_deconv_model_1_'
+                                       + '_dpth_prfls_deconv_model_1_time_win_'
                                        + str(idxTmeWin)))
 
         # Output path for figures:

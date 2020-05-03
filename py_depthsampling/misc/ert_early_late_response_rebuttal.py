@@ -51,6 +51,29 @@ lstTmeWins = [(5, 6, 7),
 # create pickles with event related timecourses, see `ert.py`):
 lstCon = ['Pd', 'Ps', 'Cd']
 
+# Output folder for figures:
+pathPlots = '/media/ssd_dropbox/Dropbox/University/PhD/PacMan_Project/Figures/F04_S05_Depth_profiles_early_later_REVISION_02/'
+
+# File type suffix for plot:
+strFlTp = '.png'
+
+# Figure scaling factor:
+varDpi = 100.0
+
+# Label for axes:
+strXlabel = 'Cortical depth level'
+strYlabel = 'fMRI signal change [%]'
+
+# Number of resampling iterations for peak finding (for models 1, 2, and 3) or
+# random noise samples (models 4 and 5):
+varNumIt = 10000
+
+# Lower & upper bound of percentile bootstrap (in percent), for bootstrap
+# confidence interval (models 1, 2, and 3) - this value is only printed, not
+# plotted - or plotted confidence intervals in case of model 5:
+varCnfLw = 0.5
+varCnfUp = 99.5
+
 
 # -----------------------------------------------------------------------------
 # *** Create npz files with depth profiles
@@ -109,7 +132,7 @@ for strRoi in lstRois:
             # Save npz file with single-condition depth profiles of current
             # time window to disk:
             np.savez(pathNpzTmp,
-                     aryDpth=aryDpth[:, idxCon, :],
+                     arySubDpthMns=aryDpth[:, idxCon, :],
                      vecNumInc=vecNumInc)
 
 # -----------------------------------------------------------------------------
@@ -121,44 +144,56 @@ for strRoi in lstRois:
     # Loop through time windows and construct arrays for drain model.
     for idxTmeWin, tplTmeWin in enumerate(lstTmeWins):
 
-         # Path of npz file with un-corrected depth profiles:
-        pathNpzTmp = pathNpz.format((strRoi
-                                     + '_dpth_prfls_time_win_'
-                                     + str(idxTmeWin)))
+        # Path of npz file with uncorrected depth profiles to load (stimulus
+        # condition left open):
+        pathNpzTmpIn = pathNpz.format((strRoi
+                                       + '_rh_'
+                                       + '{}'
+                                       + '_dpth_prfls_time_win_'
+                                       + str(idxTmeWin)))
+
+        # Path for npz file with corrected depth profiles to save (stimulus
+        # condition left open):
+        pathNpzTmpOt = pathNpz.format((strRoi
+                                       + '_rh_'
+                                       + '{}'
+                                       + '_dpth_prfls_time_win_deconv_model_1_'
+                                       + str(idxTmeWin)))
+
+        # Output path for figures:
+        pathPlotsTmp = (pathPlots
+                        + 'deconv_'
+                        + strRoi
+                        + '_time_win_'
+                        + str(idxTmeWin)
+                        + '_')
+
+        # Limits of y-axis for across subject plot:
+        varAcrSubsYmin01 = -5.0
+        varAcrSubsYmax01 = 0.0
+        varAcrSubsYmin02 = -5.0
+        varAcrSubsYmax02 = 0.0
 
         # Call drain model function:
         drain_model(1,  # Which draining model to use
                     strRoi,
                     '',  # Deprecated
-                    strPthPrf.format(lstMetaCon[idxMtaCn],
-                                     lstRoi[idxRoi],
-                                     lstHmsph[idxHmsph],
-                                     '{}'),
-                    strPthPrfOt.format(lstMetaCon[idxMtaCn],
-                                       lstRoi[idxRoi],
-                                       lstHmsph[idxHmsph],
-                                       {},
-                                       lstMdl[idxMdl]),
-                    strPthPltOt.format(lstMetaCon[idxMtaCn],
-                                       lstRoi[idxRoi],
-                                       lstRoi[idxRoi],
-                                       lstHmsph[idxHmsph],
-                                       lstNstCon[idxCon][0],
-                                       str(lstMdl[idxMdl])),
+                    pathNpzTmpIn,
+                    pathNpzTmpOt,
+                    pathPlotsTmp,
                     strFlTp,
                     varDpi,
                     strXlabel,
                     strYlabel,
-                    lstNstCon[idxCon],
-                    lstNstConLbl[idxCon],
+                    lstCon,
+                    lstCon,
                     varNumIt,
                     varCnfLw,
                     varCnfUp,
-                    varNseRndSd,
-                    varNseSys,
-                    lstFctr,
+                    None,  # varNseRndSd,
+                    None,  # varNseSys,
+                    None,  # lstFctr,
                     varAcrSubsYmin01,
                     varAcrSubsYmax01,
                     varAcrSubsYmin02,
                     varAcrSubsYmax02)
-

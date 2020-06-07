@@ -26,8 +26,7 @@ from py_depthsampling.project.project_main import project
 
 # Load/save existing projection from/to (ROI, condition, depth level label left
 # open):
-strPthNpy = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project/{}_{}_{}.npy'  #noqa
-# strPthNpy = '/home/john/Dropbox/PacMan_Depth_Data/Higher_Level_Analysis/project/{}_{}_{}_z.npy'  #noqa
+strPthNpy = '/media/ssd_dropbox/Dropbox/University/PhD/PacMan_Depth_Data/Higher_Level_Analysis/project/{}_{}_{}.npy'  #noqa
 
 # List of subject identifiers:
 lstSubIds = ['20171023',  # '20171109',
@@ -53,8 +52,7 @@ lstDpthLbl = ['allGM', 'deepGM', 'midGM', 'superficialGM']
 lstRoi = ['v1', 'v2', 'v3']
 
 # Output path & prefix for plots (ROI, condition, depth level label left open):
-strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/pe/{}_{}_{}'  #noqa
-# strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/z/{}_{}_{}'  #noqa
+strPthPltOt = '/media/ssd_dropbox/Dropbox/University/PhD/PacMan_Plots/project/pe_for_elife_production/{}_{}_{}'  #noqa
 
 # File type suffix for plot:
 strFlTp = '.svg'

@@ -20,13 +20,13 @@ from py_depthsampling.project.project_main import project
 
 # Load/save existing projection from/to (ROI, condition, depth level label, and
 # volume index left open):
-strPthNpy = '/home/john/PhD/PacMan_Depth_Data_Dropbox_Relieve/project_ert/{}_{}_{}_volume_{}.npy'  #noqa
+strPthNpy = '/media/ssd_dropbox/Dropbox/University/PhD/PacMan_Depth_Data/Higher_Level_Analysis/project_ert/{}_{}_{}_volume_{}.npy'  #noqa
 
 # Output path & prefix for plots (ROI, condition, depth level label left open):
-strPthPltOt = '/home/john/Dropbox/PacMan_Plots/project/ert/{}_{}_{}'  #noqa
+strPthPltOt = '/media/ssd_dropbox/Dropbox/University/PhD/PacMan_Plots/project/pe_for_elife_production/{}_{}_{}'  #noqa
 
 # Region of interest ('v1' or 'v2'):
-lstRoi = ['v1', 'v2', 'v3']
+lstRoi = ['v1']
 
 # List of subject identifiers:
 lstSubIds = ['20171023',  # '20171109',
@@ -38,10 +38,10 @@ lstSubIds = ['20171023',  # '20171109',
              '20180118']
 
 # Condition levels (used to complete file names):
-lstCon = ['pacman_dynamic', 'pacman_static', 'control_dynamic']
+lstCon = ['pacman_static']
 
 # Condition labels (for plot legend):
-lstConLbl = ['Pacman dynamic', 'Pacman static', 'Control dynamic']
+lstConLbl = ['Pacman static']
 
 # Number of cortical depths:
 varNumDpth = 11
@@ -60,9 +60,6 @@ varNumLne = 2
 varAcrSubsYmin = -0.04
 varAcrSubsYmax = 0.02
 
-# Number of labels on y-axis:
-varYnum = 4
-
 # Convert y-axis values to percent (i.e. divide label values by 100)?
 # lgcCnvPrct = False
 
@@ -76,8 +73,8 @@ lstDpth = [None]
 lstDpthLbl = ['allGM']
 
 # File type suffix for plot:
-# strFlTp = '.svg'
-strFlTp = '.png'
+strFlTp = '.svg'
+# strFlTp = '.png'
 
 # Figure scaling factor:
 varDpi = 80.0
@@ -139,8 +136,8 @@ varNumX = 200
 varNumY = 200
 
 # Minimum and maximum of colour bar:
-varMin = -0.05
-varMax = 0.05
+varMin = -0.02
+varMax = 0.02
 # -----------------------------------------------------------------------------
 
 
